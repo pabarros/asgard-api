@@ -1,54 +1,41 @@
 from unittest import TestCase
+import mock
+
+from hollowman.filters.request import RequestFilter
+
 
 class RequestFilterTest(TestCase):
 
-  def test_is_app_create(self):
+  def test_dispatch_one_filter(self):
     """
-    HTTP POST em /v2/apps/
+    Tests if the run() method of the Filter is called
     """
-    self.fail()
+    class FilterOne(object):
+        def run(self, r):
+            self.filter_called = True
+            return r
+    filter_one = FilterOne();
+    with mock.patch("hollowman.filters.request._filters", [filter_one]):
+        final_request = RequestFilter.dispatch(None)
+        self.assertIsNone(final_request)
+        self.assertTrue(filter_one.filter_called)
 
-  def test_is_app_update(self):
+  def test_dispatch_chain_return_value_of_one_filter_to_the_next(self):
     """
-    HTTP PUT em /v2/apps/
+    Tests if the return value of a filter is passed to the next one
     """
-    self.fail()
+    class FilterOne(object):
+        def run(self, r):
+            r['filter_one'] = True
+            return r
 
-  def test_is_app_delete(self):
-    self.fail()
-
-  def test_get_app_ids_v2_apps(self):
-    """
-     Retorna a lista de apps envilvidas em um request a /v2/apps/
-    """
-    self.fail()
-
-  def test_get_app_ids_v2_apps_appid(self):
-    """
-     Retorna a lista de apps envilvidas em um request a /v2/apps/<app-id>
-    """
-    self.fail()
-
-  def test_get_app_ids_v2_groups_1_depth(self):
-    """
-     Retorna a lista de apps envilvidas em um request a /v2/groups/
-    """
-    self.fail()
-
-  def test_get_app_ids_v2_groups_n_depth(self):
-    """
-     Retorna a lista de apps envilvidas em um request a /v2/groups/
-    """
-    self.fail()
-
-  def test_get_app_ids_v2_groups_groupid_1_depth(self):
-    """
-     Retorna a lista de apps envilvidas em um request a /v2/groups/<group-id>
-    """
-    self.fail()
-
-  def test_get_app_ids_v2_groups_groupid_n_depth(self):
-    """
-     Retorna a lista de apps envilvidas em um request a /v2/groups/<group-id>
-    """
-    self.fail()
+    class FilterTwo(object):
+        def run(self, r):
+            r['filter_two'] = True
+            return r
+    filters = [FilterOne(), FilterTwo()]
+    with mock.patch("hollowman.filters.request._filters", filters):
+        final_request = RequestFilter.dispatch({})
+        self.assertIsNotNone(final_request)
+        self.assertTrue(final_request['filter_one'])
+        self.assertTrue(final_request['filter_two'])
