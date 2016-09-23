@@ -1,0 +1,36 @@
+{
+      "id": "/group/",
+      "apps": [],
+      "groups": [
+        {
+          "id": "/group/tools",
+          "apps": [
+            {
+              "id": "/group/tools/appone",
+              "container": {
+                "docker": {
+                  "image": "alpine:3.4",
+                  "network": "HOST"
+                }
+              }
+             }
+           ],
+          "groups":[{
+            "id": "/group/tools/bla",
+            "apps": [
+                {
+                  "id": "/group/tools/bla/apptwo",
+                  "container": {
+                    "docker": {
+                      "image": "alpine:3.4",
+                      "network": "HOST"
+                    }
+                  }
+                 }
+            ]
+            
+          }
+          ]}
+        ]
+    }
+

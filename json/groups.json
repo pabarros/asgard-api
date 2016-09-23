@@ -1,0 +1,11 @@
+ {
+        "id": "/foo",
+        "groups": [
+          {
+            "id": "/foo/bla"
+          },
+          {
+            "id": "/foo/foo"  
+          }
+        ]
+}
