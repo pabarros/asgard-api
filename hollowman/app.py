@@ -2,6 +2,7 @@ from flask import Flask, url_for, redirect, Response, request
 
 from hollowman.conf import MARATHON_ENDPOINT
 from hollowman.upstream import replay_request
+from hollowman.filters.request import RequestFilter
 
 application = Flask(__name__)
 
@@ -23,7 +24,13 @@ def ui(path):
 @application.route('/v2/', defaults={'path': ''})
 @application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 def apiv2(path):
-    r = replay_request(request, MARATHON_ENDPOINT)
+    modded_request = request
+    try:
+        modded_request = RequestFilter.dispatch(request);
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+    r = replay_request(modded_request, MARATHON_ENDPOINT)
     h = dict(r.headers)
     h.pop("Transfer-Encoding", None)
     return Response(response=r.content, status=r.status_code, headers=h)
