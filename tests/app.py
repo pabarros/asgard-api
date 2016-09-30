@@ -18,4 +18,6 @@ class TestApp(TestCase):
       with application.test_client() as client:
         response = client.get("/v2/apps")
         self.assertTrue("Content-Encoding" not in response.headers)
+        response = client.get("/ui/main.css")
+        self.assertTrue("Content-Encoding" not in response.headers)
 
