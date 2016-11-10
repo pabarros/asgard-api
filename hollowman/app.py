@@ -1,6 +1,7 @@
 from flask import Flask, url_for, redirect, Response, request
+import requests
 
-from hollowman.conf import MARATHON_ENDPOINT
+from hollowman.conf import MARATHON_ENDPOINT, MARATHON_AUTH_HEADER
 from hollowman.upstream import replay_request
 from hollowman.filters.request import RequestFilter
 
@@ -34,4 +35,9 @@ def apiv2(path):
     h = dict(r.headers)
     h.pop("Transfer-Encoding", None)
     return Response(response=r.content, status=r.status_code, headers=h)
+
+@application.route("/healhcheck")
+def healhcheck():
+    r = requests.get(MARATHON_ENDPOINT, headers={"Authorization": MARATHON_AUTH_HEADER})
+    return Response(response="", status=r.status_code)
 
