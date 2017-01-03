@@ -43,6 +43,9 @@ class DNSRequestFilter(object):
 
     def patch_app_dns_parameters(self, data):
         if self.is_docker_app(data):
+            if not 'parameters' in data['container']['docker']:
+                data['container']['docker']['parameters'] = []
+
             params = dict((param['key'], param)for param in data['container']['docker']['parameters'])
             params['dns'] = {"key": "dns", "value": "172.17.0.1"}
             data['container']['docker']['parameters'] = params.values()

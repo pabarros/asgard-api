@@ -46,8 +46,8 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
-        self.assertFalse('docker' in modiified_request.get_json()['container'])
+        modified_request = self.filter.run(request)
+        self.assertFalse('docker' in modified_request.get_json()['container'])
 
     def test_add_dns_enty_when_app_has_no_docker_parameters(self):
         data_ = {
@@ -59,14 +59,14 @@ class DNSRequestFilterTest(TestCase):
         }
         request = RequestStub(data=data_)
         dnsFilter = DNSRequestFilter()
-        modiified_request = dnsFilter.run(request)
-        self.assertIsNotNone(modiified_request)
-        self.assertTrue('container' in modiified_request.get_json())
-        self.assertTrue('docker' in modiified_request.get_json()['container'])
-        self.assertTrue('parameters' in modiified_request.get_json()[
+        modified_request = dnsFilter.run(request)
+        self.assertIsNotNone(modified_request)
+        self.assertTrue('container' in modified_request.get_json())
+        self.assertTrue('docker' in modified_request.get_json()['container'])
+        self.assertTrue('parameters' in modified_request.get_json()[
                         'container']['docker'])
 
-        docker_parameters = modiified_request.get_json()['container'][
+        docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
 
@@ -178,8 +178,8 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
-        docker_parameters = modiified_request.get_json()['container'][
+        modified_request = self.filter.run(request)
+        docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
 
@@ -212,9 +212,9 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
+        modified_request = self.filter.run(request)
 
-        docker_parameters = modiified_request.get_json()['container'][
+        docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
@@ -245,9 +245,9 @@ class DNSRequestFilterTest(TestCase):
             },
         }
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
+        modified_request = self.filter.run(request)
 
-        docker_parameters = modiified_request.get_json()['container'][
+        docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
@@ -295,15 +295,15 @@ class DNSRequestFilterTest(TestCase):
             }
         ]
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
+        modified_request = self.filter.run(request)
 
-        docker_parameters = modiified_request.get_json()[0]['container'][
+        docker_parameters = modified_request.get_json()[0]['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
         self.assertEqual("172.17.0.1", docker_parameters[0]['value'])
 
-        docker_parameters = modiified_request.get_json()[1]['container'][
+        docker_parameters = modified_request.get_json()[1]['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
@@ -333,15 +333,15 @@ class DNSRequestFilterTest(TestCase):
             },
         ]
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
+        modified_request = self.filter.run(request)
 
-        docker_parameters = modiified_request.get_json()[0]['container'][
+        docker_parameters = modified_request.get_json()[0]['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
         self.assertEqual("172.17.0.1", docker_parameters[0]['value'])
 
-        docker_parameters = modiified_request.get_json()[1]['container'][
+        docker_parameters = modified_request.get_json()[1]['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
@@ -396,15 +396,15 @@ class DNSRequestFilterTest(TestCase):
             ],
         }
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
+        modified_request = self.filter.run(request)
 
-        docker_parameters = modiified_request.get_json()['apps'][0]['container'][
+        docker_parameters = modified_request.get_json()['apps'][0]['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
         self.assertEqual("172.17.0.1", docker_parameters[0]['value'])
 
-        docker_parameters = modiified_request.get_json()['apps'][1]['container'][
+        docker_parameters = modified_request.get_json()['apps'][1]['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
@@ -471,16 +471,41 @@ class DNSRequestFilterTest(TestCase):
         }
 
         request = RequestStub(data=data_)
-        modiified_request = self.filter.run(request)
+        modified_request = self.filter.run(request)
 
-        docker_parameters = modiified_request.get_json()['groups'][0]['apps'][0][
+        docker_parameters = modified_request.get_json()['groups'][0]['apps'][0][
             'container']['docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
         self.assertEqual("172.17.0.1", docker_parameters[0]['value'])
 
-        docker_parameters = modiified_request.get_json()['groups'][0]['groups'][0][
+        docker_parameters = modified_request.get_json()['groups'][0]['groups'][0][
             'apps'][0]['container']['docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
         self.assertEqual("dns", docker_parameters[0]['key'])
         self.assertEqual("172.17.0.1", docker_parameters[0]['value'])
+
+    def test_allow_other_parameters_among_with_dns(self):
+        data = [
+            {
+                "id": "/sleep1",
+                "cmd": "sleep 40000",
+                "instances": 0,
+                "container": {
+                    "docker": {
+                        "image": "alpine:3.4",
+                        "parameters" : [
+                            {
+                                "key": "entrypoint",
+                                "value": "/my_custom_entrypoint.sh"
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+        request = RequestStub(data=data)
+        json_filtered_request = self.filter.run(request).get_json()
+        params_dict = dict((param['key'], param) for param in json_filtered_request[0]['container']['docker']['parameters'])
+        self.assertEqual(len(json_filtered_request[0]['container']['docker']['parameters']), 2)
+        self.assertDictEqual(params_dict['dns'], {"key": "dns", "value": "172.17.0.1"})
