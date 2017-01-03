@@ -11,6 +11,7 @@ application = Flask(__name__)
 def index():
     return Response(status=301, headers={"Location": url_for("ui")})
 
+
 @application.route('/ui', defaults={'path': '/'})
 @application.route('/ui/', defaults={'path': ''})
 @application.route('/ui/<path:path>')
@@ -20,13 +21,14 @@ def ui(path):
     h.pop("Transfer-Encoding", None)
     return Response(response=r.content, status=r.status_code, headers=h)
 
+
 @application.route('/v2', defaults={'path': '/'})
 @application.route('/v2/', defaults={'path': ''})
 @application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 def apiv2(path):
     modded_request = request
     try:
-        modded_request = RequestFilter.dispatch(request);
+        modded_request = RequestFilter.dispatch(request)
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -34,4 +36,3 @@ def apiv2(path):
     h = dict(r.headers)
     h.pop("Transfer-Encoding", None)
     return Response(response=r.content, status=r.status_code, headers=h)
-
