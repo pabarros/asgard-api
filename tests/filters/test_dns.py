@@ -3,7 +3,7 @@
 import json
 from unittest import TestCase
 from hollowman.filters.dns import DNSRequestFilter
-
+import unittest
 
 class RequestStub(object):
 
@@ -347,15 +347,19 @@ class DNSRequestFilterTest(TestCase):
         self.assertEqual("dns", docker_parameters[0]['key'])
         self.assertEqual("172.17.0.1", docker_parameters[0]['value'])
 
+    @unittest.skip("Ainda nao implementado")
     def test_add_consul_instances_dns_entry_single_app(self):
         self.fail()
 
+    @unittest.skip("Ainda nao implementado")
     def test_add_consul_instances_dns_when_updating_single_app(self):
         self.fail()
 
+    @unittest.skip("Ainda nao implementado")
     def test_add_consul_instances_dns_entry_multi_app(self):
         self.fail()
 
+    @unittest.skip("Ainda nao implementado")
     def test_add_consul_instances_dns_when_updating_multi_app(self):
         self.fail()
 
