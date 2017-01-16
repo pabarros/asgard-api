@@ -3,17 +3,8 @@
 import json
 from unittest import TestCase
 from hollowman.filters.dns import DNSRequestFilter
+from tests import RequestStub
 import unittest
-
-class RequestStub(object):
-
-    def __init__(self, data=None, headers=None, is_json=True):
-        self.data = json.dumps(data)
-        self.headers = headers
-        self.is_json = is_json
-
-    def get_json(self):
-        return json.loads(self.data)
 
 
 class DNSRequestFilterTest(TestCase):
