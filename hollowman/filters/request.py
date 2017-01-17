@@ -2,10 +2,14 @@
 
 from hollowman.filters.dns import DNSRequestFilter
 from hollowman.filters.trim import TrimEnvVarsRequestFilter
+from hollowman.filters.default_scale import DefaultScaleRequestFilter
 
 
-_filters = [DNSRequestFilter(), TrimEnvVarsRequestFilter()]
-
+_filters = [
+    DNSRequestFilter(),
+    TrimEnvVarsRequestFilter(),
+    DefaultScaleRequestFilter(),
+]
 
 class RequestFilter(object):
 
