@@ -1,9 +1,10 @@
 # encoding: utf-8
 
 from hollowman.filters.dns import DNSRequestFilter
+from hollowman.filters.trim import TrimEnvVarsRequestFilter
 
 
-_filters = [DNSRequestFilter()]
+_filters = [DNSRequestFilter(), TrimEnvVarsRequestFilter()]
 
 
 class RequestFilter(object):
