@@ -9,7 +9,7 @@ class DefaultScaleRequestFilter(BaseFilter):
     def run(self, request):
         data = request.get_json()
 
-        if request.method in ['PUT','POST'] and self.is_single_app(request):
+        if request.method in ['PUT','POST'] and self.is_single_app(data):
             if 'instances' in data and data['instances'] != 0:
                 data['labels'].update({
                     'default_scale': self.get_current_scale(self.get_app_id(request.path))

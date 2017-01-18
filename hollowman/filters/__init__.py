@@ -1,27 +1,23 @@
 class BaseFilter(object):
 
-    def is_single_app(self, request):
-        data = request.get_json()
-        has_groups = 'groups' in data
-        has_apps = 'apps' in data
-        is_dict = isinstance(data, dict)
+    def is_single_app(self, body):
+        has_groups = 'groups' in body
+        has_apps = 'apps' in body
+        is_dict = isinstance(body, dict)
         return is_dict and not has_groups and not has_apps
 
-    def is_multi_app(self, request):
-        data = request.get_json()
-        is_list = isinstance(data, list)
-        return is_list and not self.is_single_app(data)
+    def is_multi_app(self, body):
+        is_list = isinstance(body, list)
+        return is_list and not self.is_single_app(body)
 
-    def is_docker_app(self, request):
-        data = request.get_json()
-        has_container = 'container' in data
-        has_docker = has_container and ('docker' in data['container'])
+    def is_docker_app(self, body):
+        has_container = 'container' in body
+        has_docker = has_container and ('docker' in body['container'])
         return has_docker
 
-    def is_group(self, request):
-        data = request.get_json()
-        has_groups = 'groups' in data
-        has_apps = 'apps' in data
+    def is_group(self, body):
+        has_groups = 'groups' in body
+        has_apps = 'apps' in body
         return has_groups or has_apps
 
     def get_apps_from_group(self, group):

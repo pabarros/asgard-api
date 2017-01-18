@@ -9,4 +9,4 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 * MARATHON_ENDPOINT [required] Where to connect to find marathon api
 
 ## Running tests
-`py.test --cov=hollowman -v`
+`py.test --cov=hollowman --cov-report term-missing -v -s`
