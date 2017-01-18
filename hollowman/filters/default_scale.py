@@ -2,19 +2,32 @@
 
 import json
 from marathon import MarathonClient
+from hollowman.filters import BaseFilter
+from hollowman.conf import MARATHON_ENDPOINT, MARATHON_CREDENTIALS
 
-class DefaultScaleRequestFilter(object):
+class DefaultScaleRequestFilter(BaseFilter):
     def run(self, request):
         data = request.get_json()
 
-        #make sure we are using the "suspend button"
-        if 'instances' in data and data['instances'] == 0 and len(data) == 1:
-            data['labels'].merge({
-                'default_scale': self.get_last_scale(get_app_id(request))
-            })
+        if request.method in ['PUT','POST'] and self.is_single_app(request):
+            if 'instances' in data and data['instances'] != 0:
+                data['labels'].merge({
+                    'default_scale': self.get_current_scale(get_app_id(request.path))
+                })
 
-    def get_app_id(self, request):
-        return '/' + url.split('//')[2]
+        request.data = json.dumps(data)
 
-    def get_last_scale(self, app_id):
-        return 1
+        return request
+
+    def get_app_id(self, request_path):
+        return '/' + request_path.split('//')[-1]
+
+    def get_current_scale(self, app_id):
+        user, passw = MARATHON_CREDENTIALS.split(':')
+
+        client = MarathonClient(
+            servers=[MARATHON_ENDPOINT],
+            username=user,
+            password=passw
+        )
+        return client.get_app(app_id).instances

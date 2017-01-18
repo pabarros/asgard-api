@@ -1,18 +1,17 @@
 {
-"id": "/group/tools2",
-"apps": [
-
-{"id":"/group/tools2/outraapp",
-"cmd":"sleep 10",
- "container":{
-   "docker":{
-     "image":"alpine:3.4",
-     "network":"BRIDGE",
-     "forcePullImage":true
-   },
- "type":"DOCKER"
- }
+    "id": "/group/tools2",
+    "apps": [
+        {
+            "id": "/group/tools2/outraapp",
+            "cmd": "sleep 10",
+            "container": {
+                "docker": {
+                    "image": "alpine:3.4",
+                    "network": "BRIDGE",
+                    "forcePullImage": true
+                },
+                "type": "DOCKER"
+            }
+        }
+    ]
 }
-]
-}
-
