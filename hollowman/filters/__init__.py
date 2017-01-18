@@ -28,3 +28,6 @@ class BaseFilter(object):
         if 'apps' in group:
             return group['apps']
         return []
+
+    def get_app_id(self, request_path):
+        return '/' + request_path.split('//')[-1]

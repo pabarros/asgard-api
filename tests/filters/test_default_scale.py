@@ -6,34 +6,32 @@ from os import getcwd
 from json import loads
 
 
-class InstanceStub(object):
-    instances = 2
-
 class DefaultScaleRequestFilterTest(TestCase):
 
     def setUp(self):
         self.filter = DefaultScaleRequestFilter()
         self.marathon_client_patch = mock.patch('hollowman.filters.default_scale.MarathonClient')
-        self.marathon_client_mock = self.marathon_client_patch.start()
 
-    def tearDowns(self):
+        self.marathon_client_mock = self.marathon_client_patch.start()
+        self.marathon_client_mock.return_value.get_app.return_value.instances = 2
+
+    def tearDown(self):
         self.marathon_client_patch.stop()
 
-    # def test_run(self):
-    #     _data = loads(open(getcwd()+'/../json/single_full_app.json').read())
-    #     request = RequestStub(
-    #         data=_data,
-    #         method='POST',
-    #         path='/v2/apps//foo'
-    #     )
-    #
-    #     result_request = self.filter.run(request)
-    #
-    #     self.assertTrue('labels' in result_request.get_json()['labels'])
-    #     self.assertTrue('labels' in result_request.get_json())
+    def test_run(self):
+        _data = loads(open(getcwd()+'/../json/single_full_app.json').read())
+        request = RequestStub(
+            data=_data,
+            method='POST',
+            path='/v2/apps//foo'
+        )
+
+        result_request = self.filter.run(request)
+
+        self.assertTrue('labels' in result_request.get_json())
+        self.assertEqual(2, result_request.get_json()['labels']['default_scale'])
 
     def test_get_current_scale(self):
-        self.marathon_client_mock.return_value.get_app.return_value = InstanceStub()
         current_scale = self.filter.get_current_scale('/foo')
         self.assertEqual(current_scale, 2)
 
