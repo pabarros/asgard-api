@@ -26,7 +26,10 @@ class TestApp(TestCase):
                 self.assertTrue("Content-Encoding" not in response.headers)
 
     def test_index_path(self):
-        pass
+        response = application.test_client().open('/')
+
+        self.assertEqual(response.status_code, 301)
+        self.assertTrue('Location' in response.headers)
 
     def test_ui_path(self):
         Response = namedtuple(
@@ -50,9 +53,18 @@ class TestApp(TestCase):
             response = application.test_client().open('/ui/foo/bar')
             self.assertEqual(response.status_code, 301)
 
-    def test_apiv2_path(self):
-        pass
+    # How can we test this ?
+    # def test_apiv2_path(self):
+    #     pass
 
     def test_fail_healthcheck(self):
         response = application.test_client().open('/healthcheck')
         self.assertTrue(response.status_code >= 400)
+
+    def test_200_healthcheck(self):
+        Response = namedtuple('Response', ["status_code"])
+
+        with patch('hollowman.app.requests.get') as get_mock:
+            get_mock.return_value = Response(status_code=200)
+            response = application.test_client().open('/healthcheck')
+            self.assertEqual(response.status_code, 200)
