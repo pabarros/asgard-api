@@ -19,7 +19,7 @@ class DefaultScaleRequestFilterTest(TestCase):
         self.marathon_client_patch.stop()
 
     def test_run(self):
-        _data = loads(open(getcwd()+'/../json/single_full_app.json').read())
+        _data = loads(open('json/single_full_app.json').read())
         request = RequestStub(
             data=_data,
             method='POST',
