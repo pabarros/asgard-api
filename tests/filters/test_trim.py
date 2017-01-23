@@ -1,6 +1,6 @@
 #encoding: utf-8
 
-from hollowman.filters.trim import TrimEnvVarsRequestFilter
+from hollowman.filters.trim import TrimRequestFilter
 from unittest import TestCase
 from tests import RequestStub
 import json
@@ -9,7 +9,7 @@ import json
 class TrimEnvvarsTest(TestCase):
 
     def setUp(self):
-        self.filter = TrimEnvVarsRequestFilter()
+        self.filter = TrimRequestFilter()
 
     def test_absent_env_key(self):
         data_ = {

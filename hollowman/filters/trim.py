@@ -2,7 +2,7 @@
 
 import json
 
-class TrimEnvVarsRequestFilter(object):
+class TrimRequestFilter(object):
     def run(self, request):
         data = request.get_json()
         if 'env' in data:
