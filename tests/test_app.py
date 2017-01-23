@@ -1,6 +1,6 @@
 
 from mock import patch
-from unittest import TestCase
+from unittest import TestCase, skip
 import hollowman.upstream
 from hollowman.app import application
 from collections import namedtuple
@@ -53,13 +53,17 @@ class TestApp(TestCase):
             response = application.test_client().open('/ui/foo/bar')
             self.assertEqual(response.status_code, 301)
 
-    # How can we test this ?
-    # def test_apiv2_path(self):
-    #     pass
+    @skip('Need to find a way to test this. Any ideas ?')
+    def test_apiv2_path(self):
+        pass
 
     def test_fail_healthcheck(self):
-        response = application.test_client().open('/healthcheck')
-        self.assertTrue(response.status_code >= 400)
+        Response = namedtuple('Response', ["status_code"])
+
+        with patch('hollowman.app.requests.get') as get_mock:
+            get_mock.return_value = Response(status_code=404)
+            response = application.test_client().open('/healthcheck')
+            self.assertEqual(response.status_code, 404)
 
     def test_200_healthcheck(self):
         Response = namedtuple('Response', ["status_code"])

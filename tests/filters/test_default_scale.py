@@ -30,6 +30,8 @@ class DefaultScaleRequestFilterTest(TestCase):
 
         self.assertTrue('labels' in result_request.get_json())
         self.assertEqual(2, result_request.get_json()['labels']['default_scale'])
+        self.assertEqual("zeus", result_request.get_json()['labels']['owner'])
+        self.assertEqual("Away from olympus", result_request.get_json()['labels']['note'])
 
     def test_get_current_scale(self):
         current_scale = self.filter.get_current_scale('/foo')
