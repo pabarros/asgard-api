@@ -1,13 +1,13 @@
 # encoding: utf-8
 
 from hollowman.filters.dns import DNSRequestFilter
-from hollowman.filters.trim import TrimEnvVarsRequestFilter
+from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.default_scale import DefaultScaleRequestFilter
 
 
 _filters = [
     DNSRequestFilter(),
-    TrimEnvVarsRequestFilter(),
+    TrimRequestFilter(),
     DefaultScaleRequestFilter(),
 ]
 
