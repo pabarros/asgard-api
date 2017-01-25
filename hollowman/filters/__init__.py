@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 class BaseFilter(object):
 
     def __init__(self, ctx):
@@ -17,6 +19,17 @@ class BaseFilter(object):
         has_container = 'container' in body
         has_docker = has_container and ('docker' in body['container'])
         return has_docker
+
+    def is_request_on_app(self, request_path):
+        """
+        Verifica se o path corresponde a uma app específica
+        ex: /v2/apps/<app-id> retorna True
+        /v2/grups deve retornar False
+        """
+        remain = request_path.replace("/v2/apps/", "")
+        return "v2/apps" in request_path\
+                and len(remain) > 0\
+                and request_path != "/v2/apps"
 
     def is_group(self, body):
         has_groups = 'groups' in body

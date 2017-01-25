@@ -95,10 +95,6 @@ class DefaultScaleRequestFilterTest(TestCase):
         self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
 
     def test_get_current_scale(self):
-
         current_scale = self.filter.get_current_scale('/foo')
         self.assertEqual(current_scale, 2)
 
-    def test_get_app_id(self):
-        self.assertEqual('/foo', self.filter.get_app_id('/v2/apps//foo'))
-        self.assertEqual('/foo/taz/bar', self.filter.get_app_id('/v2/apps//foo/taz/bar'))
