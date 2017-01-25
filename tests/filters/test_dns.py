@@ -1,11 +1,12 @@
 # encoding: utf-8
 
 import json
-from unittest import TestCase
+from unittest import TestCase, skip
 from hollowman.filters.dns import DNSRequestFilter
 from tests import RequestStub
 import unittest
 from hollowman.filters.request import _ctx
+import mock
 
 
 class DNSRequestFilterTest(TestCase):
@@ -37,7 +38,7 @@ class DNSRequestFilterTest(TestCase):
                 "type": "MESOS"
             }
         }
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/apps/", data=data_)
         modified_request = self.filter.run(request)
         self.assertFalse('docker' in modified_request.get_json()['container'])
 
@@ -49,7 +50,7 @@ class DNSRequestFilterTest(TestCase):
                 }
             }
         }
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/apps/", data=data_)
         modified_request = self.filter.run(request)
         self.assertIsNotNone(modified_request)
         self.assertTrue('container' in modified_request.get_json())
@@ -80,7 +81,7 @@ class DNSRequestFilterTest(TestCase):
                   },
             }
         }
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/apps/", data=data_)
         modified_request = self.filter.run(request)
         docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
@@ -95,6 +96,7 @@ class DNSRequestFilterTest(TestCase):
         Check if the `container` key is present on the body.
         """
         data_ = {
+            "id": "/foo/bar",
             "env": {
                 "PASSWD": "secre_"
             },
@@ -114,7 +116,7 @@ class DNSRequestFilterTest(TestCase):
                 }
             }
         }
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/apps//foo/bar", data=data_)
         modified_request = self.filter.run(request)
 
         docker_parameters = modified_request.get_json()['container'][
@@ -147,7 +149,7 @@ class DNSRequestFilterTest(TestCase):
                 }
             },
         }
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/apps/", data=data_)
         modified_request = self.filter.run(request)
 
         docker_parameters = modified_request.get_json()['container'][
@@ -197,7 +199,7 @@ class DNSRequestFilterTest(TestCase):
                 },
             }
         ]
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/apps/", data=data_)
         modified_request = self.filter.run(request)
 
         docker_parameters = modified_request.get_json()[0]['container'][
@@ -235,7 +237,7 @@ class DNSRequestFilterTest(TestCase):
                 },
             },
         ]
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/apps/", data=data_)
         modified_request = self.filter.run(request)
 
         docker_parameters = modified_request.get_json()[0]['container'][
@@ -302,7 +304,7 @@ class DNSRequestFilterTest(TestCase):
 
             ],
         }
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/groups/", data=data_)
         modified_request = self.filter.run(request)
 
         docker_parameters = modified_request.get_json()['apps'][0]['container'][
@@ -377,7 +379,7 @@ class DNSRequestFilterTest(TestCase):
             ]
         }
 
-        request = RequestStub(data=data_)
+        request = RequestStub(path="/v2/groups/", data=data_)
         modified_request = self.filter.run(request)
 
         docker_parameters = modified_request.get_json()['groups'][0]['apps'][0][
@@ -411,8 +413,100 @@ class DNSRequestFilterTest(TestCase):
                 }
             }
         ]
-        request = RequestStub(data=data)
+        request = RequestStub(path="/v2/apps/", data=data)
         json_filtered_request = self.filter.run(request).get_json()
         params_dict = dict((param['key'], param) for param in json_filtered_request[0]['container']['docker']['parameters'])
         self.assertEqual(len(json_filtered_request[0]['container']['docker']['parameters']), 2)
         self.assertDictEqual(params_dict['dns'], {"key": "dns", "value": "172.17.0.1"})
+
+    def test_add_dns_when_patching_only_envvars_app_without_envs(self):
+        """
+        Temos que pegar PUT em /v2/apps/<app-name> contendo apenas a modificação das envs.
+        """
+        original_app = {
+                u"id": u"/app/foo",
+                u"cmd": u"sleep 40000",
+                u"instances": 0,
+                u"container": {
+                    u"docker": {
+                        u"image": u"alpine:3.4",
+                        u"forcePullImage": False,
+                        u"network": u"HOST",
+                        u"privileged": False,
+                    },
+                    u"type": u"DOCKER",
+                },
+        }
+        data_ = {
+            u"env": {
+                u"MY_ENV": u"abc",
+                u"OTHER_ENV": u"123",
+            }
+        }
+
+        modified_app = original_app.copy()
+        modified_app[u'container'][u'docker'][u'parameters'] = [
+                    {
+                        u"key": u"dns",
+                        u"value": u"172.17.0.1"
+                    }
+        ]
+        modified_app.update(data_)
+
+        from marathon.models.app import MarathonApp
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            request = RequestStub(path="/v2/apps//app/foo", data=data_, method="PUT")
+            #import ipdb; ipdb.set_trace()
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**original_app)
+
+            filtered_request = self.filter.run(request)
+            ctx_mock.marathon_client.get_app.assert_called_with("/app/foo")
+            self.assertDictEqual(modified_app, filtered_request.get_json())
+
+    def test_add_dns_when_patching_only_envvars_app_with_envs(self):
+        """
+        Temos que pegar PUT em /v2/apps/<app-name> contendo apenas a modificação das envs.
+        """
+        original_app = {
+                u"id": u"/app/foo",
+                u"cmd": u"sleep 40000",
+                u"instances": 0,
+                u"container": {
+                    u"docker": {
+                        u"image": u"alpine:3.4",
+                        u"forcePullImage": False,
+                        u"network": u"HOST",
+                        u"privileged": False,
+                    },
+                    u"type": u"DOCKER",
+                },
+                u"env": {
+                    "HAS_ENV": "abc",
+                    "MY_ENV": "other-value",
+                }
+        }
+        data_ = {
+            u"env": {
+                u"MY_ENV": u"abc",
+                u"OTHER_ENV": u"123",
+            }
+        }
+
+        modified_app = original_app.copy()
+        modified_app[u'container'][u'docker'][u'parameters'] = [
+                    {
+                        u"key": u"dns",
+                        u"value": u"172.17.0.1"
+                    }
+        ]
+        modified_app['env'].update(data_['env'])
+
+        from marathon.models.app import MarathonApp
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            request = RequestStub(path="/v2/apps//app/foo", data=data_, method="PUT")
+
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**original_app)
+
+            filtered_request = self.filter.run(request)
+            ctx_mock.marathon_client.get_app.assert_called_with("/app/foo")
+            self.assertDictEqual(modified_app, filtered_request.get_json())
