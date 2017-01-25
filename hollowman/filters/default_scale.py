@@ -3,9 +3,13 @@
 import json
 from marathon import MarathonClient
 from hollowman.filters import BaseFilter
-from hollowman.conf import MARATHON_ENDPOINT, MARATHON_CREDENTIALS
+
 
 class DefaultScaleRequestFilter(BaseFilter):
+
+    def __init__(self, ctx):
+        super(DefaultScaleRequestFilter, self).__init__(ctx)
+
     def run(self, request):
         data = request.get_json()
         if request.method in ['PUT','POST'] and self.is_single_app(data):
@@ -22,11 +26,4 @@ class DefaultScaleRequestFilter(BaseFilter):
         return request
 
     def get_current_scale(self, app_id):
-        user, passw = MARATHON_CREDENTIALS.split(':')
-
-        client = MarathonClient(
-            servers=[MARATHON_ENDPOINT],
-            username=user,
-            password=passw
-        )
-        return client.get_app(app_id).instances
+        return self.ctx.marathon_client.get_app(app_id).instances

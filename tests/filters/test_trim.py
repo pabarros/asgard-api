@@ -4,12 +4,15 @@ from hollowman.filters.trim import TrimRequestFilter
 from unittest import TestCase
 from tests import RequestStub
 import json
+from hollowman.filters import Context
+from hollowman.conf import marathon_client
+from hollowman.filters.request import _ctx
 
 
 class TrimEnvvarsTest(TestCase):
 
     def setUp(self):
-        self.filter = TrimRequestFilter()
+        self.filter = TrimRequestFilter(_ctx)
 
     def test_absent_env_key(self):
         data_ = {

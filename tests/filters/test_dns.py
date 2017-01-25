@@ -5,12 +5,13 @@ from unittest import TestCase
 from hollowman.filters.dns import DNSRequestFilter
 from tests import RequestStub
 import unittest
+from hollowman.filters.request import _ctx
 
 
 class DNSRequestFilterTest(TestCase):
 
     def setUp(self):
-        self.filter = DNSRequestFilter()
+        self.filter = DNSRequestFilter(_ctx)
 
     def test_do_not_add_dns_entry_if_is_not_a_docker_app(self):
         """
@@ -49,8 +50,7 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        dnsFilter = DNSRequestFilter()
-        modified_request = dnsFilter.run(request)
+        modified_request = self.filter.run(request)
         self.assertIsNotNone(modified_request)
         self.assertTrue('container' in modified_request.get_json())
         self.assertTrue('docker' in modified_request.get_json()['container'])

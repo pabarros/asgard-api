@@ -1,8 +1,13 @@
 #encoding: utf-8
 
 import json
+from hollowman.filters import BaseFilter
 
-class TrimRequestFilter(object):
+class TrimRequestFilter(BaseFilter):
+
+    def __init__(self, ctx):
+        super(TrimRequestFilter, self).__init__(ctx)
+
     def run(self, request):
         data = request.get_json()
         _new_envs = {}

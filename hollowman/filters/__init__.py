@@ -1,5 +1,8 @@
 class BaseFilter(object):
 
+    def __init__(self, ctx):
+        self.ctx = ctx
+
     def is_single_app(self, body):
         has_groups = 'groups' in body
         has_apps = 'apps' in body
@@ -27,3 +30,9 @@ class BaseFilter(object):
 
     def get_app_id(self, request_path):
         return '/' + request_path.split('//')[-1]
+
+
+class Context(object):
+
+    def __init__(self, marathon_client):
+        self.marathon_client = marathon_client

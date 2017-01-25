@@ -4,6 +4,9 @@ from hollowman.filters import BaseFilter
 
 class DNSRequestFilter(BaseFilter):
 
+    def __init__(self, ctx):
+        super(DNSRequestFilter, self).__init__(ctx)
+
     def run(self, request):
         if request.is_json and request.data:
             body = request.get_json()

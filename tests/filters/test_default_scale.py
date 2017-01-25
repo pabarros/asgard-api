@@ -7,16 +7,20 @@ from tests import RequestStub
 from os import getcwd
 from json import loads
 
+from hollowman.filters.default_scale import DefaultScaleRequestFilter
+from hollowman import conf
+from hollowman.filters import Context
 
 class DefaultScaleRequestFilterTest(TestCase):
 
     def setUp(self):
-        self.filter = DefaultScaleRequestFilter()
-        self.marathon_client_patch = mock.patch('hollowman.filters.default_scale.MarathonClient')
+        self.marathon_client_patch = mock.patch.object(conf, 'marathon_client')
 
         self.marathon_client_mock = self.marathon_client_patch.start()
         full_app_data = loads(open('json/single_full_app.json').read())
         self.marathon_client_mock.return_value.get_app.return_value = MarathonApp(**full_app_data)
+        self.marathon_client_mock.get_app.return_value.instances = 2
+        self.filter = DefaultScaleRequestFilter(Context(self.marathon_client_mock))
 
     def tearDown(self):
         self.marathon_client_patch.stop()
@@ -91,6 +95,7 @@ class DefaultScaleRequestFilterTest(TestCase):
         self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
 
     def test_get_current_scale(self):
+
         current_scale = self.filter.get_current_scale('/foo')
         self.assertEqual(current_scale, 2)
 
