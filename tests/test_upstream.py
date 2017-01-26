@@ -5,6 +5,7 @@ from mock import Mock, patch
 import mock
 import flask
 import requests
+import json
 
 from hollowman.app import application
 from hollowman.upstream import replay_request
@@ -63,3 +64,35 @@ class UpstreamTest(TestCase):
             called_headers = mock_get.call_args[1]['headers']
             self.assertEquals(called_headers['X-Header-A'], "42")
             self.assertEquals(called_headers['X-Header-B'], "10")
+
+    @patch.object(requests, 'put')
+    def test_remove_some_key_before_replay_put_request(self, mock_put):
+        """
+        We must remove these keys:
+            * version
+            * fetch
+        When GETting an app, Marathon returns a JSON with these two keys, bus refuses to
+        accept a PUT/POST on this same app if these keys are present.
+        """
+        with application.test_request_context("/v2/apps", method="PUT", data='{"id": "/abc", "version": "0", "fetch": ["a", "b"]}'):
+            replay_request(flask.request, "http://marathon:8080")
+            self.assertTrue(mock_put.called)
+            called_data_json = json.loads(mock_put.call_args[1]['data'])
+            self.assertFalse('version' in called_data_json)
+            self.assertFalse('fetch' in called_data_json)
+
+    @patch.object(requests, 'post')
+    def test_remove_some_key_before_replay_post_request(self, mock_post):
+        """
+        We must remove these keys:
+            * version
+            * fetch
+        When GETting an app, Marathon returns a JSON with these two keys, bus refuses to
+        accept a PUT/POST on this same app if these keys are present.
+        """
+        with application.test_request_context("/v2/apps", method="POST", data='{"id": "/abc", "version": "0", "fetch": ["a", "b"]}'):
+            replay_request(flask.request, "http://marathon:8080")
+            self.assertTrue(mock_post.called)
+            called_data_json = json.loads(mock_post.call_args[1]['data'])
+            self.assertFalse('version' in called_data_json)
+            self.assertFalse('fetch' in called_data_json)
