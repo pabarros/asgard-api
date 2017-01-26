@@ -9,18 +9,19 @@ class TrimRequestFilter(BaseFilter):
         super(TrimRequestFilter, self).__init__(ctx)
 
     def run(self, request):
-        data = request.get_json()
-        _new_envs = {}
-        _new_labels = {}
-        if 'env' in data:
-            for key, value in data['env'].iteritems():
-                _new_envs[key.strip()] = value.strip()
-            data['env'] = _new_envs
+        if request.is_json and request.data:
+            data = json.loads(request.data)
+            _new_envs = {}
+            _new_labels = {}
+            if 'env' in data:
+                for key, value in data['env'].iteritems():
+                    _new_envs[key.strip()] = value.strip()
+                data['env'] = _new_envs
 
-        if 'labels' in data:
-            for key, value in data['labels'].iteritems():
-                _new_labels[key.strip()] = value.strip()
-            data['labels'] = _new_labels
+            if 'labels' in data:
+                for key, value in data['labels'].iteritems():
+                    _new_labels[key.strip()] = value.strip()
+                data['labels'] = _new_labels
 
-        request.data = json.dumps(data)
+            request.data = json.dumps(data)
         return request

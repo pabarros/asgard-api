@@ -10,7 +10,7 @@ class DNSRequestFilter(BaseFilter):
 
     def run(self, request):
         if request.is_json and request.data:
-            body = request.get_json()
+            body = json.loads(request.data)
 
             if self.is_request_on_app(request.path) and self._payloas_has_only_env(request, body):
                 # Só temos as envs nesse payload, vamos buscar a app original e mesclar com o payload
@@ -28,6 +28,7 @@ class DNSRequestFilter(BaseFilter):
                     self.patch_app_dns_parameters(app)
             if self.is_group(body):
                 self.patch_apps_from_group(body)
+
             request.data = json.dumps(body)
         return request
 
