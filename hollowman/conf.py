@@ -12,4 +12,4 @@ MARATHON_AUTH_HEADER = "Basic {}".format(
     base64.b64encode(MARATHON_CREDENTIALS))
 
 user, passw = MARATHON_CREDENTIALS.split(':')
-marathon_client = MarathonClient(user, passw)
+marathon_client = MarathonClient([MARATHON_ENDPOINT], username=user, password=passw)
