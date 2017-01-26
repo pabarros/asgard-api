@@ -8,11 +8,13 @@ from hollowman.conf import MARATHON_ENDPOINT, MARATHON_CREDENTIALS
 class DefaultScaleRequestFilter(BaseFilter):
     def run(self, request):
         data = request.get_json()
-
         if request.method in ['PUT','POST'] and self.is_single_app(data):
-            if 'instances' in data and data['instances'] != 0:
+            current_app_scale = self.get_current_scale(self.get_app_id(request.path))
+            if 'instances' in data and data['instances'] == 0 and current_app_scale != 0:
+                if 'labels' not in data:
+                    data['labels'] = {}
                 data['labels'].update({
-                    'default_scale': self.get_current_scale(self.get_app_id(request.path))
+                    'hollowman.default_scale': current_app_scale
                 })
 
         request.data = json.dumps(data)

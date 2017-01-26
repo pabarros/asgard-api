@@ -1,5 +1,7 @@
 from unittest import TestCase
 import mock
+
+from marathon.models.app import MarathonApp
 from hollowman.filters.default_scale import DefaultScaleRequestFilter
 from tests import RequestStub
 from os import getcwd
@@ -13,13 +15,16 @@ class DefaultScaleRequestFilterTest(TestCase):
         self.marathon_client_patch = mock.patch('hollowman.filters.default_scale.MarathonClient')
 
         self.marathon_client_mock = self.marathon_client_patch.start()
-        self.marathon_client_mock.return_value.get_app.return_value.instances = 2
+        full_app_data = loads(open('json/single_full_app.json').read())
+        self.marathon_client_mock.return_value.get_app.return_value = MarathonApp(**full_app_data)
 
     def tearDown(self):
         self.marathon_client_patch.stop()
 
-    def test_run(self):
-        _data = loads(open('json/single_full_app.json').read())
+    def test_suspend_a_running_app(self):
+        _data = {
+            "instances": 0
+        }
         request = RequestStub(
             data=_data,
             method='POST',
@@ -29,9 +34,61 @@ class DefaultScaleRequestFilterTest(TestCase):
         result_request = self.filter.run(request)
 
         self.assertTrue('labels' in result_request.get_json())
-        self.assertEqual(2, result_request.get_json()['labels']['default_scale'])
+        self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
+
+
+    def test_suspend_a_running_app_with_labels(self):
+        _data = {
+            "instances": 0,
+            "labels": {
+                "owner": "zeus"
+            }
+        }
+        request = RequestStub(
+            data=_data,
+            method='POST',
+            path='/v2/apps//foo'
+        )
+
+        result_request = self.filter.run(request)
+
+        self.assertTrue('labels' in result_request.get_json())
+        self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
         self.assertEqual("zeus", result_request.get_json()['labels']['owner'])
-        self.assertEqual("Away from olympus", result_request.get_json()['labels']['note'])
+
+    def test_suspend_and_already_suspended_app(self):
+        """
+        In this case we must not override the value o labels.hollowman.default_scale.
+        """
+        _data = {
+            "instances": 0
+        }
+        request = RequestStub(
+            data=_data,
+            method='POST',
+            path='/v2/apps//foo'
+        )
+
+        with mock.patch('hollowman.filters.default_scale.MarathonClient') as marathon_client:
+            marathon_client.return_value.get_app.return_value.instances = 0
+            result_request = self.filter.run(request)
+
+            self.assertFalse('labels' in result_request.get_json())
+
+    def test_create_label_on_app_without_labels(self):
+        _data = {
+            "instances": 0
+        }
+        request = RequestStub(
+            data=_data,
+            method='POST',
+            path='/v2/apps//foo'
+        )
+
+        result_request = self.filter.run(request)
+
+        self.assertTrue('labels' in result_request.get_json())
+        self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
 
     def test_get_current_scale(self):
         current_scale = self.filter.get_current_scale('/foo')
