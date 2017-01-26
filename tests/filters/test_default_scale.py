@@ -38,7 +38,7 @@ class DefaultScaleRequestFilterTest(TestCase):
         result_request = self.filter.run(request)
 
         self.assertTrue('labels' in result_request.get_json())
-        self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
+        self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
 
 
     def test_suspend_a_running_app_with_labels(self):
@@ -57,7 +57,7 @@ class DefaultScaleRequestFilterTest(TestCase):
         result_request = self.filter.run(request)
 
         self.assertTrue('labels' in result_request.get_json())
-        self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
+        self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
         self.assertEqual("zeus", result_request.get_json()['labels']['owner'])
 
     def test_suspend_and_already_suspended_app(self):
@@ -98,7 +98,7 @@ class DefaultScaleRequestFilterTest(TestCase):
         result_request = self.filter.run(request)
 
         self.assertTrue('labels' in result_request.get_json())
-        self.assertEqual(2, result_request.get_json()['labels']['hollowman.default_scale'])
+        self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
 
     def test_get_current_scale(self):
         current_scale = self.filter.get_current_scale('/foo')
