@@ -73,11 +73,17 @@ class DefaultScaleRequestFilterTest(TestCase):
             path='/v2/apps//foo'
         )
 
-        with mock.patch('hollowman.filters.default_scale.MarathonClient') as marathon_client:
-            marathon_client.return_value.get_app.return_value.instances = 0
-            result_request = self.filter.run(request)
+        current_app_data = {
+            "instances": 0,
+            "id": "/foo"
+        }
+        marathon_client_mock = mock.MagicMock()
+        marathon_client_mock.get_app.return_value = MarathonApp(**current_app_data)
 
-            self.assertFalse('labels' in result_request.get_json())
+        default_scale_filter = DefaultScaleRequestFilter(Context(marathon_client=marathon_client_mock))
+        result_request = default_scale_filter.run(request)
+
+        self.assertFalse('labels' in result_request.get_json())
 
     def test_create_label_on_app_without_labels(self):
         _data = {
