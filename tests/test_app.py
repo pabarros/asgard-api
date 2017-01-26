@@ -30,7 +30,6 @@ class TestApp(TestCase):
 
         self.assertEqual(response.status_code, 301)
         self.assertTrue('Location' in response.headers)
-        self.fail()
 
     def test_ui_path(self):
         Response = namedtuple(
