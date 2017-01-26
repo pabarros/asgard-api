@@ -16,7 +16,7 @@ def replay_request(request, destination_url):
     method = request.method.lower()
     if method in ['put', 'post']:
         request_data = json.loads(request.data)
-        request_data.pop("version")
-        request_data.pop("fetch")
+        request_data.pop("version", None)
+        request_data.pop("fetch", None)
         request.data = json.dumps(request_data)
     return getattr(requests, method)(to_url, params=params, headers=headers, data=request.data)
