@@ -17,13 +17,18 @@ class DummyResponse(object):
 class TestApp(TestCase):
 
     def test_remove_transfer_encoding_header(self):
-        with patch('hollowman.upstream.replay_request', return_value=DummyResponse(headers={"Transfer-Encoding": "chunked"})):
-            from hollowman.app import application
+        mock_response = DummyResponse(headers={"Transfer-Encoding": "chunked"})
+        with patch.object(hollowman.upstream, 'replay_request', return_value=mock_response) as replay_mock:
             with application.test_client() as client:
                 response = client.get("/v2/apps")
                 self.assertTrue("Content-Encoding" not in response.headers)
+                self.assertEqual(200, response.status_code)
+
                 response = client.get("/ui/main.css")
                 self.assertTrue("Content-Encoding" not in response.headers)
+                self.assertEqual(200, response.status_code)
+
+                self.assertEqual(2, replay_mock.call_count)
 
     def test_index_path(self):
         response = application.test_client().open('/')
@@ -41,7 +46,7 @@ class TestApp(TestCase):
             ]
         )
 
-        with patch('hollowman.app.replay_request') as replay_request_mock:
+        with patch.object(hollowman.upstream, 'replay_request') as replay_request_mock:
             replay_request_mock.return_value = Response(
                 headers={
                     "foo": "bar",

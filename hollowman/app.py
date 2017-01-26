@@ -2,7 +2,7 @@ from flask import Flask, url_for, redirect, Response, request
 import requests
 
 from hollowman.conf import MARATHON_ENDPOINT, MARATHON_AUTH_HEADER
-from hollowman.upstream import replay_request
+from hollowman import upstream
 from hollowman.filters.request import RequestFilter
 
 application = Flask(__name__)
@@ -16,7 +16,7 @@ def index():
 @application.route('/ui/', defaults={'path': ''})
 @application.route('/ui/<path:path>')
 def ui(path):
-    r = replay_request(request, MARATHON_ENDPOINT)
+    r = upstream.replay_request(request, MARATHON_ENDPOINT)
     h = dict(r.headers)
     h.pop("Transfer-Encoding", None)
     return Response(response=r.content, status=r.status_code, headers=h)
@@ -31,7 +31,7 @@ def apiv2(path):
     except Exception as e:
         import traceback
         traceback.print_exc()
-    r = replay_request(modded_request, MARATHON_ENDPOINT)
+    r = upstream.replay_request(modded_request, MARATHON_ENDPOINT)
     h = dict(r.headers)
     h.pop("Transfer-Encoding", None)
     return Response(response=r.content, status=r.status_code, headers=h)
