@@ -11,9 +11,5 @@ ENV UWSGI_PROCESSES=4
 COPY requirements.txt /tmp/
 RUN pip --no-cache-dir install -r /tmp/requirements.txt
 
-COPY requirements-dev.txt /tmp/
-COPY Docker/test_entrypoint.sh /
-RUN chmod a+x /test_entrypoint.sh
-
 COPY . /opt/app
 WORKDIR /opt/app
