@@ -19,7 +19,7 @@ class DefaultScaleRequestFilter(BaseFilter):
                     if 'labels' not in data:
                         data['labels'] = {}
                     data['labels'].update({
-                        'hollowman.default_scale': current_app_scale
+                        'hollowman.default_scale': str(current_app_scale)
                     })
 
             request.data = json.dumps(data)
