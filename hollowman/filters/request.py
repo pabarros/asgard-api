@@ -11,7 +11,8 @@ _ctx = Context(marathon_client=marathon_client)
 _filters = [
     DNSRequestFilter(_ctx),
     TrimRequestFilter(_ctx),
-    DefaultScaleRequestFilter(_ctx),
+    # Dsligado por enquanto, mais detalhes: https://sievetech.atlassian.net/browse/IN-2035
+    #DefaultScaleRequestFilter(_ctx),
 ]
 
 class RequestFilter(object):
