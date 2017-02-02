@@ -14,7 +14,7 @@ def replay_request(request, destination_url):
     headers.pop("Content-Length", None)
     headers['Authorization'] = conf.MARATHON_AUTH_HEADER
     method = request.method.lower()
-    if method in ['put', 'post']:
+    if method in ['put', 'post'] and request.is_json:
         request_data = json.loads(request.data)
         request_data.pop("version", None)
         request_data.pop("fetch", None)
