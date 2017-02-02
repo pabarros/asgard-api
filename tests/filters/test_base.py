@@ -18,8 +18,25 @@ class BaseFilterTest(unittest.TestCase):
         self.assertFalse(self.filter.is_request_on_app("/v2/groups"))
 
     def test_get_app_id(self):
+        self.assertEqual('', self.filter.get_app_id('/v2/apps'))
+        self.assertEqual('', self.filter.get_app_id('/v2/apps/'))
+
         self.assertEqual('/foo', self.filter.get_app_id('/v2/apps//foo'))
         self.assertEqual('/foo/taz/bar', self.filter.get_app_id('/v2/apps//foo/taz/bar'))
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/restart'))
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/restart/'))
+        self.assertEqual('/foo/taz-restart', self.filter.get_app_id('/v2/apps//foo/taz-restart/versions/version-id'))
+
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/tasks'))
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/tasks/'))
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/tasks/task-id'))
+        self.assertEqual('/foo/taz-tasks', self.filter.get_app_id('/v2/apps//foo/taz-tasks/versions/version-id'))
+        
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/versions'))
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/versions/'))
+        self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/versions/version-id'))
+        self.assertEqual('/foo/taz-versions', self.filter.get_app_id('/v2/apps//foo/taz-versions/versions/version-id'))
+
 
     def test_is_docker_app(self):
         data_ = {

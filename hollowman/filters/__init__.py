@@ -1,5 +1,6 @@
 #encoding: utf-8
 
+
 class BaseFilter(object):
 
     def __init__(self, ctx):
@@ -26,10 +27,7 @@ class BaseFilter(object):
         ex: /v2/apps/<app-id> retorna True
         /v2/grups deve retornar False
         """
-        remain = request_path.replace("/v2/apps/", "")
-        return "v2/apps" in request_path\
-                and len(remain) > 0\
-                and request_path != "/v2/apps"
+        return "v2/apps" in request_path and self.get_app_id(request_path)
 
     def is_group(self, body):
         has_groups = 'groups' in body
@@ -42,7 +40,20 @@ class BaseFilter(object):
         return []
 
     def get_app_id(self, request_path):
-        return '/' + request_path.split('//')[-1]
+        split_ = request_path.split('/')
+        api_paths = [
+            'restart',
+            'tasks',
+            'versions',
+        ]
+        locations = [split_.index(path) for path in api_paths if path in split_]
+        cut_limit = min(locations or [len(split_)])
+        # Removes every path after the app name
+        split_ = split_[:cut_limit]
+
+        # Removes evey empty path
+        split_ = [part for part in split_ if part]
+        return '/'.join(split_).replace('v2/apps', '')
 
 
 class Context(object):
