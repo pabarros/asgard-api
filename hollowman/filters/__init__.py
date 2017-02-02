@@ -27,10 +27,7 @@ class BaseFilter(object):
         ex: /v2/apps/<app-id> retorna True
         /v2/grups deve retornar False
         """
-        remain = request_path.replace("/v2/apps/", "")
-        return "v2/apps" in request_path\
-                and len(remain) > 0\
-                and request_path != "/v2/apps"
+        return "v2/apps" in request_path and self.get_app_id(request_path)
 
     def is_group(self, body):
         has_groups = 'groups' in body
