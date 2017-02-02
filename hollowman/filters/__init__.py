@@ -44,16 +44,19 @@ class BaseFilter(object):
 
     def get_app_id(self, request_path):
         split_ = request_path.split('/')
-        cut_limit = len(split_)
         api_paths = [
             'restart',
             'tasks',
             'versions',
         ]
-        if any([path in request_path for path in api_paths]):
-            locations = [split_.index(path) for path in api_paths if path in split_]
-            cut_limit = min(locations)
-        return '/'.join(split_[:cut_limit]).replace('/v2/apps/', '')
+        locations = [split_.index(path) for path in api_paths if path in split_]
+        cut_limit = min(locations or [len(split_)])
+        # Removes every path after the app name
+        split_ = split_[:cut_limit]
+
+        # Removes evey empty path
+        split_ = [part for part in split_ if part]
+        return '/'.join(split_).replace('v2/apps', '')
 
 
 class Context(object):

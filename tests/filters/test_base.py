@@ -18,6 +18,9 @@ class BaseFilterTest(unittest.TestCase):
         self.assertFalse(self.filter.is_request_on_app("/v2/groups"))
 
     def test_get_app_id(self):
+        self.assertEqual('', self.filter.get_app_id('/v2/apps'))
+        self.assertEqual('', self.filter.get_app_id('/v2/apps/'))
+
         self.assertEqual('/foo', self.filter.get_app_id('/v2/apps//foo'))
         self.assertEqual('/foo/taz/bar', self.filter.get_app_id('/v2/apps//foo/taz/bar'))
         self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/restart'))
