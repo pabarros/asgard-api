@@ -1,5 +1,6 @@
 #encoding: utf-8
 
+
 class BaseFilter(object):
 
     def __init__(self, ctx):
@@ -42,7 +43,17 @@ class BaseFilter(object):
         return []
 
     def get_app_id(self, request_path):
-        return '/' + request_path.split('//')[-1]
+        split_ = request_path.split('/')
+        cut_limit = len(split_)
+        api_paths = [
+            'restart',
+            'tasks',
+            'versions',
+        ]
+        if any([path in request_path for path in api_paths]):
+            locations = [split_.index(path) for path in api_paths if path in split_]
+            cut_limit = min(locations)
+        return '/'.join(split_[:cut_limit]).replace('/v2/apps/', '')
 
 
 class Context(object):
