@@ -6,7 +6,7 @@ class HollowmanRequest(Request):
         """
         Changed cache to False to ease filter implementations
         """
-        return super(Request, self).get_json(
+        return super(HollowmanRequest, self).get_json(
             force,
             silent,
             cache

@@ -92,7 +92,6 @@ class UpstreamTest(TestCase):
         """
         with application.test_request_context("/v2/apps", method="POST", data='{"id": "/abc", "version": "0", "fetch": ["a", "b"]}', headers={'Content-Type': 'application/json'}):
             #flask.request.is_json = True
-            #import ipdb; ipdb.set_trace()
             replay_request(flask.request, "http://marathon:8080")
             self.assertTrue(mock_post.called)
             called_data_json = json.loads(mock_post.call_args[1]['data'])
