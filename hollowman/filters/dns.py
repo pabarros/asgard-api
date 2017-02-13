@@ -14,7 +14,7 @@ class DNSRequestFilter(BaseFilter):
 
             if self.is_request_on_app(request.path) and self._payloas_has_only_env(request, body):
                 # Só temos as envs nesse payload, vamos buscar a app original e mesclar com o payload
-                original_app = self.ctx.marathon_client.get_app(self.get_app_id(request.path))
+                original_app = self.get_original_app(request)
                 if not original_app.env:
                     original_app.env = {}
                 for key, value in body['env'].iteritems():

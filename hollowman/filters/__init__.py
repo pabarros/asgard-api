@@ -1,6 +1,5 @@
 #encoding: utf-8
 
-
 class BaseFilter(object):
 
     def __init__(self, ctx):
@@ -54,6 +53,9 @@ class BaseFilter(object):
         # Removes evey empty path
         split_ = [part for part in split_ if part]
         return '/'.join(split_).replace('v2/apps', '')
+
+    def get_original_app(self, request):
+        return self.ctx.marathon_client.get_app(self.get_app_id(request.path))
 
 
 class Context(object):
