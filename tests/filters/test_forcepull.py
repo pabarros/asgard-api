@@ -59,7 +59,8 @@ class ForcePullTest(TestCase):
         }
         request = RequestStub(data=data)
         modified_request = self.filter.run(request)
-        self.assertEqual(
-            True,
+        self.assertTrue(
             modified_request.get_json()['container']['docker']['forcePullImage']
         )
+        self.assertEqual("data", modified_request.get_json()['container']['volumes']['containerPath'])
+        self.assertTrue("type" in modified_request.get_json())
