@@ -62,5 +62,5 @@ class ForcePullTest(TestCase):
         self.assertTrue(
             modified_request.get_json()['container']['docker']['forcePullImage']
         )
-        self.assertEqual("data", modified_request.get_json()['container']['volumes']['containerPath'])
-        self.assertTrue("type" in modified_request.get_json())
+        self.assertEqual("data", modified_request.get_json()['container']['volumes'][0]['containerPath'])
+        self.assertTrue("type" in modified_request.get_json()['container'])

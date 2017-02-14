@@ -3,6 +3,7 @@
 import json
 from hollowman.filters import BaseFilter
 
+
 class ForcePullFilter(BaseFilter):
 
     def __init__(self, ctx):
@@ -17,13 +18,13 @@ class ForcePullFilter(BaseFilter):
             else:
                 value = True
 
-            data.update({
-                "container": {
-                    "docker": {
-                        "forcePullImage": value
-                    }
-                }
-            })
+            if 'container' not in data:
+                data['container'] = {}
+
+            if 'docker' not in data['container']:
+                data['container']['docker'] = {}
+
+            data['container']['docker']["forcePullImage"] = value
 
             request.data = json.dumps(data)
 
