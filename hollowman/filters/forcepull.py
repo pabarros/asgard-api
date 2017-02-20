@@ -10,22 +10,24 @@ class ForcePullFilter(BaseFilter):
         super(ForcePullFilter, self).__init__(ctx)
 
     def run(self, request):
-        data = request.get_json()
+        
+        if request.is_json and request.data:
+            data = request.get_json()
 
-        if self.is_single_app(data):
-            if 'labels' in data and ('hollowman.disable_forcepull' in data['labels']):
-                value = False
-            else:
-                value = True
+            if self.is_single_app(data):
+                if 'labels' in data and ('hollowman.disable_forcepull' in data['labels']):
+                    value = False
+                else:
+                    value = True
 
-            if 'container' not in data:
-                data['container'] = {}
+                if 'container' not in data:
+                    data['container'] = {}
 
-            if 'docker' not in data['container']:
-                data['container']['docker'] = {}
+                if 'docker' not in data['container']:
+                    data['container']['docker'] = {}
 
-            data['container']['docker']["forcePullImage"] = value
+                data['container']['docker']["forcePullImage"] = value
 
-            request.data = json.dumps(data)
+                request.data = json.dumps(data)
 
         return request
