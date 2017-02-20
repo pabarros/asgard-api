@@ -3,8 +3,6 @@
 from hollowman.filters.forcepull import ForcePullFilter
 from unittest import TestCase
 from tests import RequestStub
-import json
-from hollowman.filters import Context
 from hollowman.filters.request import _ctx
 
 
