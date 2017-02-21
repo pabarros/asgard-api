@@ -15,19 +15,16 @@ class ForcePullFilter(BaseFilter):
             data = request.get_json()
 
             if self.is_single_app(data):
-                if 'labels' in data and ('hollowman.disable_forcepull' in data['labels']):
+                original_app_dict = json.loads(self.get_original_app(request).to_json())
+                original_app_dict.update(data)
+
+                if 'labels' in original_app_dict and ('hollowman.disable_forcepull' in original_app_dict['labels']):
                     value = False
                 else:
                     value = True
 
-                if 'container' not in data:
-                    data['container'] = {}
+                original_app_dict['container']['docker']["forcePullImage"] = value
 
-                if 'docker' not in data['container']:
-                    data['container']['docker'] = {}
-
-                data['container']['docker']["forcePullImage"] = value
-
-                request.data = json.dumps(data)
+                request.data = json.dumps(original_app_dict)
 
         return request
