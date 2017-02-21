@@ -31,7 +31,7 @@ class BaseFilterTest(unittest.TestCase):
         self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/tasks/'))
         self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/tasks/task-id'))
         self.assertEqual('/foo/taz-tasks', self.filter.get_app_id('/v2/apps//foo/taz-tasks/versions/version-id'))
-        
+
         self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/versions'))
         self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/versions/'))
         self.assertEqual('/foo/taz', self.filter.get_app_id('/v2/apps//foo/taz/versions/version-id'))
@@ -125,3 +125,7 @@ class BaseFilterTest(unittest.TestCase):
             {"id": "/bar"}
         ]
         self.assertTrue(self.filter.is_multi_app(data_))
+
+    @unittest.skip(reason="Method 'get_app_id' is already tested and marathon_client is an external lib.")
+    def test_get_original_app(self):
+        pass

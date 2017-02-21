@@ -456,7 +456,6 @@ class DNSRequestFilterTest(TestCase):
         from marathon.models.app import MarathonApp
         with mock.patch.object(self.filter, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps//app/foo", data=data_, method="PUT")
-            #import ipdb; ipdb.set_trace()
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**original_app)
 
             filtered_request = self.filter.run(request)

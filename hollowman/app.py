@@ -1,11 +1,12 @@
 from flask import Flask, url_for, redirect, Response, request
 import requests
 
+from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.conf import MARATHON_ENDPOINT, MARATHON_AUTH_HEADER
 from hollowman import upstream
 from hollowman.filters.request import RequestFilter
 
-application = Flask(__name__)
+application = HollowmanFlask(__name__)
 
 
 @application.route("/", methods=["GET"])
@@ -40,4 +41,3 @@ def apiv2(path):
 def healhcheck():
     r = requests.get(MARATHON_ENDPOINT, headers={"Authorization": MARATHON_AUTH_HEADER})
     return Response(response="", status=r.status_code)
-
