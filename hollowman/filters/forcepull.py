@@ -10,7 +10,6 @@ class ForcePullFilter(BaseFilter):
         super(ForcePullFilter, self).__init__(ctx)
 
     def run(self, request):
-        
         if request.is_json and request.data:
             data = request.get_json()
 

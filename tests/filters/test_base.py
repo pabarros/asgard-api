@@ -2,7 +2,11 @@
 
 from hollowman.filters import BaseFilter
 from hollowman.filters.request import _ctx
+from tests import RequestStub
 import unittest
+
+from marathon.models.app import MarathonApp
+import mock
 
 
 class BaseFilterTest(unittest.TestCase):
@@ -126,6 +130,18 @@ class BaseFilterTest(unittest.TestCase):
         ]
         self.assertTrue(self.filter.is_multi_app(data_))
 
-    @unittest.skip(reason="Method 'get_app_id' is already tested and marathon_client is an external lib.")
     def test_get_original_app(self):
-        pass
+        """
+        If app does not exist yet, return an empty marathon.models.app.MarathonApp()
+        """
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            request = RequestStub(path="/v2/apps", data={})
+            ctx_mock.marathon_client.get_app.side_effect = KeyError()
+            marathon_app = self.filter.get_original_app(request)
+            self.assertIsNone(marathon_app.id)
+            self.assertIsNotNone(marathon_app)
+
+    def test_empty_marathon_app_to_json(self):
+        empty_app = MarathonApp()
+        self.assertEqual('{}', empty_app.to_json())
+
