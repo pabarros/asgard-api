@@ -7,23 +7,13 @@ from tests import RequestStub
 from os import getcwd
 from json import loads
 
+from hollowman.filters.request import _ctx
 from hollowman.filters.default_scale import DefaultScaleRequestFilter
-from hollowman import conf
-from hollowman.filters import Context
 
 class DefaultScaleRequestFilterTest(TestCase):
 
     def setUp(self):
-        self.marathon_client_patch = mock.patch.object(conf, 'marathon_client')
-
-        self.marathon_client_mock = self.marathon_client_patch.start()
-        full_app_data = loads(open('json/single_full_app.json').read())
-        self.marathon_client_mock.return_value.get_app.return_value = MarathonApp(**full_app_data)
-        self.marathon_client_mock.get_app.return_value.instances = 2
-        self.filter = DefaultScaleRequestFilter(Context(self.marathon_client_mock))
-
-    def tearDown(self):
-        self.marathon_client_patch.stop()
+        self.filter = DefaultScaleRequestFilter(_ctx)
 
     def test_suspend_a_running_app(self):
         _data = {
@@ -31,14 +21,16 @@ class DefaultScaleRequestFilterTest(TestCase):
         }
         request = RequestStub(
             data=_data,
-            method='POST',
+            method='PUT',
             path='/v2/apps//foo'
         )
 
-        result_request = self.filter.run(request)
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(instances=2)
+            result_request = self.filter.run(request)
 
-        self.assertTrue('labels' in result_request.get_json())
-        self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
+            self.assertTrue('labels' in result_request.get_json())
+            self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
 
 
     def test_suspend_a_running_app_with_labels(self):
@@ -54,11 +46,13 @@ class DefaultScaleRequestFilterTest(TestCase):
             path='/v2/apps//foo'
         )
 
-        result_request = self.filter.run(request)
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(instances=3)
+            result_request = self.filter.run(request)
 
-        self.assertTrue('labels' in result_request.get_json())
-        self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
-        self.assertEqual("zeus", result_request.get_json()['labels']['owner'])
+            self.assertTrue('labels' in result_request.get_json())
+            self.assertEqual("3", result_request.get_json()['labels']['hollowman.default_scale'])
+            self.assertEqual("zeus", result_request.get_json()['labels']['owner'])
 
     def test_suspend_and_already_suspended_app(self):
         """
@@ -73,17 +67,15 @@ class DefaultScaleRequestFilterTest(TestCase):
             path='/v2/apps//foo'
         )
 
-        current_app_data = {
-            "instances": 0,
-            "id": "/foo"
-        }
-        marathon_client_mock = mock.MagicMock()
-        marathon_client_mock.get_app.return_value = MarathonApp(**current_app_data)
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(instances=0)
+            result_request = self.filter.run(request)
+            self.assertFalse('labels' in result_request.get_json())
 
-        default_scale_filter = DefaultScaleRequestFilter(Context(marathon_client=marathon_client_mock))
-        result_request = default_scale_filter.run(request)
-
-        self.assertFalse('labels' in result_request.get_json())
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp()
+            result_request = self.filter.run(request)
+            self.assertFalse('labels' in result_request.get_json())
 
     def test_create_label_on_app_without_labels(self):
         _data = {
@@ -91,16 +83,20 @@ class DefaultScaleRequestFilterTest(TestCase):
         }
         request = RequestStub(
             data=_data,
-            method='POST',
+            method='PUT',
             path='/v2/apps//foo'
         )
 
-        result_request = self.filter.run(request)
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(instances=2)
+            result_request = self.filter.run(request)
 
-        self.assertTrue('labels' in result_request.get_json())
-        self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
+            self.assertTrue('labels' in result_request.get_json())
+            self.assertEqual("2", result_request.get_json()['labels']['hollowman.default_scale'])
 
     def test_get_current_scale(self):
-        current_scale = self.filter.get_current_scale('/foo')
-        self.assertEqual(current_scale, 2)
+        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(instances=2)
+            current_scale = self.filter.get_current_scale('/foo')
+            self.assertEqual(current_scale, 2)
 

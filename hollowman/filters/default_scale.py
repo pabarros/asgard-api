@@ -13,16 +13,20 @@ class DefaultScaleRequestFilter(BaseFilter):
     def run(self, request):
         if request.is_json and request.data:
             data = json.loads(request.data)
-            if request.method in ['PUT','POST'] and self.is_single_app(data):
-                current_app_scale = self.get_current_scale(self.get_app_id(request.path))
-                if 'instances' in data and data['instances'] == 0 and current_app_scale != 0:
-                    if 'labels' not in data:
-                        data['labels'] = {}
-                    data['labels'].update({
+            if self.is_single_app(data):
+                original_app = self.get_original_app(request)
+                original_app_dict = json.loads(original_app.to_json())
+                current_app_scale = original_app.instances
+
+                if data.get('instances', 1) == 0 and current_app_scale != 0 and current_app_scale is not None:
+                    labels = data.get("labels", {})
+                    labels.update({
                         'hollowman.default_scale': str(current_app_scale)
                     })
+                    data['labels'] = labels
 
-            request.data = json.dumps(data)
+            original_app_dict.update(data)
+            request.data = json.dumps(original_app_dict)
 
         return request
 

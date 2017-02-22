@@ -145,3 +145,6 @@ class BaseFilterTest(unittest.TestCase):
         empty_app = MarathonApp()
         self.assertEqual('{}', empty_app.to_json())
 
+    def test_default_instances_value_on_empty_app(self):
+        empty_app = MarathonApp()
+        self.assertEqual(None, empty_app.instances)

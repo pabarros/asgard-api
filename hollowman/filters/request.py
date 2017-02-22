@@ -15,8 +15,7 @@ _filters = [
     TrimRequestFilter(_ctx),
     ForcePullFilter(_ctx),
     BaseConstraintFilter(_ctx),
-    # Desligado por enquanto, mais detalhes: https://sievetech.atlassian.net/browse/IN-2035
-    #DefaultScaleRequestFilter(_ctx),
+    DefaultScaleRequestFilter(_ctx),
 ]
 
 class RequestFilter(object):
