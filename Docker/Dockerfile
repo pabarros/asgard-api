@@ -1,6 +1,6 @@
 FROM docker.sieve.com.br/alpine/py27/uwsgi20:0.0.10
 
-#Version: 0.0.8
+#Version: 0.0.9
 
 ARG _=""
 ENV GIT_COMMIT_HASH=${_}
