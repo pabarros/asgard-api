@@ -59,7 +59,8 @@ class BaseFilter(object):
     def get_original_app(self, request):
         try:
             return self.ctx.marathon_client.get_app(self.get_app_id(request.path))
-        except KeyError as ke:
+        except Exception as e:
+            # TODO: Logar que tivemos essa exception
             return MarathonApp()
 
 

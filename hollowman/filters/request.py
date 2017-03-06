@@ -4,6 +4,7 @@ from hollowman.filters.dns import DNSRequestFilter
 from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.default_scale import DefaultScaleRequestFilter
 from hollowman.filters.base_constraint import BaseConstraintFilter
+from hollowman.filters.appname import AddAppNameFilter
 from hollowman.filters import Context
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.conf import marathon_client
@@ -16,6 +17,7 @@ _filters = [
     ForcePullFilter(_ctx),
     BaseConstraintFilter(_ctx),
     DefaultScaleRequestFilter(_ctx),
+    AddAppNameFilter(_ctx),
 ]
 
 class RequestFilter(object):

@@ -19,3 +19,8 @@ class RequestStub(object):
 
     def get_json(self):
         return json.loads(self.data)
+
+class ContextStub(object):
+
+    def __init__(self, marathon_client=None):
+        self.marathon_client = marathon_client
