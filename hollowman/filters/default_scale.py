@@ -7,14 +7,12 @@ from hollowman.filters import BaseFilter
 
 class DefaultScaleRequestFilter(BaseFilter):
 
-    def __init__(self, ctx):
-        super(DefaultScaleRequestFilter, self).__init__(ctx)
-
-    def run(self, request):
+    def run(self, ctx):
+        request = ctx.request
         if request.is_json and request.data:
             data = json.loads(request.data)
             if self.is_single_app(data):
-                original_app = self.get_original_app(request)
+                original_app = self.get_original_app(ctx)
                 original_app_dict = json.loads(original_app.to_json())
                 current_app_scale = original_app.instances
 
@@ -30,5 +28,3 @@ class DefaultScaleRequestFilter(BaseFilter):
 
         return request
 
-    def get_current_scale(self, app_id):
-        return self.ctx.marathon_client.get_app(app_id).instances
