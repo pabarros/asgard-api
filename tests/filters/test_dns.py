@@ -5,14 +5,15 @@ from unittest import TestCase, skip
 from hollowman.filters.dns import DNSRequestFilter
 from tests import RequestStub
 import unittest
-from hollowman.filters.request import _ctx
+from hollowman.filters import Context
 import mock
 
 
 class DNSRequestFilterTest(TestCase):
 
     def setUp(self):
-        self.filter = DNSRequestFilter(_ctx)
+        self.ctx = Context(marathon_client=None, request=None)
+        self.filter = DNSRequestFilter()
 
     def test_do_not_add_dns_entry_if_is_not_a_docker_app(self):
         """
@@ -39,7 +40,8 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(path="/v2/apps/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertFalse('docker' in modified_request.get_json()['container'])
 
     def test_add_dns_enty_when_app_has_no_docker_parameters(self):
@@ -51,7 +53,8 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(path="/v2/apps/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertIsNotNone(modified_request)
         self.assertTrue('container' in modified_request.get_json())
         self.assertTrue('docker' in modified_request.get_json()['container'])
@@ -82,7 +85,8 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(path="/v2/apps/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
         self.assertEqual(1, len(docker_parameters))
@@ -117,7 +121,8 @@ class DNSRequestFilterTest(TestCase):
             }
         }
         request = RequestStub(path="/v2/apps//foo/bar", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
 
         docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
@@ -150,7 +155,8 @@ class DNSRequestFilterTest(TestCase):
             },
         }
         request = RequestStub(path="/v2/apps/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
 
         docker_parameters = modified_request.get_json()['container'][
             'docker']['parameters']
@@ -200,7 +206,8 @@ class DNSRequestFilterTest(TestCase):
             }
         ]
         request = RequestStub(path="/v2/apps/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
 
         docker_parameters = modified_request.get_json()[0]['container'][
             'docker']['parameters']
@@ -238,7 +245,8 @@ class DNSRequestFilterTest(TestCase):
             },
         ]
         request = RequestStub(path="/v2/apps/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
 
         docker_parameters = modified_request.get_json()[0]['container'][
             'docker']['parameters']
@@ -305,7 +313,8 @@ class DNSRequestFilterTest(TestCase):
             ],
         }
         request = RequestStub(path="/v2/groups/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
 
         docker_parameters = modified_request.get_json()['apps'][0]['container'][
             'docker']['parameters']
@@ -380,7 +389,8 @@ class DNSRequestFilterTest(TestCase):
         }
 
         request = RequestStub(path="/v2/groups/", data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
 
         docker_parameters = modified_request.get_json()['groups'][0]['apps'][0][
             'container']['docker']['parameters']
@@ -414,7 +424,9 @@ class DNSRequestFilterTest(TestCase):
             }
         ]
         request = RequestStub(path="/v2/apps/", data=data)
-        json_filtered_request = self.filter.run(request).get_json()
+        self.ctx.request = request
+
+        json_filtered_request = self.filter.run(self.ctx).get_json()
         params_dict = dict((param['key'], param) for param in json_filtered_request[0]['container']['docker']['parameters'])
         self.assertEqual(len(json_filtered_request[0]['container']['docker']['parameters']), 2)
         self.assertDictEqual(params_dict['dns'], {"key": "dns", "value": "172.17.0.1"})
@@ -454,11 +466,12 @@ class DNSRequestFilterTest(TestCase):
         modified_app.update(data_)
 
         from marathon.models.app import MarathonApp
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps//app/foo", data=data_, method="PUT")
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**original_app)
+            ctx_mock.request = request
 
-            filtered_request = self.filter.run(request)
+            filtered_request = self.filter.run(ctx_mock)
             ctx_mock.marathon_client.get_app.assert_called_with("/app/foo")
             self.assertDictEqual(modified_app, filtered_request.get_json())
 
@@ -501,11 +514,12 @@ class DNSRequestFilterTest(TestCase):
         modified_app['env'].update(data_['env'])
 
         from marathon.models.app import MarathonApp
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps//app/foo", data=data_, method="PUT")
 
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**original_app)
-
-            filtered_request = self.filter.run(request)
+            ctx_mock.request = request
+            filtered_request = self.filter.run(ctx_mock)
             ctx_mock.marathon_client.get_app.assert_called_with("/app/foo")
             self.assertDictEqual(modified_app, filtered_request.get_json())
+

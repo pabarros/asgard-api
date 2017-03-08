@@ -1,7 +1,7 @@
 #encoding: utf-8
 
 from hollowman.filters import BaseFilter
-from hollowman.filters.request import _ctx
+from hollowman.filters import Context
 from tests import RequestStub
 import unittest
 
@@ -12,7 +12,8 @@ import mock
 class BaseFilterTest(unittest.TestCase):
 
     def setUp(self):
-        self.filter = BaseFilter(_ctx)
+        self.ctx = Context(marathon_client=None, request=None)
+        self.filter = BaseFilter()
 
     def test_is_request_on_app(self):
         self.assertTrue(self.filter.is_request_on_app("/v2/apps//app/foo"))
@@ -134,10 +135,12 @@ class BaseFilterTest(unittest.TestCase):
         """
         If app does not exist yet, return an empty marathon.models.app.MarathonApp()
         """
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps", data={})
             ctx_mock.marathon_client.get_app.side_effect = KeyError()
-            marathon_app = self.filter.get_original_app(request)
+            ctx_mock.request = request
+
+            marathon_app = self.filter.get_original_app(ctx_mock)
             self.assertIsNone(marathon_app.id)
             self.assertIsNotNone(marathon_app)
 
