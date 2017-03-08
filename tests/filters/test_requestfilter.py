@@ -23,27 +23,30 @@ class RequestFilterTest(TestCase):
             self.assertIsNone(final_request)
             self.assertTrue(filter_one.filter_called)
 
-    def test_dispatch_chain_return_value_of_one_filter_to_the_next(self):
-        """
-        Tests if the return value of a filter is passed to the next one
-        """
+    def test_dispatch_popultates_ctx_with_the_request_object(self):
+        class RequestObject(object):
+            filter_one = None
+            filter_two = None
+
         class FilterOne(object):
 
-            def run(self, r):
-                r['filter_one'] = True
-                return r
+            def run(self, ctx):
+                ctx.request.filter_one = True
+                return ctx.request
 
         class FilterTwo(object):
 
-            def run(self, r):
-                r['filter_two'] = True
-                return r
+            def run(self, ctx):
+                ctx.request.filter_two = True
+                return ctx.request
+
         filters = [FilterOne(), FilterTwo()]
         with mock.patch("hollowman.filters.request._filters", filters):
-            final_request = RequestFilter.dispatch({})
+            request = RequestObject()
+            final_request = RequestFilter.dispatch(request)
             self.assertIsNotNone(final_request)
-            self.assertTrue(final_request['filter_one'])
-            self.assertTrue(final_request['filter_two'])
+            self.assertTrue(request.filter_one)
+            self.assertTrue(request.filter_two)
 
     def test_dispatch_all_filters_empty_body(self):
         """

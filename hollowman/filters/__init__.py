@@ -65,3 +65,4 @@ class Context(object):
 
     def __init__(self, marathon_client, request):
         self.marathon_client = marathon_client
+        self.request = request

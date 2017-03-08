@@ -151,3 +151,14 @@ class BaseFilterTest(unittest.TestCase):
     def test_default_instances_value_on_empty_app(self):
         empty_app = MarathonApp()
         self.assertEqual(None, empty_app.instances)
+
+
+class TestContext(unittest.TestCase):
+
+    def test_set_marathon_client(self):
+        ctx = Context(marathon_client=True, request=None)
+        self.assertTrue(ctx.marathon_client)
+
+    def test_set_request(self):
+        ctx = Context(marathon_client=None, request=True)
+        self.assertTrue(ctx.request)

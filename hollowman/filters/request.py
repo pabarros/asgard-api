@@ -18,11 +18,17 @@ _filters = [
     AddAppNameFilter(),
 ]
 
+
+def _get_ctx():
+    return Context(marathon_client=marathon_client, request=None)
+
+
 class RequestFilter(object):
 
     @staticmethod
     def dispatch(request):
-        ctx = Context(marathon_client=marathon_client, request=request)
+        ctx = _get_ctx()
+        ctx.request = request
         for _request_filter in _filters:
             _request_filter.run(ctx)
         return ctx.request
