@@ -12,7 +12,8 @@ class TestAppNameFilterTest(unittest.TestCase):
 
 
     def setUp(self):
-        self.filter = AddAppNameFilter(ContextStub())
+        self.ctx = ContextStub()
+        self.filter = AddAppNameFilter()
 
     def test_add_appname_app_with_other_params(self):
         data_ = {
@@ -28,10 +29,12 @@ class TestAppNameFilterTest(unittest.TestCase):
                 }
             } 
         }
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data_)
             request = RequestStub(path="/v2/apps//my/app/foo", data=data_, method="PUT")
-            modified_request = self.filter.run(request)
+
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             result_data = modified_request.get_json()
             self.assertEqual(2, len(result_data['container']['docker']['parameters']))
 
@@ -47,10 +50,11 @@ class TestAppNameFilterTest(unittest.TestCase):
                 }
             } 
         }
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             ctx_mock.marathon_client.get_app.return_value = MarathonApp()
             request = RequestStub(path="/v2/apps//my/app/foo", data=data_, method="PUT")
-            modified_request = self.filter.run(request)
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             result_data = modified_request.get_json()
 
             docker_params = result_data['container']['docker']['parameters']
@@ -66,10 +70,11 @@ class TestAppNameFilterTest(unittest.TestCase):
                 }
             } 
         }
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data_)
             request = RequestStub(path="/v2/apps//my/app/foo", data=data_, method="PUT")
-            modified_request = self.filter.run(request)
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             result_data = modified_request.get_json()
 
             docker_params = result_data['container']['docker']['parameters']
@@ -98,10 +103,11 @@ class TestAppNameFilterTest(unittest.TestCase):
                 }
             } 
         }
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data_)
             request = RequestStub(path="/v2/apps//my/app/foo", data=data_, method="PUT")
-            modified_request = self.filter.run(request)
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             result_data = modified_request.get_json()
 
             docker_params = result_data['container']['docker']['parameters']

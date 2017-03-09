@@ -5,10 +5,8 @@ from hollowman.filters import BaseFilter
 
 class TrimRequestFilter(BaseFilter):
 
-    def __init__(self, ctx):
-        super(TrimRequestFilter, self).__init__(ctx)
-
-    def run(self, request):
+    def run(self, ctx):
+        request = ctx.request
         if request.is_json and request.data:
             data = json.loads(request.data)
             _new_envs = {}

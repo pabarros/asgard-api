@@ -6,13 +6,14 @@ from tests import RequestStub
 import json
 from hollowman.filters import Context
 from hollowman.conf import marathon_client
-from hollowman.filters.request import _ctx
+from hollowman.filters import Context
 
 
 class TrimEnvvarsTest(TestCase):
 
     def setUp(self):
-        self.filter = TrimRequestFilter(_ctx)
+        self.ctx = Context(marathon_client=None, request=None)
+        self.filter = TrimRequestFilter()
 
     def test_absent_env_key(self):
         data_ = {
@@ -36,7 +37,8 @@ class TrimEnvvarsTest(TestCase):
             },
         }
         request = RequestStub(data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertDictEqual(data_, modified_request.get_json())
 
     def test_empty_env_vars(self):
@@ -62,7 +64,8 @@ class TrimEnvvarsTest(TestCase):
             "env": {}
         }
         request = RequestStub(data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertDictEqual(data_, modified_request.get_json())
 
     def test_json_with_one_env_var(self):
@@ -90,7 +93,8 @@ class TrimEnvvarsTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertEqual(modified_request.get_json()['env']['MY_ENV'], "abc")
 
     def test_json_with_multiple_env_vars(self):
@@ -120,7 +124,8 @@ class TrimEnvvarsTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertEqual(modified_request.get_json()['env']['MY_ENV'], "abc")
         self.assertEqual(modified_request.get_json()['env']['OTHER_ENV'], "10.0.0.1")
         self.assertEqual(modified_request.get_json()['env']['ANOTHER_ENV_WITH_SPACES'], "some spaces")
@@ -141,7 +146,8 @@ class TrimEnvvarsTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertFalse('  MY_ENV  ' in modified_request.get_json()['env'])
         self.assertFalse(' OTHER_ENV   ' in modified_request.get_json()['env'])
 
@@ -171,7 +177,8 @@ class TrimEnvvarsTest(TestCase):
             }
         }
         request = RequestStub(data=data_)
-        modified_request = self.filter.run(request)
+        self.ctx.request = request
+        modified_request = self.filter.run(self.ctx)
         self.assertEqual(modified_request.get_json()['labels']['MY_LABEL'], "abc")
         self.assertEqual(modified_request.get_json()['labels']['OTHER_LABEL'], "10.0.0.1")
         self.assertFalse('MY_LABEL ' in modified_request.get_json()['labels'])

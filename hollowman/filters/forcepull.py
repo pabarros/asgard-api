@@ -6,10 +6,8 @@ from hollowman.filters import BaseFilter
 
 class ForcePullFilter(BaseFilter):
 
-    def __init__(self, ctx):
-        super(ForcePullFilter, self).__init__(ctx)
-
-    def run(self, request):
+    def run(self, ctx):
+        request = ctx.request
         if request.is_json and request.data:
             data = request.get_json()
 

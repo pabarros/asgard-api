@@ -6,11 +6,8 @@ from hollowman.filters import BaseFilter
 
 class AddAppNameFilter(BaseFilter):
 
-    def __init__(self, ctx):
-        super(AddAppNameFilter, self).__init__(ctx)
-
-    def run(self, request):
-
+    def run(self, ctx):
+        request = ctx.request
         if request.is_json and request.data and self.is_request_on_app(request.path):
             data = request.get_json()
             original_app_dict = json.loads(self.get_original_app(request).to_json())

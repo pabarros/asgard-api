@@ -9,22 +9,25 @@ from hollowman.filters import Context
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.conf import marathon_client
 
-_ctx = Context(marathon_client=marathon_client)
-
 _filters = [
-    DNSRequestFilter(_ctx),
-    TrimRequestFilter(_ctx),
-    ForcePullFilter(_ctx),
-    BaseConstraintFilter(_ctx),
-    DefaultScaleRequestFilter(_ctx),
-    AddAppNameFilter(_ctx),
+    DNSRequestFilter(),
+    TrimRequestFilter(),
+    ForcePullFilter(),
+    BaseConstraintFilter(),
+    DefaultScaleRequestFilter(),
+    AddAppNameFilter(),
 ]
+
+
+def _get_ctx(request):
+    return Context(marathon_client=marathon_client, request=request)
+
 
 class RequestFilter(object):
 
     @staticmethod
     def dispatch(request):
-        next_ = request
+        ctx = _get_ctx(request)
         for _request_filter in _filters:
-            next_ = _request_filter.run(next_)
-        return next_
+            _request_filter.run(ctx)
+        return ctx.request

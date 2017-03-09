@@ -4,9 +4,6 @@ from marathon.models.app import MarathonApp
 
 class BaseFilter(object):
 
-    def __init__(self, ctx):
-        self.ctx = ctx
-
     def is_single_app(self, body):
         has_groups = 'groups' in body
         has_apps = 'apps' in body
@@ -56,9 +53,9 @@ class BaseFilter(object):
         split_ = [part for part in split_ if part]
         return '/'.join(split_).replace('v2/apps', '')
 
-    def get_original_app(self, request):
+    def get_original_app(self, ctx):
         try:
-            return self.ctx.marathon_client.get_app(self.get_app_id(request.path))
+            return ctx.marathon_client.get_app(self.get_app_id(ctx.request.path))
         except Exception as e:
             # TODO: Logar que tivemos essa exception
             return MarathonApp()
@@ -66,5 +63,6 @@ class BaseFilter(object):
 
 class Context(object):
 
-    def __init__(self, marathon_client):
+    def __init__(self, marathon_client, request):
         self.marathon_client = marathon_client
+        self.request = request

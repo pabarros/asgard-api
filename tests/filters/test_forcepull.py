@@ -3,7 +3,7 @@
 from hollowman.filters.forcepull import ForcePullFilter
 from unittest import TestCase
 from tests import RequestStub
-from hollowman.filters.request import _ctx
+from hollowman.filters import Context
 
 from marathon.models.app import MarathonApp
 import mock
@@ -11,7 +11,8 @@ import mock
 class ForcePullTest(TestCase):
 
     def setUp(self):
-        self.filter = ForcePullFilter(_ctx)
+        self.ctx = Context(marathon_client=None, request=None)
+        self.filter = ForcePullFilter()
 
     def test_simple_app(self):
         data = {
@@ -22,11 +23,12 @@ class ForcePullTest(TestCase):
                 }
             }
         }
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
 
-            modified_request = self.filter.run(request)
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             self.assertEqual(
                 True,
                 modified_request.get_json()['container']['docker']['forcePullImage']
@@ -45,11 +47,12 @@ class ForcePullTest(TestCase):
             }
         }
 
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
 
-            modified_request = self.filter.run(request)
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             self.assertEqual(
                 False,
                 modified_request.get_json()['container']['docker']['forcePullImage']
@@ -80,11 +83,12 @@ class ForcePullTest(TestCase):
             }
         }
 
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
 
-            modified_request = self.filter.run(request)
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             self.assertTrue(
                 modified_request.get_json()['container']['docker']['forcePullImage']
             )
@@ -116,12 +120,13 @@ class ForcePullTest(TestCase):
             }
         }
 
-        with mock.patch.object(self.filter, "ctx") as ctx_mock:
+        with mock.patch.object(self, "ctx") as ctx_mock:
             request = RequestStub(path="/v2/apps/", data=data, method="POST")
             # if the app does not exist, get_app() returns an empty marathon.models.app.MarathonApp()
             ctx_mock.marathon_client.get_app.return_value = MarathonApp()
 
-            modified_request = self.filter.run(request)
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
             self.assertTrue(
                 modified_request.get_json()['container']['docker']['forcePullImage']
             )
