@@ -10,7 +10,7 @@ class AddAppNameFilter(BaseFilter):
         request = ctx.request
         if request.is_json and request.data and self.is_request_on_app(request.path):
             data = request.get_json()
-            original_app_dict = json.loads(self.get_original_app(request).to_json())
+            original_app_dict = json.loads(self.get_original_app(ctx).to_json())
             original_app_dict.update(data)
 
             if 'parameters' not in original_app_dict['container']['docker']:

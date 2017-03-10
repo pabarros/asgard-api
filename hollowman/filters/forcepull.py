@@ -12,7 +12,7 @@ class ForcePullFilter(BaseFilter):
             data = request.get_json()
 
             if self.is_single_app(data):
-                original_app_dict = json.loads(self.get_original_app(request).to_json())
+                original_app_dict = json.loads(self.get_original_app(ctx).to_json())
                 original_app_dict.update(data)
 
                 if 'labels' in original_app_dict and ('hollowman.disable_forcepull' in original_app_dict['labels']):
