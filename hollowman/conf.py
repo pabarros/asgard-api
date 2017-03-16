@@ -13,3 +13,6 @@ MARATHON_AUTH_HEADER = "Basic {}".format(
 
 user, passw = MARATHON_CREDENTIALS.split(':')
 marathon_client = MarathonClient([MARATHON_ENDPOINT], username=user, password=passw)
+
+# Default enabled
+FILTER_DNS_ENABLED = os.getenv("HOLLOWMAN_FILTER_DNS_ENABLE", "1") == "1"

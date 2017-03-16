@@ -9,10 +9,15 @@ class DNSRequestFilter(BaseFilter):
         request = ctx.request
         if request.is_json and request.data:
             body = json.loads(request.data)
+            original_app = self.get_original_app(ctx)
+
+            if 'hollowman.filter.dns.disable' in original_app.labels:
+                return request
+
 
             if self.is_request_on_app(request.path) and self._payloas_has_only_env(request, body):
                 # Só temos as envs nesse payload, vamos buscar a app original e mesclar com o payload
-                original_app = self.get_original_app(ctx)
+
                 if not original_app.env:
                     original_app.env = {}
                 for key, value in body['env'].iteritems():

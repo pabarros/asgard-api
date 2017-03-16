@@ -8,5 +8,18 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
 * MARATHON_ENDPOINT [required] Where to connect to find marathon api
 
+* HOLLOWMAN_FILTER_DNS_ENABLE: "1|0" Diz se o filtro de DNS estará ligado ou desligado
+
+
+
+## Opções específicas de filtros
+
+# DNS
+ * hollowman.filter.dns.disable: Label que define se o filtro de dns está ligado para uma app específica.
+
+# FORCE PULL
+ * hollowman.filter.forcepull.disable: Label que define se o checkbox de forcepull não será marcado automaticamente para uma app específica
+
+
 ## Running tests
 `py.test --cov=hollowman --cov-report term-missing -v -s`
