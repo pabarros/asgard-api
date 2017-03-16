@@ -3,6 +3,7 @@ import mock
 
 from hollowman.app import application
 from hollowman.filters.request import RequestFilter
+from hollowman.filters.dns import DNSRequestFilter
 
 from flask import request
 from marathon.models.app import MarathonApp
@@ -95,3 +96,20 @@ class RequestFilterTest(TestCase):
                 import traceback
                 traceback.print_exc()
                 self.fail("Nao deveria ter dado exception, %s" % e)
+
+    def test_build_filters_list(self):
+        import hollowman
+        self.assertTrue(len(hollowman.filters.request._filters) > 1)
+
+    def test_do_not_add_dns_filter_if_filter_is_disabled(self):
+        from hollowman.filters import request
+        with mock.patch.object(request, "conf") as conf_mock:
+            conf_mock.FILTER_DNS_ENABLED = False
+            filters = request._build_filters_list()
+            dns_filter_included = [isinstance(filter_, DNSRequestFilter) for filter_ in filters]
+            self.assertFalse(any(dns_filter_included), "DNSRequestFilter esta na lista de filtros ligados, nao deveria")
+
+            conf_mock.FILTER_DNS_ENABLED = True
+            filters = request._build_filters_list()
+            dns_filter_included = [isinstance(filter_, DNSRequestFilter) for filter_ in filters]
+            self.assertTrue(any(dns_filter_included), "DNSRequestFilter NAO esta na lista de filtros ligados, deveria")
