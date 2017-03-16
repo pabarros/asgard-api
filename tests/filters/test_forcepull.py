@@ -43,7 +43,7 @@ class ForcePullTest(TestCase):
                 }
             },
             "labels": {
-                "hollowman.disable_forcepull": "any_value"
+                "hollowman.filter.forcepull.disable": "any_value"
             }
         }
 
