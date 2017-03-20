@@ -21,6 +21,12 @@ class BaseConstraintFilter(BaseFilter):
                             "exclusive",
                             "UNLIKE",
                             ".*"
+                        ],
+                        [
+                            "dc",
+                            "LIKE",
+                            "sl",
+
                         ]
                     ]
 

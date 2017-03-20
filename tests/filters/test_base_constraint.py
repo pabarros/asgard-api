@@ -35,6 +35,12 @@ class BaseConstraintFilterTest(TestCase):
                             "exclusive",
                             "UNLIKE",
                             ".*"
+                        ],
+                        [
+                            "dc",
+                            "LIKE",
+                            "sl",
+
                         ]
                     ]
                 }
