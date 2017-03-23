@@ -292,7 +292,7 @@ class DNSRequestFilterTest(TestCase):
                       "type": "DOCKER",
                     "docker": {
                         "image": "alpine:3.4",
-                      "network": "HOST",
+                      "network": "BRIDGE",
                     }
                   }
                 },
@@ -306,7 +306,7 @@ class DNSRequestFilterTest(TestCase):
                         "type": "DOCKER",
                         "docker": {
                             "image": "alpine:3.4",
-                            "network": "HOST",
+                            "network": "BRIDGE",
                         }
                     }
                 },
@@ -364,7 +364,7 @@ class DNSRequestFilterTest(TestCase):
                           "container": {
                               "docker": {
                                   "image": "alpine:3.4",
-                                  "network": "HOST"
+                                  "network": "BRIDGE"
                               }
                           }
                       }
@@ -378,7 +378,7 @@ class DNSRequestFilterTest(TestCase):
                                   "container": {
                                       "docker": {
                                           "image": "alpine:3.4",
-                                          "network": "HOST"
+                                          "network": "BRIDGE"
                                       }
                                   }
                               }
@@ -445,7 +445,7 @@ class DNSRequestFilterTest(TestCase):
                     u"docker": {
                         u"image": u"alpine:3.4",
                         u"forcePullImage": False,
-                        u"network": u"HOST",
+                        u"network": u"BRIDGE",
                         u"privileged": False,
                     },
                     u"type": u"DOCKER",
@@ -477,6 +477,8 @@ class DNSRequestFilterTest(TestCase):
             self.assertDictEqual(modified_app, filtered_request.get_json())
 
     def test_add_dns_when_patching_only_envvars_app_with_envs(self):
+        self.maxDiff = None
+
         """
         Temos que pegar PUT em /v2/apps/<app-name> contendo apenas a modificação das envs.
         """
@@ -488,7 +490,7 @@ class DNSRequestFilterTest(TestCase):
                     u"docker": {
                         u"image": u"alpine:3.4",
                         u"forcePullImage": False,
-                        u"network": u"HOST",
+                        u"network": u"BRIDGE",
                         u"privileged": False,
                     },
                     u"type": u"DOCKER",
@@ -537,7 +539,7 @@ class DNSRequestFilterTest(TestCase):
                 u"docker": {
                     u"image": u"alpine:3.4",
                     u"forcePullImage": False,
-                    u"network": u"HOST",
+                    u"network": u"BRIDGE",
                     u"privileged": False,
                 },
                 u"type": u"DOCKER",
@@ -570,7 +572,7 @@ class DNSRequestFilterTest(TestCase):
                 u"docker": {
                     u"image": u"alpine:3.4",
                     u"forcePullImage": False,
-                    u"network": u"HOST",
+                    u"network": u"BRIDGE",
                     u"privileged": False,
                     u"parameters": parameters_,
                 },
@@ -586,3 +588,31 @@ class DNSRequestFilterTest(TestCase):
             ctx_mock.request = request
             filtered_request = self.filter.run(ctx_mock)
             self.assertEqual(parameters_, filtered_request.get_json()['container']['docker']['parameters'])
+
+    def test_network_host_app_left_intact(self):
+        """
+        When the app is on network=HOST mode we shouldn't mess with it.
+        """
+        data_ = {
+            "id": "/foo/sleep2",
+            "cmd": "sleep 40000",
+            "cpus": 1,
+            "mem": 128,
+            "disk": 0,
+            "instances": 0,
+            "container": {
+                  "type": "DOCKER",
+                  "docker": {
+                      "image": "alpine:3.4",
+                      "network": "HOST",
+                  },
+            }
+        }
+
+        with mock.patch.object(self, "ctx") as ctx_mock:
+            request = RequestStub(path="/v2/apps//foo/sleep2", data=data_)
+
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data_)
+            ctx_mock.request = request
+            modified_request = self.filter.run(ctx_mock)
+            self.assertFalse("parameters" in modified_request.get_json()['container']['docker'])

@@ -29,7 +29,7 @@ def apiv2(path):
     modded_request = request
     try:
         modded_request = RequestFilter.dispatch(request)
-    except Exception as e:
+    except Exception as e:# pragma: no cover
         import traceback
         traceback.print_exc()
     r = upstream.replay_request(modded_request, MARATHON_ENDPOINT)
