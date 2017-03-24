@@ -12,7 +12,7 @@ class DNSRequestFilter(BaseFilter):
             original_app = self.get_original_app(ctx)
 
             if 'hollowman.filter.dns.disable' in original_app.labels or \
-                (hasattr(original_app.container, "docker") and original_app.container.docker.network == 'HOST'):
+                self.is_app_network_host(original_app):
                 return request
 
             if self.is_request_on_app(request.path) and self._payloas_has_only_env(request, body):
