@@ -4,6 +4,9 @@ import json
 from hollowman.filters import BaseFilter
 
 
+DEFAULT_CONSTRAINT_DC = [ "dc", "LIKE", "sl", ]
+DEFAULT_CONSTRAINT_EXCLUSIVE = [ "exclusive", "UNLIKE", ".*" ]
+
 class BaseConstraintFilter(BaseFilter):
 
     def run(self, ctx):
@@ -12,23 +15,18 @@ class BaseConstraintFilter(BaseFilter):
             data = request.get_json()
 
             if self.is_single_app(data):
-                app_dict = json.loads(self.get_original_app(ctx).to_json())
+                originial_app = self.get_original_app(ctx)
+                app_dict = json.loads(originial_app.to_json())
                 app_dict.update(data)
 
-                if 'constraints' not in app_dict or app_dict['constraints'] == []:
+                if not originial_app.constraints:
                     app_dict['constraints'] = [
-                        [
-                            "exclusive",
-                            "UNLIKE",
-                            ".*"
-                        ],
-                        [
-                            "dc",
-                            "LIKE",
-                            "sl",
-
-                        ]
+                        DEFAULT_CONSTRAINT_EXCLUSIVE,
+                        DEFAULT_CONSTRAINT_DC,
                     ]
+                elif originial_app.constraints \
+                        and "dc" not in [c.field for c in originial_app.constraints]:
+                    app_dict['constraints'].append(DEFAULT_CONSTRAINT_DC)
 
                 request.data = json.dumps(app_dict)
 

@@ -75,6 +75,58 @@ class BaseConstraintFilterTest(TestCase):
                             "exclusive",
                             "LIKE",
                             "web"
+                        ],
+                        [
+                            "dc",
+                            "LIKE",
+                            "sl"
+                        ]
+                    ]
+                }
+            )
+
+    def test_simple_app_with_dc_constraint(self):
+        """
+        Se uma app ja possui a constraint "dc" não mexemos nas constraints
+        """
+        data = {
+            "id": "/foo/bar",
+            "constraints": [
+                [
+                    "exclusive",
+                    "LIKE",
+                    "web"
+                ],
+                [
+                    "dc",
+                    "LIKE",
+                    "(sl|aws)",
+                ]
+            ]
+        }
+
+        from marathon.models.app import MarathonApp
+        with mock.patch.object(self, "ctx") as ctx_mock:
+            request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
+
+            self.ctx.request = request
+            modified_request = self.filter.run(self.ctx)
+
+            self.assertEqual(
+                modified_request.get_json(),
+                {
+                    "id": "/foo/bar",
+                    "constraints": [
+                        [
+                            "exclusive",
+                            "LIKE",
+                            "web"
+                        ],
+                        [
+                            "dc",
+                            "LIKE",
+                            "(sl|aws)"
                         ]
                     ]
                 }
