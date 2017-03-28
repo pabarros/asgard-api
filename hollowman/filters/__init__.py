@@ -60,6 +60,9 @@ class BaseFilter(object):
             # TODO: Logar que tivemos essa exception
             return MarathonApp()
 
+    def is_app_network_host(self, app):
+        return hasattr(app.container, "docker") and app.container.docker.network == 'HOST'
+
 
 class Context(object):
 

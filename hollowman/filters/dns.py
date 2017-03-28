@@ -11,9 +11,9 @@ class DNSRequestFilter(BaseFilter):
             body = json.loads(request.data)
             original_app = self.get_original_app(ctx)
 
-            if 'hollowman.filter.dns.disable' in original_app.labels:
+            if 'hollowman.filter.dns.disable' in original_app.labels or \
+                self.is_app_network_host(original_app):
                 return request
-
 
             if self.is_request_on_app(request.path) and self._payloas_has_only_env(request, body):
                 # Só temos as envs nesse payload, vamos buscar a app original e mesclar com o payload

@@ -152,6 +152,62 @@ class BaseFilterTest(unittest.TestCase):
         empty_app = MarathonApp()
         self.assertEqual(None, empty_app.instances)
 
+    def test_is_network_host_legit_app(self):
+        data = {
+            "id": "/foo/sleep2",
+            "cmd": "sleep 40000",
+            "cpus": 1,
+            "mem": 128,
+            "disk": 0,
+            "instances": 0,
+            "container": {
+                  "type": "DOCKER",
+                  "docker": {
+                      "image": "alpine:3.4",
+                      "network": "HOST",
+                  },
+            }
+        }
+
+        marathon_app = MarathonApp(**data)
+
+        self.assertTrue(self.filter.is_app_network_host(marathon_app))
+
+    def test_is_network_host_legit_app_bridge(self):
+        data = {
+            "id": "/foo/sleep2",
+            "cmd": "sleep 40000",
+            "cpus": 1,
+            "mem": 128,
+            "disk": 0,
+            "instances": 0,
+            "container": {
+                  "type": "DOCKER",
+                  "docker": {
+                      "image": "alpine:3.4",
+                      "network": "BRIDGE",
+                  },
+            }
+        }
+
+        marathon_app = MarathonApp(**data)
+
+        self.assertFalse(self.filter.is_app_network_host(marathon_app))
+
+    def test_is_network_host_incomplete_app(self):
+        data = {
+            "id": "/foo/sleep2",
+            "disk": 0,
+            "instances": 0
+        }
+
+        marathon_app = MarathonApp(**data)
+
+        self.assertFalse(self.filter.is_app_network_host(marathon_app))
+
+    def test_is_network_host_none_app(self):
+        self.assertFalse(self.filter.is_app_network_host(MarathonApp()))
+
 
 class TestContext(unittest.TestCase):
 
