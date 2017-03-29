@@ -6,6 +6,8 @@ from hollowman.filters import BaseFilter
 
 class AddAppNameFilter(BaseFilter):
 
+    name = 'add_app_name'
+
     def run(self, ctx):
         request = ctx.request
         if request.is_json and request.data and self.is_request_on_app(request.path):
@@ -17,13 +19,13 @@ class AddAppNameFilter(BaseFilter):
                 original_app_dict['container']['docker']['parameters'] = []
 
             param_value = "hollowman.appname={}".format(original_app_dict['id'])
-            self.patch_label_param(original_app_dict['container']['docker']['parameters'], 
-                                   key="label", 
+            self.patch_label_param(original_app_dict['container']['docker']['parameters'],
+                                   key="label",
                                    value=param_value
             )
 
             request.data = json.dumps(original_app_dict)
-                
+
 
         return request
 
@@ -33,7 +35,7 @@ class AddAppNameFilter(BaseFilter):
             if param['key'] == "label" and param['value'].startswith("hollowman.appname="):
                 param['value'] = value
                 found = True
-        
+
         if not found:
             docker_params.append(
                 {

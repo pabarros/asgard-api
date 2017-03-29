@@ -54,6 +54,9 @@ class BaseFilter(object):
         return '/'.join(split_).replace('v2/apps', '')
 
     def get_original_app(self, ctx):
+        """
+        :rtype: marathon.models.app.MarathonApp
+        """
         try:
             return ctx.marathon_client.get_app(self.get_app_id(ctx.request.path))
         except Exception as e:

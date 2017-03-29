@@ -5,6 +5,8 @@ from hollowman.filters import BaseFilter
 
 class TrimRequestFilter(BaseFilter):
 
+    name = 'trim'
+
     def run(self, ctx):
         request = ctx.request
         if request.is_json and request.data:

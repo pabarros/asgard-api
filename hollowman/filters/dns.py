@@ -5,6 +5,8 @@ from hollowman.filters import BaseFilter
 
 class DNSRequestFilter(BaseFilter):
 
+    name = 'dns'
+
     def run(self, ctx):
         request = ctx.request
         if request.is_json and request.data:

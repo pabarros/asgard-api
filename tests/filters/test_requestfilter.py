@@ -2,54 +2,47 @@ from unittest import TestCase
 import mock
 
 from hollowman.app import application
-from hollowman.filters.request import RequestFilter
+from hollowman.filters.request import RequestFilter, _get_ctx, _build_filters_list
 from hollowman.filters.dns import DNSRequestFilter
 
 from flask import request
 from marathon.models.app import MarathonApp
 import json
+from os import environ
 
 class RequestFilterTest(TestCase):
+
+    def test_production_filters_have_attr_name(self):
+        for f in _build_filters_list():
+            self.assertTrue(hasattr(f, 'name'))
 
     def test_dispatch_one_filter(self):
         """
         Tests if the run() method of the Filter is called
         """
-        class FilterOne(object):
-
-            def run(self, r):
-                self.filter_called = True
-                return r
-        filter_one = FilterOne()
-        with mock.patch("hollowman.filters.request._filters", [filter_one]):
+        _filters = [mock.MagicMock()]
+        with mock.patch("hollowman.filters.request._filters", _filters):
             final_request = RequestFilter.dispatch(None)
             self.assertIsNone(final_request)
-            self.assertTrue(filter_one.filter_called)
+            self.assertTrue(_filters[0].run.called)
 
     def test_dispatch_popultates_ctx_with_the_request_object(self):
         class RequestObject(object):
-            filter_one = None
-            filter_two = None
+            foo = "bar"
 
-        class FilterOne(object):
-
-            def run(self, ctx):
-                ctx.request.filter_one = True
-                return ctx.request
-
-        class FilterTwo(object):
-
-            def run(self, ctx):
-                ctx.request.filter_two = True
-                return ctx.request
-
-        filters = [FilterOne(), FilterTwo()]
+        filters = [mock.MagicMock(), mock.MagicMock()]
         with mock.patch("hollowman.filters.request._filters", filters):
             request = RequestObject()
             final_request = RequestFilter.dispatch(request)
             self.assertIsNotNone(final_request)
-            self.assertTrue(request.filter_one)
-            self.assertTrue(request.filter_two)
+            self.assertEqual(final_request, request)
+            for f in filters:
+                context_param = f.run.call_args[0][0]
+                self.assertTrue(hasattr(
+                    context_param,
+                    "request"
+                ))
+                self.assertTrue(context_param.request.foo == "bar")
 
     def test_dispatch_all_filters_empty_body(self):
         """
@@ -102,14 +95,10 @@ class RequestFilterTest(TestCase):
         self.assertTrue(len(hollowman.filters.request._filters) > 1)
 
     def test_do_not_add_dns_filter_if_filter_is_disabled(self):
-        from hollowman.filters import request
-        with mock.patch.object(request, "conf") as conf_mock:
-            conf_mock.FILTER_DNS_ENABLED = False
+        new_env = {}
+        new_env["{prefix}"]
+        with mock.patch.dict(environ, {"foo":"bar"}):
+            import ipdb; ipdb.set_trace()
             filters = request._build_filters_list()
             dns_filter_included = [isinstance(filter_, DNSRequestFilter) for filter_ in filters]
-            self.assertFalse(any(dns_filter_included), "DNSRequestFilter esta na lista de filtros ligados, nao deveria")
-
-            conf_mock.FILTER_DNS_ENABLED = True
-            filters = request._build_filters_list()
-            dns_filter_included = [isinstance(filter_, DNSRequestFilter) for filter_ in filters]
-            self.assertTrue(any(dns_filter_included), "DNSRequestFilter NAO esta na lista de filtros ligados, deveria")
+            self.assertFalse(any(dns_filter_included), "DNSRequestFilter esta na lista de filtros desligados, nao deveria")
