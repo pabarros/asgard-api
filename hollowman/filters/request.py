@@ -11,7 +11,7 @@ from hollowman.filters import Context
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman import conf
 
-from marathon.models import app
+from marathon.models import MarathonApp
 
 def _build_filters_list():
     _all_filters = [
@@ -24,13 +24,10 @@ def _build_filters_list():
     ]
 
     _enabled_filters = []
+    lowercase_envvars = [envvar.lower() for envvar in os.environ]
 
     for f in _all_filters:
-        filter_disable_control_envvar = "{prefix}.{filter_name}.disable".format(
-            prefix=RequestFilter.control_label_prefix,
-            filter_name=f
-        )
-        if filter_disable_control_envvar not in [envvar.lower() for envvar in os.environ]:
+        if conf.ConfHelper.get_filter_disable_variable(f) not in lowercase_envvars:
             _enabled_filters.append(f)
 
     return _enabled_filters
@@ -43,27 +40,24 @@ def _get_ctx(request):
 
 class RequestFilter(object):
 
-    """
-    Prefix for control labels used by Hollowman itself
-    """
-    control_label_prefix = "hollowman"
-
     @staticmethod
     def check_filter_disable(ctx, request, request_filter):
         """
+        :param ctx:
+        :type ctx: hollowman.filters.Context
+
+        :param request:
+        :type request: hollowman.hollowman_flask.HollowmanRequest
+
         :param request_filter:
         :type request_filter: hollowman.filters.BaseFilter
         """
         original_app = request_filter.get_original_app(ctx)
+        request_app = MarathonApp(request.data if hasattr(request, "data") else None)
+        disable_variable = conf.ConfHelper.get_filter_disable_variable(request_filter)
 
-        # disable all via env var on hollowman
-        # check payload app for disabling too
-        # check if all registered filters has .name
-
-        return "{prefix}.{filter_name}.disable".format(
-            prefix=RequestFilter.control_label_prefix,
-            filter_name=request_filter.name.lower()
-        ).strip() in original_app.labels
+        return disable_variable in request_app.env or \
+                disable_variable in original_app.labels
 
     @staticmethod
     def dispatch(request):
