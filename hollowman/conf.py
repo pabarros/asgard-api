@@ -33,16 +33,11 @@ variable_namespace = os.getenv('variable_namespace', 'hollowman').strip().lower(
 
 class ConfHelper(object):
 
+    envvars =  {k.lower().strip(): v.lower().strip() for k,v in os.environ.iteritems()}
+
     @staticmethod
-    def get_filter_variable_name(request_filter, variables = []):
+    def get_filter_env_variable_name(request_filter, variables = []):
         """
-        This method must return the base name to be used on any
-        control variable/label.
-
-        Eg:
-            For input: (<default_scale_filter>, ["disable"])
-            Must return something like: "hollowman.default_scale.disable"
-
         :param request_filter: A request filter
         :type request_filter: hollowman.filters.BaseFilter
 
@@ -52,11 +47,51 @@ class ConfHelper(object):
 
         _variables = [v.lower().strip() for v in variables]
 
-        return "".join(
+        return "_".join(
             [variable_namespace, request_filter.name.strip()] + \
             _variables
         )
 
     @staticmethod
-    def get_filter_disable_variable(request_filter):
-        return ConfHelper.get_filter_variable_name(request_filter, ['disable'])
+    def get_filter_label_variable_name(request_filter, variables = []):
+        """
+        :param request_filter: A request filter
+        :type request_filter: hollowman.filters.BaseFilter
+
+        :param variables: Variables to be used
+        :type variables: list[str]
+        """
+
+        _variables = [v.lower().strip() for v in variables]
+
+        return ".".join(
+            [variable_namespace, request_filter.name.strip()] + \
+            _variables
+        )
+
+    @staticmethod
+    def is_filter_globally_enabled(request_filter):
+        """
+        Returns True if the filter is disable via hollowman envvar
+        """
+        return ConfHelper.get_filter_env_variable_name(
+            request_filter,
+            ['disable']
+        ) not in ConfHelper.envvars
+
+    @staticmethod
+    def is_filter_locally_enabled(request_filter, marathon_app):
+        """
+        Returns True if the filter is disable via marathon_app label
+        :param marathon_app: Marathon app to search for labels
+        :type marathon_app: marathon.MarathonApp
+
+        :param request_filter: BaseFilter instance
+        :type request_filter: hollowman.filters.BaseFilter
+
+        :rtype: bool
+        """
+        return ConfHelper.get_filter_label_variable_name(
+            request_filter,
+            ['disable']
+        ) not in marathon_app.labels

@@ -24,10 +24,9 @@ def _build_filters_list():
     ]
 
     _enabled_filters = []
-    lowercase_envvars = [envvar.lower() for envvar in os.environ]
 
     for f in _all_filters:
-        if conf.ConfHelper.get_filter_disable_variable(f) not in lowercase_envvars:
+        if conf.ConfHelper.is_filter_globally_enabled(f):
             _enabled_filters.append(f)
 
     return _enabled_filters
@@ -41,7 +40,7 @@ def _get_ctx(request):
 class RequestFilter(object):
 
     @staticmethod
-    def check_filter_disable(ctx, request, request_filter):
+    def check_filter_enabled(ctx, request, request_filter):
         """
         :param ctx:
         :type ctx: hollowman.filters.Context
@@ -54,16 +53,15 @@ class RequestFilter(object):
         """
         original_app = request_filter.get_original_app(ctx)
         request_app = MarathonApp(request.data if hasattr(request, "data") else None)
-        disable_variable = conf.ConfHelper.get_filter_disable_variable(request_filter)
 
-        return disable_variable in request_app.env or \
-                disable_variable in original_app.labels
+        return conf.ConfHelper.is_filter_locally_enabled(request_filter, original_app) or \
+                conf.ConfHelper.is_filter_locally_enabled(request_filter, request_app)
 
     @staticmethod
     def dispatch(request):
         ctx = _get_ctx(request)
         for _request_filter in _filters:
-            if not RequestFilter.check_filter_disable(ctx, request, _request_filter):
+            if RequestFilter.check_filter_enabled(ctx, request, _request_filter):
                 _request_filter.run(ctx)
         return ctx.request
 
