@@ -6,7 +6,7 @@ from hollowman.filters import BaseFilter
 
 class AddAppNameFilter(BaseFilter):
 
-    name = 'add_app_name'
+    name = 'appname'
 
     def run(self, ctx):
         request = ctx.request
