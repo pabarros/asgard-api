@@ -16,3 +16,10 @@ marathon_client = MarathonClient([MARATHON_ENDPOINT], username=user, password=pa
 
 # Default enabled
 FILTER_DNS_ENABLED = os.getenv("HOLLOWMAN_FILTER_DNS_ENABLE", "1") == "1"
+
+def _build_cors_whitelist(env_value):
+    if not env_value:
+        return []
+    return [_host.strip() for _host in env_value.split(",") if _host.strip()]
+
+CORS_WHITELIST = _build_cors_whitelist(os.getenv("HOLLOWMAN_CORS_WHITELIST"))
