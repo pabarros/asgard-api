@@ -1,12 +1,18 @@
+#encoding: utf-8
+
 from flask import Flask, url_for, redirect, Response, request
+from flask_cors import CORS
+
 import requests
 
 from hollowman.hollowman_flask import HollowmanFlask
-from hollowman.conf import MARATHON_ENDPOINT, MARATHON_AUTH_HEADER
+from hollowman.conf import MARATHON_ENDPOINT, MARATHON_AUTH_HEADER, CORS_WHITELIST
 from hollowman import upstream
 from hollowman.filters.request import RequestFilter
 
 application = HollowmanFlask(__name__)
+CORS(application, origins=CORS_WHITELIST)
+
 
 
 @application.route("/", methods=["GET"])
