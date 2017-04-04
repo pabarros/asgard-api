@@ -9,7 +9,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 * MARATHON_ENDPOINT [required] Where to connect to find marathon api
 
 * HOLLOWMAN_FILTER_DNS_ENABLE: "1|0" Diz se o filtro de DNS estará ligado ou desligado
-
+* HOLLOWMAN_REDIRECT_ROOTPATH_TO: Env que diz para onde o usuario será redirecionado se acessar a raiz onde o hollowman está deployado. Defaults to `/v2/apps`
 
 
 ## Opções específicas de filtros

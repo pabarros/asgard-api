@@ -7,6 +7,7 @@ import requests
 
 from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.conf import MARATHON_ENDPOINT, MARATHON_AUTH_HEADER, CORS_WHITELIST
+from hollowman import conf
 from hollowman import upstream
 from hollowman.filters.request import RequestFilter
 
@@ -14,19 +15,9 @@ application = HollowmanFlask(__name__)
 CORS(application, origins=CORS_WHITELIST)
 
 
-
 @application.route("/", methods=["GET"])
 def index():
-    return Response(status=301, headers={"Location": url_for("ui")})
-
-@application.route('/ui', defaults={'path': '/'})
-@application.route('/ui/', defaults={'path': ''})
-@application.route('/ui/<path:path>')
-def ui(path):
-    r = upstream.replay_request(request, MARATHON_ENDPOINT)
-    h = dict(r.headers)
-    h.pop("Transfer-Encoding", None)
-    return Response(response=r.content, status=r.status_code, headers=h)
+    return Response(status=302, headers={"Location": conf.REDIRECT_ROOTPATH_TO})
 
 @application.route('/v2', defaults={'path': '/'})
 @application.route('/v2/', defaults={'path': ''})
