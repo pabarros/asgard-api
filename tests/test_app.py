@@ -2,6 +2,7 @@
 from mock import patch
 from unittest import TestCase, skip
 import hollowman.upstream
+from hollowman import conf
 from hollowman.app import application
 from collections import namedtuple
 
@@ -24,40 +25,23 @@ class TestApp(TestCase):
                 self.assertTrue("Content-Encoding" not in response.headers)
                 self.assertEqual(200, response.status_code)
 
-                response = client.get("/ui/main.css")
-                self.assertTrue("Content-Encoding" not in response.headers)
-                self.assertEqual(200, response.status_code)
-
-                self.assertEqual(2, replay_mock.call_count)
-
     def test_index_path(self):
         response = application.test_client().open('/')
 
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertTrue('Location' in response.headers)
+        self.assertEqual("http://localhost/v2/apps", response.headers['Location'])
 
-    def test_ui_path(self):
-        Response = namedtuple(
-            'Response',
-            [
-                "headers",
-                "content",
-                "status_code"
-            ]
-        )
+        redirect_value = "https://marathon.sieve.com.br"
+        with patch.object(conf, "REDIRECT_ROOTPATH_TO", new=redirect_value) as redirect_mock:
+            response = application.test_client().open('/')
 
-        with patch.object(hollowman.upstream, 'replay_request') as replay_request_mock:
-            replay_request_mock.return_value = Response(
-                headers={
-                    "foo": "bar",
-                    "Transfer-Encoding": 123
-                },
-                content="foofoofoofoofoofoo",
-                status_code=301
-            )
-            response = application.test_client().open('/ui/foo/bar')
-            self.assertEqual(response.status_code, 301)
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue('Location' in response.headers)
+            self.assertEqual(redirect_value, response.headers['Location'])
 
+    
+    
     @skip('Need to find a way to test this. Any ideas ?')
     def test_apiv2_path(self):
         pass
