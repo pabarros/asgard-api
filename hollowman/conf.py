@@ -5,6 +5,8 @@ import base64
 
 from marathon import MarathonClient
 
+ENABLED = "1"
+
 MARATHON_ENDPOINT = os.getenv("MARATHON_ENDPOINT", "http://127.0.0.1:8080")
 MARATHON_CREDENTIALS = os.getenv("MARATHON_CREDENTIALS", "guest:guest")
 

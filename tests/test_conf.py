@@ -1,5 +1,3 @@
-
-<<<<<<< HEAD
 import unittest
 import mock
 import os
