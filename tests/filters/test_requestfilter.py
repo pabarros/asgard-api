@@ -3,6 +3,7 @@ import mock
 import os
 
 from hollowman.app import application
+from hollowman.filters import BaseFilter
 from hollowman.filters.request import RequestFilter, _get_ctx, _build_filters_list
 from hollowman.filters.dns import DNSRequestFilter
 from hollowman.filters.appname import AddAppNameFilter
@@ -33,23 +34,33 @@ class RequestFilterTest(TestCase):
             self.assertIsNone(final_request)
             self.assertTrue(_filters[0].run.called)
 
-    # def test_dispatch_popultates_ctx_with_the_request_object(self):
-    #     class RequestObject(object):
-    #         foo = "bar"
-    #
-    #     # filters = [mock.MagicMock(), mock.MagicMock()]
-    #     with mock.patch("hollowman.filters.request._filters", []):
-    #         request = RequestObject()
-    #         final_request = RequestFilter.dispatch(request)
-    #         self.assertIsNotNone(final_request)
-    #         self.assertEqual(final_request, request)
-    #         for f in filters:
-    #             context_param = f.run.call_args[0][0]
-    #             self.assertTrue(hasattr(
-    #                 context_param,
-    #                 "request"
-    #             ))
-    #             self.assertTrue(context_param.request.foo == "bar")
+
+    def test_dispatch_popultates_ctx_with_the_request_object(self):
+        class RequestObject(object):
+            filter_one = None
+            filter_two = None
+
+        class FilterOne(BaseFilter):
+            name = "one"
+
+            def run(self, ctx):
+                ctx.request.filter_one = True
+                return ctx.request
+
+        class FilterTwo(BaseFilter):
+            name = "two"
+
+            def run(self, ctx):
+                ctx.request.filter_two = True
+                return ctx.request
+
+        filters = [FilterOne(), FilterTwo()]
+        with mock.patch("hollowman.filters.request._filters", filters):
+            request = RequestObject()
+            final_request = RequestFilter.dispatch(request)
+            self.assertIsNotNone(final_request)
+            self.assertTrue(request.filter_one)
+            self.assertTrue(request.filter_two)
 
     def test_dispatch_all_filters_empty_body(self):
         """
