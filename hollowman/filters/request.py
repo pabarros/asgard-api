@@ -14,7 +14,8 @@ from hollowman import conf
 
 from marathon.models import MarathonApp
 
-DISABLER_ENV_VAR_NAME = "HOLLOWMAN_FILTER_{filter_name}_DISABLE"
+DISABLER_ENV_VAR_NAME   = "HOLLOWMAN_FILTER_{filter_name}_DISABLE"
+DISABLER_LABEL_NAME     = "hollowman.filter.{filter_name}.disable"
 
 def _build_filters_list():
     _all_filters = [
@@ -62,7 +63,7 @@ class RequestFilter(object):
 
         request_app = MarathonApp.from_json(request_as_json)
 
-        disable_label = "hollowman.filter.{filter_name}.disable".format(filter_name=request_filter.name)
+        disable_label = DISABLER_LABEL_NAME.format(filter_name=request_filter.name)
 
         if disable_label not in request_app.labels:
             if not some_label_was_modified:
