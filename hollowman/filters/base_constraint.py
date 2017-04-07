@@ -9,7 +9,7 @@ DEFAULT_CONSTRAINT_EXCLUSIVE = [ "exclusive", "UNLIKE", ".*" ]
 
 class BaseConstraintFilter(BaseFilter):
 
-    name = 'base_constraint'
+    name = 'constraint'
 
     def run(self, ctx):
         request = ctx.request

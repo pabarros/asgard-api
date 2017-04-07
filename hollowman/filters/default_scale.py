@@ -7,7 +7,7 @@ from hollowman.filters import BaseFilter
 
 class DefaultScaleRequestFilter(BaseFilter):
 
-    name = 'default_scale'
+    name = 'scale'
 
     def run(self, ctx):
         request = ctx.request

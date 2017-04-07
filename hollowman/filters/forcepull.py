@@ -6,7 +6,7 @@ from hollowman.filters import BaseFilter
 
 class ForcePullFilter(BaseFilter):
 
-    name = 'force_pull'
+    name = 'pull'
 
     def run(self, ctx):
         request = ctx.request
