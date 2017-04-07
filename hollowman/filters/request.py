@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import os
+import json
 
 from hollowman.filters.dns import DNSRequestFilter
 from hollowman.filters.trim import TrimRequestFilter
@@ -55,10 +56,19 @@ class RequestFilter(object):
         :type request_filter: hollowman.filters.BaseFilter
         """
         original_app = request_filter.get_original_app(ctx)
-        request_app = MarathonApp(request.data if hasattr(request, "data") else None)
 
-        return conf.ConfHelper.is_filter_locally_enabled(request_filter, original_app) or \
-                conf.ConfHelper.is_filter_locally_enabled(request_filter, request_app)
+        request_as_json = request.get_json() if (request.is_json and request.data) else {}
+        some_label_was_modified = "labels" in request_as_json
+
+        request_app = MarathonApp.from_json(request_as_json)
+
+        disable_label = "hollowman.filter.{filter_name}.disable".format(filter_name=request_filter.name)
+
+        if disable_label not in request_app.labels:
+            if not some_label_was_modified:
+                return disable_label not in original_app.labels
+            else:
+                return True
 
     @staticmethod
     def dispatch(request):

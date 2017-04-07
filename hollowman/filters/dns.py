@@ -1,7 +1,7 @@
 #encoding: utf-8
 import json
 from hollowman.filters import BaseFilter
-
+from marathon.models.app import MarathonApp
 
 class DNSRequestFilter(BaseFilter):
 
@@ -13,8 +13,7 @@ class DNSRequestFilter(BaseFilter):
             body = json.loads(request.data)
             original_app = self.get_original_app(ctx)
 
-            if 'hollowman.filter.dns.disable' in original_app.labels or \
-                self.is_app_network_host(original_app):
+            if self.is_app_network_host(original_app) or self.is_payload_network_host(body):
                 return request
 
             if self.is_request_on_app(request.path) and self._payloas_has_only_env(request, body):
@@ -56,3 +55,7 @@ class DNSRequestFilter(BaseFilter):
         if 'groups' in group:
             for subgroup in group['groups']:
                 self.patch_apps_from_group(subgroup)
+
+    def is_payload_network_host(self, data):
+        network = data['container']['docker'].get("network", "BRIDGE") if self.is_docker_app(data) else None
+        return network == "HOST"
