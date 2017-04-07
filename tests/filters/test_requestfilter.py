@@ -107,9 +107,9 @@ class RequestFilterTest(TestCase):
 
     def test_build_filters_dns_globally_disabled(self):
         with mock.patch.object(os, 'getenv') as getenv_mock:
-            def _side_effect(arg, default):
-                _data = {"HOLLOWMAN_FILTER_DNS_ENABLE": "0"}
-                return _data.get(arg, default)
+            def _side_effect(arg):
+                _data = {"HOLLOWMAN_FILTER_DNS_DISABLE": "any-value"}
+                return _data.get(arg)
 
             getenv_mock.side_effect = _side_effect
             all_filters = _build_filters_list()
@@ -119,11 +119,11 @@ class RequestFilterTest(TestCase):
 
     def test_build_filters_appname_globally_disabled(self):
         with mock.patch.object(os, 'getenv') as getenv_mock:
-            def _side_effect(arg, default):
-                _data = {"HOLLOWMAN_FILTER_APPNAME_ENABLE": "0"}
-                return _data.get(arg, default)
+            def _side_effect(arg):
+                _data = {"HOLLOWMAN_FILTER_APPNAME_DISABLE": "any-value"}
+                return _data.get(arg)
 
             getenv_mock.side_effect = _side_effect
             all_filters = _build_filters_list()
             self.assertTrue(len(all_filters) > 0)
-            self.assertFalse(any([isinstance(f, AddAppNameFilter) for f in all_filters]), "DNSRequestFilter nao deveria estar ligado")
+            self.assertFalse(any([isinstance(f, AddAppNameFilter) for f in all_filters]), "AddAppNameFilter nao deveria estar ligado")

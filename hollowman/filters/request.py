@@ -13,7 +13,7 @@ from hollowman import conf
 
 from marathon.models import MarathonApp
 
-DISABLER_ENV_VAR_NAME = "HOLLOWMAN_FILTER_{filter_name}_ENABLE"
+DISABLER_ENV_VAR_NAME = "HOLLOWMAN_FILTER_{filter_name}_DISABLE"
 
 def _build_filters_list():
     _all_filters = [
@@ -29,7 +29,7 @@ def _build_filters_list():
 
     for f in _all_filters:
         env_name = DISABLER_ENV_VAR_NAME.format(filter_name=f.name)
-        if os.getenv(env_name.upper(), conf.ENABLED) == conf.ENABLED:
+        if os.getenv(env_name.upper()) is None:
             _enabled_filters.append(f)
 
     return _enabled_filters
