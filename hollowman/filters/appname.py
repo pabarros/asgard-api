@@ -1,6 +1,6 @@
 
-
 import json
+
 from hollowman.filters import BaseFilter
 
 

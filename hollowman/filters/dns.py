@@ -1,7 +1,10 @@
 #encoding: utf-8
 import json
+
 from hollowman.filters import BaseFilter
+
 from marathon.models.app import MarathonApp
+
 
 class DNSRequestFilter(BaseFilter):
 
