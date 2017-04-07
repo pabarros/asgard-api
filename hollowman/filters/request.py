@@ -17,12 +17,12 @@ DISABLER_ENV_VAR_NAME = "HOLLOWMAN_FILTER_{filter_name}_DISABLE"
 
 def _build_filters_list():
     _all_filters = [
-        DNSRequestFilter(),
         TrimRequestFilter(),
         ForcePullFilter(),
         BaseConstraintFilter(),
         DefaultScaleRequestFilter(),
         AddAppNameFilter(),
+        DNSRequestFilter(),
     ]
 
     _enabled_filters = []
