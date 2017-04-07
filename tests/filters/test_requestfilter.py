@@ -12,7 +12,7 @@ from flask import request
 from marathon.models.app import MarathonApp
 import json
 from os import environ
-from hollowman.conf import ConfHelper
+from tests import RequestStub
 
 class RequestFilterTest(TestCase):
 
