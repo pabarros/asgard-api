@@ -7,6 +7,8 @@ from hollowman.filters import BaseFilter
 
 class DefaultScaleRequestFilter(BaseFilter):
 
+    name = 'scale'
+
     def run(self, ctx):
         request = ctx.request
         if request.is_json and request.data:
@@ -27,4 +29,3 @@ class DefaultScaleRequestFilter(BaseFilter):
             request.data = json.dumps(original_app_dict)
 
         return request
-

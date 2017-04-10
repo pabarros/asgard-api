@@ -57,6 +57,7 @@ class DNSRequestFilterTest(TestCase):
         request = RequestStub(path="/v2/apps/", data=data_)
         self.ctx.request = request
         modified_request = self.filter.run(self.ctx)
+
         self.assertIsNotNone(modified_request)
         self.assertTrue('container' in modified_request.get_json())
         self.assertTrue('docker' in modified_request.get_json()['container'])
@@ -525,70 +526,6 @@ class DNSRequestFilterTest(TestCase):
             ctx_mock.marathon_client.get_app.assert_called_with("/app/foo")
             self.assertDictEqual(modified_app, filtered_request.get_json())
 
-    def test_do_not_add_dns_entries_if_disablelabel_present_no_parameters(self):
-        """
-        Se a label hollowman.filter.dns.disable estiver presente, nenhum dns server será
-        adicionado para essa app
-        """
-        data_ = {
-            "id": "/app/foo",
-            "labels": {
-                "hollowman.filter.dns.disable": "true"
-            },
-            u"container": {
-                u"docker": {
-                    u"image": u"alpine:3.4",
-                    u"forcePullImage": False,
-                    u"network": u"BRIDGE",
-                    u"privileged": False,
-                },
-                u"type": u"DOCKER",
-            },
-
-        }
-
-        with mock.patch.object(self, "ctx") as ctx_mock:
-            request = RequestStub(path="/v2/apps//app/foo", data=data_, method="PUT")
-
-            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data_)
-            ctx_mock.request = request
-            filtered_request = self.filter.run(ctx_mock)
-            self.assertTrue('parameters' not in filtered_request.get_json()['container']['docker'])
-
-    def test_do_not_add_dns_entries_if_disablelabel_present_app_with_parameters(self):
-        """
-        Se a label hollowman.filter.dns.disable estiver presente, nenhum dns server será
-        adicionado para essa app
-        """
-        parameters_ = [
-            {u"key": u"param", u"value": u"42"}
-        ]
-        data_ = {
-            "id": "/app/foo",
-            "labels": {
-                "hollowman.filter.dns.disable": "true"
-            },
-            u"container": {
-                u"docker": {
-                    u"image": u"alpine:3.4",
-                    u"forcePullImage": False,
-                    u"network": u"BRIDGE",
-                    u"privileged": False,
-                    u"parameters": parameters_,
-                },
-                u"type": u"DOCKER",
-            },
-
-        }
-
-        with mock.patch.object(self, "ctx") as ctx_mock:
-            request = RequestStub(path="/v2/apps//app/foo", data=data_, method="PUT")
-
-            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data_)
-            ctx_mock.request = request
-            filtered_request = self.filter.run(ctx_mock)
-            self.assertEqual(parameters_, filtered_request.get_json()['container']['docker']['parameters'])
-
     def test_network_host_app_left_intact(self):
         """
         When the app is on network=HOST mode we shouldn't mess with it.
@@ -615,4 +552,64 @@ class DNSRequestFilterTest(TestCase):
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data_)
             ctx_mock.request = request
             modified_request = self.filter.run(ctx_mock)
+
+            self.assertFalse("parameters" in modified_request.get_json()['container']['docker'])
+
+    def test_original_app_is_netbridge_but_request_app_changes_to_nethost_and_enables_dns_filter(self):
+        """
+        Current App has:
+            * DNS filter disabled
+            * Is network Bridge
+        This App receives an update that:
+            * Enables DNS Filter, that is, removes the disable label
+            * Changes App network to HOST
+
+        DNS Filter must run, bot not modify docker parameters
+        """
+
+        base_app = {
+            "id": "/foo/sleep2",
+            "cmd": "sleep 40000",
+            "cpus": 1,
+            "mem": 128,
+            "disk": 0,
+            "instances": 0,
+            "container": {
+                  "type": "DOCKER",
+                  "docker": {
+                      "image": "alpine:3.4",
+                      "network": "BRIDGE",
+                  },
+            },
+        }
+
+        original_app = base_app.copy()
+        original_app['labels'] = {
+                "hollowman.filter.dns.disable": "true",
+        }
+
+        request_app = {
+            "id": "/foo/sleep2",
+            "cmd": "sleep 40000",
+            "cpus": 1,
+            "mem": 128,
+            "disk": 0,
+            "instances": 0,
+            "container": {
+                  "type": "DOCKER",
+                  "docker": {
+                      "image": "alpine:3.4",
+                      "network": "HOST",
+                  },
+            },
+        }
+
+        with mock.patch.object(self, "ctx") as ctx_mock:
+            request = RequestStub(path="/v2/apps//foo/sleep2", data=request_app)
+
+            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**original_app)
+            ctx_mock.request = request
+            #import ipdb; ipdb.set_trace()
+            modified_request = self.filter.run(ctx_mock)
+
             self.assertFalse("parameters" in modified_request.get_json()['container']['docker'])

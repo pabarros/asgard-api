@@ -1,10 +1,12 @@
 
-
 import json
+
 from hollowman.filters import BaseFilter
 
 
 class AddAppNameFilter(BaseFilter):
+
+    name = 'appname'
 
     def run(self, ctx):
         request = ctx.request
@@ -13,17 +15,18 @@ class AddAppNameFilter(BaseFilter):
             original_app_dict = json.loads(self.get_original_app(ctx).to_json())
             original_app_dict.update(data)
 
-            if 'parameters' not in original_app_dict['container']['docker']:
-                original_app_dict['container']['docker']['parameters'] = []
+            if self.is_docker_app(original_app_dict):
+                if 'parameters' not in original_app_dict['container']['docker']:
+                    original_app_dict['container']['docker']['parameters'] = []
 
-            param_value = "hollowman.appname={}".format(original_app_dict['id'])
-            self.patch_label_param(original_app_dict['container']['docker']['parameters'], 
-                                   key="label", 
-                                   value=param_value
-            )
+                param_value = "hollowman.appname={}".format(original_app_dict['id'])
+                self.patch_label_param(original_app_dict['container']['docker']['parameters'],
+                                       key="label",
+                                       value=param_value
+                )
 
             request.data = json.dumps(original_app_dict)
-                
+
 
         return request
 
@@ -33,7 +36,7 @@ class AddAppNameFilter(BaseFilter):
             if param['key'] == "label" and param['value'].startswith("hollowman.appname="):
                 param['value'] = value
                 found = True
-        
+
         if not found:
             docker_params.append(
                 {

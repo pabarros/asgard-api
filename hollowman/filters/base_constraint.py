@@ -9,6 +9,8 @@ DEFAULT_CONSTRAINT_EXCLUSIVE = [ "exclusive", "UNLIKE", ".*" ]
 
 class BaseConstraintFilter(BaseFilter):
 
+    name = 'constraint'
+
     def run(self, ctx):
         request = ctx.request
         if request.is_json and request.data:

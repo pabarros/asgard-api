@@ -34,30 +34,6 @@ class ForcePullTest(TestCase):
                 modified_request.get_json()['container']['docker']['forcePullImage']
             )
 
-    def test_simple_app_disable_pull(self):
-        data = {
-            "id": "/foo/bar",
-            "container":{
-                "docker":{
-                    "image": "alpine:3.4"
-                }
-            },
-            "labels": {
-                "hollowman.filter.forcepull.disable": "any_value"
-            }
-        }
-
-        with mock.patch.object(self, "ctx") as ctx_mock:
-            request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
-            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
-
-            self.ctx.request = request
-            modified_request = self.filter.run(self.ctx)
-            self.assertEqual(
-                False,
-                modified_request.get_json()['container']['docker']['forcePullImage']
-            )
-
     def test_app_with_fields(self):
         data = {
             "id": "/foo/bar",

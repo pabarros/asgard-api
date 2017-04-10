@@ -7,19 +7,19 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Env vars
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
 * MARATHON_ENDPOINT [required] Where to connect to find marathon api
-
-* HOLLOWMAN_FILTER_DNS_ENABLE: "1|0" Diz se o filtro de DNS estará ligado ou desligado
 * HOLLOWMAN_REDIRECT_ROOTPATH_TO: Env que diz para onde o usuario será redirecionado se acessar a raiz onde o hollowman está deployado. Defaults to `/v2/apps`
 
 
 ## Opções específicas de filtros
 
-# DNS
- * hollowman.filter.dns.disable: Label que define se o filtro de dns está ligado para uma app específica.
+Qualquer filtro pode ser desliagdo por app caso a app possua a label `hollowman.filter.<name>.disable=<anyvalue>`. Onde `<name>` é o 
+valor do atributo `name` da classe que implementa o filtro em questão.
 
-# FORCE PULL
- * hollowman.filter.forcepull.disable: Label que define se o checkbox de forcepull não será marcado automaticamente para uma app específica
 
+Um filtro qualquer pode ser desabilitado **globalmente** usando a envvar: HOLLOWMAN_FILTER_<NAME>_DISABLE: "qualquer-valor". 
+
+
+A ausência da env ou da label significa que o filtro está ligado.
 
 ## Running tests
 `py.test --cov=hollowman --cov-report term-missing -v -s`

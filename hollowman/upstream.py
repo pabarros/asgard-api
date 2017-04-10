@@ -1,8 +1,10 @@
 # encoding: utf-8
 
-import requests
 import sys
 import json
+
+import requests
+
 from hollowman import conf
 
 

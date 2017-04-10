@@ -2,7 +2,6 @@
 
 from flask import Flask, url_for, redirect, Response, request
 from flask_cors import CORS
-
 import requests
 
 from hollowman.hollowman_flask import HollowmanFlask
