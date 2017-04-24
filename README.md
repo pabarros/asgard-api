@@ -21,5 +21,25 @@ Um filtro qualquer pode ser desabilitado **globalmente** usando a envvar: HOLLOW
 
 A ausência da env ou da label significa que o filtro está ligado.
 
+### Passando parametros adcionais para um filtro
+
+É possível passar parametros abritrários para um filtro qualquer via envvar. O nome da env deve ser:
+
+`HOLLOWMAN_FILTER_<FILTER>_PARAM_<OPTIONNAME>_<INDEX>` onde:
+
+`<FILTER>` é o nome do filtro
+`<OPTIONNAME>` e o nome do parametro
+`<INDEX>` é um indice para quando precisamos passar uma lista
+
+
+
+## Parametros por Filtro
+
+### Constraint
+
+O Filtro DNS recebe o parametro `BASECONSTRAINT`. Esse parametro diz quais constraints serão adicionadas a uma pp caso ela não tenha nenhuma. Isso significa que o nome da env é: `HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_{0,1,2}`
+
+
+
 ## Running tests
 `py.test --cov=hollowman --cov-report term-missing -v -s`
