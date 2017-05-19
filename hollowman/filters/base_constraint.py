@@ -19,19 +19,17 @@ class BaseConstraintFilter(BaseFilter):
 
             if self.is_single_app(data):
                 originial_app = self.get_original_app(ctx)
+
                 app_dict = json.loads(originial_app.to_json())
                 app_dict.update(data)
 
                 base_constraint_options = get_option(self.name, "BASECONSTRAINT")
                 base_constraints = []
                 for constraint in base_constraint_options:
-                    base_constraints.append(MarathonConstraint(*constraint.split(":")))
+                    base_constraints.append(MarathonConstraint(*constraint.split(":")).json_repr())
 
-                if not originial_app.constraints:
-                    app_dict['constraints'] = [c.json_repr() for c in base_constraints]
-
-                if not data.get('constraints'):
-                    app_dict['constraints'] = [c.json_repr() for c in base_constraints]
+                if 'constraints' not in app_dict:
+                    app_dict['constraints'] = base_constraints
 
                 request.data = json.dumps(app_dict)
 

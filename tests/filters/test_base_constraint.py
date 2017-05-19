@@ -153,28 +153,28 @@ class BaseConstraintFilterTest(TestCase):
         from marathon.models.app import MarathonApp
         with mock.patch.object(self, "ctx") as ctx_mock, \
                 mock.patch.dict('os.environ', {
-                    "HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_0": "exclusive:UNLIKE:.*",
+                    "HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_0": "workload:LIKE:general",
                     "HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_1": "dc:LIKE:sl"
                 }) as env_mock:
-            request = RequestStub(path="/v2/apps//app/foo", data={u"id": "/foo/bar", u"mem": 32}, method="PUT")
+            request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
 
             self.ctx.request = request
             modified_request = self.filter.run(self.ctx)
+
             self.assertEqual(
                 {
-                    u"id": u"/foo/bar",
-                    u"mem": 32,
-                    u"constraints": [
+                    "id": "/foo/bar",
+                    "constraints": [
                         [
                             "exclusive",
-                            "UNLIKE",
-                            ".*"
+                            "LIKE",
+                            "web"
                         ],
                         [
                             "dc",
                             "LIKE",
-                            "sl"
+                            "(sl|aws)",
                         ]
                     ]
                 },

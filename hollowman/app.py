@@ -35,7 +35,6 @@ def apiv2(path):
 
 @application.route("/healthcheck")
 def healhcheck():
-    import pdb; pdb.set_trace()
     r = requests.get(MARATHON_ENDPOINT, headers={"Authorization": MARATHON_AUTH_HEADER})
     return Response(response="", status=r.status_code)
 
