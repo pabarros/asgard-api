@@ -62,7 +62,7 @@ class BaseConstraintFilterTest(TestCase):
 
         from marathon.models.app import MarathonApp
         with mock.patch.object(self, "ctx") as ctx_mock:
-            request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
+            request = RequestStub(path="/v2/apps//foo/bar", data=data, method="PUT")
             ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
 
             self.ctx.request = request
@@ -80,103 +80,4 @@ class BaseConstraintFilterTest(TestCase):
                         ]
                     ]
                 }
-            )
-
-    def test_simple_app_with_dc_constraint(self):
-        """
-        Se uma app ja possui a constraint "dc" não mexemos nas constraints
-        """
-        data = {
-            "id": "/foo/bar",
-            "constraints": [
-                [
-                    "exclusive",
-                    "LIKE",
-                    "web"
-                ],
-                [
-                    "dc",
-                    "LIKE",
-                    "(sl|aws)",
-                ]
-            ]
-        }
-
-        from marathon.models.app import MarathonApp
-        with mock.patch.object(self, "ctx") as ctx_mock:
-            request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
-            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
-
-            self.ctx.request = request
-            modified_request = self.filter.run(self.ctx)
-
-            self.assertEqual(
-                modified_request.get_json(),
-                {
-                    "id": "/foo/bar",
-                    "constraints": [
-                        [
-                            "exclusive",
-                            "LIKE",
-                            "web"
-                        ],
-                        [
-                            "dc",
-                            "LIKE",
-                            "(sl|aws)"
-                        ]
-                    ]
-                }
-            )
-
-    def test_original_app_with_constraint_payload_without(self):
-        """
-        Se uma app originalmente possui alguma constraint, mas o payload que está
-        chegando no request está sem nada, devemos colocar as constraints default
-        """
-        data = {
-            "id": "/foo/bar",
-            "constraints": [
-                [
-                    "exclusive",
-                    "LIKE",
-                    "web"
-                ],
-                [
-                    "dc",
-                    "LIKE",
-                    "(sl|aws)",
-                ]
-            ]
-        }
-
-        from marathon.models.app import MarathonApp
-        with mock.patch.object(self, "ctx") as ctx_mock, \
-                mock.patch.dict('os.environ', {
-                    "HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_0": "workload:LIKE:general",
-                    "HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_1": "dc:LIKE:sl"
-                }) as env_mock:
-            request = RequestStub(path="/v2/apps//app/foo", data=data, method="PUT")
-            ctx_mock.marathon_client.get_app.return_value = MarathonApp(**data)
-
-            self.ctx.request = request
-            modified_request = self.filter.run(self.ctx)
-
-            self.assertEqual(
-                {
-                    "id": "/foo/bar",
-                    "constraints": [
-                        [
-                            "exclusive",
-                            "LIKE",
-                            "web"
-                        ],
-                        [
-                            "dc",
-                            "LIKE",
-                            "(sl|aws)",
-                        ]
-                    ]
-                },
-                modified_request.get_json()
             )
