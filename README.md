@@ -8,10 +8,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
 * MARATHON_ENDPOINT [required] Where to connect to find marathon api
 * HOLLOWMAN_REDIRECT_ROOTPATH_TO: Env que diz para onde o usuario será redirecionado se acessar a raiz onde o hollowman está deployado. Defaults to `/v2/apps`
-* GOOGLE_OAUTH2_CLIENT_ID: ID da app Oauth2, registrado no console do Google
-* GOOGLE_OAUTH2_CLIENT_SECRET: Secret dessa app.
-* SECRET_KEY: Secret usado pelo Flask
-* REDIRECT_AFTER_LOGIN: URL pra onde o usuário será redirecionado após o fluxo do oauth2. O redirect é feito pra: `URL?jwt=<token_jwt>`
+* HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_ID: ID da app Oauth2, registrado no console do Google
+* HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_SECRET: Secret dessa app.
+* HOLLOWMAN_SECRET_KEY: Secret usado pelo Flask
+* HOLLOWMAN_REDIRECT_AFTER_LOGIN: URL pra onde o usuário será redirecionado após o fluxo do oauth2. O redirect é feito pra: `URL?jwt=<token_jwt>`
 
 
 ## Opções específicas de filtros
