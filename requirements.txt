@@ -4,4 +4,4 @@ requests==2.11.1
 marathon==0.8.10
 Flask-Cors==3.0.2
 Flask-JWT==0.3.2
-simple-json-logger-0.1.0
+simple-json-logger==0.1.0
