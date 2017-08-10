@@ -1,43 +1,34 @@
 #encoding: utf-8
 
-from flask import Flask, url_for, redirect, Response, request
+from datetime import timedelta
+
+from flask import request
 from flask_cors import CORS
-import requests
 
 from hollowman.hollowman_flask import HollowmanFlask
-from hollowman.conf import MARATHON_ENDPOINT, MARATHON_AUTH_HEADER, CORS_WHITELIST
-from hollowman import conf
-from hollowman import upstream
-from hollowman.filters.request import RequestFilter
+from hollowman.conf import SECRET_KEY, CORS_WHITELIST
+from hollowman.log import logger
 
 application = HollowmanFlask(__name__)
+application.secret_key = SECRET_KEY
+application.permanent_session_lifetime = timedelta(minutes=5)
+application.config["JWT_AUTH_URL_RULE"] = None
+
 CORS(application, origins=CORS_WHITELIST)
 
+@application.after_request
+def after_request(response):
+    logger.info(
+        {
+            "method": request.method,
+            "status_code": response.status_code,
+            "path": request.path,
+            "user": (hasattr(request, "user") and request.user) or None,
+            "location": response.headers.get("Location"),
+            "qstring": request.args
+        }
+    )
+    return response
 
-@application.route("/", methods=["GET"])
-def index():
-    return Response(status=302, headers={"Location": conf.REDIRECT_ROOTPATH_TO})
+import hollowman.routes
 
-@application.route('/v2', defaults={'path': '/'})
-@application.route('/v2/', defaults={'path': ''})
-@application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
-def apiv2(path):
-    modded_request = request
-    try:
-        modded_request = RequestFilter.dispatch(request)
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-    r = upstream.replay_request(modded_request, MARATHON_ENDPOINT)
-    h = dict(r.headers)
-    h.pop("Transfer-Encoding", None)
-    return Response(response=r.content, status=r.status_code, headers=h)
-
-@application.route("/healthcheck")
-def healhcheck():
-    r = requests.get(MARATHON_ENDPOINT, headers={"Authorization": MARATHON_AUTH_HEADER})
-    return Response(response="", status=r.status_code)
-
-
-if __name__ == "__main__":
-    application.run(host="0.0.0.0", port=5000, debug=True)

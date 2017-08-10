@@ -26,7 +26,7 @@ class TestApp(TestCase):
                 self.assertEqual(200, response.status_code)
 
     def test_index_path(self):
-        response = application.test_client().open('/')
+        response = application.test_client().get('/')
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue('Location' in response.headers)
@@ -40,8 +40,6 @@ class TestApp(TestCase):
             self.assertTrue('Location' in response.headers)
             self.assertEqual(redirect_value, response.headers['Location'])
 
-    
-    
     @skip('Need to find a way to test this. Any ideas ?')
     def test_apiv2_path(self):
         pass
@@ -49,7 +47,7 @@ class TestApp(TestCase):
     def test_fail_healthcheck(self):
         Response = namedtuple('Response', ["status_code"])
 
-        with patch('hollowman.app.requests.get') as get_mock:
+        with patch('hollowman.routes.requests.get') as get_mock:
             get_mock.return_value = Response(status_code=404)
             response = application.test_client().open('/healthcheck')
             self.assertEqual(response.status_code, 404)
@@ -57,7 +55,7 @@ class TestApp(TestCase):
     def test_200_healthcheck(self):
         Response = namedtuple('Response', ["status_code"])
 
-        with patch('hollowman.app.requests.get') as get_mock:
+        with patch('hollowman.routes.requests.get') as get_mock:
             get_mock.return_value = Response(status_code=200)
             response = application.test_client().open('/healthcheck')
             self.assertEqual(response.status_code, 200)
