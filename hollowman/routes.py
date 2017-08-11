@@ -41,7 +41,6 @@ def healhcheck():
 @application.route("/login/google")
 def google_login():
     callback=url_for("authorized", _external=True)
-    front_url = "http://localhost:4200/ajax.html"
     return google_oauth2.authorize(callback=callback)
 
 @application.route("/authenticate/google")
@@ -63,3 +62,4 @@ def authorized(resp):
 @google_oauth2.tokengetter
 def get_access_token():
     return session.get('access_token')
+
