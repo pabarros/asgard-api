@@ -4,6 +4,12 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ![Hollowman](https://bytebucket.org/sievetech/hollowman/raw/f6fa51242599cf5c659371e725c440da61b02453/hollowman.jpg?token=4d80dc08d24e9ddb42ef8ef0eea371d5d699f3f8)
 
+
+## Changelog
+
+* 0.0.23
+  - Obriga a presença do token JWT em todas as requisições para `/v2/apps`.
+
 ## Env vars
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
 * MARATHON_ENDPOINT [required] Where to connect to find marathon api

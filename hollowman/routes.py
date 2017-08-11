@@ -10,7 +10,7 @@ from hollowman.auth.google import google_oauth2
 from hollowman.decorators import populate_user
 from hollowman.filters.request import RequestFilter
 from hollowman.log import logger
-from hollowman.auth.jwt import jwt_auth
+from hollowman.auth.jwt import jwt_auth, jwt_required
 
 @application.route("/", methods=["GET"])
 def index():
@@ -19,6 +19,7 @@ def index():
 @application.route('/v2', defaults={'path': '/'})
 @application.route('/v2/', defaults={'path': ''})
 @application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
+@jwt_required()
 @populate_user()
 def apiv2(path):
     modded_request = request
