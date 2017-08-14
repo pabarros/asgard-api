@@ -8,7 +8,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 * 0.0.23
-  - Obriga a presença do token JWT em todas as requisições para `/v2/apps`.
+  - Adicionado todo o fluxo para autenticação oauth2, mas ainda não é obrigatório. 
 
 ## Env vars
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
