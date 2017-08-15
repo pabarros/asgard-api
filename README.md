@@ -9,6 +9,8 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 * 0.0.23
   - Adicionado todo o fluxo para autenticação oauth2, mas ainda não é obrigatório. 
+* 0.0.24
+  - Migrando para Flask-OAuthlib
 
 ## Env vars
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
