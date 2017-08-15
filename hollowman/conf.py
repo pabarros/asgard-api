@@ -11,7 +11,7 @@ DISABLED = "0"
 MARATHON_ENDPOINT = os.getenv("MARATHON_ENDPOINT", "http://127.0.0.1:8080")
 MARATHON_CREDENTIALS = os.getenv("MARATHON_CREDENTIALS", "guest:guest")
 
-MARATHON_AUTH_HEADER = "Basic {}".format(base64.b64encode(MARATHON_CREDENTIALS))
+MARATHON_AUTH_HEADER = "Basic {}".format(base64.b64encode(MARATHON_CREDENTIALS.encode("utf-8")))
 
 user, passw = MARATHON_CREDENTIALS.split(':')
 marathon_client = MarathonClient([MARATHON_ENDPOINT], username=user, password=passw)

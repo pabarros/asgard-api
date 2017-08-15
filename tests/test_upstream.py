@@ -54,7 +54,7 @@ class UpstreamTest(TestCase):
             replay_request(flask.request, "http://marathon:8080")
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['data']
-            self.assertEquals(called_headers, "Request Data")
+            self.assertEquals(called_headers, b"Request Data")
 
     @patch.object(requests, 'get')
     def test_original_headers_to_upstream_request(self, mock_get):

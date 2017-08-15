@@ -24,7 +24,7 @@ class DNSRequestFilter(BaseFilter):
 
                 if not original_app.env:
                     original_app.env = {}
-                for key, value in body['env'].iteritems():
+                for key, value in body['env'].items():
                     original_app.env[key] = value
                 body = json.loads(original_app.to_json())
 
@@ -49,7 +49,7 @@ class DNSRequestFilter(BaseFilter):
 
             params = dict((param['key'], param)for param in data['container']['docker']['parameters'])
             params['dns'] = {"key": "dns", "value": "172.17.0.1"}
-            data['container']['docker']['parameters'] = params.values()
+            data['container']['docker']['parameters'] = list(params.values())
         return data
 
     def patch_apps_from_group(self, group):

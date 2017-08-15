@@ -11,7 +11,7 @@ from hollowman import conf
 def replay_request(request, destination_url):
     to_url = "{}{}".format(destination_url, request.path)
     params = [(key, value)
-              for key, value in request.args.iteritems(multi=True)]
+              for key, value in request.args.items(multi=True)]
     headers = dict(request.headers)
     headers.pop("Content-Length", None)
     headers['Authorization'] = conf.MARATHON_AUTH_HEADER
