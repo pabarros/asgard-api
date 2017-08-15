@@ -1,7 +1,7 @@
-Flask==0.11.1
-requests==2.11.1
-marathon==0.8.10
+Flask==0.12.2
 Flask-Cors==3.0.2
 Flask-JWT==0.3.2
-simple-json-logger==0.1.0
 Flask-OAuthlib==0.9.4
+marathon==0.8.10
+requests==2.18.3
+simple-json-logger==0.1.0
