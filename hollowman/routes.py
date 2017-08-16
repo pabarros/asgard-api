@@ -12,7 +12,7 @@ from hollowman.decorators import auth_required
 from hollowman.filters.request import RequestFilter
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth
-from hollowman.plugins import PLUGIN_REGISTRY, get_plugin_registry_data
+from hollowman.plugins import get_plugin_registry_data
 
 @application.route("/", methods=["GET"])
 def index():

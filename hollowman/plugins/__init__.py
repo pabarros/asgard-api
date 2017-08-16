@@ -30,3 +30,4 @@ def register_plugin(plugin_id):
 
 def get_plugin_registry_data():
     return {'plugins': list(PLUGIN_REGISTRY.values())}
+

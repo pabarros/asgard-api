@@ -33,6 +33,19 @@ class PluginEndpointTest(unittest.TestCase):
              mock.patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False):
             register_plugin("some-example-plugin")
             response = application.test_client().get("/v2/plugins")
+            self.assertDictEqual({}, json.loads(response.data))
+
+    def test_return_only_registered_plugins_not_empty(self):
+        plugin_data = {
+            "some-example-plugin":{
+                "id": "some-example-plugin",
+                "info":{
+                    "modules": ["ui"]
+                }
+            }
+        }
+        with mock.patch.multiple(routes, PLUGIN_REGISTRY = plugin_data):
+            response = application.test_client().get("/v2/plugins")
             self.assertDictEqual(plugin_data, json.loads(response.data))
 
     def test_redirect_to_right_main_js(self):
