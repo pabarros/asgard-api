@@ -56,6 +56,16 @@ A ausência da env ou da label significa que o filtro está ligado.
 O Filtro DNS recebe o parametro `BASECONSTRAINT`. Esse parametro diz quais constraints serão adicionadas a uma pp caso ela não tenha nenhuma. Isso significa que o nome da env é: `HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_{0,1,2}`
 
 
+## Como adicionar novos plugins para a UI
+
+
+Para adicionar novos plugins o `main.js` do plugin deve ser comitado em `/static/plugins/<plugin-id>/main.js`
+Alteramos o arquivo `routes.py` e adicionamos uma nova chamada a `register_plugin(<plugin-id>)`
+
+Isso é o mínimo neceessário para que esse novo plugin esteja disponível para a UI.
+
+
+
 
 ## Running tests
 `py.test --cov=hollowman --cov-report term-missing -v -s`
