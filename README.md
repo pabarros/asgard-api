@@ -60,7 +60,7 @@ O Filtro DNS recebe o parametro `BASECONSTRAINT`. Esse parametro diz quais const
 
 
 Para adicionar novos plugins o `main.js` do plugin deve ser comitado em `/static/plugins/<plugin-id>/main.js`
-Alteramos o arquivo `routes.py` e adicionamos uma nova chamada a `register_plugin(<plugin-id>)`
+Alteramos o arquivo `app.py` e adicionamos uma nova chamada a `register_plugin(<plugin-id>)`
 
 Isso é o mínimo neceessário para que esse novo plugin esteja disponível para a UI.
 
