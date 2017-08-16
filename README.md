@@ -7,10 +7,14 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* 0.0.23
-  - Adicionado todo o fluxo para autenticação oauth2, mas ainda não é obrigatório. 
+* 0.0.25
+  - Adicionadas rotas pra servir o código dos plugins para a UI
+  - Atualização para imagem base alpine/py27/uwsgi20:0.0.11, por causa do `UWSGI_EXTRA_ARGS`
+  - Necessidade de passar `UWSGI_EXTRA_ARGS="--static-map2 /static=/opt/app/"`
 * 0.0.24
   - Migrando para Flask-OAuthlib
+* 0.0.23
+  - Adicionado todo o fluxo para autenticação oauth2, mas ainda não é obrigatório. 
 
 ## Env vars
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
