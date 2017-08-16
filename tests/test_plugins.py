@@ -13,20 +13,23 @@ class PluginEndpointTest(unittest.TestCase):
 
 
     def test_return_only_registered_plugins_empty(self):
-        with mock.patch.multiple(routes, PLUGIN_REGISTRY = {}):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
             response = application.test_client().get("/v2/plugins")
-            self.assertDictEqual({}, json.loads(response.data))
+            self.assertDictEqual({"plugins": []}, json.loads(response.data))
 
     def test_return_only_registered_plugins_not_empty(self):
         plugin_data = {
-            "some-example-plugin":{
-                "id": "some-example-plugin",
-                "info":{
-                    "modules": ["ui"]
+            u"plugins": [
+                {
+                        u"id": u"some-example-plugin",
+                        u"info":{
+                            u"modules": [u"ui"]
+                        }
                 }
-            }
+            ]
         }
-        with mock.patch.multiple(routes, PLUGIN_REGISTRY = plugin_data):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
+            register_plugin("some-example-plugin")
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual(plugin_data, json.loads(response.data))
 
@@ -40,7 +43,7 @@ class PluginEndpointTest(unittest.TestCase):
             "check-expired-session-plugin": {
                 "id": "check-expired-session-plugin",
                 "info": {
-                    "modules": ["id"]
+                    "modules": ["ui"]
                 }
             }
         }
@@ -53,13 +56,13 @@ class PluginEndpointTest(unittest.TestCase):
             "check-expired-session-plugin": {
                 "id": "check-expired-session-plugin",
                 "info": {
-                    "modules": ["id"]
+                    "modules": ["ui"]
                 }
             },
             "colapse-sidebar-plugin": {
                 "id": "colapse-sidebar-plugin",
                 "info": {
-                    "modules": ["id"]
+                    "modules": ["ui"]
                 }
             }
         }

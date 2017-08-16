@@ -8,6 +8,7 @@ from flask_cors import CORS
 from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.conf import SECRET_KEY, CORS_WHITELIST
 from hollowman.log import logger
+from hollowman.plugins import register_plugin
 
 application = HollowmanFlask(__name__)
 application.secret_key = SECRET_KEY
@@ -32,4 +33,5 @@ def after_request(response):
     return response
 
 import hollowman.routes
+register_plugin("example-plugin")
 

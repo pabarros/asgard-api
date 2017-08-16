@@ -23,8 +23,16 @@ def register_plugin(plugin_id):
     plugin_data = {
         "id": plugin_id,
         "info": {
-            "modules": ["id"]
+            "modules": ["ui"]
         }
     }
     PLUGIN_REGISTRY[plugin_id] = plugin_data
 
+def get_plugin_registry_data():
+    data = {
+        "plugins": []
+    }
+    for key, value in PLUGIN_REGISTRY.items():
+        data["plugins"].append(value)
+
+    return data

@@ -12,7 +12,7 @@ from hollowman.decorators import populate_user
 from hollowman.filters.request import RequestFilter
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth
-from hollowman.plugins import PLUGIN_REGISTRY
+from hollowman.plugins import PLUGIN_REGISTRY, get_plugin_registry_data
 
 @application.route("/", methods=["GET"])
 def index():
@@ -68,7 +68,7 @@ def get_access_token():
 
 @application.route("/v2/plugins")
 def plugins():
-    return make_response(json.dumps(PLUGIN_REGISTRY), 200)
+    return make_response(json.dumps(get_plugin_registry_data()), 200)
 
 @application.route("/v2/plugins/<string:plugin_id>/main.js")
 def main_js(plugin_id):
