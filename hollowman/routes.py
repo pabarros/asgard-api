@@ -2,6 +2,7 @@
 
 import requests
 from flask import Flask, url_for, redirect, Response, request, session, render_template, make_response
+import json
 
 from hollowman import conf
 from hollowman import upstream
@@ -11,6 +12,7 @@ from hollowman.decorators import populate_user
 from hollowman.filters.request import RequestFilter
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth
+from hollowman.plugins import PLUGIN_REGISTRY
 
 @application.route("/", methods=["GET"])
 def index():
@@ -62,4 +64,13 @@ def authorized(resp):
 @google_oauth2.tokengetter
 def get_access_token():
     return session.get('access_token')
+
+
+@application.route("/v2/plugins")
+def plugins():
+    return make_response(json.dumps(PLUGIN_REGISTRY), 200)
+
+@application.route("/v2/plugins/<string:plugin_id>/main.js")
+def main_js(plugin_id):
+    return redirect("static/plugins/{}/main.js".format(plugin_id))
 

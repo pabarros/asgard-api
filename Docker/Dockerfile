@@ -1,4 +1,4 @@
-FROM docker.sieve.com.br/alpine/py27/uwsgi20:0.0.10
+FROM docker.sieve.com.br/alpine/py27/uwsgi20:0.0.11
 
 #Version: 0.0.24
 #Tag: infra/hollowman
