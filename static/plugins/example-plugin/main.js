@@ -132,7 +132,7 @@
 	        _addons2.default.createElement(
 	          "h3",
 	          { className: "small-caps" },
-	          "Example Plugin"
+	          "Total de aplica\xE7\xF5es"
 	        )
 	      ),
 	      _addons2.default.createElement(
@@ -140,23 +140,14 @@
 	        { className: "list-group filters" },
 	        _addons2.default.createElement(
 	          "li",
-	          null,
+	          { onClick: this.handleClick },
 	          this.state.appsCount,
-	          " applications in total"
+	          " apps in total"
 	        ),
 	        _addons2.default.createElement(
 	          "li",
 	          null,
 	          _addons2.default.createElement("hr", null)
-	        ),
-	        _addons2.default.createElement(
-	          "li",
-	          { className: "clickable", onClick: this.handleClick },
-	          _addons2.default.createElement(
-	            "a",
-	            null,
-	            "Click me"
-	          )
 	        )
 	      )
 	    );
