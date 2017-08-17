@@ -14,7 +14,7 @@
 #               "ui"
 #            ],
 #         },
-# É isso que diz à UI para voltar e paagr o main.js
+# É isso que diz à UI para voltar e pegar o main.js
 
 PLUGIN_REGISTRY = {
 }
@@ -29,10 +29,4 @@ def register_plugin(plugin_id):
     PLUGIN_REGISTRY[plugin_id] = plugin_data
 
 def get_plugin_registry_data():
-    data = {
-        "plugins": []
-    }
-    for key, value in PLUGIN_REGISTRY.items():
-        data["plugins"].append(value)
-
-    return data
+    return {'plugins': list(PLUGIN_REGISTRY.values())}
