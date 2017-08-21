@@ -94,7 +94,7 @@ class RequestFilterTest(TestCase):
                     ctx_mock = mock.MagicMock()
                     ctx_mock.request = request
                     get_ctx_mock.return_value = ctx_mock
-                    get_original_app_mock.return_value = MarathonApp(**json.loads(open("json/single_full_app.json").read()))
+                    get_original_app_mock.return_value = MarathonApp(**json.loads(open("tests/fixtures/single_full_app.json").read()))
 
                     RequestFilter.dispatch(request)
 
