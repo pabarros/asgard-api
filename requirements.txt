@@ -5,3 +5,4 @@ Flask-OAuthlib==0.9.4
 marathon==0.8.10
 requests==2.18.3
 simple-json-logger==0.1.0
+sqlalchemy==1.1.13
