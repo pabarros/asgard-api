@@ -2,6 +2,8 @@
 
 import json
 
+from hollowman.models import BaseModel, engine
+
 class RequestStub(object):
 
     def __init__(self,
@@ -24,3 +26,10 @@ class ContextStub(object):
 
     def __init__(self, marathon_client=None):
         self.marathon_client = marathon_client
+
+
+def rebuild_schema():
+    assert engine.name == "sqlite"
+    BaseModel.metadata.drop_all(engine)
+    BaseModel.metadata.create_all(engine)
+

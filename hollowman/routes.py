@@ -8,7 +8,7 @@ from hollowman import conf
 from hollowman import upstream
 from hollowman.app import application
 from hollowman.auth.google import google_oauth2
-from hollowman.decorators import populate_user
+from hollowman.decorators import populate_user, auth_required
 from hollowman.filters.request import RequestFilter
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth
@@ -21,7 +21,7 @@ def index():
 @application.route('/v2', defaults={'path': '/'})
 @application.route('/v2/', defaults={'path': ''})
 @application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
-@populate_user()
+@auth_required()
 def apiv2(path):
     modded_request = request
     try:
@@ -35,7 +35,6 @@ def apiv2(path):
     return Response(response=r.content, status=r.status_code, headers=h)
 
 @application.route("/healthcheck")
-@populate_user()
 def healhcheck():
     r = requests.get(conf.MARATHON_ENDPOINT, headers={"Authorization": conf.MARATHON_AUTH_HEADER})
     return Response(response="", status=r.status_code)
@@ -67,6 +66,7 @@ def get_access_token():
 
 
 @application.route("/v2/plugins")
+@auth_required()
 def plugins():
     return make_response(json.dumps(get_plugin_registry_data()), 200)
 
