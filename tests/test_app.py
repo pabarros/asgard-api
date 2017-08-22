@@ -1,11 +1,15 @@
 
+from collections import namedtuple
 from mock import patch
 from unittest import TestCase, skip
-import hollowman.upstream
-from hollowman import conf
-from hollowman.app import application
-from collections import namedtuple
 
+from hollowman.app import application
+from hollowman import conf
+from hollowman import decorators
+import hollowman.upstream
+from hollowman.models import HollowmanSession, User
+
+from tests import rebuild_schema
 
 class DummyResponse(object):
 
@@ -17,10 +21,20 @@ class DummyResponse(object):
 
 class TestApp(TestCase):
 
+    def setUp(self):
+        rebuild_schema()
+        self.session = HollowmanSession()
+        self.session.add(User(tx_email="user@host.com.br", tx_name="John Doe", tx_authkey="69ed620926be4067a36402c3f7e9ddf0"))
+        self.session.commit()
+
+    def tearDown(self):
+        self.session.close()
+
     def test_remove_transfer_encoding_header(self):
         mock_response = DummyResponse(headers={"Transfer-Encoding": "chunked"})
-        with patch.object(hollowman.upstream, 'replay_request', return_value=mock_response) as replay_mock:
-            with application.test_client() as client:
+        with patch.object(hollowman.upstream, 'replay_request', return_value=mock_response) as replay_mock, \
+             application.test_client() as client, \
+             patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False):
                 response = client.get("/v2/apps")
                 self.assertTrue("Content-Encoding" not in response.headers)
                 self.assertEqual(200, response.status_code)

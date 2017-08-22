@@ -57,7 +57,7 @@ def auth_required():
                 if email_by_jwt:
                     request.user = email_by_jwt
                 return fn(*args, **kwargs)
-            except:
+            except Exception as e:
                 return make_response(invalid_token_response_body, 401)
         return decorator
     return wrapper
