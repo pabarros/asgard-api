@@ -26,7 +26,7 @@ def check_auth_token(token):
         _query = s.query(User).filter_by(tx_authkey=token)
         user = _query.count()
         if not user:
-            logger.info({"auth": "failed", "token-type": "apikey", "error": "Key not found"})
+            logger.info({"auth": "failed", "token-type": "apikey", "error": "Key not found", "token": token})
             return None
         return _query.all()[0].tx_email
 
