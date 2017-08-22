@@ -27,18 +27,17 @@ class TestAuthentication(TestCase):
         self.session = HollowmanSession()
         self.session.add(User(tx_email="user@host.com.br", tx_name="John Doe", tx_authkey="69ed620926be4067a36402c3f7e9ddf0"))
         self.session.commit()
+        self.response_http_200 = MagicMock(status_code=200)
 
     def tearDown(self):
         self.session.close()
 
-    def test_jwt_disable_auth_if_env_is_present_even_invalid_token(self):
+    def test_jwt_disable_auth_if_env_is_present_even_if_invalid_token(self):
         """
-        Env temporária para podermo desligar/ligar a autenticação sem
+        Env temporária para podermos desligar/ligar a autenticação sem
         precisar comitar código.
         """
-        response_mock = MagicMock()
-        response_mock.status_code = 200
-        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock, \
+        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock, \
              patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False), \
              application.app_context(), \
              application.test_client() as test_client:
@@ -51,9 +50,7 @@ class TestAuthentication(TestCase):
         """
         We populate the user even if auth is disabled. What's really disabled is auth enforcement.
         """
-        response_mock = MagicMock()
-        response_mock.status_code = 200
-        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock, \
+        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock, \
              patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False), \
              application.app_context(), \
              application.test_client() as test_client:
@@ -67,18 +64,14 @@ class TestAuthentication(TestCase):
         """
         Populates request.user if authentication is successful
         """
-        response_mock = MagicMock()
-        response_mock.status_code = 200
-        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock:
+        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
             with application.test_client() as client:
                 r = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
                 self.assertEqual(200, r.status_code)
                 self.assertEqual("user@host.com.br", request.user)
 
     def test_return_200_if_key_found(self):
-        response_mock = MagicMock()
-        response_mock.status_code = 200
-        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock:
+        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
             with application.test_client() as client:
                 r = client.get("/v2/apps", headers={"Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"})
                 self.assertEqual(200, r.status_code)
@@ -106,9 +99,7 @@ class TestAuthentication(TestCase):
                 self.assertEqual(0, session_mock.call_count)
 
     def test_return_200_if_jwt_token_valid(self):
-        response_mock = MagicMock()
-        response_mock.status_code = 200
-        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock:
+        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
             test_client = application.test_client()
             with application.app_context():
                 jwt_data = jwt_payload_handler({"email": "user@host.com.br"})
@@ -117,9 +108,7 @@ class TestAuthentication(TestCase):
                 self.assertEqual(200, r.status_code)
 
     def test_populate_request_user_if_jwt_token_is_valid(self):
-        response_mock = MagicMock()
-        response_mock.status_code = 200
-        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock:
+        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
             with application.app_context(), application.test_client() as test_client:
                 jwt_data = jwt_payload_handler({"email": "user-jwt@host.com.br"})
                 jwt_token = jwt.encode(jwt_data, key=conf.SECRET_KEY)
