@@ -10,6 +10,7 @@ from alchemytools.context import managed
 from hollowman.auth.jwt import jwt_auth
 from hollowman.conf import SECRET_KEY, HOLLOWMAN_ENFORCE_AUTH
 from hollowman.models import HollowmanSession, User
+from hollowman.log import logger
 
 
 invalid_token_response_body = json.dumps({"msg": "Authorization token is invalid"})
@@ -49,6 +50,7 @@ def auth_required():
                     request.user = email_by_jwt
                 return fn(*args, **kwargs)
             except Exception as e:
+                logger.error({"exc": e, "step": "auth"})
                 return make_response(invalid_token_response_body, 401)
         return decorator
     return wrapper
