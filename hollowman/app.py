@@ -14,7 +14,7 @@ application = HollowmanFlask(__name__)
 application.secret_key = SECRET_KEY
 application.permanent_session_lifetime = timedelta(minutes=5)
 application.config["JWT_AUTH_URL_RULE"] = None
-application.config["JWT_EXPIRATION_DELTA"] = timedelta(days=1)
+application.config["JWT_EXPIRATION_DELTA"] = timedelta(days=7)
 
 CORS(application, origins=CORS_WHITELIST)
 
