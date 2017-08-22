@@ -5,6 +5,8 @@ import base64
 
 from marathon import MarathonClient
 
+ENABLED = "1"
+
 MARATHON_ENDPOINT = os.getenv("MARATHON_ENDPOINT", "http://127.0.0.1:8080")
 MARATHON_CREDENTIALS = os.getenv("MARATHON_CREDENTIALS", "guest:guest")
 
@@ -28,5 +30,6 @@ SECRET_KEY = os.getenv("HOLLOWMAN_SECRET_KEY", "secret")
 REDIRECT_AFTER_LOGIN = os.getenv("HOLLOWMAN_REDIRECT_AFTER_LOGIN")
 
 HOLLOWMAN_DB_URL = os.getenv("HOLLOWMAN_DB_URL", "sqlite://")
-HOLLOWMAN_DB_ECHO = os.getenv("HOLLOWMAN_DB_ECHO", False) == "1"
+HOLLOWMAN_DB_ECHO = os.getenv("HOLLOWMAN_DB_ECHO", False) == ENABLED
+HOLLOWMAN_ENFORCE_AUTH = os.getenv("HOLLOWMAN_ENFORCE_AUTH", True) == ENABLED
 

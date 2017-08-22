@@ -1,3 +1,4 @@
+#encoding: utf-8
 
 from collections import namedtuple
 
@@ -12,6 +13,7 @@ from flask import request
 from hollowman.app import application
 from hollowman.models import HollowmanSession, User
 from hollowman import conf
+from hollowman import decorators
 import hollowman.upstream
 from hollowman.auth.jwt import jwt_payload_handler
 
@@ -29,12 +31,37 @@ class TestAuthentication(TestCase):
     def tearDown(self):
         self.session.close()
 
-    def test_disable_auth_if_env_is_present(self):
+    def test_jwt_disable_auth_if_env_is_present_even_invalid_token(self):
         """
         Env temporária para podermo desligar/ligar a autenticação sem
         precisar comitar código.
         """
-        self.fail()
+        response_mock = MagicMock()
+        response_mock.status_code = 200
+        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock, \
+             patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False), \
+             application.app_context(), \
+             application.test_client() as test_client:
+                jwt_data = jwt_payload_handler({"email": "user@host.com.br"})
+                jwt_token = jwt.encode(jwt_data, key="for-sure-the-wrong-key")
+                r = test_client.get("/v2/apps", headers={"Authorization": "JWT {}".format(jwt_token)})
+                self.assertEqual(200, r.status_code)
+
+    def test_jwt_populate_user_even_if_auth_is_disabled(self):
+        """
+        We populate the user even if auth is disabled. What's really disabled is auth enforcement.
+        """
+        response_mock = MagicMock()
+        response_mock.status_code = 200
+        with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock, \
+             patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False), \
+             application.app_context(), \
+             application.test_client() as test_client:
+                jwt_data = jwt_payload_handler({"email": "user@host.com.br"})
+                jwt_token = jwt.encode(jwt_data, key=conf.SECRET_KEY)
+                r = test_client.get("/v2/apps", headers={"Authorization": "JWT {}".format(jwt_token)})
+                self.assertEqual(200, r.status_code)
+                self.assertEqual("user@host.com.br", request.user)
 
     def test_populate_request_user_if_key_is_valid(self):
         """

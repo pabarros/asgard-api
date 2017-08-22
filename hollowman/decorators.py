@@ -8,7 +8,7 @@ from flask import request, make_response
 from alchemytools.context import managed
 
 from hollowman.auth.jwt import jwt_auth
-from hollowman.conf import SECRET_KEY
+from hollowman.conf import SECRET_KEY, HOLLOWMAN_ENFORCE_AUTH
 from hollowman.models import HollowmanSession, User
 
 def populate_user():
@@ -49,7 +49,8 @@ def auth_required():
                 email_by_token = check_auth_token()
                 email_by_jwt = check_jwt_token()
 
-                if not any((email_by_jwt, email_by_token)):
+                authenticated = any([email_by_jwt, email_by_token])
+                if HOLLOWMAN_ENFORCE_AUTH and not authenticated:
                     return make_response(invalid_token_response_body, 401)
 
                 request.user = email_by_token
