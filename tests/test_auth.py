@@ -80,7 +80,7 @@ class TestAuthentication(TestCase):
         response_mock.status_code = 200
         with patch.object(hollowman.upstream, 'replay_request', return_value=response_mock) as replay_mock:
             with application.test_client() as client:
-                r = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
+                r = client.get("/v2/apps", headers={"Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"})
                 self.assertEqual(200, r.status_code)
 
     def test_return_401_if_key_not_found(self):

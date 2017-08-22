@@ -50,8 +50,8 @@ def auth_required():
         @wraps(fn)
         def decorator(*args, **kwargs):
             try:
-                auth_header = request.headers.get("Authorization", " ")
-                token_type, token = auth_header.split(" ")
+                auth_header = request.headers.get("Authorization", "invalid-type invalid-token")
+                token_type, token = auth_header.strip().split(" ")
                 authenticated_user = AUTH_TYPES[token_type](token)
 
                 if HOLLOWMAN_ENFORCE_AUTH and not authenticated_user:
