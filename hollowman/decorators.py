@@ -30,13 +30,12 @@ def check_auth_token(token):
             return None
         return _query.all()[0].tx_email
 
-def check_jwt_token(token):
+def check_jwt_token(jwt_token):
     try:
-        jwt_token = jwt_auth.request_callback()
         payload = jwt.decode(jwt_token, key=SECRET_KEY)
         return payload["email"]
     except Exception as e:
-        logger.info({"auth": "failed", "token-type": "jwt", "error": str(e)})
+        logger.info({"auth": "failed", "token-type": "jwt", "error": str(e), "jwt_token": jwt_token})
         return None
 
 def not_authenticated(_):
