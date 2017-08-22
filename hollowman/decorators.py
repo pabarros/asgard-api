@@ -22,6 +22,7 @@ def check_auth_token():
         _query = s.query(User).filter_by(tx_authkey=token)
         user = _query.count()
         if not user:
+            logger.info({"auth": "failed", "token-type": "apikey", "error": "Key not found"})
             return None
         return _query.all()[0].tx_email
 
@@ -31,6 +32,7 @@ def check_jwt_token():
         payload = jwt.decode(jwt_token, key=SECRET_KEY)
         return payload["email"]
     except Exception as e:
+        logger.info({"auth": "failed", "token-type": "jwt", "error": str(e)})
         return None
 
 def auth_required():
