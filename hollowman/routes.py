@@ -8,7 +8,7 @@ from hollowman import conf
 from hollowman import upstream
 from hollowman.app import application
 from hollowman.auth.google import google_oauth2
-from hollowman.decorators import populate_user, auth_required
+from hollowman.decorators import auth_required
 from hollowman.filters.request import RequestFilter
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth

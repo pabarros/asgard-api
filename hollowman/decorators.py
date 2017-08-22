@@ -11,17 +11,8 @@ from hollowman.auth.jwt import jwt_auth
 from hollowman.conf import SECRET_KEY, HOLLOWMAN_ENFORCE_AUTH
 from hollowman.models import HollowmanSession, User
 
-def populate_user():
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-
-            return fn(*args, **kwargs)
-        return decorator
-    return wrapper
 
 invalid_token_response_body = json.dumps({"msg": "Authorization token is invalid"})
-
 
 def check_auth_token():
     auth_header = request.headers.get("Authorization", " ")
