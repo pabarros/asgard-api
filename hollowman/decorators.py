@@ -1,6 +1,7 @@
 #encoding: utf-8
 
 from functools import wraps
+from collections import defaultdict
 
 import jwt
 import json
@@ -15,9 +16,12 @@ from hollowman.log import logger
 
 invalid_token_response_body = json.dumps({"msg": "Authorization token is invalid"})
 
-def check_auth_token():
-    auth_header = request.headers.get("Authorization", " ")
-    token = auth_header.split(" ")[1]
+
+class TokenTypes(object):
+    USER_TOKEN = "Token"
+    JWT = "JWT"
+
+def check_auth_token(token):
     with managed(HollowmanSession) as s:
         _query = s.query(User).filter_by(tx_authkey=token)
         user = _query.count()
@@ -26,7 +30,7 @@ def check_auth_token():
             return None
         return _query.all()[0].tx_email
 
-def check_jwt_token():
+def check_jwt_token(token):
     try:
         jwt_token = jwt_auth.request_callback()
         payload = jwt.decode(jwt_token, key=SECRET_KEY)
@@ -35,21 +39,26 @@ def check_jwt_token():
         logger.info({"auth": "failed", "token-type": "jwt", "error": str(e)})
         return None
 
+def not_authenticated(_):
+    return None
+
+AUTH_TYPES = defaultdict(lambda: not_authenticated)
+AUTH_TYPES[TokenTypes.USER_TOKEN] = check_auth_token
+AUTH_TYPES[TokenTypes.JWT] = check_jwt_token
+
 def auth_required():
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
             try:
-                email_by_token = check_auth_token()
-                email_by_jwt = check_jwt_token()
+                auth_header = request.headers.get("Authorization", " ")
+                token_type, token = auth_header.split(" ")
+                authenticated_user = AUTH_TYPES[token_type](token)
 
-                authenticated = any([email_by_jwt, email_by_token])
-                if HOLLOWMAN_ENFORCE_AUTH and not authenticated:
+                if HOLLOWMAN_ENFORCE_AUTH and not authenticated_user:
                     return make_response(invalid_token_response_body, 401)
 
-                request.user = email_by_token
-                if email_by_jwt:
-                    request.user = email_by_jwt
+                request.user = authenticated_user
                 return fn(*args, **kwargs)
             except Exception as e:
                 logger.error({"exc": e, "step": "auth"})

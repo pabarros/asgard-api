@@ -95,6 +95,16 @@ class TestAuthentication(TestCase):
             self.assertEqual(401, r.status_code)
             self.assertEqual("Authorization token is invalid", json.loads(r.data)['msg'])
 
+    def test_jwt_do_not_trigger_token_auth_if_jwt_token_is_present(self):
+        """
+        Both auth uses the same header: Authorization. Token Auth should be called if current token is JWT
+        """
+        with application.test_client() as test_client, \
+             application.app_context(), \
+             patch.object(decorators, "HollowmanSession") as session_mock:
+                r = test_client.get("/v2/apps", headers={"Authorization": "JWT Token"})
+                self.assertEqual(0, session_mock.call_count)
+
     def test_return_200_if_jwt_token_valid(self):
         response_mock = MagicMock()
         response_mock.status_code = 200
