@@ -44,20 +44,28 @@ def google_login():
     callback=url_for("authorized", _external=True)
     return google_oauth2.authorize(callback=callback)
 
-@application.route("/authenticate/google")
-@google_oauth2.authorized_handler
-def authorized(resp):
-    access_token = resp.get('access_token')
 
-    headers = {'Authorization': 'OAuth '+access_token}
+def check_authentication_successful(access_token):
+    headers = {'Authorization': "OAuth {}".format(access_token)}
     response = requests.get('https://www.googleapis.com/oauth2/v1/userinfo', headers=headers)
     if response.status_code != 200:
         logger.info({"response": response.content, "status_code": response.status_code})
+        return None
+    return response.json()
+
+@application.route("/authenticate/google")
+@google_oauth2.authorized_handler
+def authorized(resp):
+    access_token = resp and resp.get('access_token')
+
+    authentication_ok = check_authentication_successful(access_token)
+    if not authentication_ok:
         return render_template("login-failed.html")
 
-    data = response.json()
+    data = authentication_ok
     data["jwt"] = jwt_auth.jwt_encode_callback({"email": data["email"]})
 
+    session["jwt"] = data["jwt"]
     return redirect("{}?jwt={}".format(conf.REDIRECT_AFTER_LOGIN, data["jwt"]))
 
 @google_oauth2.tokengetter

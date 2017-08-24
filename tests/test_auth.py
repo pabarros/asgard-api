@@ -16,6 +16,7 @@ from hollowman import conf
 from hollowman import decorators
 import hollowman.upstream
 from hollowman.auth.jwt import jwt_payload_handler
+from hollowman import routes
 
 from . import rebuild_schema
 
@@ -137,4 +138,16 @@ class TestAuthentication(TestCase):
             r = test_client.get("/v2/apps")
             self.assertEqual(401, r.status_code)
             self.assertEqual("Authorization token is invalid", json.loads(r.data)['msg'])
+
+    def test_redirect_with_jwt_token_after_login(self):
+        """
+        Checks that the JWT Token contains the right data. For now, the user email got from teh OAuth2 Provider
+        """
+        test_client = application.test_client()
+        with application.app_context(), \
+             patch.object(routes, "check_authentication_successful", return_value={"email": "email@host.com.br"}):
+            r = test_client.get("/authenticate/google")
+            self.assertEqual(302, r.status_code)
+            jwt_token = r.headers["Location"].split("=")[1]
+            self.assertEqual("email@host.com.br", jwt.decode(jwt_token, key=conf.SECRET_KEY)["email"])
 
