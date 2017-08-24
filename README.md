@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.27
+  - Atualizando immage base para uwsgi/py27:0.0.12 (Log "JSON")
+
 * 0.0.26
   - Adicionado lógica para dupla autenticação: Token JWT (com oauth2) e Token de usuário
   - Adicionadas novas configurações: HOLLOWMAN_DB_ECHO, HOLLOWMAN_ENFORCE_AUTH, HOLLOWMAN_DB_URL
