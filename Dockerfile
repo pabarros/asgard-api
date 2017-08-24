@@ -1,6 +1,6 @@
 FROM docker.sieve.com.br/alpine/py27/uwsgi20:0.0.11
 
-#Version: log-401
+#Version: 0.0.26
 #Tag: infra/hollowman
 
 ARG _=""

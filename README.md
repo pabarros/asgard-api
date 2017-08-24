@@ -4,7 +4,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* -next
+* 0.0.26
   - Adicionado lógica para dupla autenticação: Token JWT (com oauth2) e Token de usuário
   - Adicionadas novas configurações: HOLLOWMAN_DB_ECHO, HOLLOWMAN_ENFORCE_AUTH, HOLLOWMAN_DB_URL
 
