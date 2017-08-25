@@ -1,4 +1,3 @@
-#encoding: utf-8
 from unittest import TestCase
 import mock
 import os
@@ -13,7 +12,6 @@ import hollowman.filters
 from flask import request
 from marathon.models.app import MarathonApp
 import json
-from os import environ
 from tests import RequestStub
 from tests.utils import with_fixture
 
