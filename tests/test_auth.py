@@ -18,7 +18,7 @@ import hollowman.upstream
 from hollowman.auth.jwt import jwt_payload_handler
 from hollowman import routes
 
-from . import rebuild_schema
+from tests import rebuild_schema
 
 
 class TestAuthentication(TestCase):
@@ -57,7 +57,10 @@ class TestAuthentication(TestCase):
              application.test_client() as test_client:
                 jwt_data = jwt_payload_handler({"email": "user@host.com.br"})
                 jwt_token = jwt.encode(jwt_data, key=conf.SECRET_KEY)
-                r = test_client.get("/v2/apps", headers={"Authorization": "JWT {}".format(jwt_token)})
+                auth_header = {
+                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+                }
+                r = test_client.get("/v2/apps", headers=auth_header)
                 self.assertEqual(200, r.status_code)
                 self.assertEqual("user@host.com.br", request.user)
 
@@ -105,7 +108,10 @@ class TestAuthentication(TestCase):
             with application.app_context():
                 jwt_data = jwt_payload_handler({"email": "user@host.com.br"})
                 jwt_token = jwt.encode(jwt_data, key=conf.SECRET_KEY)
-                r = test_client.get("/v2/apps", headers={"Authorization": "JWT {}".format(jwt_token)})
+                auth_header = {
+                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+                }
+                r = test_client.get("/v2/apps", headers=auth_header)
                 self.assertEqual(200, r.status_code)
 
     def test_populate_request_user_if_jwt_token_is_valid(self):
@@ -113,7 +119,10 @@ class TestAuthentication(TestCase):
             with application.app_context(), application.test_client() as test_client:
                 jwt_data = jwt_payload_handler({"email": "user-jwt@host.com.br"})
                 jwt_token = jwt.encode(jwt_data, key=conf.SECRET_KEY)
-                r = test_client.get("/v2/apps", headers={"Authorization": "JWT {}".format(jwt_token)})
+                auth_header = {
+                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+                }
+                r = test_client.get("/v2/apps", headers=auth_header)
                 self.assertEqual(200, r.status_code)
                 self.assertEqual("user-jwt@host.com.br", request.user)
 
@@ -124,11 +133,13 @@ class TestAuthentication(TestCase):
         """
         self.fail()
 
-
     def test_return_401_if_jwt_token_is_invalid(self):
         with application.app_context(), application.test_client() as test_client:
             jwt_token = jwt.encode({"email": "user@host.com.br"}, key="wrong key")
-            r = test_client.get("/v2/apps", headers={"Authorization": "JWT {}".format(jwt_token)})
+            auth_header = {
+                "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+            }
+            r = test_client.get("/v2/apps", headers=auth_header)
             self.assertEqual(401, r.status_code)
             self.assertEqual("Authorization token is invalid", json.loads(r.data)['msg'])
 
