@@ -65,7 +65,7 @@ def authorized(resp):
     data = authentication_ok
     data["jwt"] = jwt_auth.jwt_encode_callback({"email": data["email"]})
 
-    session["jwt"] = data["jwt"]
+    session["jwt"] = data["jwt"] = data["jwt"].decode('utf-8')
     return redirect("{}?jwt={}".format(conf.REDIRECT_AFTER_LOGIN, data["jwt"]))
 
 @google_oauth2.tokengetter
