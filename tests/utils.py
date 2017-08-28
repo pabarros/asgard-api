@@ -12,7 +12,7 @@ def get_fixture(file_name: str) -> Dict:
         return json.load(fp)
 
 
-def with_fixture(fixture_path):
+def with_json_fixture(fixture_path):
     def wrapper(func):
         def decorator(self):
             fixture = get_fixture(fixture_path)

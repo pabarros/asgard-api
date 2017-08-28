@@ -1,3 +1,4 @@
+from typing import Dict
 from unittest import TestCase
 import mock
 import os
@@ -13,7 +14,7 @@ from flask import request
 from marathon.models.app import MarathonApp
 import json
 from tests import RequestStub
-from tests.utils import with_fixture
+from tests.utils import with_json_fixture
 
 
 class RequestFilterTest(TestCase):
@@ -77,8 +78,8 @@ class RequestFilterTest(TestCase):
                 traceback.print_exc()
                 self.fail("Nao deveria ter dado exception, %s" % e)
 
-    @with_fixture("single_full_app.json")
-    def test_dispatch_all_filters_with_incomplete_body(self, app_config):
+    @with_json_fixture("single_full_app.json")
+    def test_dispatch_all_filters_with_incomplete_body(self, single_full_app: Dict):
         """
         Tests if we can run all filters with an incomplete body, which force them to
         pull the original app from Marathon
@@ -94,7 +95,7 @@ class RequestFilterTest(TestCase):
                     ctx_mock = mock.MagicMock()
                     ctx_mock.request = request
                     get_ctx_mock.return_value = ctx_mock
-                    get_original_app_mock.return_value = MarathonApp(**app_config)
+                    get_original_app_mock.return_value = MarathonApp(**single_full_app)
 
                     RequestFilter.dispatch(request)
 
