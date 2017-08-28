@@ -63,7 +63,7 @@ def authorized(resp):
         return render_template("login-failed.html")
 
     data = authentication_ok
-    data["jwt"] = jwt_auth.jwt_encode_callback({"email": data["email"]})
+    data["jwt"]: bytes = jwt_auth.jwt_encode_callback({"email": data["email"]})
 
     session["jwt"] = data["jwt"] = data["jwt"].decode('utf-8')
     return redirect("{}?jwt={}".format(conf.REDIRECT_AFTER_LOGIN, data["jwt"]))
