@@ -1,5 +1,3 @@
-#encoding: utf-8
-
 from collections import namedtuple
 
 import jwt
@@ -162,3 +160,16 @@ class TestAuthentication(TestCase):
             jwt_token = r.headers["Location"].split("=")[1]
             self.assertEqual("email@host.com.br", jwt.decode(jwt_token, key=conf.SECRET_KEY)["email"])
 
+    def test_redirect_with_jwt_url_is_formed_with_unicode_jwt(self):
+        test_client = application.test_client()
+        jwt = MagicMock()
+
+        with application.app_context(), \
+             patch.object(routes, "check_authentication_successful",
+                          return_value={"email": "email@host.com.br"}),\
+             patch.object(routes.jwt_auth, "jwt_encode_callback", return_value=jwt), \
+             patch.object(routes, 'redirect') as redirect:
+            response = test_client.get("/authenticate/google")
+
+            jwt.decode.assert_called_once_with('utf-8')
+            redirect.assert_called_once_with("{}?jwt={}".format(conf.REDIRECT_AFTER_LOGIN, jwt.decode.return_value))
