@@ -32,6 +32,9 @@ def after_request(response):
     )
     return response
 
+import marathon
+marathon.log = logger
+
 import hollowman.routes
 register_plugin("example-plugin")
 
