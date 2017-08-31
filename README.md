@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.29
+  - Migração para python 3.6
+
 * 0.0.28
   - Atualizando example-plugin. Corrigindo chamada à Dialog API.
 
