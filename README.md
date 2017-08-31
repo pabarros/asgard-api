@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.28
+  - Atualizando example-plugin. Corrigindo chamada à Dialog API.
+
 * 0.0.27
   - Atualizando immage base para uwsgi/py27:0.0.12 (Log "JSON")
 
