@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.30
+  - Adicionando session-checker-plugin
+
 * 0.0.29
   - Migração para python 3.6
 
