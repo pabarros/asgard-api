@@ -74,7 +74,6 @@ def get_access_token():
 
 
 @application.route("/v2/plugins")
-@auth_required()
 def plugins():
     return make_response(json.dumps(get_plugin_registry_data()), 200)
 
