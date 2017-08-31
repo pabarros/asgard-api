@@ -12,6 +12,7 @@ _build
 .ropeproject
 *.py[co]
 conf_local.py
+.env
 
 # https://github.com/github/gitignore/raw/master/Python.gitignore
 # Packages
