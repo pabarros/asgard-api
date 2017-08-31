@@ -37,4 +37,5 @@ marathon.log = logger
 
 import hollowman.routes
 register_plugin("example-plugin")
+register_plugin("session-checker-plugin")
 
