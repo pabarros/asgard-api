@@ -95,7 +95,10 @@
 	Sieve.DialogStore.on("DIALOG_EVENTS_ACCEPT_DIALOG", acceptDialog);
 
 	function checkSession() {
-	  ajaxWrapper({ url: config.apiURL + "v2/deployments" }).error(function (error) {
+	  ajaxWrapper({
+	    url: config.apiURL + "v2/deployments",
+	    concurrent: true
+	  }).error(function (error) {
 	    checkStatusCode(error.status);
 	  });
 	}
