@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.31
+  - Removendo header Content-Encoding. Marathon 1.3.13 retorna os responses em formato gzip, mas o hollowman ainda nao trata isso.
+
 * 0.0.30
   - Adicionando session-checker-plugin
 
