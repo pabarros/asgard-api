@@ -1,5 +1,3 @@
-# encoding utf-8
-
 import os
 import base64
 
@@ -33,3 +31,6 @@ REDIRECT_AFTER_LOGIN = os.getenv("HOLLOWMAN_REDIRECT_AFTER_LOGIN")
 HOLLOWMAN_DB_URL = os.getenv("HOLLOWMAN_DB_URL", "sqlite://")
 HOLLOWMAN_DB_ECHO = os.getenv("HOLLOWMAN_DB_ECHO", DISABLED) == ENABLED
 HOLLOWMAN_ENFORCE_AUTH = os.getenv("HOLLOWMAN_ENFORCE_AUTH", ENABLED) == ENABLED
+
+HOLLOWMAN_NEW_DISPATCHER_USERS = (os.getenv("HOLLOWMAN_NEW_DISPATCHER_USERS", "").split(",")
+                                  if os.getenv("HOLLOWMAN_NEW_DISPATCHER_USERS") else [])
