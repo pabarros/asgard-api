@@ -2,12 +2,12 @@ import json
 import requests
 from flask import url_for, redirect, Response, request, session, \
                   render_template, make_response
-from hollowman import conf
-from hollowman import upstream
+from hollowman import conf, request_handlers
+
 from hollowman.app import application
 from hollowman.auth.google import google_oauth2
 from hollowman.decorators import auth_required
-from hollowman.filters.request import RequestFilter
+
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth
 from hollowman.plugins import get_plugin_registry_data
@@ -23,19 +23,10 @@ def index():
 @application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @auth_required()
 def apiv2(path):
-    modded_request = request
-    try:
-        modded_request = RequestFilter.dispatch(request)
-    except Exception:
-        import traceback
-        traceback.print_exc()
-    r = upstream.replay_request(modded_request, conf.MARATHON_ENDPOINT)
-    h = dict(r.headers)
-    h.pop("Transfer-Encoding", None)
-    # Marathon 1.3.x returns all responses gziped
-    h.pop("Content-Encoding", None)
-
-    return Response(response=r.content, status=r.status_code, headers=h)
+    if request.user in conf.HOLLOWMAN_NEW_DISPATCHER_USERS:
+        return request_handlers.new(request)
+    else:
+        return request_handlers.old(request)
 
 
 @application.route("/healthcheck")
