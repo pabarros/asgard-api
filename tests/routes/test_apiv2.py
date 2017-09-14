@@ -65,7 +65,7 @@ class TestAuthentication(TestCase):
             test_client = application.test_client()
             with application.app_context():
                 auth_header = self.make_auth_header(self.normal_user.tx_email)
-                #
+
                 request_handlers.old.return_value = self.response_http_200
                 r = test_client.get("/v2/apps", headers=auth_header)
                 self.assertEqual(200, r.status_code)
