@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, url_for, redirect, Response, request, session, render_template, make_response
+from flask import url_for, redirect, Response, request, session, render_template, make_response
 import json
 
 from hollowman import conf
