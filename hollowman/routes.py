@@ -1,5 +1,3 @@
-#encoding: utf-8
-
 import requests
 from flask import Flask, url_for, redirect, Response, request, session, render_template, make_response
 import json
