@@ -14,13 +14,66 @@ from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth
 from hollowman.plugins import get_plugin_registry_data
 
+
+def raw_proxy():
+    r = upstream.replay_request(request, conf.MARATHON_ENDPOINT)
+    return Response(response=r.content, status=r.status_code, headers=dict(r.headers))
+
+@application.route("/v2/deployments", defaults={"uuid": ""}, methods=["GET"])
+@application.route("/v2/deployments/<string:uuid>", methods=["GET", "DELETE"])
+def deployments(uuid):
+    return raw_proxy()
+
+@application.route("/v2/groups", defaults={"group_id": ""}, methods=["GET", "PUT", "POST", "DELETE"])
+@application.route("/v2/groups//<path:group>/versions", methods=["GET"])
+@application.route("/v2/groups/<path:group>/versions", methods=["GET"])
+@application.route("/v2/groups/versions", defaults={"group": ""}, methods=["GET"])
+@application.route("/v2/groups//<path:group>", methods=["GET", "POST", "PUT", "DELETE"])
+@application.route("/v2/groups/<path:group>", methods=["GET", "POST", "PUT", "DELETE"])
+def groups(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/tasks", methods=["GET"])
+@application.route("/v2/tasks/delete", methods=["POST"])
+def tasks():
+    return raw_proxy()
+
+@application.route("/v2/artifacts", methods=["GET"])
+@application.route("/v2/artifacts/<path:path>", methods=["GET", "PUT", "POST", "DELETE"])
+@application.route("/v2/artifacts//<path:path>", methods=["GET", "PUT", "POST", "DELETE"])
+def artifacts(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/info", methods=["GET"])
+def info(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/leader", methods=["GET", "DELETE"])
+def leader(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/queue", methods=["GET"])
+@application.route("/v2/queue/<path:app>/delay", methods=["GET", "DELETE"])
+@application.route("/v2/queue//<path:app>/delay", methods=["GET", "DELETE"])
+def queue(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/ping", methods=["GET"])
+def ping(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/metrics", methods=["GET"])
+def metrics(*args, **kwargs):
+    return raw_proxy()
+
 @application.route("/", methods=["GET"])
 def index():
     return Response(status=302, headers={"Location": conf.REDIRECT_ROOTPATH_TO})
 
-@application.route('/v2', defaults={'path': '/'})
-@application.route('/v2/', defaults={'path': ''})
-@application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps', defaults={'path': '/'}, methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps/', defaults={'path': ''}, methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps//<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @auth_required()
 def apiv2(path):
     modded_request = request
@@ -30,10 +83,7 @@ def apiv2(path):
         import traceback
         traceback.print_exc()
     r = upstream.replay_request(modded_request, conf.MARATHON_ENDPOINT)
-    h = dict(r.headers)
-    h.pop("Transfer-Encoding", None)
-    h.pop("Content-Encoding", None) # Marathon 1.3.x returns all responses gziped
-    return Response(response=r.content, status=r.status_code, headers=h)
+    return Response(response=r.content, status=r.status_code, headers=dict(r.headers))
 
 @application.route("/healthcheck")
 def healhcheck():
