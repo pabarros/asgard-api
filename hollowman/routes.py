@@ -21,6 +21,7 @@ def raw_proxy():
 
 @application.route("/v2/deployments", defaults={"uuid": ""}, methods=["GET"])
 @application.route("/v2/deployments/<string:uuid>", methods=["GET", "DELETE"])
+@auth_required()
 def deployments(uuid):
     return raw_proxy()
 
@@ -30,39 +31,47 @@ def deployments(uuid):
 @application.route("/v2/groups/versions", defaults={"group": ""}, methods=["GET"])
 @application.route("/v2/groups//<path:group>", methods=["GET", "POST", "PUT", "DELETE"])
 @application.route("/v2/groups/<path:group>", methods=["GET", "POST", "PUT", "DELETE"])
+@auth_required()
 def groups(*args, **kwargs):
     return raw_proxy()
 
 @application.route("/v2/tasks", methods=["GET"])
 @application.route("/v2/tasks/delete", methods=["POST"])
+@auth_required()
 def tasks():
     return raw_proxy()
 
 @application.route("/v2/artifacts", methods=["GET"])
 @application.route("/v2/artifacts/<path:path>", methods=["GET", "PUT", "POST", "DELETE"])
 @application.route("/v2/artifacts//<path:path>", methods=["GET", "PUT", "POST", "DELETE"])
+@auth_required()
 def artifacts(*args, **kwargs):
     return raw_proxy()
 
 @application.route("/v2/info", methods=["GET"])
+@auth_required()
 def info(*args, **kwargs):
     return raw_proxy()
 
 @application.route("/v2/leader", methods=["GET", "DELETE"])
+@auth_required()
 def leader(*args, **kwargs):
     return raw_proxy()
 
 @application.route("/v2/queue", methods=["GET"])
 @application.route("/v2/queue/<path:app>/delay", methods=["GET", "DELETE"])
 @application.route("/v2/queue//<path:app>/delay", methods=["GET", "DELETE"])
+@auth_required()
 def queue(*args, **kwargs):
     return raw_proxy()
 
 @application.route("/ping", methods=["GET"])
+@auth_required()
 def ping(*args, **kwargs):
     return raw_proxy()
 
 @application.route("/metrics", methods=["GET"])
+@auth_required()
 def metrics(*args, **kwargs):
     return raw_proxy()
 
