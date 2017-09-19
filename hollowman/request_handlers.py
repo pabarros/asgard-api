@@ -13,10 +13,10 @@ def old(request: HollowmanRequest) -> Response:
         import traceback
         traceback.print_exc()
 
-    r = upstream.replay_request(modded_request, conf.MARATHON_ENDPOINT)
-    return Response(response=r.content,
-                    status=r.status_code,
-                    headers=r.headers)
+    resp = upstream.replay_request(modded_request, conf.MARATHON_ENDPOINT)
+    return Response(response=resp.content,
+                    status=resp.status_code,
+                    headers=dict(resp.headers))
 
 
 def new(request: HollowmanRequest) -> Response:
