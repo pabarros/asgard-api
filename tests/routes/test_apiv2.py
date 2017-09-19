@@ -3,9 +3,11 @@ from typing import Dict
 import jwt
 
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, NonCallableMock
 
 from flask import Response
+from requests.models import Response as RequestsResponse
+from requests.structures import CaseInsensitiveDict
 
 from hollowman.app import application
 from hollowman import conf
@@ -72,3 +74,24 @@ class TestAuthentication(TestCase):
 
                 request_handlers.new.assert_not_called()
                 request_handlers.old.assert_called_once()
+
+    def test_it_creates_a_response_using_a_dict_of_headers(self):
+        """
+        O atributo headers de um objeto `request.models.Response` é utilizado
+        para gerar o response do holloman. Por ser do tipo `CaseInsentiveDict`,
+        quebra a implementação do flask e faz com que seja necessário o typecast
+        para `dict`.
+        """
+        with patch('hollowman.request_handlers.upstream.replay_request') as replay_request:
+            response = NonCallableMock(
+                content=b"Foo",
+                status_code=200,
+                headers=CaseInsensitiveDict({'dog': 'Xablau'})
+            )
+            replay_request.return_value = response
+            test_client = application.test_client()
+            with application.app_context():
+                auth_header = self.make_auth_header(self.normal_user.tx_email)
+                r = test_client.get("/v2/apps", headers=auth_header)
+
+                self.assertEqual(200, r.status_code)
