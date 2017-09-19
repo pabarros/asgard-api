@@ -11,11 +11,12 @@ def old(request: HollowmanRequest) -> Response:
         modded_request = RequestFilter.dispatch(request)
     except Exception:
         import traceback
-    
         traceback.print_exc()
 
     r = upstream.replay_request(modded_request, conf.MARATHON_ENDPOINT)
-    return Response(response=r.content, status=r.status_code, headers=r.headers)
+    return Response(response=r.content,
+                    status=r.status_code,
+                    headers=dict(r.headers))
 
 
 def new(request: HollowmanRequest) -> Response:
