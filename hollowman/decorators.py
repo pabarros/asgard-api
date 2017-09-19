@@ -60,7 +60,7 @@ def auth_required():
                 request.user = authenticated_user
                 return fn(*args, **kwargs)
             except Exception as e:
-                logger.error({"exc": e, "step": "auth"})
+                logger.exception({"exc": e, "step": "auth"})
                 return make_response(invalid_token_response_body, 401)
         return decorator
     return wrapper
