@@ -2,7 +2,7 @@ import json
 import requests
 from flask import url_for, redirect, Response, request, session, \
                   render_template, make_response
-from hollowman import conf, request_handlers
+from hollowman import conf, request_handlers, upstream
 
 from hollowman.app import application
 from hollowman.auth.google import google_oauth2
@@ -13,14 +13,74 @@ from hollowman.auth.jwt import jwt_auth
 from hollowman.plugins import get_plugin_registry_data
 
 
+def raw_proxy():
+    r = upstream.replay_request(request, conf.MARATHON_ENDPOINT)
+    return Response(response=r.content, status=r.status_code, headers=dict(r.headers))
+
+@application.route("/v2/deployments", defaults={"uuid": ""}, methods=["GET"])
+@application.route("/v2/deployments/<string:uuid>", methods=["GET", "DELETE"])
+@auth_required()
+def deployments(uuid):
+    return raw_proxy()
+
+@application.route("/v2/groups", defaults={"group_id": ""}, methods=["GET", "PUT", "POST", "DELETE"])
+@application.route("/v2/groups//<path:group>/versions", methods=["GET"])
+@application.route("/v2/groups/<path:group>/versions", methods=["GET"])
+@application.route("/v2/groups/versions", defaults={"group": ""}, methods=["GET"])
+@application.route("/v2/groups//<path:group>", methods=["GET", "POST", "PUT", "DELETE"])
+@application.route("/v2/groups/<path:group>", methods=["GET", "POST", "PUT", "DELETE"])
+@auth_required()
+def groups(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/tasks", methods=["GET"])
+@application.route("/v2/tasks/delete", methods=["POST"])
+@auth_required()
+def tasks():
+    return raw_proxy()
+
+@application.route("/v2/artifacts", methods=["GET"])
+@application.route("/v2/artifacts/<path:path>", methods=["GET", "PUT", "POST", "DELETE"])
+@application.route("/v2/artifacts//<path:path>", methods=["GET", "PUT", "POST", "DELETE"])
+@auth_required()
+def artifacts(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/info", methods=["GET"])
+@auth_required()
+def info(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/leader", methods=["GET", "DELETE"])
+@auth_required()
+def leader(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/v2/queue", methods=["GET"])
+@application.route("/v2/queue/<path:app>/delay", methods=["GET", "DELETE"])
+@application.route("/v2/queue//<path:app>/delay", methods=["GET", "DELETE"])
+@auth_required()
+def queue(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/ping", methods=["GET"])
+@auth_required()
+def ping(*args, **kwargs):
+    return raw_proxy()
+
+@application.route("/metrics", methods=["GET"])
+@auth_required()
+def metrics(*args, **kwargs):
+    return raw_proxy()
+
 @application.route("/", methods=["GET"])
 def index():
     return Response(status=302, headers={"Location": conf.REDIRECT_ROOTPATH_TO})
 
-
-@application.route('/v2', defaults={'path': '/'})
-@application.route('/v2/', defaults={'path': ''})
-@application.route('/v2/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps', defaults={'path': '/'}, methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps/', defaults={'path': ''}, methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps//<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
+@application.route('/v2/apps/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @auth_required()
 def apiv2(path):
     if request.user in conf.HOLLOWMAN_NEW_DISPATCHER_USERS:
@@ -84,3 +144,4 @@ def plugins():
 @application.route("/v2/plugins/<string:plugin_id>/main.js")
 def main_js(plugin_id):
     return redirect("static/plugins/{}/main.js".format(plugin_id))
+
