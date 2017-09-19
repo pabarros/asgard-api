@@ -16,7 +16,7 @@ def old(request: HollowmanRequest) -> Response:
     r = upstream.replay_request(modded_request, conf.MARATHON_ENDPOINT)
     return Response(response=r.content,
                     status=r.status_code,
-                    headers=dict(r.headers))
+                    headers=r.headers)
 
 
 def new(request: HollowmanRequest) -> Response:
