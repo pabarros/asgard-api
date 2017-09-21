@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.33
+  - Implementação do roteamento para o fluxo novo e fluxo velho. Isso depois será removido, quando tudo for fluxo novo.
+
 * 0.0.32
   - Separando o mapeamento de todas as rotas da API. Isso vai permitir que possamos mexer nas rotas de forma individual 
 
