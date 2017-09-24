@@ -1,8 +1,11 @@
 import json
 from unittest import TestCase
 from unittest.mock import patch, Mock
-from marathon import NotFoundError, MarathonApp
 
+from marathon import NotFoundError, MarathonApp
+from responses import RequestsMock
+
+from hollowman import conf
 from hollowman.app import application
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.parsers import RequestParser
@@ -91,14 +94,22 @@ class SplitTests(TestCase):
                 with self.assertRaises(NotFoundError):
                     list(request_parser.split())
 
-    @with_json_fixture('get-v2apps-all-appps.json')
+    @with_json_fixture('requests/get-v2apps-all-apps.json')
     def test_a_request_with_n_apps_returns_n_marathonapps(self, fixture):
         with application.test_request_context('/v2/apps/', method='GET') as ctx:
             request_parser = RequestParser(ctx.request)
-            with patch.object(request_parser, 'marathon_client') as client:
-                client.list_apps.return_value =
-                apps = request_parser.split()
+            with RequestsMock() as rsps:
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                         body=json.dumps(fixture),
+                         status=200)
+                apps = list(request_parser.split())
 
+                request_apps = [request_app for request_app, _ in apps]
+                self.assertEqual(request_apps, [MarathonApp()] * 4)
+
+                self.assertEqual([app.id for _, app in apps],
+                                 [app['id'] for app in fixture['apps']])
 
     @with_json_fixture('single_full_app.json')
     def test_a_request_for_a_new_app_will_return_a_tuple_with_an_empty_marathonapp(self, fixture):
