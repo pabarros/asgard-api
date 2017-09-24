@@ -5,15 +5,15 @@ from enum import Enum, auto
 
 
 class OperationType(Enum):
-    READ = auto()
-    WRITE = auto()
+    READ = 'read'
+    WRITE = 'write'
 
-    SCALE_UP = auto()
-    SCALE_DOWN = auto()
-    RESTART = auto()
-    DESTROY = auto()
-    SUSPEND = auto()
-    CREATE = auto()
+    SCALE_UP = 'scale_up'
+    SCALE_DOWN = 'scale_down'
+    RESTART = 'restart'
+    DESTROY = 'destroy'
+    SUSPEND = 'suspend'
+    CREATE = 'create'
 
 
 class HollowmanRequest(Request):
