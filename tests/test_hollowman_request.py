@@ -24,35 +24,25 @@ class TestHollowmanRequest(TestCase):
 class TestOperations(TestCase):
     def test_GET_request_is_a_READ_operation(self):
         with application.test_request_context('/v2/apps/', method='GET'):
-            operations = request.get_operations()
-
-            self.assertIn(OperationType.READ, operations)
-            self.assertNotIn(OperationType.WRITE, operations)
+            self.assertIn(OperationType.READ, request.operations)
+            self.assertNotIn(OperationType.WRITE, request.operations)
 
     def test_POST_request_is_a_WRITE_operation(self):
         with application.test_request_context('/v2/apps/', method='POST'):
-            operations = request.get_operations()
-
-            self.assertIn(OperationType.WRITE, operations)
-            self.assertNotIn(OperationType.READ, operations)
+            self.assertIn(OperationType.WRITE, request.operations)
+            self.assertNotIn(OperationType.READ, request.operations)
 
     def test_PUT_request_is_a_WRITE_operation(self):
         with application.test_request_context('/v2/apps/', method='PUT'):
-            operations = request.get_operations()
-
-            self.assertIn(OperationType.WRITE, operations)
-            self.assertNotIn(OperationType.READ, operations)
+            self.assertIn(OperationType.WRITE, request.operations)
+            self.assertNotIn(OperationType.READ, request.operations)
 
     def test_PATCH_request_is_a_WRITE_operation(self):
         with application.test_request_context('/v2/apps/', method='PATCH'):
-            operations = request.get_operations()
-
-            self.assertIn(OperationType.WRITE, operations)
-            self.assertNotIn(OperationType.READ, operations)
+            self.assertIn(OperationType.WRITE, request.operations)
+            self.assertNotIn(OperationType.READ, request.operations)
 
     def test_DELETE_request_is_a_WRITE_operation(self):
         with application.test_request_context('/v2/apps/', method='DELETE'):
-            operations = request.get_operations()
-
-            self.assertIn(OperationType.WRITE, operations)
-            self.assertNotIn(OperationType.READ, operations)
+            self.assertIn(OperationType.WRITE, request.operations)
+            self.assertNotIn(OperationType.READ, request.operations)
