@@ -1,0 +1,426 @@
+{
+  "apps": [
+    {
+      "id": "/supended/captura/wetl/updater/mailmarketing",
+      "cmd": "mail_marketing updater",
+      "args": null,
+      "user": null,
+      "env": {
+        "REDIS_HOST": "10.76.98.141",
+        "SIEVE_DB_BASEPRODUTO_ADDRESS": "10.48.61.103",
+        "SIEVE_DB_MATCHING_ADDRESS": "10.37.58.27",
+        "DB_POOL_MAXOVERFLOW_PORTAL": "2",
+        "SIEVE_DB_MANAGER_ADDRESS": "10.37.58.27",
+        "SIEVE_DB_PORTAL_ADDRESS": "10.155.80.2",
+        "SIEVE_DB_PORTAL_SLAVE_ADDRESS": "10.155.80.2",
+        "MODEL_CACHE_HOST": "10.76.98.141",
+        "QUEUE_INTERNAL_IP": "10.37.58.35",
+        "prod": "1"
+      },
+      "instances": 0,
+      "cpus": 0.3,
+      "mem": 512,
+      "disk": 0,
+      "executor": "",
+      "constraints": [
+        [
+          "exclusive",
+          "UNLIKE",
+          ".*"
+        ],
+        [
+          "dc",
+          "LIKE",
+          "sl"
+        ]
+      ],
+      "uris": [
+        "file:///etc/docker.tar.bz2"
+      ],
+      "fetch": [
+        {
+          "uri": "file:///etc/docker.tar.bz2",
+          "extract": true,
+          "executable": false,
+          "cache": false
+        }
+      ],
+      "storeUrls": [],
+      "ports": [
+        10027
+      ],
+      "portDefinitions": [
+        {
+          "port": 10027,
+          "protocol": "tcp",
+          "labels": {}
+        }
+      ],
+      "requirePorts": false,
+      "backoffSeconds": 1,
+      "backoffFactor": 1.15,
+      "maxLaunchDelaySeconds": 3600,
+      "container": {
+        "type": "DOCKER",
+        "volumes": [],
+        "docker": {
+          "image": "docker.sieve.com.br/wetl:latest",
+          "network": "BRIDGE",
+          "privileged": false,
+          "parameters": [
+            {
+              "key": "dns",
+              "value": "172.17.0.1"
+            },
+            {
+              "key": "label",
+              "value": "hollowman.appname=/supended/captura/wetl/updater/mailmarketing"
+            }
+          ],
+          "forcePullImage": true
+        }
+      },
+      "healthChecks": [],
+      "readinessChecks": [],
+      "dependencies": [],
+      "upgradeStrategy": {
+        "minimumHealthCapacity": 0,
+        "maximumOverCapacity": 0
+      },
+      "labels": {},
+      "acceptedResourceRoles": null,
+      "ipAddress": null,
+      "version": "2017-06-13T12:58:20.468Z",
+      "residency": null,
+      "versionInfo": {
+        "lastScalingAt": "2017-06-13T12:58:20.468Z",
+        "lastConfigChangeAt": "2017-06-13T12:58:20.468Z"
+      },
+      "tasksStaged": 0,
+      "tasksRunning": 0,
+      "tasksHealthy": 0,
+      "tasksUnhealthy": 0,
+      "deployments": []
+    },
+    {
+      "id": "/captura/fetcher/xvfb",
+      "cmd": null,
+      "args": null,
+      "user": null,
+      "env": {},
+      "instances": 15,
+      "cpus": 0.1,
+      "mem": 128,
+      "disk": 0,
+      "executor": "",
+      "constraints": [
+        [
+          "workload",
+          "LIKE",
+          "(fetcher|fetcher-interactiveX)"
+        ],
+        [
+          "hostname",
+          "UNIQUE"
+        ],
+        [
+          "dc",
+          "LIKE",
+          "aws"
+        ]
+      ],
+      "uris": [
+        "file:///etc/docker.tar.bz2"
+      ],
+      "fetch": [
+        {
+          "uri": "file:///etc/docker.tar.bz2",
+          "extract": true,
+          "executable": false,
+          "cache": false
+        }
+      ],
+      "storeUrls": [],
+      "ports": [
+        10095
+      ],
+      "portDefinitions": [
+        {
+          "port": 10095,
+          "protocol": "tcp",
+          "labels": {}
+        }
+      ],
+      "requirePorts": false,
+      "backoffSeconds": 1,
+      "backoffFactor": 1,
+      "maxLaunchDelaySeconds": 3600,
+      "container": {
+        "type": "DOCKER",
+        "volumes": [
+          {
+            "containerPath": "/tmp",
+            "hostPath": "/tmp/xvfb",
+            "mode": "RW"
+          }
+        ],
+        "docker": {
+          "image": "docker.sieve.com.br/ubuntu/xvfb:0.0.3",
+          "network": "BRIDGE",
+          "portMappings": [
+            {
+              "containerPort": 0,
+              "hostPort": 0,
+              "servicePort": 10095,
+              "protocol": "tcp",
+              "labels": {}
+            }
+          ],
+          "privileged": false,
+          "parameters": [
+            {
+              "key": "label",
+              "value": "hollowman.appname=/captura/fetcher/xvfb"
+            }
+          ],
+          "forcePullImage": true
+        }
+      },
+      "healthChecks": [],
+      "readinessChecks": [],
+      "dependencies": [],
+      "upgradeStrategy": {
+        "minimumHealthCapacity": 0,
+        "maximumOverCapacity": 0
+      },
+      "labels": {
+        "hollowman.default_scale": "1"
+      },
+      "acceptedResourceRoles": null,
+      "ipAddress": null,
+      "version": "2017-09-21T18:15:59.392Z",
+      "residency": null,
+      "versionInfo": {
+        "lastScalingAt": "2017-09-21T18:15:59.392Z",
+        "lastConfigChangeAt": "2017-09-19T19:02:28.684Z"
+      },
+      "tasksStaged": 0,
+      "tasksRunning": 15,
+      "tasksHealthy": 0,
+      "tasksUnhealthy": 0,
+      "deployments": []
+    },
+    {
+      "id": "/infra/redis/beta",
+      "cmd": null,
+      "args": null,
+      "user": null,
+      "env": {},
+      "instances": 0,
+      "cpus": 0.1,
+      "mem": 64,
+      "disk": 0,
+      "executor": "",
+      "constraints": [
+        [
+          "exclusive",
+          "UNLIKE",
+          ".*"
+        ],
+        [
+          "dc",
+          "LIKE",
+          "sl"
+        ],
+        [
+          "hostname",
+          "LIKE",
+          "(10.76.98.168)"
+        ]
+      ],
+      "uris": [
+        "file:///etc/docker.tar.bz2"
+      ],
+      "fetch": [
+        {
+          "uri": "file:///etc/docker.tar.bz2",
+          "extract": true,
+          "executable": false,
+          "cache": false
+        }
+      ],
+      "storeUrls": [],
+      "ports": [
+        10001
+      ],
+      "portDefinitions": [
+        {
+          "port": 10001,
+          "protocol": "tcp",
+          "labels": {}
+        }
+      ],
+      "requirePorts": false,
+      "backoffSeconds": 1,
+      "backoffFactor": 1.15,
+      "maxLaunchDelaySeconds": 3600,
+      "container": {
+        "type": "DOCKER",
+        "volumes": [],
+        "docker": {
+          "image": "docker.sieve.com.br/alpine/redis:0.0.1",
+          "network": "HOST",
+          "privileged": true,
+          "parameters": [
+            {
+              "key": "label",
+              "value": "hollowman.appname=/infra/redis/beta"
+            }
+          ],
+          "forcePullImage": true
+        }
+      },
+      "healthChecks": [
+        {
+          "protocol": "TCP",
+          "gracePeriodSeconds": 30,
+          "intervalSeconds": 10,
+          "timeoutSeconds": 5,
+          "maxConsecutiveFailures": 3,
+          "ignoreHttp1xx": false,
+          "port": 6379
+        }
+      ],
+      "readinessChecks": [],
+      "dependencies": [],
+      "upgradeStrategy": {
+        "minimumHealthCapacity": 1,
+        "maximumOverCapacity": 1
+      },
+      "labels": {
+        "hollowman.default_scale": "1"
+      },
+      "acceptedResourceRoles": null,
+      "ipAddress": null,
+      "version": "2017-07-11T19:43:43.267Z",
+      "residency": null,
+      "versionInfo": {
+        "lastScalingAt": "2017-07-11T19:43:43.267Z",
+        "lastConfigChangeAt": "2017-07-11T19:43:43.267Z"
+      },
+      "tasksStaged": 0,
+      "tasksRunning": 0,
+      "tasksHealthy": 0,
+      "tasksUnhealthy": 0,
+      "deployments": []
+    },
+    {
+      "id": "/pricing/cron/crond",
+      "cmd": null,
+      "args": null,
+      "user": null,
+      "env": {
+        "SIEVE_QUEUE_HOST": "rabbitmq.service.sieve.com.br",
+        "SIEVE_DB_MATCHING_ADDRESS": "pgsql.service.sieve.com.br",
+        "SIEVE_SKYHUB_API_BASE_URL": "https://in.skyhub.com.br/",
+        "SIEVE_DB_MANAGER_ADDRESS": "pgsql.service.sieve.com.br",
+        "SIEVE_DB_PORTAL_ADDRESS": "db0master.service.sieve.com.br",
+        "SIEVE_DB_PORTAL_SLAVE_ADDRESS": "db0slave.service.sieve.com.br",
+        "MODEL_CACHE_HOST": "captura.redis.service.sieve.com.br",
+        "SIEVE_REDIS_URL": "redis://captura.redis.service.sieve.com.br:6379/0",
+        "QUEUE_INTERNAL_IP": "rabbitmq.service.sieve.com.br",
+        "prod": "1",
+        "REDIS_URL": "redis://captura.redis.service.sieve.com.br:6379/3"
+      },
+      "instances": 1,
+      "cpus": 0.6,
+      "mem": 128,
+      "disk": 0,
+      "executor": "",
+      "constraints": [
+        [
+          "workload",
+          "LIKE",
+          "general"
+        ],
+        [
+          "dc",
+          "LIKE",
+          "(aws|sl|gcp)"
+        ]
+      ],
+      "uris": [
+        "file:///etc/docker.tar.bz2"
+      ],
+      "fetch": [
+        {
+          "uri": "file:///etc/docker.tar.bz2",
+          "extract": true,
+          "executable": false,
+          "cache": false
+        }
+      ],
+      "storeUrls": [],
+      "ports": [
+        10040
+      ],
+      "portDefinitions": [
+        {
+          "port": 10040,
+          "protocol": "tcp",
+          "labels": {}
+        }
+      ],
+      "requirePorts": false,
+      "backoffSeconds": 1,
+      "backoffFactor": 1.15,
+      "maxLaunchDelaySeconds": 3600,
+      "container": {
+        "type": "DOCKER",
+        "volumes": [],
+        "docker": {
+          "image": "docker.sieve.com.br/pricing-cron",
+          "network": "BRIDGE",
+          "portMappings": [
+            {
+              "containerPort": 0,
+              "hostPort": 0,
+              "servicePort": 10040,
+              "protocol": "tcp",
+              "labels": {}
+            }
+          ],
+          "privileged": false,
+          "parameters": [
+            {
+              "key": "label",
+              "value": "hollowman.appname=/pricing/cron/crond"
+            }
+          ],
+          "forcePullImage": true
+        }
+      },
+      "healthChecks": [],
+      "readinessChecks": [],
+      "dependencies": [],
+      "upgradeStrategy": {
+        "minimumHealthCapacity": 0,
+        "maximumOverCapacity": 0
+      },
+      "labels": {},
+      "acceptedResourceRoles": null,
+      "ipAddress": null,
+      "version": "2017-08-07T18:25:09.435Z",
+      "residency": null,
+      "versionInfo": {
+        "lastScalingAt": "2017-08-07T18:25:09.435Z",
+        "lastConfigChangeAt": "2017-08-07T18:25:09.435Z"
+      },
+      "tasksStaged": 0,
+      "tasksRunning": 1,
+      "tasksHealthy": 0,
+      "tasksUnhealthy": 0,
+      "deployments": []
+    }
+  ]
+}
