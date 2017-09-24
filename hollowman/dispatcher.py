@@ -4,7 +4,6 @@ from marathon import MarathonApp
 
 from hollowman.filters.dummy import DummyLogFilter
 from hollowman.hollowman_flask import OperationType
-from hollowman.log import logger
 
 
 class InterruptPipelineException(Exception):
@@ -14,7 +13,8 @@ class InterruptPipelineException(Exception):
 
 
 filters_pipeline = {
-    OperationType.READ: (DummyLogFilter(),)
+    OperationType.READ: (DummyLogFilter(),),
+    OperationType.WRITE: (DummyLogFilter(),)
 }
 
 
@@ -22,12 +22,10 @@ def dispatch(operations: Iterable[OperationType],
              user,
              request_app: MarathonApp,
              app: MarathonApp) -> MarathonApp:
-    logger.debug(request_app)
+
     for operation in operations:
         for filter_ in filters_pipeline[operation]:
             func = getattr(filter_, operation.value)
-            try:
-                request_app = func(user, request_app, app)
-            except KeyError:
-                pass  # skip. Unintersting operation
-    return request_app
+            filtered_app = func(user, request_app, app)
+
+    return filtered_app
