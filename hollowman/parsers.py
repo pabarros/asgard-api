@@ -28,11 +28,8 @@ class RequestParser:
     def is_app_request(self):
         return self.request.path.startswith(self.app_path_prefix)
 
-    def is_list_app_request(self):
+    def is_list_apps_request(self):
         return self.is_app_request() and self.path is None
-
-    def is_app_list_request(self):
-        return self.is_app_request()
 
     def is_group_request(self):
         return self.request.path.startswith(self.group_path_prefix)
@@ -51,19 +48,20 @@ class RequestParser:
         if matches:
             return matches.groups()[0]
 
-    def _split_app_list_request(self):
-        apps = self.marathon_client.list_apps()
-
     def split(self) -> Apps:
         if self.is_group_request():
             raise NotImplementedError()
 
         if self.is_read_request():
-            if self.is_app_list_request():
-
-            app = self.marathon_client.get_app(self.path)
-            yield MarathonApp(), app
-            return
+            if self.is_list_apps_request():
+                apps = self.marathon_client.list_apps()
+                for app in apps:
+                    yield MarathonApp(), app
+                return
+            else:
+                app = self.marathon_client.get_app(self.path)
+                yield MarathonApp(), app
+                return
 
         data = self.request.get_json()
         if not isinstance(data, list):
