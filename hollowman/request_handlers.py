@@ -29,12 +29,11 @@ def new(request: HollowmanRequest) -> Response:
 
     filtered_apps = []
     for request_app, app in request_parser.split():
-        filtered_apps.append(
-            dispatch(operations=request.operations,
-                     user=None,
-                     request_app=request_app,
-                     app=app)
-        )
+        filtered_request_app = dispatch(operations=request.operations,
+                                        user=None,
+                                        request_app=request_app,
+                                        app=app)
+        filtered_apps.append((filtered_request_app, app))
 
     joined_request = request_parser.join(filtered_apps)
     return old(joined_request)
