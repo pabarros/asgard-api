@@ -1,5 +1,5 @@
 import json
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Dict
 
 import re
 from marathon import MarathonApp
@@ -70,6 +70,15 @@ class RequestParser:
         split_ = [part for part in split_ if part]
         return '/'.join(split_).replace('v2/apps', '') or None
 
+    def get_request_data(self) -> Iterable[Dict]:
+        if not self.request.data:
+            # request actions like '/v2/apps/*/restart' got no body
+            return [{}]
+
+        data = self.request.get_json()
+        if not isinstance(data, list):
+            return [data]
+
     def split(self) -> Apps:
         if self.is_group_request():
             raise NotImplementedError()
@@ -85,15 +94,10 @@ class RequestParser:
                 yield MarathonApp(), app
                 return
 
-        data = self.request.get_json()
-        if not isinstance(data, list):
-            data = [data]
-
-        for app in data:
+        for app in self.get_request_data():
             request_app = MarathonApp.from_json(app)
-
             try:
-                app = self.marathon_client.get_app(request_app.id)
+                app = self.marathon_client.get_app(self.app_id or request_app.id)
             except NotFoundError:
                 app = MarathonApp()
 
