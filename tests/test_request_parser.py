@@ -139,6 +139,38 @@ class SplitTests(TestCase):
                 ]
             )
 
+    @with_json_fixture('single_full_app.json')
+    def test_a_request_for_write_operation_with_appid_in_url_path_returns_a_tuple_of_marathonapp(self, fixture):
+        scale_up = {'instances': 10}
+        with application.test_request_context('/v2/apps/foo',
+                                              method='PUT',
+                                              data=json.dumps(scale_up)) as ctx:
+            request_parser = RequestParser(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                         body=json.dumps({'app': fixture}),
+                         status=200)
+                apps = list(request_parser.split())
+                expected_app = (MarathonApp(**scale_up), MarathonApp.from_json(fixture))
+                self.assertEqual(apps, [expected_app])
+
+    @with_json_fixture('single_full_app.json')
+    def test_a_request_for_restart_operation_with_appid_in_url_path_returns_a_tuple_of_marathonapp(self, fixture):
+        with application.test_request_context('/v2/apps/xablau/restart',
+                                              method='PUT',
+                                              data=b'') as ctx:
+            request_parser = RequestParser(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/apps//xablau',
+                         body=json.dumps({'app': fixture}),
+                         status=200)
+                apps = list(request_parser.split())
+
+                expected_app = (MarathonApp(), MarathonApp.from_json(fixture))
+                self.assertEqual(apps, [expected_app])
+
     def test_it_raises_an_error_if_group_request(self):
         with application.test_request_context('/v2/groups/',
                                               method='PUT', data=b'') as ctx:
