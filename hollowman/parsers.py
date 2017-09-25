@@ -16,7 +16,6 @@ class RequestParser:
 
     app_path_prefix = '/v2/apps'
     group_path_prefix = '/v2/groups'
-    marathon_path_re = r'^\/v2\/[a-z]+(\/.+)'
 
     def __init__(self, request: HollowmanRequest):
         self.request = request
@@ -35,7 +34,7 @@ class RequestParser:
         """
         It's a request at /v2/apps/$ ?
         """
-        return self.is_app_request() and self.path is None
+        return self.is_app_request() and self.app_id is None
 
     def is_group_request(self):
         """
@@ -44,7 +43,7 @@ class RequestParser:
         return self.request.path.startswith(self.group_path_prefix)
 
     @property
-    def path(self) -> str:
+    def app_id(self) -> str:
         """
         self.request.path = '/v2/apps//marathon/app/id' -> '//marathon/app/id'
         self.request.path = '/v2/apps/marathon/app/id' -> '/marathon/app/id'
@@ -53,9 +52,23 @@ class RequestParser:
         Marathon's api accept both double or single slashes at the beginning
 
         """
-        matches = re.match(self.marathon_path_re, self.request.path)
-        if matches:
-            return matches.groups()[0]
+        if not self.is_app_request():
+            raise ValueError("Not a valid /v2/apps path")
+
+        split_ = self.request.path.split('/')
+        api_paths = [
+            'restart',
+            'tasks',
+            'versions',
+        ]
+        locations = [split_.index(path) for path in api_paths if path in split_]
+        cut_limit = min(locations or [len(split_)])
+        # Removes every path after the app name
+        split_ = split_[:cut_limit]
+
+        # Removes evey empty path
+        split_ = [part for part in split_ if part]
+        return '/'.join(split_).replace('v2/apps', '') or None
 
     def split(self) -> Apps:
         if self.is_group_request():
@@ -68,7 +81,7 @@ class RequestParser:
                     yield MarathonApp(), app
                 return
             else:
-                app = self.marathon_client.get_app(self.path)
+                app = self.marathon_client.get_app(self.app_id)
                 yield MarathonApp(), app
                 return
 
