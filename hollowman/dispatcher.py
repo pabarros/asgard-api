@@ -6,26 +6,25 @@ from hollowman.filters.dummy import DummyLogFilter
 from hollowman.hollowman_flask import OperationType
 
 
-class InterruptPipelineException(Exception):
-    def __init__(self, response_body: dict, status_code: int):
-        self.response_body = response_body
-        self.status_code = status_code
-
-
-filters_pipeline = {
+FILTERS_PIPELINE = {
     OperationType.READ: (DummyLogFilter(),),
     OperationType.WRITE: (DummyLogFilter(),)
 }
 
 
-def dispatch(operations: Iterable[OperationType],
-             user,
-             request_app: MarathonApp,
-             app: MarathonApp) -> MarathonApp:
+def dispatch(operations, user, request_app, app,
+             filters_pipeline=FILTERS_PIPELINE) -> MarathonApp:
+    """
+    :type operations: Iterable[OperationType]
+    :type request_app: MarathonApp
+    :type app: MarathonApp
+    :type filters_pipeline: Dict[OperationType, Iterable[BaseFilter]]
 
+    todo: (user, request_app, app) podem ser refatorados em uma classe de domínio
+    """
     for operation in operations:
         for filter_ in filters_pipeline[operation]:
             func = getattr(filter_, operation.value)
-            filtered_app = func(user, request_app, app)
+            request_app = func(user, request_app, app)
 
-    return filtered_app
+    return request_app
