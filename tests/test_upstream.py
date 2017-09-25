@@ -10,9 +10,20 @@ import json
 from hollowman.app import application
 from hollowman.upstream import replay_request
 import hollowman.conf
+from tests import RequestStub
 
 
 class UpstreamTest(TestCase):
+
+    @patch.object(requests, 'get')
+    def test_replay_request_removes_specific_headers_from_upstream_response(self, mock_get):
+        HEADER_NAME_CONTENT_ENCODING = "Content-Encoding"
+        HEADER_NAME_TRANSFER_ENCODING = "Transfer-Encoding"
+        mock_get.return_value = RequestStub(headers={HEADER_NAME_CONTENT_ENCODING: "gzip", HEADER_NAME_TRANSFER_ENCODING: "chunked"})
+        with application.test_request_context("/v2/apps", method="GET"):
+            response = replay_request(flask.request, "http://marathon:8080")
+            self.assertFalse(HEADER_NAME_CONTENT_ENCODING in response.headers.keys())
+            self.assertFalse(HEADER_NAME_TRANSFER_ENCODING in response.headers.keys())
 
     @patch.object(requests, 'get')
     def test_remove_conent_length_header(self, mock_get):

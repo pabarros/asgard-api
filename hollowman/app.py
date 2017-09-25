@@ -11,6 +11,7 @@ from hollowman.log import logger
 from hollowman.plugins import register_plugin
 
 application = HollowmanFlask(__name__)
+application.url_map.strict_slashes = False
 application.secret_key = SECRET_KEY
 application.permanent_session_lifetime = timedelta(minutes=5)
 application.config["JWT_AUTH_URL_RULE"] = None

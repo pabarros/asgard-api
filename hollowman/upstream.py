@@ -21,4 +21,7 @@ def replay_request(request, destination_url):
         request_data.pop("version", None)
         request_data.pop("fetch", None)
         request.data = json.dumps(request_data)
-    return getattr(requests, method)(to_url, params=params, headers=headers, data=request.data)
+    upstream_response = getattr(requests, method)(to_url, params=params, headers=headers, data=request.data)
+    upstream_response.headers.pop("Content-Encoding", None)
+    upstream_response.headers.pop("Transfer-Encoding", None) # Marathon 1.3.x returns all responses gziped
+    return upstream_response

@@ -1,5 +1,3 @@
-#encoding: utf-8
-
 from functools import wraps
 from collections import defaultdict
 
@@ -8,7 +6,6 @@ import json
 from flask import request, make_response
 from alchemytools.context import managed
 
-from hollowman.auth.jwt import jwt_auth
 from hollowman.conf import SECRET_KEY, HOLLOWMAN_ENFORCE_AUTH
 from hollowman.models import HollowmanSession, User
 from hollowman.log import logger
@@ -60,7 +57,7 @@ def auth_required():
                 request.user = authenticated_user
                 return fn(*args, **kwargs)
             except Exception as e:
-                logger.error({"exc": e, "step": "auth"})
+                logger.exception({"exc": e, "step": "auth"})
                 return make_response(invalid_token_response_body, 401)
         return decorator
     return wrapper
