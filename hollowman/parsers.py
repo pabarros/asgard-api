@@ -1,7 +1,6 @@
 import json
 from typing import Iterable, Tuple, Dict
 
-import re
 from marathon import MarathonApp
 from marathon.exceptions import NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
