@@ -7,7 +7,7 @@ from marathon.exceptions import NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
 
 from hollowman import conf
-from hollowman.hollowman_flask import HollowmanRequest
+from hollowman.hollowman_flask import HollowmanRequest, OperationType
 
 
 class RequestParser:
@@ -23,7 +23,7 @@ class RequestParser:
         self.marathon_client = conf.marathon_client
 
     def is_read_request(self) -> bool:
-        return not self.request.data
+        return OperationType.READ in self.request.operations
 
     def is_app_request(self):
         return self.request.path.startswith(self.app_path_prefix)
