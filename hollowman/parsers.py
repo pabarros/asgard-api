@@ -26,12 +26,21 @@ class RequestParser:
         return OperationType.READ in self.request.operations
 
     def is_app_request(self):
+        """
+        It's a request at /v2/apps/* ?
+        """
         return self.request.path.startswith(self.app_path_prefix)
 
     def is_list_apps_request(self):
+        """
+        It's a request at /v2/apps/$ ?
+        """
         return self.is_app_request() and self.path is None
 
     def is_group_request(self):
+        """
+        It's a request at /v2/groups/* ?
+        """
         return self.request.path.startswith(self.group_path_prefix)
 
     @property
