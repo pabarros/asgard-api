@@ -1,6 +1,21 @@
 from flask import Flask,Request
 from json import loads
 
+from enum import Enum
+
+
+class OperationType(Enum):
+    READ = 'read'
+    WRITE = 'write'
+
+    SCALE_UP = 'scale_up'
+    SCALE_DOWN = 'scale_down'
+    RESTART = 'restart'
+    DESTROY = 'destroy'
+    SUSPEND = 'suspend'
+    CREATE = 'create'
+
+
 class HollowmanRequest(Request):
 
     def get_json(self, cache=False, **kwargs):
@@ -12,6 +27,18 @@ class HollowmanRequest(Request):
         #     cache=False,
         #     **kwargs
         # )
+
+    @property
+    def operations(self):
+        operations = []
+
+        if self.method == 'GET':
+            operations.append(OperationType.READ)
+        elif self.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+            operations.append(OperationType.WRITE)
+
+        return operations
+
 
 #  See: http://flask.pocoo.org/docs/0.12/patterns/subclassing/
 class HollowmanFlask(Flask):

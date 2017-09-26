@@ -49,7 +49,7 @@ class UpstreamTest(TestCase):
             replay_request(flask.request, "http://marathon:8080")
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['headers']['Authorization']
-            self.assertEquals(called_headers, "bla")
+            self.assertEqual(called_headers, "bla")
 
     @patch.object(requests, 'get')
     def test_add_query_string_from_original_request(self, mock_get):
@@ -57,7 +57,7 @@ class UpstreamTest(TestCase):
             replay_request(flask.request, "http://marathon:8080")
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['params']
-            self.assertEquals(dict(called_headers), {"a": "b", "c": "d"})
+            self.assertEqual(dict(called_headers), {"a": "b", "c": "d"})
 
     @patch.object(requests, 'get')
     def test_add_original_payload_to_upstream_request(self, mock_get):
@@ -65,7 +65,7 @@ class UpstreamTest(TestCase):
             replay_request(flask.request, "http://marathon:8080")
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['data']
-            self.assertEquals(called_headers, b"Request Data")
+            self.assertEqual(called_headers, b"Request Data")
 
     @patch.object(requests, 'get')
     def test_original_headers_to_upstream_request(self, mock_get):
@@ -73,8 +73,8 @@ class UpstreamTest(TestCase):
             replay_request(flask.request, "http://marathon:8080")
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['headers']
-            self.assertEquals(called_headers['X-Header-A'], "42")
-            self.assertEquals(called_headers['X-Header-B'], "10")
+            self.assertEqual(called_headers['X-Header-A'], "42")
+            self.assertEqual(called_headers['X-Header-B'], "10")
 
     @patch.object(requests, 'put')
     def test_remove_some_key_before_replay_put_request(self, mock_put):
