@@ -9,4 +9,4 @@ pipelines:
           - python --version
           - pip --version
           - pip install -r requirements-tests.txt
-          - py.test -v --cov
+          - py.test -v --cov=hollowman --cov-report term-missing
