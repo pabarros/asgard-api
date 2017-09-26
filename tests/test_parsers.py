@@ -206,6 +206,7 @@ class JoinTests(TestCase):
 
                 request = request_parser.join(apps)
                 self.assertIsInstance(request, HollowmanRequest)
+                self.assertEqual(request.get_json()['id'], '/foo')
 
     @with_json_fixture('single_full_app.json')
     def test_it_recreates_a_post_request_for_a_single_app(self, fixture):
@@ -219,6 +220,7 @@ class JoinTests(TestCase):
 
                 request = request_parser.join(apps)
                 self.assertIsInstance(request, HollowmanRequest)
+                self.assertEqual(request.get_json()['id'], '/foo')
 
     @with_json_fixture('requests/put-multi-app.json')
     def test_it_recreates_a_put_request_for_multiple_apps(self, fixture):
