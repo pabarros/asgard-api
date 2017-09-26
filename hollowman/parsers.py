@@ -112,9 +112,13 @@ class RequestParser:
             readonly and dont manipulate the request
             """
             return self.request
+        if self.is_list_apps_request():
+            apps_json_repr = [request_app.json_repr(minimal=True)
+                              for request_app, _ in apps]
+        else:
+            request_app, _ = apps[0]
+            apps_json_repr = request_app.json_repr(minimal=True)
 
-        apps_json_repr = [request_app.json_repr(minimal=True)
-                          for request_app, _ in apps]
         request = HollowmanRequest(environ=self.request.environ, shallow=True)
         request.data = json.dumps(apps_json_repr, cls=self.json_encoder)
         return request
