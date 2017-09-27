@@ -26,12 +26,6 @@ class RequestHandlersTests(TestCase):
     def tearDown(self):
         patch.stopall()
 
-    def test_it_calls_the_old_handler_for_group_requests(self):
-        with application.test_request_context('/v2/groups/', method='GET') as ctx:
-            with patch('hollowman.request_handlers.old') as old:
-                new(ctx.request)
-                old.assert_called_once_with(ctx.request)
-
     def test_it_dispatches_apps_from_request(self):
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
             with patch('hollowman.request_handlers.old') as old:
