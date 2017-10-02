@@ -4,9 +4,6 @@ from mock import Mock
 from hollowman.filters.trim import TrimRequestFilter, TrimEnvvarsFilter
 from unittest import TestCase
 from tests import RequestStub
-import json
-from hollowman.filters import Context
-from hollowman.conf import marathon_client
 from hollowman.filters import Context
 
 
