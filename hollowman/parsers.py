@@ -108,7 +108,7 @@ class RequestParser:
 
         if self.is_read_request() and self.is_app_request():
             """
-            OperationType.READ derived request filters are 
+            OperationType.READ derived request filters are
             readonly and dont manipulate the request
             """
             return self.request
