@@ -2,18 +2,15 @@ from typing import Iterable
 
 from marathon import MarathonApp
 
-from hollowman.filters.dummy import DummyLogFilter
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.hollowman_flask import OperationType
 
 
 FILTERS_PIPELINE = {
     OperationType.READ: (
-        DummyLogFilter(),
     ),
 
     OperationType.WRITE: (
-        DummyLogFilter(),
         ForcePullFilter(),
     )
 }
