@@ -24,3 +24,9 @@ class ForcePullFilter(BaseFilter):
                 request.data = json.dumps(original_app_dict)
 
         return request
+
+    def write(sef, user, request_app, app):
+        if request_app.container and request_app.container.docker:
+            request_app.container.docker.force_pull_image = True
+        return request_app
+
