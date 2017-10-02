@@ -7,13 +7,14 @@ from hollowman import upstream, conf
 from hollowman.filters.request import RequestFilter
 
 
-def old(request: HollowmanRequest) -> Response:
+def old(request: HollowmanRequest, run_filters=True) -> Response:
     modded_request = request
-    try:
-        modded_request = RequestFilter.dispatch(request)
-    except Exception:
-        import traceback
-        traceback.print_exc()
+    if run_filters:
+        try:
+            modded_request = RequestFilter.dispatch(request)
+        except Exception:
+            import traceback
+            traceback.print_exc()
 
     resp = upstream.replay_request(modded_request, conf.MARATHON_ENDPOINT)
     return Response(response=resp.content,
@@ -36,4 +37,4 @@ def new(request: HollowmanRequest) -> Response:
         filtered_apps.append((filtered_request_app, app))
 
     joined_request = request_parser.join(filtered_apps)
-    return old(joined_request)
+    return old(joined_request, run_filters=False)
