@@ -28,3 +28,8 @@ def dispatch(operations, user, request_app, app,
             request_app = func(user, request_app, app)
 
     return request_app
+
+def merge_marathon_apps(base_app, modified_app):
+    merged = base_app.json_repr(minimal=False)
+    merged.update(modified_app.json_repr(minimal=True))
+    return MarathonApp.from_json(merged)
