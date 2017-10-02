@@ -1,7 +1,7 @@
 from marathon import MarathonApp
 from mock import Mock
 
-from hollowman.filters.trim import TrimRequestFilter, TrimEnvvarsFilter
+from hollowman.filters.trim import TrimRequestFilter
 from unittest import TestCase
 from tests import RequestStub
 from hollowman.filters import Context
@@ -185,7 +185,7 @@ class TrimEnvvarsTest(TestCase):
 
 class TrimEnvvarsFilterTests(TestCase):
     def setUp(self):
-        self.filter = TrimEnvvarsFilter()
+        self.filter = TrimRequestFilter()
 
     def test_it_trims_envvars_values(self):
         pass

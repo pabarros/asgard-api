@@ -1,5 +1,3 @@
-#encoding: utf-8
-
 import json
 from typing import Dict
 
@@ -7,9 +5,10 @@ from marathon import MarathonApp
 
 from hollowman.filters import BaseFilter
 
-class TrimRequestFilter(BaseFilter):
 
+class TrimRequestFilter(BaseFilter):
     name = 'trim'
+    app_attrs_to_trim = ('labels', 'env')
 
     def run(self, ctx):
         request = ctx.request
@@ -29,10 +28,6 @@ class TrimRequestFilter(BaseFilter):
 
             request.data = json.dumps(data)
         return request
-
-
-class TrimEnvvarsFilter:
-    app_attrs_to_trim = ('labels', 'env')
 
     def _trim_dict_items(self, d: Dict[str, str]) -> Dict[str, str]:
         new = {}

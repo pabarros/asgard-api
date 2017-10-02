@@ -3,7 +3,7 @@ from typing import Iterable
 from marathon import MarathonApp
 
 from hollowman.filters.dummy import DummyLogFilter
-from hollowman.filters.trim import TrimEnvvarsFilter
+from hollowman.filters.trim import TrimRequestFilter
 from hollowman.hollowman_flask import OperationType
 
 
@@ -13,7 +13,7 @@ FILTERS_PIPELINE = {
     ),
     OperationType.WRITE: (
         DummyLogFilter(),
-        TrimEnvvarsFilter()
+        TrimRequestFilter()
     )
 }
 
