@@ -9,19 +9,39 @@ from tests.utils import with_json_fixture
 
 
 class DispatcherTests(TestCase):
-    def test_it_calls_registered_filters_in_order(self):
+
+    @with_json_fixture("single_full_app.json")
+    def test_it_calls_registered_filters_in_order(self, single_full_app_fixture):
+        request_app = MarathonApp.from_json(single_full_app_fixture)
+        original_app = MarathonApp()
+        merged_app = merge_marathon_apps(original_app, request_app)
         filters = [Mock(), Mock()]
-        request_app = Mock()
+        for f in filters:
+            f.read.return_value = request_app
         user = Mock()
-        app = Mock()
 
         dispatch(
-            [OperationType.READ], user, request_app, app,
+            [OperationType.READ], user, request_app, original_app,
             filters_pipeline={OperationType.READ: filters}
         )
 
-        filters[0].read.assert_called_once_with(user, request_app, app)
-        filters[1].read.assert_called_once_with(user, filters[0].read.return_value, app)
+        filters[0].read.assert_called_once_with(user, merged_app, original_app)
+        filters[1].read.assert_called_once_with(user, merge_marathon_apps(original_app, filters[0].read.return_value), original_app)
+
+    @with_json_fixture("single_full_app.json")
+    def test_it_calls_registered_filters_with_request_app_merged(self, single_full_app_fixture):
+        filters = [Mock()]
+        original_app = MarathonApp.from_json(single_full_app_fixture)
+        request_app = MarathonApp.from_json({"env": {"FOO": "BAR"}})
+        merged_app = merge_marathon_apps(original_app, request_app)
+        user = Mock()
+
+        dispatch(
+            [OperationType.WRITE], user, request_app, original_app,
+            filters_pipeline={OperationType.WRITE: filters}
+        )
+
+        filters[0].write.assert_called_once_with(user, merged_app, original_app)
 
     def test_it_doesnt_calls_filters_for_other_operations(self):
         filters = [Mock(), Mock()]
@@ -77,3 +97,13 @@ class DispatcherTests(TestCase):
         self.assertTrue(merged_app.constraints)
         self.assertTrue(merged_app.labels)
 
+    @with_json_fixture("single_full_app.json")
+    def test_merge_two_marathon_apps_when_creating_app(self, single_full_app_fixture):
+        modified_app = MarathonApp.from_json(single_full_app_fixture)
+        original_app = MarathonApp()
+
+        merged_app = merge_marathon_apps(original_app, modified_app)
+        self.assertFalse(merged_app.container.docker.privileged)
+        self.assertEqual("mesosphere:marathon/latest", merged_app.container.docker.image)
+        self.assertTrue(merged_app.constraints)
+        self.assertTrue(merged_app.labels)
