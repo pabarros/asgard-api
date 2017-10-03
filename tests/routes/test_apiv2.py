@@ -38,10 +38,6 @@ class TestAuthentication(TestCase):
 
         self.response_http_200 = Response(status=200)
 
-        self.conf_patch = patch.object(conf, 'HOLLOWMAN_NEW_DISPATCHER_USERS',
-                                       [self.new_dispatcher_user.tx_email])
-        self.conf_patch.start()
-
     def tearDown(self):
         patch.stopall()
 
@@ -51,19 +47,6 @@ class TestAuthentication(TestCase):
         return {
             "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
         }
-
-    def test_it_calls_the_new_filters_dispatching_for_configured_users(self):
-        with patch('hollowman.routes.request_handlers') as request_handlers:
-            test_client = application.test_client()
-            with application.app_context():
-                auth_header = self.make_auth_header(self.new_dispatcher_user.tx_email)
-
-                request_handlers.new.return_value = self.response_http_200
-                r = test_client.get("/v2/apps", headers=auth_header)
-                self.assertEqual(200, r.status_code)
-
-                request_handlers.new.assert_called_once()
-                request_handlers.old.assert_not_called()
 
     @with_json_fixture("single_full_app.json")
     def test_it_creates_a_response_using_a_dict_of_headers(self, fixture):

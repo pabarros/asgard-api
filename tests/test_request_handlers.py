@@ -28,7 +28,7 @@ class RequestHandlersTests(TestCase):
 
     def test_it_dispatches_apps_from_request(self):
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
-            with patch('hollowman.request_handlers.old') as old:
+            with patch('hollowman.request_handlers.upstream_request') as old:
                 response = new(ctx.request)
 
                 self.assertEqual(response, old.return_value)
