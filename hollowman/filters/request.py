@@ -7,7 +7,6 @@ from hollowman.filters.dns import DNSRequestFilter
 from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.default_scale import DefaultScaleRequestFilter
 from hollowman.filters.base_constraint import BaseConstraintFilter
-from hollowman.filters.appname import AddAppNameFilter
 from hollowman.filters import Context
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman import conf
@@ -23,7 +22,6 @@ def _build_filters_list():
         ForcePullFilter(),
         BaseConstraintFilter(),
         DefaultScaleRequestFilter(),
-        AddAppNameFilter(),
         DNSRequestFilter(),
     ]
 
