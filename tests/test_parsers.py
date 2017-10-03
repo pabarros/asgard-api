@@ -159,7 +159,7 @@ class SplitTests(TestCase):
     def test_a_request_for_restart_operation_with_appid_in_url_path_returns_a_tuple_of_marathonapp(self, fixture):
         with application.test_request_context('/v2/apps/xablau/restart',
                                               method='PUT',
-                                              data=b'') as ctx:
+                                              data=b'{"force": true}') as ctx:
             request_parser = RequestParser(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',

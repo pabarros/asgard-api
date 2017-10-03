@@ -1,6 +1,7 @@
 from typing import Dict
 
 import jwt
+import json
 
 from unittest import TestCase
 from unittest.mock import patch, NonCallableMock
@@ -8,11 +9,13 @@ from unittest.mock import patch, NonCallableMock
 from flask import Response
 from requests.models import Response as RequestsResponse
 from requests.structures import CaseInsensitiveDict
+from responses import RequestsMock
 
 from hollowman.app import application
 from hollowman import conf
 from hollowman.auth.jwt import jwt_payload_handler
 from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
 from hollowman.models import HollowmanSession, User
 
@@ -62,20 +65,8 @@ class TestAuthentication(TestCase):
                 request_handlers.new.assert_called_once()
                 request_handlers.old.assert_not_called()
 
-    def test_it_calls_the_old_filters_dispatching_for_other_users(self):
-        with patch('hollowman.routes.request_handlers') as request_handlers:
-            test_client = application.test_client()
-            with application.app_context():
-                auth_header = self.make_auth_header(self.normal_user.tx_email)
-
-                request_handlers.old.return_value = self.response_http_200
-                r = test_client.get("/v2/apps", headers=auth_header)
-                self.assertEqual(200, r.status_code)
-
-                request_handlers.new.assert_not_called()
-                request_handlers.old.assert_called_once()
-
-    def test_it_creates_a_response_using_a_dict_of_headers(self):
+    @with_json_fixture("single_full_app.json")
+    def test_it_creates_a_response_using_a_dict_of_headers(self, fixture):
         """
         O atributo headers de um objeto `request.models.Response` é utilizado
         para gerar o response do holloman. Por ser do tipo `CaseInsentiveDict`,
@@ -92,6 +83,11 @@ class TestAuthentication(TestCase):
             test_client = application.test_client()
             with application.app_context():
                 auth_header = self.make_auth_header(self.normal_user.tx_email)
-                r = test_client.get("/v2/apps", headers=auth_header)
+                with RequestsMock() as rsps:
+                    rsps.add(method='GET',
+                             url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                             body=json.dumps({'apps': [fixture]}),
+                             status=200)
+                    r = test_client.get("/v2/apps", headers=auth_header)
 
-                self.assertEqual(200, r.status_code)
+                    self.assertEqual(200, r.status_code)

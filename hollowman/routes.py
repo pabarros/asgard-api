@@ -83,10 +83,7 @@ def index():
 @application.route('/v2/apps/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @auth_required()
 def apiv2(path):
-    if request.user in conf.HOLLOWMAN_NEW_DISPATCHER_USERS:
-        return request_handlers.new(request)
-    else:
-        return request_handlers.old(request)
+    return request_handlers.new(request)
 
 
 @application.route("/healthcheck")

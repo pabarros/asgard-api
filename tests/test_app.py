@@ -2,6 +2,8 @@
 from collections import namedtuple
 from mock import patch
 from unittest import TestCase, skip
+import responses
+import json
 
 from hollowman.app import application
 from hollowman import conf
@@ -10,6 +12,7 @@ import hollowman.upstream
 from hollowman.models import HollowmanSession, User
 
 from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
 class DummyResponse(object):
 
@@ -21,14 +24,21 @@ class DummyResponse(object):
 
 class TestApp(TestCase):
 
-    def setUp(self):
+    @with_json_fixture("single_full_app.json")
+    def setUp(self, fixture):
         rebuild_schema()
         self.session = HollowmanSession()
         self.session.add(User(tx_email="user@host.com.br", tx_name="John Doe", tx_authkey="69ed620926be4067a36402c3f7e9ddf0"))
         self.session.commit()
+        responses.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                         body=json.dumps({'apps': [fixture]}),
+                         status=200)
+        responses.start()
 
     def tearDown(self):
         self.session.close()
+        responses.stop()
 
     def test_remove_transfer_encoding_header(self):
         mock_response = DummyResponse(headers={"Transfer-Encoding": "chunked"})

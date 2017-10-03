@@ -7,6 +7,7 @@ from mock import patch, MagicMock
 from unittest import TestCase, skip
 import unittest
 from flask import request
+import responses
 
 from hollowman.app import application
 from hollowman.models import HollowmanSession, User
@@ -17,19 +18,28 @@ from hollowman.auth.jwt import jwt_payload_handler
 from hollowman import routes
 
 from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
 
 class TestAuthentication(TestCase):
 
-    def setUp(self):
+    @with_json_fixture("single_full_app.json")
+    def setUp(self, fixture):
         rebuild_schema()
         self.session = HollowmanSession()
         self.session.add(User(tx_email="user@host.com.br", tx_name="John Doe", tx_authkey="69ed620926be4067a36402c3f7e9ddf0"))
         self.session.commit()
         self.response_http_200 = MagicMock(status_code=200)
+        responses.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                         body=json.dumps({'apps': [fixture]}),
+                         status=200)
+        responses.start()
+
 
     def tearDown(self):
         self.session.close()
+        responses.stop()
 
     def test_jwt_disable_auth_if_env_is_present_even_if_invalid_token(self):
         """

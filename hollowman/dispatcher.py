@@ -2,13 +2,19 @@ from typing import Iterable
 
 from marathon import MarathonApp
 
-from hollowman.filters.dummy import DummyLogFilter
+from hollowman.filters.trim import TrimRequestFilter
+from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.hollowman_flask import OperationType
 
 
 FILTERS_PIPELINE = {
-    OperationType.READ: (DummyLogFilter(),),
-    OperationType.WRITE: (DummyLogFilter(),)
+    OperationType.READ: (
+    ),
+
+    OperationType.WRITE: (
+        ForcePullFilter(),
+        TrimRequestFilter()
+    )
 }
 
 
@@ -25,6 +31,12 @@ def dispatch(operations, user, request_app, app,
     for operation in operations:
         for filter_ in filters_pipeline[operation]:
             func = getattr(filter_, operation.value)
-            request_app = func(user, request_app, app)
+            request_app = func(user, merge_marathon_apps(base_app=app, modified_app=request_app), app)
 
     return request_app
+
+
+def merge_marathon_apps(base_app, modified_app):
+    merged = base_app.json_repr(minimal=False)
+    merged.update(modified_app.json_repr(minimal=True))
+    return MarathonApp.from_json(merged)

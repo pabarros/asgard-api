@@ -3,6 +3,7 @@
 import json
 
 from hollowman.filters import BaseFilter
+from hollowman.log import logger
 
 
 class ForcePullFilter(BaseFilter):
@@ -24,3 +25,12 @@ class ForcePullFilter(BaseFilter):
                 request.data = json.dumps(original_app_dict)
 
         return request
+
+    def write(sef, user, request_app, app):
+        try:
+            request_app.container.docker.force_pull_image = True
+            logger.info("Forcing pull image of app {}".format(request_app.id))
+        except AttributeError as e:
+            pass
+        return request_app
+

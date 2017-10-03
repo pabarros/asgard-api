@@ -71,10 +71,15 @@ class RequestParser:
 
     def get_request_data(self) -> Iterable[Dict]:
         if not self.request.data:
-            # request actions like '/v2/apps/*/restart' got no body
             return [{}]
 
         data = self.request.get_json()
+        """
+        Matrathon's UI POST request to '/v2/apps/*/restart' contains a body
+        with `{"force": (true|false)}` which isn't compatible with `MarathonApp` 
+        interface and marathons api, and should be removed.  
+        """
+        data.pop('force', None)
         if not isinstance(data, list):
             return [data]
 
@@ -108,7 +113,7 @@ class RequestParser:
 
         if self.is_read_request() and self.is_app_request():
             """
-            OperationType.READ derived request filters are 
+            OperationType.READ derived request filters are
             readonly and dont manipulate the request
             """
             return self.request
