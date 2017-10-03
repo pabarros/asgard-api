@@ -5,9 +5,11 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 * next
+  - Remoção do Fluxo velho de request
+
+* 0.0.35
   - Fitlro forcepull
   - Filtro trim
-  - Remoção do Fluxo velho de request
 
 * 0.0.34
   - Major Refactoring do pipeline de filtros. Agora cada filtro recebe apenas uma app por vez, independente do request estar sendo feito em múltiplas apps
