@@ -79,3 +79,12 @@ class TestAppNameFilter(unittest.TestCase):
         self.assertEqual(2, len(modified_app.container.docker.parameters))
         self.assertEqual("hollowman.appname=/foo", modified_app.container.docker.parameters[1]['value'])
 
+    def test_empty_body(self):
+        wrong_app_name_param = {
+            "key": "label",
+            "value": "hollowman.appname=/foo",
+        }
+        self.request_app = MarathonApp()
+        modified_app = self.filter.write(self.user, self.request_app, self.original_app)
+        self.assertTrue(modified_app is self.request_app)
+
