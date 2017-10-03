@@ -4,6 +4,7 @@ from marathon import MarathonApp
 
 from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.forcepull import ForcePullFilter
+from hollowman.filters.appname import AddAppNameFilter
 from hollowman.hollowman_flask import OperationType
 
 
@@ -13,7 +14,8 @@ FILTERS_PIPELINE = {
 
     OperationType.WRITE: (
         ForcePullFilter(),
-        TrimRequestFilter()
+        TrimRequestFilter(),
+        AddAppNameFilter(),
     )
 }
 
