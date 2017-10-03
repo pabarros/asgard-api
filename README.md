@@ -6,6 +6,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 * next
   - Remoção do Fluxo velho de request
+  - Remoção dos filtros: dns, constraint, defaultscale. Serão re-implementados eventualmente. 
 
 * 0.0.35
   - Fitlro forcepull
