@@ -76,8 +76,8 @@ class RequestParser:
         data = self.request.get_json()
         """
         Matrathon's UI POST request to '/v2/apps/*/restart' contains a body
-        with `{"force": (true|false)}` which isn't compatible with `MarathonApp` 
-        interface and marathons api, and should be removed.  
+        with `{"force": (true|false)}` which isn't compatible with `MarathonApp`
+        interface and marathons api, and should be removed.
         """
         data.pop('force', None)
         if not isinstance(data, list):
