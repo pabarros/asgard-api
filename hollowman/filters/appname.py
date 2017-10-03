@@ -1,10 +1,7 @@
 
 import json
 
-from hollowman.filters import BaseFilter
-
-
-class AddAppNameFilter(BaseFilter):
+class AddAppNameFilter():
 
     name = 'appname'
 

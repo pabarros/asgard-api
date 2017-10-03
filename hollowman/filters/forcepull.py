@@ -2,11 +2,10 @@
 
 import json
 
-from hollowman.filters import BaseFilter
 from hollowman.log import logger
 
 
-class ForcePullFilter(BaseFilter):
+class ForcePullFilter():
 
     name = 'pull'
 

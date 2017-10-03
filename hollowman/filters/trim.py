@@ -3,10 +3,8 @@ from typing import Dict
 
 from marathon import MarathonApp
 
-from hollowman.filters import BaseFilter
 
-
-class TrimRequestFilter(BaseFilter):
+class TrimRequestFilter():
     name = 'trim'
     app_attrs_to_trim = ('labels', 'env')
 
