@@ -1,7 +1,6 @@
 from typing import Iterable
 
-from marathon import MarathonApp
-
+from hollowman.marathonapp import SieveMarathonApp
 from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
@@ -21,7 +20,7 @@ FILTERS_PIPELINE = {
 
 
 def dispatch(operations, user, request_app, app,
-             filters_pipeline=FILTERS_PIPELINE) -> MarathonApp:
+             filters_pipeline=FILTERS_PIPELINE) -> SieveMarathonApp:
     """
     :type operations: Iterable[OperationType]
     :type request_app: MarathonApp
@@ -41,4 +40,4 @@ def dispatch(operations, user, request_app, app,
 def merge_marathon_apps(base_app, modified_app):
     merged = base_app.json_repr(minimal=False)
     merged.update(modified_app.json_repr(minimal=True))
-    return MarathonApp.from_json(merged)
+    return SieveMarathonApp.from_json(merged)
