@@ -20,6 +20,24 @@ class TestAppNameFilter(unittest.TestCase):
         self.filter = AddAppNameFilter()
         self.user = mock.MagicMock()
 
+    def test_app_without_docker_info(self):
+        """
+        Não faz nada se a app não possui .container.docker.*
+        """
+        self.original_app = MarathonApp()
+        del self.request_app.container.docker
+        modified_app = self.filter.write(self.user, self.request_app, self.original_app)
+        self.assertTrue(modified_app is self.request_app)
+        self.assertFalse(hasattr(modified_app.container, "docker"))
+
+    def test_app_without_parameters(self):
+        self.original_app = MarathonApp()
+        self.request_app.container.docker.parameters = []
+        modified_app = self.filter.write(self.user, self.request_app, self.original_app)
+        self.assertTrue(modified_app is self.request_app)
+        self.assertEqual(1, len(modified_app.container.docker.parameters))
+        self.assertEqual("hollowman.appname=/foo", modified_app.container.docker.parameters[0]['value'])
+
     def test_create_app_without_appame(self):
         self.original_app = MarathonApp()
         modified_app = self.filter.write(self.user, self.request_app, self.original_app)

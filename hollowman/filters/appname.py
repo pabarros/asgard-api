@@ -6,11 +6,11 @@ class AddAppNameFilter():
     name = 'appname'
 
     def write(self, user, request_app, original_app):
+        if not hasattr(request_app.container, "docker"):
+            return request_app
+
         appname = "hollowman.appname={}".format(request_app.id)
-        try:
-            params = request_app.container.docker.parameters
-        except AttributeError:
-            params = []
+        params = request_app.container.docker.parameters
 
         for p in params:
             if p['key'] == "label" and p['value'].startswith("hollowman.appname"):
