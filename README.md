@@ -4,9 +4,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* next
+* 0.0.36
   - Remoção do Fluxo velho de request
   - Remoção dos filtros: dns, constraint, defaultscale. Serão re-implementados eventualmente. 
+  - Criação do wrapper para o MarathonApp
 
 * 0.0.35
   - Fitlro forcepull
