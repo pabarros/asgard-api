@@ -17,6 +17,5 @@ class TrimRequestFilter():
     def write(self, user, request_app: MarathonApp, app: MarathonApp) -> MarathonApp:
         for name in self.app_attrs_to_trim:
             attr = getattr(request_app, name)
-            if attr:
-                setattr(request_app, name, self._trim_dict_items(attr))
+            setattr(request_app, name, self._trim_dict_items(attr))
         return request_app
