@@ -14,7 +14,7 @@ zk_metrics_blueprint = Blueprint(__name__, __name__)
 
 @zk_metrics_blueprint.route("/<int:myid>")
 def zk_metrics(myid):
-    ZK_IP = os.getenv("HOLLOWMAN_METRICS_ZK_ID_{}".format(myid))
+    ZK_IP = os.getenv("HOLLOWMAN_METRICS_ZK_ID_{}".format(myid - 1))
     if not ZK_IP:
         return make_response("{}", 404)
 

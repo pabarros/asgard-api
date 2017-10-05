@@ -30,7 +30,7 @@ class TestZKMetrics(TestCase):
 
     def test_zk_metrics_server_found(self):
         with application.test_client() as client:
-            with patch.dict(os.environ, HOLLOWMAN_METRICS_ZK_ID_1="127.0.0.1"):
+            with patch.dict(os.environ, HOLLOWMAN_METRICS_ZK_ID_0="127.0.0.1"):
                 expected_return = {"connections": 10, "is_leader": 0}
                 self.parse_stat_output_mock.return_value = expected_return
                 res = client.get("/_cat/metrics/zk/1")
