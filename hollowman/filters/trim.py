@@ -1,7 +1,7 @@
 import json
 from typing import Dict
 
-from marathon import MarathonApp
+from hollowman.marathonapp import SieveMarathonApp
 
 
 class TrimRequestFilter():
@@ -14,7 +14,7 @@ class TrimRequestFilter():
             new[k.strip()] = v.strip()
         return new
 
-    def write(self, user, request_app: MarathonApp, app: MarathonApp) -> MarathonApp:
+    def write(self, user, request_app: SieveMarathonApp, app: SieveMarathonApp) -> SieveMarathonApp:
         for name in self.app_attrs_to_trim:
             attr = getattr(request_app, name)
             setattr(request_app, name, self._trim_dict_items(attr))
