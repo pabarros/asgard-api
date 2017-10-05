@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-from flask import request
+from flask import request, Blueprint
 from flask_cors import CORS
 
 from hollowman.hollowman_flask import HollowmanFlask
@@ -10,12 +10,17 @@ from hollowman.conf import SECRET_KEY, CORS_WHITELIST
 from hollowman.log import logger
 from hollowman.plugins import register_plugin
 
+from hollowman.metrics.zk.blueprint import zk_metrics_blueprint
+
 application = HollowmanFlask(__name__)
 application.url_map.strict_slashes = False
 application.secret_key = SECRET_KEY
 application.permanent_session_lifetime = timedelta(minutes=5)
 application.config["JWT_AUTH_URL_RULE"] = None
 application.config["JWT_EXPIRATION_DELTA"] = timedelta(days=7)
+
+application.register_blueprint(zk_metrics_blueprint, url_prefix="/_cat/metrics/zk")
+
 
 CORS(application, origins=CORS_WHITELIST)
 
