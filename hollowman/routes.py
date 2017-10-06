@@ -5,6 +5,7 @@ from flask import url_for, redirect, Response, request, session, \
 from hollowman import conf, request_handlers, upstream
 
 from hollowman.app import application
+from hollowman.auth import _get_user_by_email
 from hollowman.auth.google import google_oauth2
 from hollowman.decorators import auth_required
 
@@ -111,7 +112,6 @@ def check_authentication_successful(access_token):
         return None
     return response.json()
 
-
 @application.route("/authenticate/google")
 @google_oauth2.authorized_handler
 def authorized(resp):
@@ -119,10 +119,18 @@ def authorized(resp):
 
     authentication_ok = check_authentication_successful(access_token)
     if not authentication_ok:
-        return render_template("login-failed.html")
+        return render_template("login-failed.html", reason="Invalid OAuth2 code")
 
-    data = authentication_ok
-    data["jwt"]: bytes = jwt_auth.jwt_encode_callback({"email": data["email"]})
+    user = _get_user_by_email(authentication_ok["email"])
+    if not user:
+        return render_template("login-failed.html", reason="User not found")
+
+    account_id = None
+    if user.accounts:
+        account_id = user.accounts[0].id
+
+    data = {}
+    data["jwt"]: bytes = jwt_auth.jwt_encode_callback({"email": user.tx_email, "account_id": account_id})
 
     session["jwt"] = data["jwt"] = data["jwt"].decode('utf-8')
     return redirect("{}?jwt={}".format(conf.REDIRECT_AFTER_LOGIN, data["jwt"]))

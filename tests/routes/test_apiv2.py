@@ -13,7 +13,7 @@ from responses import RequestsMock
 
 from hollowman.app import application
 from hollowman import conf
-from hollowman.auth.jwt import jwt_payload_handler
+from hollowman.auth.jwt import jwt_auth
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
 
@@ -42,8 +42,7 @@ class TestAuthentication(TestCase):
         patch.stopall()
 
     def make_auth_header(self, email: str) -> Dict[str, str]:
-        jwt_data = jwt_payload_handler({"email": email})
-        jwt_token = jwt.encode(jwt_data, key=conf.SECRET_KEY)
+        jwt_token = jwt_auth.jwt_encode_callback({"email": email, "account_id": 1})
         return {
             "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
         }

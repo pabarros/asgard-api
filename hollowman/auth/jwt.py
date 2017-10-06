@@ -21,7 +21,7 @@ def jwt_payload_handler(user_info):
     iat = datetime.utcnow()
     exp = iat + current_app.config.get('JWT_EXPIRATION_DELTA')
     nbf = iat + current_app.config.get('JWT_NOT_BEFORE_DELTA')
-    return {'exp': exp, 'iat': iat, 'nbf': nbf, "email": user_info["email"]}
+    return {'exp': exp, 'iat': iat, 'nbf': nbf, "email": user_info["email"], "account_id": user_info["account_id"]}
 
 @jwt_auth.identity_handler
 def jwt_identity(payload):

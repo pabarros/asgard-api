@@ -13,4 +13,6 @@ class Account(BaseModel):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     users = relationship(User, secondary=UserHasAccount, backref="accounts")
+    namespace = Column(String, nullable=False)
+    owner = Column(String, nullable=False)
 
