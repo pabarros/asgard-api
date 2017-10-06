@@ -69,6 +69,19 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 * HOLLOWMAN_DB_URL: URL completa (com user, pwd, host, schema) do banco de dados: Formato: `postgresql://<user>:<pwd>@<host>/<schema>`
 
 
+
+## Evoluindo o banco de dados
+
+Sempr que fizermos uma mudança no banco, vamos guardar o SQL na pasta `sql/`. Os arquivos têm nome prefixado por um número (`date +"%s"`),
+pois isso indica a ordem em que deve ser rodados. Por enquanto vamos assim até migrar para um projeto que gerencie essas migrações.
+
+Para pegar o SQL que o Alchemy gera para um model:
+Abra o ipython com a env 
+>>> from sqlalchemy.schema import CreateTable
+>>> from hollowman.models import <Model>
+>>> from hollowman.models import engine
+>>> print (CreateTable(Account.__table__).compile(engine))
+
 ## Opções específicas de filtros
 
 Qualquer filtro pode ser desliagdo por app caso a app possua a label `hollowman.filter.<name>.disable=<anyvalue>`. Onde `<name>` é o 
