@@ -5,17 +5,17 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from hollowman.app import application
-from hollowman.metrics.zk import blueprint
+from hollowman.metrics.zk import routes
 
 
 
 class TestZKMetrics(TestCase):
 
     def setUp(self):
-        self.send_command_patcher = patch.object(blueprint, 'send_command')
+        self.send_command_patcher = patch.object(routes, 'send_command')
         self.send_command_patcher.start()
 
-        self.parse_stat_output_patcher = patch.object(blueprint, "parse_stat_output")
+        self.parse_stat_output_patcher = patch.object(routes, "parse_stat_output")
         self.parse_stat_output_mock = self.parse_stat_output_patcher.start()
 
     def tearDown(self):

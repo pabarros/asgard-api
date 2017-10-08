@@ -10,7 +10,7 @@ from hollowman.conf import SECRET_KEY, CORS_WHITELIST
 from hollowman.log import logger
 from hollowman.plugins import register_plugin
 
-from hollowman.metrics.zk.blueprint import zk_metrics_blueprint
+from hollowman.metrics.zk.routes import zk_metrics_blueprint
 
 application = HollowmanFlask(__name__)
 application.url_map.strict_slashes = False
