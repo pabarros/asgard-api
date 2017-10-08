@@ -1,6 +1,7 @@
 
 import json
 import os
+from http import HTTPStatus
 
 from flask import Blueprint, make_response
 
@@ -16,12 +17,13 @@ zk_metrics_blueprint = Blueprint(__name__, __name__)
 def zk_metrics(myid):
     ZK_IP = os.getenv("HOLLOWMAN_METRICS_ZK_ID_{}".format(myid - 1))
     if not ZK_IP:
-        return make_response("{}", 404)
+        return make_response("{}", HTTPStatus.NOT_FOUND)
 
     res = parse_stat_output(send_command(ZK_IP, 2181, "stat").decode("utf8"))
-    response = make_response(json.dumps(res), 200)
+    response = make_response(json.dumps(res), HTTPStatus.OK)
     response.headers['Content-type'] = "application/json"
     return response
+
 
 @zk_metrics_blueprint.route("/leader")
 def zk_leader():
