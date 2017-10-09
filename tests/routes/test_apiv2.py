@@ -17,7 +17,7 @@ from hollowman.auth.jwt import jwt_auth
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
 
-from hollowman.models import HollowmanSession, User
+from hollowman.models import HollowmanSession, User, Account
 
 
 class TestAuthentication(TestCase):
@@ -33,6 +33,7 @@ class TestAuthentication(TestCase):
             tx_email="user@host.com.br",
             tx_name="John Doe",
             tx_authkey="70ed620926be4067a36402c3f7e9ddf0")
+        self.normal_user.accounts = [Account(name="New Account", namespace="acc", owner="company")]
         self.session.add_all([self.new_dispatcher_user, self.normal_user])
         self.session.commit()
 
