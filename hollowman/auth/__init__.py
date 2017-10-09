@@ -14,8 +14,7 @@ def _get_user_by_email(email):
     with managed(HollowmanSession) as s:
         try:
             user = s.query(User).filter(User.tx_email == email).one()
-            [s.expunge(acc) for acc in user.accounts]
-            s.expunge(user)
+            _expunge_user_and_accounts(s, user)
             return user
         except NoResultFound:
             return None
