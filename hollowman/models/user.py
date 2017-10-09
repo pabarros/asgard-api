@@ -6,10 +6,12 @@ from sqlalchemy.orm import relationship
 from hollowman.models import BaseModel
 from hollowman.models.user_has_account import UserHasAccount
 
+
 class User(BaseModel):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
+    accounts = relationship('Account', secondary=UserHasAccount)
     tx_name = Column(String, nullable=False)
     tx_email = Column(String, nullable=False, unique=True)
     tx_authkey = Column(String(32), nullable=True, unique=True)

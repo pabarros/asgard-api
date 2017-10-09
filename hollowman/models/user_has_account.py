@@ -15,6 +15,7 @@ from hollowman.models import BaseModel
 #    account = relation("Account")
 
 UserHasAccount = Table('user_has_account', BaseModel.metadata,
+    Column('id', Integer, primary_key=True),
     Column('user_id', Integer, ForeignKey('user.id')),
     Column('account_id', Integer, ForeignKey('account.id'))
 )
