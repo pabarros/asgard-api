@@ -101,7 +101,9 @@ class SplitTests(TestCase):
             request_parser = RequestParser(ctx.request)
 
             with patch.object(request_parser, 'marathon_client') as client:
-                client.get_app.side_effect = NotFoundError(response=Mock())
+                response_mock = Mock()
+                response_mock.headers.get.return_value = 'application/json'
+                client.get_app.side_effect = NotFoundError(response=response_mock)
                 with self.assertRaises(NotFoundError):
                     list(request_parser.split())
 
@@ -129,7 +131,9 @@ class SplitTests(TestCase):
                                               data=json.dumps(fixture)) as ctx:
             request_parser = RequestParser(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
-                client.get_app.side_effect = NotFoundError(response=Mock())
+                response_mock = Mock()
+                response_mock.headers.get.return_value = 'application/json'
+                client.get_app.side_effect = NotFoundError(response=response_mock)
                 apps = list(request_parser.split())
 
             self.assertEqual(

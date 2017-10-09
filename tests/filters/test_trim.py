@@ -60,10 +60,10 @@ class TrimRequestFilterTest(TestCase):
         }
         request_app = MarathonApp.from_json(app_dict)
         filtered_app = self.filter.write(Mock(), request_app, Mock())
-        filtered_app = filtered_app.json_repr()
+        #filtered_app = filtered_app.json_repr()
 
-        self.assertEqual(filtered_app['env'], None)
-        self.assertEqual(filtered_app['labels'], {})
+        self.assertEqual(filtered_app.env, {})
+        self.assertEqual(filtered_app.labels, {})
 
     def test_empty_env(self):
         app_dict = {
