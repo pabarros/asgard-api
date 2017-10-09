@@ -80,9 +80,9 @@ class TestAuthentication(TestCase):
                 r = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
                 self.assertEqual(200, r.status_code)
                 self.assertEqual("user@host.com.br", request.user.tx_email)
-                self.assertEqual(4, request.user.current_account.id)
-                self.assertEqual("dev", request.user.current_account.namespace)
-                self.assertEqual("company", request.user.current_account.owner)
+                self.assertEqual(self.account_dev.id, request.user.current_account.id)
+                self.assertEqual(self.account_dev.namespace, request.user.current_account.namespace)
+                self.assertEqual(self.account_dev.owner, request.user.current_account.owner)
 
     @unittest.skip("Pode não fazer sentido...")
     def test_jwt_populate_default_account_if_request_account_is_empty(self):
@@ -255,7 +255,7 @@ class TestAuthentication(TestCase):
                 self.assertEqual(401, r.status_code)
                 self.assertEqual("No associated account", json.loads(r.data)['msg'])
 
-    def test_jet_add_redirect_with_account_id_on_token_after_login(self):
+    def test_jwt_add_redirect_with_account_id_on_token_after_login(self):
         """
         Depois do processo de login, o token JWT conterá o account_id da conta padrão
         do usuário.
@@ -271,7 +271,7 @@ class TestAuthentication(TestCase):
             jwt_token = redirect_mock.call_args_list[0][0][0].split("=")[1]
             token_content = jwt.decode(jwt_token, conf.SECRET_KEY)
             self.assertEqual("user@host.com.br", token_content['email'])
-            self.assertEqual(4, token_content['account_id'])
+            self.assertEqual(self.account_dev.id, token_content['account_id'])
 
     def test_add_default_account_on_first_jwt_token(self):
         """
