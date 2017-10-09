@@ -56,8 +56,7 @@ class TestAuthentication(TestCase):
         Env temporária para podermos desligar/ligar a autenticação sem
         precisar comitar código.
         """
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock, \
-             patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False), \
+        with patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False), \
              application.app_context(), \
              application.test_client() as test_client:
                 jwt_token =  jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 1})
@@ -68,21 +67,19 @@ class TestAuthentication(TestCase):
         """
         Populates request.user if authentication is successful
         """
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            with application.test_client() as client:
-                r = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-                self.assertEqual(200, r.status_code)
-                self.assertEqual("user@host.com.br", request.user.tx_email)
+        with application.test_client() as client:
+            r = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
+            self.assertEqual(200, r.status_code)
+            self.assertEqual("user@host.com.br", request.user.tx_email)
 
     def test_token_populate_default_account_if_request_account_is_empty(self):
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            with application.test_client() as client:
-                r = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-                self.assertEqual(200, r.status_code)
-                self.assertEqual("user@host.com.br", request.user.tx_email)
-                self.assertEqual(self.account_dev.id, request.user.current_account.id)
-                self.assertEqual(self.account_dev.namespace, request.user.current_account.namespace)
-                self.assertEqual(self.account_dev.owner, request.user.current_account.owner)
+        with application.test_client() as client:
+            r = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
+            self.assertEqual(200, r.status_code)
+            self.assertEqual("user@host.com.br", request.user.tx_email)
+            self.assertEqual(self.account_dev.id, request.user.current_account.id)
+            self.assertEqual(self.account_dev.namespace, request.user.current_account.namespace)
+            self.assertEqual(self.account_dev.owner, request.user.current_account.owner)
 
     @unittest.skip("Pode não fazer sentido...")
     def test_jwt_populate_default_account_if_request_account_is_empty(self):
@@ -90,38 +87,35 @@ class TestAuthentication(TestCase):
         Como quem gera o token JWT é o server e ele *sempre* coloca account_id (Um user sem nennhuma account associada não se loga), esse request nunca vai acontecer.
         Não acontece pois é impossivel gerar um JWT válido sem ter a SECRET_KEY que só o server tem.
         """
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            test_client = application.test_client()
-            with application.app_context():
-                jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br"})
-                auth_header = {
-                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
-                }
-                r = test_client.get("/v2/apps", headers=auth_header)
-                self.assertEqual(200, r.status_code)
-                self.assertEqual(3, r.user.current_account)
+        test_client = application.test_client()
+        with application.app_context():
+            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br"})
+            auth_header = {
+                "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+            }
+            r = test_client.get("/v2/apps", headers=auth_header)
+            self.assertEqual(200, r.status_code)
+            self.assertEqual(3, r.user.current_account)
 
     def test_jwt_return_401_if_user_is_not_linked_to_account(self):
         """
         If usere tries to access account without being associated to this account
         """
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            test_client = application.test_client()
-            with application.app_context():
-                jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": self.account_with_no_user.id})
-                auth_header = {
-                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
-                }
-                r = test_client.get("/v2/apps", headers=auth_header)
-                self.assertEqual(401, r.status_code)
-                self.assertEqual("Permission Denied to access this account", json.loads(r.data)['msg'])
+        test_client = application.test_client()
+        with application.app_context():
+            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": self.account_with_no_user.id})
+            auth_header = {
+                "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+            }
+            r = test_client.get("/v2/apps", headers=auth_header)
+            self.assertEqual(401, r.status_code)
+            self.assertEqual("Permission Denied to access this account", json.loads(r.data)['msg'])
 
 
     def test_return_200_if_key_found(self):
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            with application.test_client() as client:
-                r = client.get("/v2/apps", headers={"Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"})
-                self.assertEqual(200, r.status_code)
+        with application.test_client() as client:
+            r = client.get("/v2/apps", headers={"Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"})
+            self.assertEqual(200, r.status_code)
 
     def test_return_401_if_key_not_found(self):
         with application.test_client() as client:
@@ -150,33 +144,30 @@ class TestAuthentication(TestCase):
         Qualquer request com `?account_id` que o usuário nao esteja vinculado, retorna 401
         """
         account_id = self.account_with_no_user.id
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            with application.test_client() as client:
-                r = client.get("/v2/apps?account_id={}".format(account_id), headers={"Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"})
-                self.assertEqual(401, r.status_code)
+        with application.test_client() as client:
+            r = client.get("/v2/apps?account_id={}".format(account_id), headers={"Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"})
+            self.assertEqual(401, r.status_code)
 
     def test_return_200_if_jwt_token_valid(self):
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            test_client = application.test_client()
-            with application.app_context():
-                jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 4})
-                auth_header = {
-                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
-                }
-                r = test_client.get("/v2/apps", headers=auth_header)
-                self.assertEqual(200, r.status_code)
+        test_client = application.test_client()
+        with application.app_context():
+            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 4})
+            auth_header = {
+                "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+            }
+            r = test_client.get("/v2/apps", headers=auth_header)
+            self.assertEqual(200, r.status_code)
 
     def test_jwt_populate_request_user_if_token_is_valid(self):
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            with application.app_context(), application.test_client() as test_client:
-                jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 5})
-                auth_header = {
-                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
-                }
-                r = test_client.get("/v2/apps", headers=auth_header)
-                self.assertEqual(200, r.status_code)
-                self.assertEqual("user@host.com.br", request.user.tx_email)
-                self.assertEqual(5, request.user.current_account.id)
+        with application.app_context(), application.test_client() as test_client:
+            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 5})
+            auth_header = {
+                "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+            }
+            r = test_client.get("/v2/apps", headers=auth_header)
+            self.assertEqual(200, r.status_code)
+            self.assertEqual("user@host.com.br", request.user.tx_email)
+            self.assertEqual(5, request.user.current_account.id)
 
     @unittest.skip("Ainda nao temos usuarios validos/ativos/invalidos")
     def test_return_401_if_jwt_token_is_valid_but_user_is_invalid(self):
@@ -249,11 +240,10 @@ class TestAuthentication(TestCase):
             render_mock.assert_called_once_with("login-failed.html", reason="User not found")
 
     def test_login_failed_user_has_no_associated_account(self):
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            with application.test_client() as client:
-                r = client.get("/v2/apps", headers={"Authorization": "Token 7b4184bfe7d2349eb56bcfb9dc246cf8"})
-                self.assertEqual(401, r.status_code)
-                self.assertEqual("No associated account", json.loads(r.data)['msg'])
+        with application.test_client() as client:
+            r = client.get("/v2/apps", headers={"Authorization": "Token 7b4184bfe7d2349eb56bcfb9dc246cf8"})
+            self.assertEqual(401, r.status_code)
+            self.assertEqual("No associated account", json.loads(r.data)['msg'])
 
     def test_jwt_add_redirect_with_account_id_on_token_after_login(self):
         """
@@ -305,24 +295,22 @@ class TestAuthentication(TestCase):
             jwt_auth_mock.assert_called_once_with({"email": "user-no-accounts@host.com.br", "account_id": None})
 
     def test_token_return_401_if_user_has_no_associated_account(self):
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            with application.test_client() as client:
-                r = client.get("/v2/apps", headers={"Authorization": " Token 7b4184bfe7d2349eb56bcfb9dc246cf8"})
-                self.assertEqual(401, r.status_code)
-                self.assertEqual("No associated account", json.loads(r.data)['msg'])
+        with application.test_client() as client:
+            r = client.get("/v2/apps", headers={"Authorization": " Token 7b4184bfe7d2349eb56bcfb9dc246cf8"})
+            self.assertEqual(401, r.status_code)
+            self.assertEqual("No associated account", json.loads(r.data)['msg'])
 
     @unittest.skip("Em teoria nunca vai existir um token JWT valido sem account_id. Mais detahes no teste test_jwt_populate_default_account_if_request_account_is_empty")
     def test_jwt_return_401_if_user_has_no_associated_account(self):
-        with patch.object(hollowman.upstream, 'replay_request', return_value=self.response_http_200) as replay_mock:
-            test_client = application.test_client()
-            with application.app_context():
-                jwt_token = jwt_auth.jwt_encode_callback({"email": "user-no-accounts@host.com.br", "account_id": 2})
-                auth_header = {
-                    "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
-                }
-                r = test_client.get("/v2/apps", headers=auth_header)
-                self.assertEqual(401, r.status_code)
-                self.assertEqual("No associated account", json.loads(r.data)['msg'])
+        test_client = application.test_client()
+        with application.app_context():
+            jwt_token = jwt_auth.jwt_encode_callback({"email": "user-no-accounts@host.com.br", "account_id": 2})
+            auth_header = {
+                "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
+            }
+            r = test_client.get("/v2/apps", headers=auth_header)
+            self.assertEqual(401, r.status_code)
+            self.assertEqual("No associated account", json.loads(r.data)['msg'])
 
     def test_jwt_return_401_if_when_account_does_not_exist(self):
         test_client = application.test_client()
