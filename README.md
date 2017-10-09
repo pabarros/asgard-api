@@ -6,6 +6,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 * -next
   - Adicionando primeiro endpoint de métricas. ZK. Já feito com flask Blueprints.
+  - Atualizando marathon-python para 0.9.2
 
 * 0.0.36
   - Remoção do Fluxo velho de request
