@@ -6,7 +6,9 @@ from hollowman.models import HollowmanSession, User, Account
 
 
 def _expunge_user_and_accounts(session, user):
-    [session.expunge(acc) for acc in user.accounts]
+    for acc in user.accounts:
+        session.expunge(acc)
+
     session.expunge(user)
 
 
