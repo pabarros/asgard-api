@@ -5,6 +5,8 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 * -next
+  - Início do suporte a `account_id` nos requests
+  - Necessidade de estar vinculado a pelo menos uma conta para que o request seja válido
   - Adicionando primeiro endpoint de métricas. ZK. Já feito com flask Blueprints.
   - Atualizando marathon-python para 0.9.2
 
