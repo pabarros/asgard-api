@@ -5,7 +5,7 @@ from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
 from hollowman.hollowman_flask import OperationType
-
+from hollowman.filters.owner import AddOwnerConstraintFilter
 
 FILTERS_PIPELINE = {
     OperationType.READ: (
@@ -15,6 +15,7 @@ FILTERS_PIPELINE = {
         ForcePullFilter(),
         TrimRequestFilter(),
         AddAppNameFilter(),
+        AddOwnerConstraintFilter(),
     )
 }
 
