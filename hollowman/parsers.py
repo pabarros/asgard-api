@@ -79,9 +79,10 @@ class RequestParser:
         with `{"force": (true|false)}` which isn't compatible with `MarathonApp`
         interface and marathons api, and should be removed.
         """
-        data.pop('force', None)
         if not isinstance(data, list):
+            data.pop('force', None)
             return [data]
+        return data
 
     def split(self) -> Apps:
         if self.is_group_request():

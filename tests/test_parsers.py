@@ -175,6 +175,23 @@ class SplitTests(TestCase):
                 expected_app = (MarathonApp(), MarathonApp.from_json(fixture))
                 self.assertEqual(apps, [expected_app])
 
+    @with_json_fixture('single_full_app.json')
+    def test_split_does_not_break_when_removing_force_parameter_if_request_is_a_list(self, fixture):
+        request_data = {"id": "/foo", "instances": 2}
+        with application.test_request_context('/v2/apps/',
+                                              method='PUT',
+                                              data=json.dumps(request_data)) as ctx:
+            request_parser = RequestParser(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                         body=json.dumps({'app': fixture}),
+                         status=200)
+                apps = list(request_parser.split())
+
+                expected_app = (MarathonApp.from_json(request_data), MarathonApp.from_json(fixture))
+                self.assertEqual(apps, [expected_app])
+
     def test_it_raises_an_error_if_group_request(self):
         with application.test_request_context('/v2/groups/',
                                               method='PUT', data=b'') as ctx:
