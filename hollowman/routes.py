@@ -8,6 +8,7 @@ from hollowman.app import application
 from hollowman.auth import _get_user_by_email
 from hollowman.auth.google import google_oauth2
 from hollowman.decorators import auth_required
+from hollowman.parsers import RequestParser
 
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth
@@ -84,7 +85,7 @@ def index():
 @application.route('/v2/apps/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @auth_required()
 def apiv2(path):
-    return request_handlers.new(request)
+    return request_handlers.new(RequestParser(request))
 
 
 @application.route("/healthcheck")
