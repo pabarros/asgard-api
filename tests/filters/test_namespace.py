@@ -51,3 +51,7 @@ class TestNamespaceFilter(unittest.TestCase):
         modified_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
         self.assertEqual("/dev/foo", modified_app.id)
 
+    def test_does_nothing_if_user_is_none(self):
+        modified_app = self.filter.write(None, self.request_app, SieveMarathonApp())
+        self.assertEqual("/foo", modified_app.id)
+
