@@ -77,6 +77,19 @@ class UpstreamTest(TestCase):
             self.assertEqual(called_headers['X-Header-B'], "10")
 
     @patch.object(requests, 'put')
+    def test_remove_some_key_before_replay_put_request_data_is_a_list(self, mock_put):
+        """
+        A API aceita uma lista se o request for um PUT em /v2/apps.
+        O pop() da lista se comporta diferente do pop do dict. Temos que tratar isso.
+        """
+        with application.test_request_context("/v2/apps", method="PUT", data='[{"id": "/abc", "version": "0", "fetch": ["a", "b"]}]', headers={'Content-Type': 'application/json'}):
+            replay_request(flask.request, "http://marathon:8080")
+            self.assertTrue(mock_put.called)
+            called_data_json = json.loads(mock_put.call_args[1]['data'])
+            self.assertFalse('version' in called_data_json[0])
+            self.assertFalse('fetch' in called_data_json[0])
+
+    @patch.object(requests, 'put')
     def test_remove_some_key_before_replay_put_request(self, mock_put):
         """
         We must remove these keys:
