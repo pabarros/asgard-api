@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from marathon.models.app import MarathonApp
 
-from hollowman.dispatcher import dispatch, merge_marathon_apps
+from hollowman.dispatcher import dispatch, merge_marathon_apps, FILTERS_PIPELINE
 from hollowman.hollowman_flask import OperationType
 from tests.utils import with_json_fixture
 
@@ -107,3 +107,10 @@ class DispatcherTests(TestCase):
         self.assertEqual("mesosphere:marathon/latest", merged_app.container.docker.image)
         self.assertTrue(merged_app.constraints)
         self.assertTrue(merged_app.labels)
+
+    @with_json_fixture("single_full_app.json")
+    def test_assert_all_filters_run_with_unauthenticated_request(self, single_full_app_fixture):
+        marathon_app = MarathonApp.from_json(single_full_app_fixture)
+        for filter_ in FILTERS_PIPELINE[OperationType.WRITE]:
+            filtered_app = filter_.write(None, marathon_app, marathon_app)
+            self.assertTrue(marathon_app is filtered_app)

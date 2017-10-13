@@ -55,10 +55,7 @@
     ],
     "env": {
         "XPS1": "Test",
-        "XPS2": "Rest",
-        "PASSWORD": {
-            "secret": "/db/password"
-        }
+        "XPS2": "Rest"
     },
     "executor": "",
     "labels": {
