@@ -6,6 +6,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 * -next
   - BUGFIX: User do request sendo corretamente repassado para o dispatch
+  - Filter para adicionar a costraint `owner:LIKE:<account.owner>`
 
 * 0.0.37
   - Início do suporte a `account_id` nos requests
