@@ -4,6 +4,12 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+
+* -next
+  - Suporte a request com lista no body;
+  - Implementação do filtro que adiciona namespace
+  - Desligando filtro de namespace, por enquanto.
+
 * 0.0.38
   - BUGFIX: User do request sendo corretamente repassado para o dispatch
   - Filter para adicionar a costraint `owner:LIKE:<account.owner>`
