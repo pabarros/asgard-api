@@ -9,6 +9,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
   - Suporte a request com lista no body;
   - Implementação do filtro que adiciona namespace
   - Desligando filtro de namespace, por enquanto.
+  - Implementado um teste para ajudar a garantir que nenhum filtro ativo terá problemas com requests não-autenticados
 
 * 0.0.38
   - BUGFIX: User do request sendo corretamente repassado para o dispatch
