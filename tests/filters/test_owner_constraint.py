@@ -32,7 +32,7 @@ class OwnerFilterTest(unittest.TestCase):
         self.request_app.constraints = []
         filtered_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
 
-        owner_constraint = filtered_app.get_constraint_by_name("owner")
+        owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(1, len(filtered_app.constraints))
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
@@ -42,7 +42,7 @@ class OwnerFilterTest(unittest.TestCase):
         self.original_app.constraints = []
         filtered_app = self.filter.write(self.user, self.request_app, self.original_app)
 
-        owner_constraint = filtered_app.get_constraint_by_name("owner")
+        owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(1, len(filtered_app.constraints))
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
@@ -51,7 +51,7 @@ class OwnerFilterTest(unittest.TestCase):
         self.request_app.constraints.append(MarathonConstraint(field="owner", operator="LIKE", value="other-owner"))
         filtered_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
 
-        owner_constraint = filtered_app.get_constraint_by_name("owner")
+        owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(2, len(filtered_app.constraints))
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
@@ -60,7 +60,7 @@ class OwnerFilterTest(unittest.TestCase):
         self.request_app.constraints.append(MarathonConstraint(field="owner", operator="LIKE", value="other-owner"))
         filtered_app = self.filter.write(self.user, self.request_app, self.original_app)
 
-        owner_constraint = filtered_app.get_constraint_by_name("owner")
+        owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(2, len(filtered_app.constraints))
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
@@ -68,7 +68,7 @@ class OwnerFilterTest(unittest.TestCase):
     def test_create_app_add_constraint_app_with_other_constraints(self):
         filtered_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
 
-        owner_constraint = filtered_app.get_constraint_by_name("owner")
+        owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(2, len(filtered_app.constraints))
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
@@ -76,7 +76,7 @@ class OwnerFilterTest(unittest.TestCase):
     def test_update_app_add_constraint_app_with_other_constraints(self):
         filtered_app = self.filter.write(self.user, self.request_app, self.original_app)
 
-        owner_constraint = filtered_app.get_constraint_by_name("owner")
+        owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(2, len(filtered_app.constraints))
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
@@ -85,9 +85,9 @@ class OwnerFilterTest(unittest.TestCase):
         self.original_app.constraints.append(MarathonConstraint(field="owner", operator="LIKE", value=self.account_dev.owner))
         filtered_app = self.filter.write(self.user, self.request_app, self.original_app)
 
-        owner_constraint = filtered_app.get_constraint_by_name("owner")
+        owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(2, len(filtered_app.constraints))
-        self.assertEqual("srv2.*", filtered_app.get_constraint_by_name("hostname")[0].value)
+        self.assertEqual("srv2.*", filtered_app.get_constraints_by_name("hostname")[0].value)
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
 
