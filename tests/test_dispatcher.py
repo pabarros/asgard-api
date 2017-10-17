@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from marathon.models.app import MarathonApp
 
 from hollowman.dispatcher import dispatch, merge_marathon_apps, FILTERS_PIPELINE
-from hollowman.hollowman_flask import OperationType
+from hollowman.hollowman_flask import OperationType, FilterType
 from tests.utils import with_json_fixture
 
 
@@ -22,7 +22,7 @@ class DispatcherTests(TestCase):
 
         dispatch(
             [OperationType.READ], user, request_app, original_app,
-            filters_pipeline={OperationType.READ: filters}
+            filters_pipeline={FilterType.REQUEST: {OperationType.READ: filters}}
         )
 
         filters[0].read.assert_called_once_with(user, merged_app, original_app)
@@ -38,7 +38,7 @@ class DispatcherTests(TestCase):
 
         dispatch(
             [OperationType.WRITE], user, request_app, original_app,
-            filters_pipeline={OperationType.WRITE: filters}
+            filters_pipeline={FilterType.REQUEST: {OperationType.WRITE: filters}}
         )
 
         filters[0].write.assert_called_once_with(user, merged_app, original_app)
@@ -51,7 +51,12 @@ class DispatcherTests(TestCase):
 
         dispatch(
             [OperationType.READ], user, request_app, app,
-            filters_pipeline={OperationType.READ: [], OperationType.WRITE: filters}
+            filters_pipeline={
+                FilterType.REQUEST: {
+                    OperationType.READ: [],
+                    OperationType.WRITE: filters
+                }
+            }
         )
 
         for filter in filters:
@@ -111,6 +116,6 @@ class DispatcherTests(TestCase):
     @with_json_fixture("single_full_app.json")
     def test_assert_all_filters_run_with_unauthenticated_request(self, single_full_app_fixture):
         marathon_app = MarathonApp.from_json(single_full_app_fixture)
-        for filter_ in FILTERS_PIPELINE[OperationType.WRITE]:
+        for filter_ in FILTERS_PIPELINE[FilterType.REQUEST][OperationType.WRITE]:
             filtered_app = filter_.write(None, marathon_app, marathon_app)
             self.assertTrue(marathon_app is filtered_app)

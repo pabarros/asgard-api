@@ -8,7 +8,7 @@ from marathon import MarathonApp
 from hollowman.app import application
 from hollowman.request_handlers import new
 from hollowman.models import HollowmanSession, User, Account
-from hollowman.parsers import RequestParser
+from hollowman.http_wrappers.request import Request
 from hollowman import conf
 
 from tests import rebuild_schema
@@ -56,7 +56,7 @@ class RequestHandlersTests(TestCase):
     def test_it_dispatches_apps_from_request(self):
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
             with patch('hollowman.request_handlers.upstream_request'):
-                request_parser = RequestParser(ctx.request)
+                request_parser = Request(ctx.request)
                 request_parser.split = MagicMock(return_value=self.request_apps)
                 request_parser.join = MagicMock()
                 response = new(request_parser)
@@ -72,7 +72,7 @@ class RequestHandlersTests(TestCase):
             with patch('hollowman.request_handlers.upstream_request'):
                 user = MagicMock()
                 ctx.request.user = user
-                request_parser = RequestParser(ctx.request)
+                request_parser = Request(ctx.request)
                 request_parser.split = MagicMock(return_value=[self.request_apps[0]])
                 request_parser.join = MagicMock()
                 response = new(request_parser)
@@ -84,7 +84,7 @@ class RequestHandlersTests(TestCase):
     def test_it_calls_dispatch_with_user_none_if_not_authenticated(self):
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
             with patch('hollowman.request_handlers.upstream_request'):
-                request_parser = RequestParser(ctx.request)
+                request_parser = Request(ctx.request)
                 request_parser.split = MagicMock(return_value=[self.request_apps[0]])
                 request_parser.join = MagicMock()
                 response = new(request_parser)

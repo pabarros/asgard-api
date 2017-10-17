@@ -1,7 +1,7 @@
 from flask import Flask,Request
 from json import loads
 
-from enum import Enum
+from enum import Enum, auto
 
 
 class OperationType(Enum):
@@ -14,6 +14,11 @@ class OperationType(Enum):
     DESTROY = 'destroy'
     SUSPEND = 'suspend'
     CREATE = 'create'
+
+
+class FilterType(Enum):
+    REQUEST = auto()
+    RESPONSE = auto()
 
 
 class HollowmanRequest(Request):

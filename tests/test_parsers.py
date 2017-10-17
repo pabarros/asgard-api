@@ -8,7 +8,7 @@ from responses import RequestsMock
 from hollowman import conf
 from hollowman.app import application
 from hollowman.hollowman_flask import HollowmanRequest
-from hollowman.parsers import RequestParser
+from hollowman.http_wrappers.request import Request
 from tests.utils import with_json_fixture, get_fixture
 
 
@@ -17,38 +17,38 @@ class RequestParserTests(TestCase):
     def test_it_recognizes_group_requests(self):
         with application.test_request_context('/v2/groups/',
                                               method='GET', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_group_request())
             self.assertFalse(request_parser.is_app_request())
 
         with application.test_request_context('/v2/groups/xablau/Xena',
                                               method='PUT', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_group_request())
             self.assertFalse(request_parser.is_app_request())
 
         with application.test_request_context('/v2/groups/xablau',
                                               method='DELETE', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_group_request())
             self.assertFalse(request_parser.is_app_request())
 
     def test_it_recognizes_apps_requests(self):
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_app_request())
             self.assertFalse(request_parser.is_group_request())
 
         with application.test_request_context('/v2/apps/',
                                               method='PUT', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_app_request())
             self.assertFalse(request_parser.is_group_request())
 
         with application.test_request_context('/v2/apps//',
                                               method='DELETE', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_app_request())
             self.assertFalse(request_parser.is_group_request())
 
@@ -70,12 +70,12 @@ class RequestParserTests(TestCase):
 
         for request_path, expected_marathon_path in expected_paths.items():
             # noinspection PyTypeChecker
-            parser = RequestParser(Mock(path=request_path))
+            parser = Request(Mock(path=request_path))
             self.assertEqual(parser.app_id, expected_marathon_path)
 
     def test_it_raises_an_error_if_get_app_id_is_called_for_v2groups_path(self):
         with self.assertRaises(ValueError):
-            RequestParser(Mock(path='/v2/groups/xablau')).app_id
+            Request(Mock(path='/v2/groups/xablau')).app_id
 
 
 class SplitTests(TestCase):
@@ -84,7 +84,7 @@ class SplitTests(TestCase):
     def test_a_read_single_app_request_returns_a_single_marathonapp_if_app_exists(self, fixture):
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
 
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
@@ -98,7 +98,7 @@ class SplitTests(TestCase):
 
     def test_a_read_single_app_request_returns_an_errorif_app_doesnt_exists(self):
         with application.test_request_context('/v2/apps//foo', method='GET') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
 
             with patch.object(request_parser, 'marathon_client') as client:
                 response_mock = Mock()
@@ -110,7 +110,7 @@ class SplitTests(TestCase):
     @with_json_fixture('requests/get-v2apps-all-apps.json')
     def test_a_request_with_n_apps_returns_n_marathonapps(self, fixture):
         with application.test_request_context('/v2/apps/', method='GET') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
                          url=conf.MARATHON_ENDPOINT + '/v2/apps',
@@ -129,7 +129,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 response_mock = Mock()
                 response_mock.headers.get.return_value = 'application/json'
@@ -149,7 +149,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/foo',
                                               method='PUT',
                                               data=json.dumps(scale_up)) as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
                          url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
@@ -164,7 +164,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/xablau/restart',
                                               method='PUT',
                                               data=b'{"force": true}') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
                          url=conf.MARATHON_ENDPOINT + '/v2/apps//xablau',
@@ -181,7 +181,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/',
                                               method='PUT',
                                               data=json.dumps(request_data)) as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
                          url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
@@ -195,7 +195,7 @@ class SplitTests(TestCase):
     def test_it_raises_an_error_if_group_request(self):
         with application.test_request_context('/v2/groups/',
                                               method='PUT', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with self.assertRaises(NotImplementedError):
                 list(request_parser.split())
 
@@ -205,7 +205,7 @@ class JoinTests(TestCase):
     def test_it_recreates_a_get_request_for_a_single_app(self, fixture):
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
                 apps = list(request_parser.split())
@@ -220,7 +220,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
                 apps = list(request_parser.split())
@@ -234,7 +234,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='POST',
                                               data=json.dumps(fixture)) as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
                 apps = list(request_parser.split())
@@ -248,7 +248,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps/',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             mock_app = get_fixture('single_full_app.json')
             mock_apps = [(MarathonApp.from_json(mock_app), Mock()) for _ in range(2)]
 
@@ -262,6 +262,6 @@ class JoinTests(TestCase):
     def test_it_raises_an_error_if_group_request(self):
         with application.test_request_context('/v2/groups/',
                                               method='PUT', data=b'') as ctx:
-            request_parser = RequestParser(ctx.request)
+            request_parser = Request(ctx.request)
             with self.assertRaises(NotImplementedError):
                 request_parser.join([])
