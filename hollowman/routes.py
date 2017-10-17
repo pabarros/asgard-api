@@ -2,13 +2,12 @@ import json
 import requests
 from flask import url_for, redirect, Response, request, session, \
                   render_template, make_response
-from hollowman import conf, request_handlers, upstream
+from hollowman import conf, request_handlers, upstream, http_wrappers
 
 from hollowman.app import application
 from hollowman.auth import _get_user_by_email
 from hollowman.auth.google import google_oauth2
 from hollowman.decorators import auth_required
-from hollowman.parsers import RequestParser
 
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
@@ -85,7 +84,7 @@ def index():
 @application.route('/v2/apps/<path:path>', methods=["GET", "POST", "PUT", "DELETE"])
 @auth_required()
 def apiv2(path):
-    return request_handlers.new(RequestParser(request))
+    return request_handlers.new(http_wrappers.Request(request))
 
 
 @application.route("/healthcheck")

@@ -1,15 +1,14 @@
 import json
 from typing import Iterable, Tuple, Dict
 
-from marathon import MarathonApp
-from marathon.exceptions import NotFoundError
+from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
 
 from hollowman import conf
 from hollowman.hollowman_flask import HollowmanRequest, OperationType
 
 
-class RequestParser:
+class Request:
     Apps = Iterable[Tuple[MarathonApp, MarathonApp]]
     json_encoder = MarathonMinimalJsonEncoder
 
