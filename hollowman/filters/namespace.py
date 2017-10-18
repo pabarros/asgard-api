@@ -1,3 +1,4 @@
+from hollowman.marathonapp import SieveMarathonApp
 
 
 class NameSpaceFilter():
@@ -23,3 +24,6 @@ class NameSpaceFilter():
         namespace_part = "/{namespace}".format(namespace=namespace)
         appname_part = request_app.id.strip("/")
         request_app.id = "/".join([namespace_part, appname_part])
+
+    def response(self, user, response_app, original_app) -> SieveMarathonApp:
+        return response_app
