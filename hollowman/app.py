@@ -35,7 +35,8 @@ def after_request(response):
             "method": request.method,
             "status_code": response.status_code,
             "path": request.path,
-            "user": (hasattr(request, "user") and request.user) or None,
+            "user": (hasattr(request, "user") and request.user.tx_email) or None,
+            "account_id": (hasattr(request, "user") and request.user.current_account.id) or None,
             "location": response.headers.get("Location"),
             "qstring": request.args
         }
