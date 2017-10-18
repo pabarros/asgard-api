@@ -9,8 +9,10 @@ from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.conf import SECRET_KEY, CORS_WHITELIST
 from hollowman.log import logger
 from hollowman.plugins import register_plugin
+from hollowman.auth.jwt import jwt_auth
 
 from hollowman.metrics.zk.routes import zk_metrics_blueprint
+from hollowman.api.account import account_blueprint
 
 application = HollowmanFlask(__name__)
 application.url_map.strict_slashes = False
@@ -20,9 +22,11 @@ application.config["JWT_AUTH_URL_RULE"] = None
 application.config["JWT_EXPIRATION_DELTA"] = timedelta(days=7)
 
 application.register_blueprint(zk_metrics_blueprint, url_prefix="/_cat/metrics/zk")
-
+application.register_blueprint(account_blueprint, url_prefix="/hollow/account")
 
 CORS(application, origins=CORS_WHITELIST)
+jwt_auth.init_app(application)
+
 
 @application.after_request
 def after_request(response):
