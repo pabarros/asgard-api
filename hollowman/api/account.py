@@ -8,11 +8,10 @@ from hollowman.auth.jwt import jwt_auth
 account_blueprint = Blueprint(__name__, __name__)
 
 
-def _generate_repsonse(user_info, extra_headers):
+def _generate_repsonse(user_info, new_jwt_token):
+    user_info["jwt_token"] = new_jwt_token
     response_body = json.dumps(user_info)
     response = make_response(response_body, 200)
-    for k, v in extra_headers.items():
-        response.headers[k] = v
     return response
 
 
@@ -40,7 +39,7 @@ def change_account(acc_id):
     try:
         user_info = _generate_user_info(request.user, request.user.accounts[account_ids.index(acc_id)])
         jwt_token = jwt_auth.jwt_encode_callback(user_info)
-        return _generate_repsonse(user_info, {"X-JWT": jwt_token})
+        return _generate_repsonse(user_info, jwt_token.decode("utf8"))
     except ValueError:
         pass
 

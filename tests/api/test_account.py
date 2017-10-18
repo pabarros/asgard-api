@@ -75,9 +75,9 @@ class TestAccountEndpoints(unittest.TestCase):
             self.assertEqual(self.user.accounts[1].id, response_data["current_account"]["id"])
             self.assertEqual(self.user.accounts[1].name, response_data["current_account"]["name"])
 
-            jwt_response_header = response.headers.get('X-JWT')
-            self.assertTrue(jwt_response_header)
-            returned_token = jwt.decode(jwt_response_header, key=SECRET_KEY)
+            jwt_response_token = response_data["jwt_token"]
+            self.assertTrue(jwt_response_token)
+            returned_token = jwt.decode(jwt_response_token, key=SECRET_KEY)
             self.assertEqual(self.user.tx_email, returned_token["user"]["email"])
             self.assertEqual(self.user.tx_name, returned_token["user"]["name"])
             self.assertEqual(self.user.accounts[1].id, returned_token["current_account"]["id"])
@@ -112,7 +112,7 @@ class TestAccountEndpoints(unittest.TestCase):
             self.assertEqual(self.user.accounts[1].id, response_data["current_account"]["id"])
             self.assertEqual(self.user.accounts[1].name, response_data["current_account"]["name"])
 
-            jwt_response_header = response.headers.get('X-JWT')
+            jwt_response_header = response_data["jwt_token"]
             self.assertTrue(jwt_response_header)
             returned_token = jwt.decode(jwt_response_header, key=SECRET_KEY)
             self.assertEqual(self.user.tx_email, returned_token["user"]["email"])
@@ -137,7 +137,7 @@ class TestAccountEndpoints(unittest.TestCase):
             self.assertEqual(self.user.accounts[0].id, response_data["current_account"]["id"])
             self.assertEqual(self.user.accounts[0].name, response_data["current_account"]["name"])
 
-            jwt_response_header = response.headers.get('X-JWT')
+            jwt_response_header = response_data["jwt_token"]
             self.assertTrue(jwt_response_header)
             returned_token = jwt.decode(jwt_response_header, key=SECRET_KEY)
             self.assertEqual(self.user.tx_email, returned_token["user"]["email"])
