@@ -14,7 +14,7 @@ from hollowman.models import HollowmanSession, User, Account, UserHasAccount
 from hollowman import conf
 from hollowman import decorators
 import hollowman.upstream
-from hollowman.auth.jwt import jwt_auth
+from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from hollowman import routes
 
 from tests import rebuild_schema
@@ -36,7 +36,8 @@ class TestAuthentication(TestCase):
         self.session.add(self.account_dev)
         self.session.add(self.account_infra)
         self.session.add(self.account_sup)
-        self.session.add(User(tx_email="user-no-accounts@host.com.br", tx_name="No Accounts", tx_authkey="7b4184bfe7d2349eb56bcfb9dc246cf8"))
+        self.user_with_no_accounts = User(tx_email="user-no-accounts@host.com.br", tx_name="No Accounts", tx_authkey="7b4184bfe7d2349eb56bcfb9dc246cf8")
+        self.session.add(self.user_with_no_accounts)
         self.account_with_no_user = Account(name="Team Nobody", namespace="nobody", owner="nobody")
         self.session.add(self.account_with_no_user)
         self.session.commit()
@@ -99,11 +100,11 @@ class TestAuthentication(TestCase):
 
     def test_jwt_return_401_if_user_is_not_linked_to_account(self):
         """
-        If usere tries to access account without being associated to this account
+        If user tries to access account without being associated to this account
         """
         test_client = application.test_client()
         with application.app_context():
-            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": self.account_with_no_user.id})
+            jwt_token = jwt_auth.jwt_encode_callback(jwt_generate_user_info(self.user, self.account_with_no_user))
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
             }
@@ -151,7 +152,7 @@ class TestAuthentication(TestCase):
     def test_return_200_if_jwt_token_valid(self):
         test_client = application.test_client()
         with application.app_context():
-            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 4})
+            jwt_token = jwt_auth.jwt_encode_callback(jwt_generate_user_info(self.user, self.account_dev))
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
             }
@@ -160,7 +161,7 @@ class TestAuthentication(TestCase):
 
     def test_jwt_populate_request_user_if_token_is_valid(self):
         with application.app_context(), application.test_client() as test_client:
-            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 5})
+            jwt_token = jwt_auth.jwt_encode_callback(jwt_generate_user_info(self.user, self.account_infra))
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
             }
@@ -192,18 +193,6 @@ class TestAuthentication(TestCase):
             r = test_client.get("/v2/apps")
             self.assertEqual(401, r.status_code)
             self.assertEqual("Authorization token is invalid", json.loads(r.data)['msg'])
-
-    def test_redirect_with_jwt_token_after_login(self):
-        """
-        Checks that the JWT Token contains the right data. For now, the user email got from teh OAuth2 Provider
-        """
-        test_client = application.test_client()
-        with application.app_context(), \
-             patch.object(routes, "check_authentication_successful", return_value={"email": "user@host.com.br"}):
-            r = test_client.get("/authenticate/google")
-            self.assertEqual(302, r.status_code)
-            jwt_token = r.headers["Location"].split("=")[1]
-            self.assertEqual("user@host.com.br", jwt.decode(jwt_token, key=conf.SECRET_KEY)["email"])
 
     def test_redirect_with_jwt_url_is_formed_with_unicode_jwt(self):
         test_client = application.test_client()
@@ -239,7 +228,17 @@ class TestAuthentication(TestCase):
 
             render_mock.assert_called_once_with("login-failed.html", reason="User not found")
 
-    def test_login_failed_user_has_no_associated_account(self):
+    def test_login_failed_user_does_not_have_any_account(self):
+        test_client = application.test_client()
+
+        with application.app_context(), \
+                patch.object(routes, "check_authentication_successful", return_value={"email": self.user_with_no_accounts.tx_email}), \
+                patch.object(routes, "render_template") as render_mock:
+            response = test_client.get("/authenticate/google")
+
+            render_mock.assert_called_once_with("login-failed.html", reason="No associated accounts")
+
+    def test_return_401_user_has_no_associated_account(self):
         with application.test_client() as client:
             r = client.get("/v2/apps", headers={"Authorization": "Token 7b4184bfe7d2349eb56bcfb9dc246cf8"})
             self.assertEqual(401, r.status_code)
@@ -254,14 +253,17 @@ class TestAuthentication(TestCase):
 
         with application.app_context(), \
              patch.object(routes, "check_authentication_successful",
-                          return_value={"email": "user@host.com.br"}),\
+                          return_value={"email": self.user.tx_email}),\
                 patch.object(routes, "redirect") as redirect_mock:
             response = test_client.get("/authenticate/google")
 
             jwt_token = redirect_mock.call_args_list[0][0][0].split("=")[1]
             token_content = jwt.decode(jwt_token, conf.SECRET_KEY)
-            self.assertEqual("user@host.com.br", token_content['email'])
-            self.assertEqual(self.account_dev.id, token_content['account_id'])
+
+            self.assertEqual(self.user.tx_email, token_content["user"]["email"])
+            self.assertEqual(self.user.tx_name, token_content["user"]["name"])
+            self.assertEqual(self.user.accounts[0].id, token_content["current_account"]["id"])
+            self.assertEqual(self.user.accounts[0].name, token_content["current_account"]["name"])
 
     def test_add_default_account_on_first_jwt_token(self):
         """
@@ -273,26 +275,11 @@ class TestAuthentication(TestCase):
 
         with application.app_context(), \
              patch.object(routes, "check_authentication_successful",
-                          return_value={"email": "user@host.com.br"}),\
+                          return_value={"email": self.user.tx_email}),\
                 patch.object(routes.jwt_auth, "jwt_encode_callback") as jwt_auth_mock:
             response = test_client.get("/authenticate/google")
 
-            jwt_auth_mock.assert_called_once_with({"email": "user@host.com.br", "account_id": self.account_dev.id})
-
-    def test_add_empty_account_on_first_jwt_token(self):
-        """
-        Caso o user não esteja vinculado e nenhuma conta, o atributo account_id deve ficar vazio
-        """
-        test_client = application.test_client()
-        jwt = MagicMock()
-
-        with application.app_context(), \
-             patch.object(routes, "check_authentication_successful",
-                          return_value={"email": "user-no-accounts@host.com.br"}),\
-                patch.object(routes.jwt_auth, "jwt_encode_callback") as jwt_auth_mock:
-            response = test_client.get("/authenticate/google")
-
-            jwt_auth_mock.assert_called_once_with({"email": "user-no-accounts@host.com.br", "account_id": None})
+            jwt_auth_mock.assert_called_once_with(jwt_generate_user_info(self.user, self.user.accounts[0]))
 
     def test_token_return_401_if_user_has_no_associated_account(self):
         with application.test_client() as client:
@@ -315,7 +302,7 @@ class TestAuthentication(TestCase):
     def test_jwt_return_401_if_when_account_does_not_exist(self):
         test_client = application.test_client()
         with application.app_context():
-            jwt_token = jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 1024})
+            jwt_token = jwt_auth.jwt_encode_callback(jwt_generate_user_info(self.user, Account(id=1024)))
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
             }

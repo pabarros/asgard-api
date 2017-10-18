@@ -13,7 +13,7 @@ from responses import RequestsMock
 
 from hollowman.app import application
 from hollowman import conf
-from hollowman.auth.jwt import jwt_auth
+from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
 
@@ -33,7 +33,8 @@ class TestAuthentication(TestCase):
             tx_email="user@host.com.br",
             tx_name="John Doe",
             tx_authkey="70ed620926be4067a36402c3f7e9ddf0")
-        self.normal_user.accounts = [Account(name="New Account", namespace="acc", owner="company")]
+        self.account = Account(name="New Account", namespace="acc", owner="company")
+        self.normal_user.accounts = [self.account]
         self.session.add_all([self.new_dispatcher_user, self.normal_user])
         self.session.commit()
 
@@ -42,8 +43,8 @@ class TestAuthentication(TestCase):
     def tearDown(self):
         patch.stopall()
 
-    def make_auth_header(self, email: str) -> Dict[str, str]:
-        jwt_token = jwt_auth.jwt_encode_callback({"email": email, "account_id": 1})
+    def make_auth_header(self, user, account) -> Dict[str, str]:
+        jwt_token = jwt_auth.jwt_encode_callback(jwt_generate_user_info(user, account))
         return {
             "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
         }
@@ -65,7 +66,7 @@ class TestAuthentication(TestCase):
             replay_request.return_value = response
             test_client = application.test_client()
             with application.app_context():
-                auth_header = self.make_auth_header(self.normal_user.tx_email)
+                auth_header = self.make_auth_header(self.normal_user, self.account)
                 with RequestsMock() as rsps:
                     rsps.add(method='GET',
                              url=conf.MARATHON_ENDPOINT + '/v2/apps',

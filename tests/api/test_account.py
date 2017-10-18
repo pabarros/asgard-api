@@ -6,7 +6,7 @@ import jwt
 from hollowman.app import application
 from hollowman.models import HollowmanSession, User, Account
 from hollowman.conf import SECRET_KEY
-from hollowman.auth.jwt import jwt_auth
+from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
@@ -25,10 +25,6 @@ class TestAccountEndpoints(unittest.TestCase):
 
         self.user_with_one_account = User(tx_email="user-one-account@host.com.br", tx_name="User One Account")
         self.user_with_one_account.accounts = [self.account_dev]
-        #self.user_with_one_account_jwt_token = jwt_auth.jwt_encode_callback({
-        #    "email": self.user_with_one_account.tx_email,
-        #    "account_id": self.user_with_one_account.accounts[0].id
-        #})
 
         self.session.add(self.account_dev)
         self.session.add(self.account_infra)
@@ -40,10 +36,13 @@ class TestAccountEndpoints(unittest.TestCase):
     def tearDown(self):
         self.session.close()
 
+    def generate_jwt_token_for_user(self, user, account):
+        return jwt_auth.jwt_encode_callback(jwt_generate_user_info(user, account))
+
     def test_get_current_user_info_valid_auth(self):
         with application.app_context(), \
                 application.test_client() as client:
-            jwt_token = jwt_auth.jwt_encode_callback({"email": self.user.tx_email, "account_id": self.user.accounts[0].id})
+            jwt_token = self.generate_jwt_token_for_user(self.user, self.user.accounts[0])
             response = client.get("/hollow/account/me", headers={"Authorization": "JWT {}".format(jwt_token.decode("utf8"))})
             self.assertEqual(200, response.status_code)
             response_data = json.loads(response.data)
@@ -65,7 +64,7 @@ class TestAccountEndpoints(unittest.TestCase):
         """
         with application.app_context(), \
                 application.test_client() as client:
-            jwt_token = jwt_auth.jwt_encode_callback({"email": self.user.tx_email, "account_id": self.user.accounts[0].id})
+            jwt_token = self.generate_jwt_token_for_user(self.user, self.user.accounts[0])
             response = client.post("/hollow/account/change/{}".format(self.user.accounts[1].id), headers={"Authorization": "JWT {}".format(jwt_token.decode("utf8"))})
             self.assertEqual(200, response.status_code)
             response_data = json.loads(response.data)
@@ -90,7 +89,7 @@ class TestAccountEndpoints(unittest.TestCase):
         """
         with application.app_context(), \
                 application.test_client() as client:
-            jwt_token = jwt_auth.jwt_encode_callback({"email": self.user.tx_email, "account_id": self.user.accounts[0].id})
+            jwt_token = self.generate_jwt_token_for_user(self.user, self.user.accounts[0])
             response = client.post("/hollow/account/change/42", headers={"Authorization": "JWT {}".format(jwt_token.decode("utf8"))})
             self.assertEqual(401, response.status_code)
             self.assertEquals("Not associated with account", json.loads(response.data)["msg"])
@@ -102,7 +101,7 @@ class TestAccountEndpoints(unittest.TestCase):
         """
         with application.app_context(), \
                 application.test_client() as client:
-            jwt_token = jwt_auth.jwt_encode_callback({"email": self.user.tx_email, "account_id": self.user.accounts[0].id})
+            jwt_token = self.generate_jwt_token_for_user(self.user, self.user.accounts[0])
             response = client.post("/hollow/account/next", headers={"Authorization": "JWT {}".format(jwt_token.decode("utf8"))})
             self.assertEqual(200, response.status_code)
             response_data = json.loads(response.data)
@@ -127,7 +126,7 @@ class TestAccountEndpoints(unittest.TestCase):
         """
         with application.app_context(), \
                 application.test_client() as client:
-            jwt_token = jwt_auth.jwt_encode_callback({"email": self.user.tx_email, "account_id": self.user.accounts[1].id})
+            jwt_token = self.generate_jwt_token_for_user(self.user, self.user.accounts[1])
             response = client.post("/hollow/account/next", headers={"Authorization": "JWT {}".format(jwt_token.decode("utf8"))})
             self.assertEqual(200, response.status_code)
             response_data = json.loads(response.data)

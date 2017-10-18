@@ -32,14 +32,14 @@ def check_auth_token(token):
 def check_jwt_token(jwt_token):
     try:
         payload = jwt.decode(jwt_token, key=SECRET_KEY)
-        return _get_user_by_email(payload["email"])
+        return _get_user_by_email(payload["user"]["email"])
     except Exception as e:
         logger.info({"auth": "failed", "token-type": "jwt", "error": str(e), "jwt_token": jwt_token})
         return None
 
 def _extract_account_id_from_jwt(jwt_token):
     try:
-        return jwt.decode(jwt_token, key=SECRET_KEY).get("account_id")
+        return jwt.decode(jwt_token, key=SECRET_KEY)["current_account"]["id"]
     except Exception:
         return None
 

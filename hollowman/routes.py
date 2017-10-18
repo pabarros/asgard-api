@@ -11,7 +11,7 @@ from hollowman.decorators import auth_required
 from hollowman.parsers import RequestParser
 
 from hollowman.log import logger
-from hollowman.auth.jwt import jwt_auth
+from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from hollowman.plugins import get_plugin_registry_data
 
 
@@ -126,12 +126,11 @@ def authorized(resp):
     if not user:
         return render_template("login-failed.html", reason="User not found")
 
-    account_id = None
-    if user.accounts:
-        account_id = user.accounts[0].id
+    if not user.accounts:
+        return render_template("login-failed.html", reason="No associated accounts")
 
     data = {}
-    data["jwt"]: bytes = jwt_auth.jwt_encode_callback({"email": user.tx_email, "account_id": account_id})
+    data["jwt"]: bytes = jwt_auth.jwt_encode_callback(jwt_generate_user_info(user, user.accounts[0]))
 
     session["jwt"] = data["jwt"] = data["jwt"].decode('utf-8')
     return redirect("{}?jwt={}".format(conf.REDIRECT_AFTER_LOGIN, data["jwt"]))

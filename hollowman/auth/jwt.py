@@ -22,8 +22,6 @@ def jwt_payload_handler(user_info):
         'exp': exp,
         'iat': iat,
         'nbf': nbf,
-        "email": user_info.get("email"),
-        "account_id": user_info.get("account_id"),
         "user": user_info.get("user"),
         "current_account": user_info.get("current_account"),
     }
@@ -32,3 +30,16 @@ def jwt_payload_handler(user_info):
 def jwt_identity(payload):
     return {"email": payload.get("email")}
 
+
+
+def jwt_generate_user_info(user, current_account):
+    return {
+        "user": {
+            "email": user.tx_email,
+            "name": user.tx_name
+        },
+        "current_account": {
+            "id": current_account.id,
+            "name": current_account.name
+        }
+    }
