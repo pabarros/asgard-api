@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.40
+  - Refactoring no SieveMarathonApp
+
 * 0.0.39
   - Suporte a request com lista no body;
   - Implementação do filtro que adiciona namespace
