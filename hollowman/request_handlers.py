@@ -24,6 +24,7 @@ def new(request: http_wrappers.Request) -> Response:
 
     joined_request = request.join(filtered_apps)
     response = upstream_request(joined_request, run_filters=False)
+    response_wrapper = http_wrappers.Response(request.request, response)
 
     return response
 
