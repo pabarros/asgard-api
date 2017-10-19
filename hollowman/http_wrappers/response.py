@@ -24,7 +24,7 @@ class Response(HTTPWrapper):
                     response_app = SieveMarathonApp.from_json(app)
                     app = self.marathon_client.get_app(self.app_id)
                     yield response_app, app
-                    return
+                return
             else:
                 response_app = SieveMarathonApp.from_json(response_content['app'])
                 app = self.marathon_client.get_app(self.app_id)
