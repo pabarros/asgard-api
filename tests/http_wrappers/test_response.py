@@ -3,7 +3,7 @@ import unittest
 from copy import deepcopy
 from http import HTTPStatus
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, call
 
 from marathon import NotFoundError, MarathonApp
 from flask import Response as FlaskResponse
@@ -37,6 +37,7 @@ class SplitTests(unittest.TestCase):
             with patch.object(response, 'marathon_client') as client:
                 client.get_app.return_value = SieveMarathonApp.from_json(fixture)
                 apps = list(response.split())
+                self.assertEqual([call("/foo")], client.get_app.call_args_list)
 
             self.assertEqual(
                 apps,
@@ -61,6 +62,7 @@ class SplitTests(unittest.TestCase):
             original_apps = [MarathonApp.from_json(app) for app in apps]
             client.get_app.side_effect = original_apps
             apps = list(response.split())
+            self.assertEqual([call("/foo"), call("/xablau")], client.get_app.call_args_list)
 
         self.assertEqual(
             apps,
@@ -207,3 +209,4 @@ class JoinTests(unittest.TestCase):
             self.assertIsInstance(joined_response, FlaskResponse)
             self.assertDictEqual(json.loads(joined_response.data),
                                  {'apps': expected_response})
+

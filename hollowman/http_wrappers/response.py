@@ -22,7 +22,7 @@ class Response(HTTPWrapper):
             if self.is_list_apps_request():
                 for app in response_content['apps']:
                     response_app = SieveMarathonApp.from_json(app)
-                    app = self.marathon_client.get_app(self.app_id)
+                    app = self.marathon_client.get_app(self.app_id or response_app.id)
                     yield response_app, app
                 return
             else:
