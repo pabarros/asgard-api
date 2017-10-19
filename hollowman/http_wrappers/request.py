@@ -1,15 +1,14 @@
 import json
-from typing import Iterable, Tuple, Dict
+from typing import Iterable, Dict
 
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
 
-from hollowman import conf
-from hollowman.hollowman_flask import HollowmanRequest, OperationType
+from hollowman.hollowman_flask import HollowmanRequest
+from hollowman.http_wrappers.base import Apps, HTTPWrapper
 
 
-class Request:
-    Apps = Iterable[Tuple[MarathonApp, MarathonApp]]
+class Request(HTTPWrapper):
     json_encoder = MarathonMinimalJsonEncoder
 
     app_path_prefix = '/v2/apps'
@@ -17,56 +16,6 @@ class Request:
 
     def __init__(self, request: HollowmanRequest):
         self.request = request
-        self.marathon_client = conf.marathon_client
-
-    def is_read_request(self) -> bool:
-        return OperationType.READ in self.request.operations
-
-    def is_app_request(self):
-        """
-        It's a request at /v2/apps/* ?
-        """
-        return self.request.path.startswith(self.app_path_prefix)
-
-    def is_list_apps_request(self):
-        """
-        It's a request at /v2/apps/$ ?
-        """
-        return self.is_app_request() and self.app_id is None
-
-    def is_group_request(self):
-        """
-        It's a request at /v2/groups/* ?
-        """
-        return self.request.path.startswith(self.group_path_prefix)
-
-    @property
-    def app_id(self) -> str:
-        """
-        self.request.path = '/v2/apps//marathon/app/id' -> '//marathon/app/id'
-        self.request.path = '/v2/apps/marathon/app/id' -> '/marathon/app/id'
-
-
-        Marathon's api accept both double or single slashes at the beginning
-
-        """
-        if not self.is_app_request():
-            raise ValueError("Not a valid /v2/apps path")
-
-        split_ = self.request.path.split('/')
-        api_paths = [
-            'restart',
-            'tasks',
-            'versions',
-        ]
-        locations = [split_.index(path) for path in api_paths if path in split_]
-        cut_limit = min(locations or [len(split_)])
-        # Removes every path after the app name
-        split_ = split_[:cut_limit]
-
-        # Removes evey empty path
-        split_ = [part for part in split_ if part]
-        return '/'.join(split_).replace('v2/apps', '') or None
 
     def get_request_data(self) -> Iterable[Dict]:
         if not self.request.data:
