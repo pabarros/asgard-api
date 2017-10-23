@@ -117,6 +117,7 @@ class SplitTests(unittest.TestCase):
                     (SieveMarathonApp(), SieveMarathonApp.from_json(fixture))
                 ])
 
+    @unittest.skip("Pode ser que esse teste nao faça sentido, já que PUT em /v2/apps/ retorna um Deployment")
     @with_json_fixture('single_full_app.json')
     def test_a_response_for_write_operation_on_multiple_apps_on_root_path_returns_tuples_of_marathonapp(self, fixture):
         request_data = [
@@ -209,4 +210,38 @@ class JoinTests(unittest.TestCase):
             self.assertIsInstance(joined_response, FlaskResponse)
             self.assertDictEqual(json.loads(joined_response.data),
                                  {'apps': expected_response})
+
+    @with_json_fixture("single_full_app.json")
+    def test_should_join_an_empty_list_into_an_empty_response_single_app(self, single_full_app_fixture):
+        with application.test_request_context('/v2/apps//foo',
+                                              method='GET', data=b'') as ctx:
+            response = FlaskResponse(response=json.dumps({"app": single_full_app_fixture}),
+                                     status=HTTPStatus.OK,
+                                     headers={})
+            response = Response(ctx.request, response)
+
+            joined_response = response.join([])
+
+            self.assertIsInstance(joined_response, FlaskResponse)
+            self.assertDictEqual(json.loads(joined_response.data), {'app': {}})
+
+    @with_json_fixture("single_full_app.json")
+    def test_should_join_an_empty_list_into_an_empty_response_multi_app(self, single_full_app_fixture):
+        modified_app = deepcopy(single_full_app_fixture)
+        modified_app['id'] = '/other-app'
+
+        fixtures = [single_full_app_fixture, modified_app]
+        expected_response = deepcopy(fixtures)
+        with application.test_request_context('/v2/apps/',
+                                              method='GET', data=b'') as ctx:
+            response = FlaskResponse(response=json.dumps({"apps": fixtures}),
+                                     status=HTTPStatus.OK,
+                                     headers={})
+            response = Response(ctx.request, response)
+
+            joined_response = response.join([])
+
+            self.assertIsInstance(joined_response, FlaskResponse)
+            self.assertDictEqual(json.loads(joined_response.data),
+                                 {'apps': []})
 
