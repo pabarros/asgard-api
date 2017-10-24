@@ -1,4 +1,6 @@
 from typing import Iterable
+from flask import Response as FlaskResponse
+import json
 
 from hollowman.marathonapp import SieveMarathonApp
 
@@ -7,6 +9,7 @@ from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
 from hollowman.hollowman_flask import OperationType, FilterType
 from hollowman.filters.owner import AddOwnerConstraintFilter
+from hollowman.http_wrappers.response import Response
 
 
 FILTERS_PIPELINE = {
@@ -45,24 +48,14 @@ def dispatch(operations, user, request_app, app,
     return request_app
 
 
-def dispatch_response_pipeline(user, response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]):
-#    filtered_response_apps = []
-#    if request.is_app_request or request.is_list_apps_request():
-#        for response_app, app in response_wrapper.split():
-#            filtered_response_app = dispatch_response(user=_get_user_from_request(request.request),
-#                              response_app=response_app,
-#                              app=app)
-#            filtered_response_apps.append((filtered_response_app, app))
-#        import ipdb
-#        ipdb.set_trace()
-#        filtered_response_apps_ = [app for app in filtered_response_apps if app[0].id.startswith("/sieve")]
-#        return response_wrapper.join(filtered_response_apps_)
-    #for filter in filters_pipeline:
-    #    response_app = filter.response(user, response_app, app)
+def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
+    filtered_response_apps = []
+    for response_app, original_app in response.split():
+        for filter_ in filters_pipeline:
+            filtered_app = filter_.response(user, response_app, original_app)
+            filtered_response_apps.append((filtered_app, original_app))
 
-    #return response_app
-    return response.response
-
+    return response.join(filtered_response_apps)
 
 def merge_marathon_apps(base_app, modified_app):
     merged = base_app.json_repr(minimal=False)
