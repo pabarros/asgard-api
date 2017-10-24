@@ -5,6 +5,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.41
+  - Implementado lógica de troca de conta
+  - Atualização do plugin session-checker-plugin, com a Dialog de troca de conta
+
 * 0.0.40
   - Refactoring no SieveMarathonApp
 
