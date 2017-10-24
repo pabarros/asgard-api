@@ -55,7 +55,8 @@ class RequestHandlersTests(TestCase):
 
     def test_it_dispatches_apps_from_request(self):
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
-            with patch('hollowman.request_handlers.upstream_request'):
+            with patch('hollowman.request_handlers.upstream_request'), \
+                 patch('hollowman.request_handlers.dispatch_response_pipeline'):
                 request_parser = Request(ctx.request)
                 request_parser.split = MagicMock(return_value=self.request_apps)
                 request_parser.join = MagicMock()
@@ -69,7 +70,8 @@ class RequestHandlersTests(TestCase):
         Certificamos que o user preenchido no request é repassado para o dispatch
         """
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
-            with patch('hollowman.request_handlers.upstream_request'):
+            with patch('hollowman.request_handlers.upstream_request'), \
+                 patch('hollowman.request_handlers.dispatch_response_pipeline'):
                 user = MagicMock()
                 ctx.request.user = user
                 request_parser = Request(ctx.request)
@@ -83,7 +85,8 @@ class RequestHandlersTests(TestCase):
 
     def test_it_calls_dispatch_with_user_none_if_not_authenticated(self):
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
-            with patch('hollowman.request_handlers.upstream_request'):
+            with patch('hollowman.request_handlers.upstream_request'), \
+                 patch('hollowman.request_handlers.dispatch_response_pipeline'):
                 request_parser = Request(ctx.request)
                 request_parser.split = MagicMock(return_value=[self.request_apps[0]])
                 request_parser.join = MagicMock()
