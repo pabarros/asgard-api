@@ -57,21 +57,13 @@ class TestAuthentication(TestCase):
         quebra a implementação do flask e faz com que seja necessário o typecast
         para `dict`.
         """
-        with patch('hollowman.request_handlers.upstream.replay_request') as replay_request:
-            response = NonCallableMock(
-                content=b"Foo",
-                status_code=200,
-                headers=CaseInsensitiveDict({'dog': 'Xablau'})
-            )
-            replay_request.return_value = response
-            test_client = application.test_client()
-            with application.app_context():
-                auth_header = self.make_auth_header(self.normal_user, self.account)
-                with RequestsMock() as rsps:
-                    rsps.add(method='GET',
-                             url=conf.MARATHON_ENDPOINT + '/v2/apps',
-                             body=json.dumps({'apps': [fixture]}),
-                             status=200)
-                    r = test_client.get("/v2/apps", headers=auth_header)
-
-                    self.assertEqual(200, r.status_code)
+        test_client = application.test_client()
+        with application.app_context():
+            auth_header = self.make_auth_header(self.normal_user.tx_email)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                         body=json.dumps({'apps': [fixture]}), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                         body=json.dumps({'app': fixture}), status=200)
+                r = test_client.get("/v2/apps", headers=auth_header)
+                self.assertEqual(200, r.status_code)
