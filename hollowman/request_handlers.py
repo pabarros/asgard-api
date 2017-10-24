@@ -1,8 +1,9 @@
 from flask import Response
 
-from hollowman.dispatcher import dispatch
+from hollowman.dispatcher import dispatch, dispatch_response_pipeline
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman import upstream, conf, http_wrappers
+from hollowman.hollowman_flask import OperationType
 
 
 def upstream_request(request: HollowmanRequest, run_filters=True) -> Response:
@@ -24,7 +25,12 @@ def new(request: http_wrappers.Request) -> Response:
 
     joined_request = request.join(filtered_apps)
     response = upstream_request(joined_request, run_filters=False)
-    response_wrapper = http_wrappers.Response(request.request, response)
+
+    if OperationType.WRITE not in request.request.operations:
+        response_wrapper = http_wrappers.Response(request.request, response)
+        final_response = dispatch_response_pipeline(user=_get_user_from_request(request.request),
+                                                   response=response_wrapper)
+        return final_response
 
     return response
 
