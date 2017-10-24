@@ -9,6 +9,7 @@ from hollowman.app import application
 from hollowman import conf
 from hollowman import decorators
 import hollowman.upstream
+from hollowman.upstream import replay_request
 from hollowman.models import HollowmanSession, User
 
 from tests import rebuild_schema
@@ -33,7 +34,8 @@ class TestApp(TestCase):
         responses.add(method='GET',
                          url=conf.MARATHON_ENDPOINT + '/v2/apps',
                          body=json.dumps({'apps': [fixture]}),
-                         status=200)
+                         status=200,
+                         headers={"Content-Encoding": "chunked"})
         responses.start()
 
     def tearDown(self):
@@ -41,13 +43,10 @@ class TestApp(TestCase):
         responses.stop()
 
     def test_remove_transfer_encoding_header(self):
-        mock_response = DummyResponse(headers={"Transfer-Encoding": "chunked"})
-        with patch.object(hollowman.upstream, 'replay_request', return_value=mock_response) as replay_mock, \
-             application.test_client() as client, \
-             patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False):
-                response = client.get("/v2/apps")
-                self.assertTrue("Content-Encoding" not in response.headers)
-                self.assertEqual(200, response.status_code)
+        with application.test_request_context("/v2/apps", method="GET") as ctx:
+            response = replay_request(ctx.request, conf.MARATHON_ENDPOINT)
+            self.assertTrue("Content-Encoding" not in response.headers)
+            self.assertEqual(200, response.status_code)
 
     def test_index_path(self):
         response = application.test_client().get('/')
