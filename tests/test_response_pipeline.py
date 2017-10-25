@@ -82,7 +82,72 @@ class ResponsePipelineTest(unittest.TestCase):
             final_response = dispatch_response_pipeline(user=self.user,
                                                         response=response_wrapper,
                                                        filters_pipeline=(RemoveNSFilter(),))
+            response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
-            self.assertEqual("/foo", json.loads(final_response.data)['apps'][0]['id'])
-            self.assertEqual("/other-app", json.loads(final_response.data)['apps'][1]['id'])
+            self.assertEqual(2, len(response_data['apps']))
+            self.assertEqual("/foo", response_data['apps'][0]['id'])
+            self.assertEqual("/other-app", response_data['apps'][1]['id'])
+
+    def test_remove_from_response_apps_outside_current_namespace(self):
+        with application.test_request_context("/v2/apps/", method="GET") as ctx:
+            single_full_app_one = deepcopy(self.single_full_app_fixture)
+            single_full_app_one['id'] = '/dev/foo'
+
+            single_full_app_two = deepcopy(self.single_full_app_fixture)
+            single_full_app_two['id'] = '/dev/other-app'
+
+            single_full_app_three = deepcopy(self.single_full_app_fixture)
+            single_full_app_three['id'] = '/othernamespace/other-app'
+
+            responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                     body=json.dumps({'app': single_full_app_one}), status=200)
+            responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/other-app',
+                     body=json.dumps({'app': single_full_app_two}), status=200)
+            responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//othernamespace/other-app',
+                     body=json.dumps({'app': single_full_app_three}), status=200)
+
+            original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two, single_full_app_three]}),
+                                              status=200, headers={})
+
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch_response_pipeline(user=self.user,
+                                                        response=response_wrapper,
+                                                       filters_pipeline=(RemoveNSFilter(),))
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(2, len(response_data['apps']))
+            self.assertEqual("/foo", response_data['apps'][0]['id'])
+            self.assertEqual("/other-app", response_data['apps'][1]['id'])
+
+    def test_do_not_remove_from_response_apps_outside_current_namespace_if_unauthenticated(self):
+        with application.test_request_context("/v2/apps/", method="GET") as ctx:
+            single_full_app_one = deepcopy(self.single_full_app_fixture)
+            single_full_app_one['id'] = '/dev/foo'
+
+            single_full_app_two = deepcopy(self.single_full_app_fixture)
+            single_full_app_two['id'] = '/dev/other-app'
+
+            single_full_app_three = deepcopy(self.single_full_app_fixture)
+            single_full_app_three['id'] = '/othernamespace/other-app'
+
+            responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                     body=json.dumps({'app': single_full_app_one}), status=200)
+            responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/other-app',
+                     body=json.dumps({'app': single_full_app_two}), status=200)
+            responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//othernamespace/other-app',
+                     body=json.dumps({'app': single_full_app_three}), status=200)
+
+            original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two, single_full_app_three]}),
+                                              status=200, headers={})
+
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch_response_pipeline(user=None,
+                                                        response=response_wrapper,
+                                                       filters_pipeline=(RemoveNSFilter(),))
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(3, len(response_data['apps']))
+            self.assertEqual("/foo", response_data['apps'][0]['id'])
+            self.assertEqual("/other-app", response_data['apps'][1]['id'])
+            self.assertEqual("/othernamespace/other-app", response_data['apps'][2]['id'])
 
