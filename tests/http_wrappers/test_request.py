@@ -255,6 +255,10 @@ class SplitTests(TestCase):
 
 class JoinTests(TestCase):
 
+    def setUp(self):
+        self.user = User(tx_name="User One", tx_email="user@host.com")
+        self.user.current_account = Account(name="Dev", namespace="dev", owner="company")
+
     @with_json_fixture('single_full_app.json')
     def test_it_recreates_a_get_request_for_a_single_app(self, fixture):
         with application.test_request_context('/v2/apps//foo',
@@ -324,6 +328,19 @@ class JoinTests(TestCase):
             request_parser = Request(ctx.request)
             with self.assertRaises(NotImplementedError):
                 request_parser.join([])
+
+    @with_json_fixture("single_full_app.json")
+    def test_change_request_path_if_is_read_single_app(self, single_full_app_fixture):
+        with application.test_request_context('/v2/apps/foo',
+                                              method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            single_full_app_fixture['id'] = "/dev/foo"
+            apps = [(MarathonApp.from_json(single_full_app_fixture), MarathonApp.from_json(single_full_app_fixture))]
+
+            request = request_parser.join(apps)
+            self.assertIsInstance(request, HollowmanRequest)
+            self.assertEqual("/v2/apps/dev/foo", request.path)
 
     @with_json_fixture("single_full_app.json")
     def test_change_request_path_if_is_write_on_one_app(self, fixture):
