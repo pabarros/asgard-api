@@ -59,7 +59,7 @@ class TestAuthentication(TestCase):
         """
         test_client = application.test_client()
         with application.app_context():
-            auth_header = self.make_auth_header(self.normal_user.tx_email)
+            auth_header = self.make_auth_header(self.normal_user, self.normal_user.accounts[0])
             with RequestsMock() as rsps:
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps',
                          body=json.dumps({'apps': [fixture]}), status=200)
