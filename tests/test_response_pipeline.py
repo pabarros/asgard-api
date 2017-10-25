@@ -88,6 +88,7 @@ class ResponsePipelineTest(unittest.TestCase):
             self.assertEqual("/foo", response_data['apps'][0]['id'])
             self.assertEqual("/other-app", response_data['apps'][1]['id'])
 
+    @unittest.skip("Só podemos ter esse código rodando quando todas as apps estiverem migradas")
     def test_remove_from_response_apps_outside_current_namespace(self):
         with application.test_request_context("/v2/apps/", method="GET") as ctx:
             single_full_app_one = deepcopy(self.single_full_app_fixture)
