@@ -26,4 +26,11 @@ class NameSpaceFilter():
         request_app.id = "/".join([namespace_part, appname_part])
 
     def response(self, user, response_app, original_app) -> SieveMarathonApp:
+        if not user:
+            return response_app
+
+        original_app_current_namespace = original_app.id.strip("/").split("/")[0]
+        if (user.current_account.namespace == original_app_current_namespace):
+            response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
+
         return response_app

@@ -55,3 +55,13 @@ class TestNamespaceFilter(unittest.TestCase):
         modified_app = self.filter.write(None, self.request_app, SieveMarathonApp())
         self.assertEqual("/foo", modified_app.id)
 
+    def test_response_remove_namespace_if_original_app_already_have_namespace(self):
+        self.original_app.id = "/dev/foo"
+        modified_app = self.filter.response(self.user, self.request_app, self.original_app)
+        self.assertEqual("/foo", modified_app.id)
+
+    def test_response_does_nothing_if_user_is_none(self):
+        self.request_app.id = "/dev/foo"
+        modified_app = self.filter.response(None, self.request_app, SieveMarathonApp())
+        self.assertEqual("/dev/foo", modified_app.id)
+
