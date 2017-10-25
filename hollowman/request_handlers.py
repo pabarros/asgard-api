@@ -1,4 +1,5 @@
 from flask import Response
+from http import HTTPStatus
 
 from hollowman.dispatcher import dispatch, dispatch_response_pipeline
 from hollowman.hollowman_flask import HollowmanRequest
@@ -26,7 +27,7 @@ def new(request: http_wrappers.Request) -> Response:
     joined_request = request.join(filtered_apps)
     response = upstream_request(joined_request, run_filters=False)
 
-    if OperationType.WRITE not in request.request.operations:
+    if OperationType.WRITE not in request.request.operations and response.status_code != HTTPStatus.NOT_FOUND:
         response_wrapper = http_wrappers.Response(request.request, response)
         final_response = dispatch_response_pipeline(user=_get_user_from_request(request.request),
                                                    response=response_wrapper)

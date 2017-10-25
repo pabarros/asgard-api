@@ -1,6 +1,8 @@
 import json
 from unittest import TestCase
 from unittest.mock import patch, Mock
+import responses
+from copy import deepcopy
 
 from marathon import NotFoundError, MarathonApp
 from responses import RequestsMock
@@ -9,6 +11,7 @@ from hollowman import conf
 from hollowman.app import application
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.request import Request
+from hollowman.models import User, Account
 from tests.utils import with_json_fixture, get_fixture
 
 
@@ -79,11 +82,21 @@ class RequestParserTests(TestCase):
 
 
 class SplitTests(TestCase):
+
+    def setUp(self):
+        self.user = User(tx_name="User One", tx_email="user@host.com")
+        self.user.current_account = Account(name="Dev", namespace="dev", owner="company")
+        responses.start()
+
+    def tearDown(self):
+        responses.stop()
+
     # todo: debater nome request_app e app <- app fica ambíguo
     @with_json_fixture('single_full_app.json')
     def test_a_read_single_app_request_returns_a_single_marathonapp_if_app_exists(self, fixture):
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
 
             with patch.object(request_parser, 'marathon_client') as client:
@@ -96,20 +109,10 @@ class SplitTests(TestCase):
                     (MarathonApp(), client.get_app.return_value)
                 ])
 
-    def test_a_read_single_app_request_returns_an_errorif_app_doesnt_exists(self):
-        with application.test_request_context('/v2/apps//foo', method='GET') as ctx:
-            request_parser = Request(ctx.request)
-
-            with patch.object(request_parser, 'marathon_client') as client:
-                response_mock = Mock()
-                response_mock.headers.get.return_value = 'application/json'
-                client.get_app.side_effect = NotFoundError(response=response_mock)
-                with self.assertRaises(NotFoundError):
-                    list(request_parser.split())
-
     @with_json_fixture('requests/get-v2apps-all-apps.json')
     def test_a_request_with_n_apps_returns_n_marathonapps(self, fixture):
         with application.test_request_context('/v2/apps/', method='GET') as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
@@ -129,6 +132,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 response_mock = Mock()
@@ -149,6 +153,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/foo',
                                               method='PUT',
                                               data=json.dumps(scale_up)) as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
@@ -164,6 +169,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/xablau/restart',
                                               method='PUT',
                                               data=b'{"force": true}') as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
@@ -181,6 +187,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/',
                                               method='PUT',
                                               data=json.dumps(request_data)) as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
@@ -195,16 +202,64 @@ class SplitTests(TestCase):
     def test_it_raises_an_error_if_group_request(self):
         with application.test_request_context('/v2/groups/',
                                               method='PUT', data=b'') as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with self.assertRaises(NotImplementedError):
                 list(request_parser.split())
 
+    @with_json_fixture("single_full_app.json")
+    def test_can_read_app_if_already_migrated(self, single_full_app_fixture):
+        """
+        Conferimos que é possível fazer um GET em
+        /v2/apps/<app-id> para uma app que já está migrada.
+        O <app-id> usado é sempre *sem* namespace
+        """
+        request_data = deepcopy(single_full_app_fixture)
+        single_full_app_fixture['id'] = '/dev/foo'
+        with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            with RequestsMock() as rsps:
+                #rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                #         body=json.dumps({'message': "App /foo not found"}), status=404)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                         body=json.dumps({'app': single_full_app_fixture}), status=200)
+
+                apps = list(request_parser.split())
+
+                expected_app = (MarathonApp(), MarathonApp.from_json(single_full_app_fixture))
+                self.assertEqual(apps, [expected_app])
+
+    @with_json_fixture("single_full_app.json")
+    def test_can_read_app_still_not_migradted(self, single_full_app_fixture):
+        """
+        Conferimos que é possível fazer um GET em
+        /v2/apps/<app-id> para uma app que já *não* está migrada.
+        O <app-id> usado é sempre *sem* namespace
+        """
+        request_data = deepcopy(single_full_app_fixture)
+        with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                         body=json.dumps({'message': "App /foo not found"}), status=404)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                         body=json.dumps({'app': single_full_app_fixture}), status=200)
+
+                apps = list(request_parser.split())
+
+                expected_app = (MarathonApp(), MarathonApp.from_json(single_full_app_fixture))
+                self.assertEqual(apps, [expected_app])
+
 
 class JoinTests(TestCase):
+
     @with_json_fixture('single_full_app.json')
     def test_it_recreates_a_get_request_for_a_single_app(self, fixture):
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
@@ -220,6 +275,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
@@ -234,6 +290,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='POST',
                                               data=json.dumps(fixture)) as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
@@ -248,6 +305,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps/',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             mock_app = get_fixture('single_full_app.json')
             mock_apps = [(MarathonApp.from_json(mock_app), Mock()) for _ in range(2)]
@@ -262,6 +320,34 @@ class JoinTests(TestCase):
     def test_it_raises_an_error_if_group_request(self):
         with application.test_request_context('/v2/groups/',
                                               method='PUT', data=b'') as ctx:
+            ctx.request.user = None
             request_parser = Request(ctx.request)
             with self.assertRaises(NotImplementedError):
                 request_parser.join([])
+
+    @with_json_fixture("single_full_app.json")
+    def test_change_request_path_if_is_write_on_one_app(self, fixture):
+        """
+        Quando fazemos WRITE em cima de uma app específica, devemos
+        ajustar o request.path para que o `upstream_request` seja feito
+        no endpoint correto.
+        """
+        user = User(tx_name="User One", tx_email="user@host.com")
+        user.current_account = Account(name="Dev", namespace="dev", owner="company")
+
+        full_app_with_name_space = deepcopy(fixture)
+        full_app_with_name_space['id'] = "/dev/foo"
+        with application.test_request_context('/v2/apps//foo', method='PUT',
+                                              data=json.dumps(fixture)) as ctx:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                              body=json.dumps({'app': full_app_with_name_space}), status=200)
+                ctx.request.user = user
+                request_parser = Request(ctx.request)
+
+                apps = list(request_parser.split())
+
+                request = request_parser.join(apps)
+                self.assertIsInstance(request, HollowmanRequest)
+                self.assertEqual("/v2/apps/dev/foo", request.path)
+
