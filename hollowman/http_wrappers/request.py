@@ -34,13 +34,15 @@ class Request(HTTPWrapper):
 
     def _get_original_app(self, user, app_id):
         try:
-            if user:
-                app_id_with_namespace = "/{}/{}".format(user.current_account.namespace, app_id.strip("/"))
-                try:
-                    return self.marathon_client.get_app(app_id_with_namespace)
-                except NotFoundError as e:
-                    return self.marathon_client.get_app(app_id)
-            return self.marathon_client.get_app(app_id)
+            if not user:
+                return self.marathon_client.get_app(app_id)
+
+            app_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
+                                                    app_id.strip("/"))
+            try:
+                return self.marathon_client.get_app(app_id_with_namespace)
+            except NotFoundError as e:
+                return self.marathon_client.get_app(app_id)
         except NotFoundError:
             return MarathonApp()
 
