@@ -40,6 +40,25 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         """
         return self.request.path.startswith(self.group_path_prefix)
 
+    def _get_object_id(self, reserved_paths, endpoint_prefix):
+        split_ = self.request.path.split('/')
+        api_paths = reserved_paths
+        locations = [split_.index(path) for path in api_paths if path in split_]
+        cut_limit = min(locations or [len(split_)])
+        # Removes every path after the app name
+        split_ = split_[:cut_limit]
+
+        # Removes evey empty path
+        split_ = [part for part in split_ if part]
+        return '/'.join(split_).replace(endpoint_prefix, '') or None
+
+    @property
+    def group_id(self) -> str:
+        reserved_paths = [
+            "versions",
+        ]
+        return self._get_object_id(reserved_paths, "v2/groups")
+
     @property
     def app_id(self) -> str:
         """
@@ -50,20 +69,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         Marathon's api accept both double or single slashes at the beginning
 
         """
-        if not self.is_app_request():
-            raise ValueError("Not a valid /v2/apps path")
-
-        split_ = self.request.path.split('/')
-        api_paths = [
+        reserved_paths = [
             'restart',
             'tasks',
             'versions',
         ]
-        locations = [split_.index(path) for path in api_paths if path in split_]
-        cut_limit = min(locations or [len(split_)])
-        # Removes every path after the app name
-        split_ = split_[:cut_limit]
-
-        # Removes evey empty path
-        split_ = [part for part in split_ if part]
-        return '/'.join(split_).replace('v2/apps', '') or None
+        return self._get_object_id(reserved_paths, "v2/apps")

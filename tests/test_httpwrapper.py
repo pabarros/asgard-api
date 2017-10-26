@@ -66,6 +66,25 @@ class HTTPWrapperTest(TestCase):
             parser = Request(Mock(path=request_path))
             self.assertEqual(parser.app_id, expected_marathon_path)
 
-    def test_it_raises_an_error_if_get_app_id_is_called_for_v2groups_path(self):
-        with self.assertRaises(ValueError):
-            Request(Mock(path='/v2/groups/xablau')).app_id
+    def test_it_parses_marathon_group_id(self):
+        expected_paths = {
+            '/v2/groups/xablau': '/xablau',
+            '/v2/groups//xablau': '/xablau',
+            '/v2/groups/xablau/xena': '/xablau/xena',
+            '/v2/groups////': None,
+            '/v2/groups': None,
+            '/v2/groups/': None,
+            '/v2/groups/versions': None,
+            '/v2/groups/xablau/restart': '/xablau/restart',
+            '/v2/groups//xablau/restart': '/xablau/restart',
+            '/v2/groups/xablau/tasks': '/xablau/tasks',
+            '/v2/groups//xablau/tasks': '/xablau/tasks',
+            '/v2/groups/xablau/versions': '/xablau',
+            '/v2/groups//xablau/versions': '/xablau'
+        }
+
+        for request_path, expected_marathon_path in expected_paths.items():
+            # noinspection PyTypeChecker
+            parser = Request(Mock(path=request_path))
+            self.assertEqual(parser.group_id, expected_marathon_path)
+
