@@ -8,6 +8,11 @@ class GroupWrapperTest(unittest.TestCase):
     def setUp(self):
         pass
 
+    def test_iterate_empty_group(self):
+        group = SieveAppGroup()
+        apps = list(group.iterate_apps())
+        self.assertEqual(0, len(apps))
+
     def test_iterate_sub_groups_one_level(self):
         data = {
             "id": "/",
