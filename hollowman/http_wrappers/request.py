@@ -6,6 +6,7 @@ from marathon.util import MarathonMinimalJsonEncoder
 
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
+from hollowman.marathon.group import SieveAppGroup
 
 
 class Request(HTTPWrapper):
@@ -46,14 +47,29 @@ class Request(HTTPWrapper):
         except NotFoundError:
             return MarathonApp()
 
+    def _get_original_group(self, user, group_id):
+        try:
+
+            group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
+                                                    (group_id or "/").strip("/"))
+            try:
+                return SieveAppGroup(self.marathon_client.get_group(group_id_with_namespace))
+            except NotFoundError as e:
+                return SieveAppGroup(self.marathon_client.get_group(group_id))
+        except NotFoundError:
+            return SieveAppGroup()
+
     def split(self) -> Apps:
-        if self.is_group_request():
-            raise NotImplementedError()
 
         if self.is_read_request():
             if self.is_list_apps_request():
                 apps = self.marathon_client.list_apps()
                 for app in apps:
+                    yield MarathonApp(), app
+                return
+            elif self.is_group_request():
+                group = self._get_original_group(self.request.user, self.group_id)
+                for app in group.iterate_apps():
                     yield MarathonApp(), app
                 return
             else:

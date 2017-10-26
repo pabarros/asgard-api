@@ -12,6 +12,9 @@ from hollowman.app import application
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.request import Request
 from hollowman.models import User, Account
+from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathonapp import SieveMarathonApp
+
 from tests.utils import with_json_fixture, get_fixture
 
 
@@ -133,14 +136,6 @@ class SplitTests(TestCase):
                 expected_app = (MarathonApp.from_json(request_data), MarathonApp.from_json(fixture))
                 self.assertEqual(apps, [expected_app])
 
-    def test_it_raises_an_error_if_group_request(self):
-        with application.test_request_context('/v2/groups/',
-                                              method='PUT', data=b'') as ctx:
-            ctx.request.user = None
-            request_parser = Request(ctx.request)
-            with self.assertRaises(NotImplementedError):
-                list(request_parser.split())
-
     @with_json_fixture("single_full_app.json")
     def test_can_read_app_if_already_migrated(self, single_full_app_fixture):
         """
@@ -185,6 +180,50 @@ class SplitTests(TestCase):
 
                 expected_app = (MarathonApp(), MarathonApp.from_json(single_full_app_fixture))
                 self.assertEqual(apps, [expected_app])
+
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
+    def test_split_groups_read_on_root_group(self, group_dev_namespace_fixture):
+
+        with application.test_request_context('/v2/groups', method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/',
+                         body=json.dumps(group_dev_namespace_fixture), status=200)
+
+                apps = list(request_parser.split())
+                self.assertEqual(3, len(apps))
+
+                expected_apps = [
+                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/a/app0"})),
+                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/appb0"})),
+                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})),
+                ]
+                self.assertEqual(apps, expected_apps)
+
+    @with_json_fixture("../fixtures/group-b_dev_namespace_with_apps.json")
+    def test_split_groups_read_on_specific_group(self, group_b_fixture):
+
+        with application.test_request_context('/v2/groups/group-b', method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                         body=json.dumps(group_b_fixture), status=200)
+
+                apps = list(request_parser.split())
+                self.assertEqual(2, len(apps))
+
+                expected_apps = [
+                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/appb0"})),
+                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})),
+                ]
+
+    def test_split_groups_write_PUT_on_group(self):
+        self.fail()
+
+    def test_split_group_nonroot_empty_group(self):
+        self.fail()
 
 
 class JoinTests(TestCase):
@@ -301,4 +340,68 @@ class JoinTests(TestCase):
                 request = request_parser.join(apps)
                 self.assertIsInstance(request, HollowmanRequest)
                 self.assertEqual("/v2/apps/dev/foo", request.path)
+
+
+class GetOriginalGroupTest(TestCase):
+
+    def setUp(self):
+        self.user = User(tx_name="User One", tx_email="user@host.com")
+        self.user.current_account = Account(name="Dev", namespace="dev", owner="company")
+
+    def test_get_original_group_not_yet_migrated(self):
+        found_group = {
+            "id": "/not-migrated",
+            "apps": [],
+            "groups": [],
+        }
+        with application.test_request_context('/v2/groups//not-migrated',
+                                              method='GET') as ctx:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/not-migrated',
+                         status=404)
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/groups//not-migrated',
+                         body=json.dumps(found_group),
+                         status=200)
+                ctx.request.user = self.user
+                request = Request(ctx.request)
+
+                group = request._get_original_group(self.user, "/not-migrated")
+                self.assertEqual(SieveAppGroup().from_json(found_group), group)
+
+    def test_get_original_group_migrated(self):
+        found_group = {
+            "id": "/dev/foo",
+            "apps": [],
+            "groups": [],
+        }
+        with application.test_request_context('/v2/groups//foo',
+                                              method='GET') as ctx:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/foo',
+                         body=json.dumps(found_group),
+                         status=200)
+                ctx.request.user = self.user
+                request = Request(ctx.request)
+
+                group = request._get_original_group(self.user, "/foo")
+                self.assertTrue(isinstance(group, SieveAppGroup))
+                self.assertEqual(SieveAppGroup().from_json(found_group), group)
+
+    def test_get_original_group_not_found(self):
+        """
+        Tenta buscar um grupo que não existe.
+        """
+        with application.test_request_context('/v2/groups//not-found',
+                                              method='GET') as ctx:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/not-found', status=404)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//not-found', status=404)
+                ctx.request.user = self.user
+                request = Request(ctx.request)
+
+                group = request._get_original_group(self.user, "/not-found")
+                self.assertEqual(SieveAppGroup(), group)
 
