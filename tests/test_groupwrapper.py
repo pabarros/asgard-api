@@ -1,5 +1,6 @@
 
 import unittest
+from marathon.models.group import MarathonGroup
 
 from hollowman.marathon.group import SieveAppGroup
 
@@ -7,6 +8,20 @@ class GroupWrapperTest(unittest.TestCase):
 
     def setUp(self):
         pass
+
+    def test_eq(self):
+        root_a = SieveAppGroup().from_json({"id": "/"})
+        root_b = SieveAppGroup().from_json({"id": "/"})
+        self.assertEqual(root_a, root_b)
+
+    def test_from_json(self):
+        data = {
+            "id": "/",
+            "apps": [],
+            "groups": [],
+        }
+        group = SieveAppGroup().from_json(data)
+        self.assertEqual("/", group.id)
 
     def test_iterate_empty_group(self):
         group = SieveAppGroup()
@@ -22,7 +37,7 @@ class GroupWrapperTest(unittest.TestCase):
             ],
             "apps": []
         }
-        group = SieveAppGroup().from_json(data)
+        group = SieveAppGroup(MarathonGroup().from_json(data))
         self.assertEqual(group.id, "/")
         all_group_ids = ["/", "/foo", "/bla"]
         self.assertEqual(all_group_ids, [g.id for g in group.iterate_groups()])
@@ -50,7 +65,7 @@ class GroupWrapperTest(unittest.TestCase):
             ],
             "apps": []
         }
-        group = SieveAppGroup().from_json(data)
+        group = SieveAppGroup(MarathonGroup().from_json(data))
         self.assertEqual(group.id, "/")
         expected_all_group_ids = ["/", "/foo", "/foo/bar"]
         returned_groups = list(group.iterate_groups())
@@ -81,7 +96,8 @@ class GroupWrapperTest(unittest.TestCase):
             ],
             "apps": []
         }
-        group = SieveAppGroup().from_json(data)
+
+        group = SieveAppGroup(MarathonGroup().from_json(data))
         self.assertEqual(group.id, "/")
         expected_all_group_ids = ["/", "/foo", "/foo/bar", "/foo/bar/baz"]
         returned_groups = list(group.iterate_groups())
@@ -119,7 +135,7 @@ class GroupWrapperTest(unittest.TestCase):
             ],
             "apps": []
         }
-        group = SieveAppGroup().from_json(data)
+        group = SieveAppGroup(MarathonGroup().from_json(data))
         self.assertEqual(group.id, "/")
         expected_all_group_ids = ["/", "/foo", "/foo/bar", "/foo/bar/baz", "/foo2"]
         returned_groups = list(group.iterate_groups())
@@ -157,7 +173,7 @@ class GroupWrapperTest(unittest.TestCase):
                 {"id": "/app1"}
             ]
         }
-        group = SieveAppGroup().from_json(data)
+        group = SieveAppGroup(MarathonGroup().from_json(data))
         self.assertEqual(group.id, "/")
         expected_all_apps_ids = ["/app0", "/app1", "/foo/app0", "/foo/app1", "/foo/bar/baz/app0", "/foo/bar/baz/app1"]
         returned_apps = list(group.iterate_apps())
@@ -171,7 +187,7 @@ class GroupWrapperTest(unittest.TestCase):
                 {"id": "/bla"},
             ],
         }
-        group = SieveAppGroup().from_json(data)
+        group = SieveAppGroup(MarathonGroup().from_json(data))
         apps = list(group.iterate_apps())
         apps[0].id = "/foo0"
         apps[1].id = "/bla0"
