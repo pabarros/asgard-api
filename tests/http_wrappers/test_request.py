@@ -343,14 +343,6 @@ class JoinTests(TestCase):
                 [app.id for app, _ in mock_apps]
             )
 
-    def test_it_raises_an_error_if_group_request(self):
-        with application.test_request_context('/v2/groups/',
-                                              method='PUT', data=b'') as ctx:
-            ctx.request.user = None
-            request_parser = Request(ctx.request)
-            with self.assertRaises(NotImplementedError):
-                request_parser.join([])
-
     @with_json_fixture("single_full_app.json")
     def test_change_request_path_if_is_read_single_app(self, single_full_app_fixture):
         with application.test_request_context('/v2/apps/foo',
@@ -389,6 +381,52 @@ class JoinTests(TestCase):
                 request = request_parser.join(apps)
                 self.assertIsInstance(request, HollowmanRequest)
                 self.assertEqual("/v2/apps/dev/foo", request.path)
+
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
+    def test_join_group_read_root_group(self, group_dev_namespace_fixture):
+        with application.test_request_context('/v2/groups', method='GET') as ctx:
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/',
+                         body=json.dumps(group_dev_namespace_fixture), status=200)
+
+                apps = list(request.split())
+                joined_request = request.join(apps)
+                self.assertEqual("/v2/groups/dev", joined_request.path)
+                self.assertEqual(b"", joined_request.data)
+
+    @with_json_fixture("../fixtures/group-b_dev_namespace_with_apps.json")
+    def test_join_group_read_non_root_group(self, group_b_fixture):
+        with application.test_request_context('/v2/groups/group-b', method='GET') as ctx:
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                         body=json.dumps(group_b_fixture), status=200)
+
+                apps = list(request.split())
+                joined_request = request.join(apps)
+                self.assertEqual("/v2/groups/dev/group-b", joined_request.path)
+                self.assertEqual(b"", joined_request.data)
+
+    @with_json_fixture("../fixtures/non_root_group_empty.json")
+    def test_join_group_read_non_root_empty_group(self, non_root_group_empty_fixture):
+        with application.test_request_context('/v2/groups/group-c', method='GET') as ctx:
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-c',
+                         body=json.dumps(non_root_group_empty_fixture), status=200)
+
+                apps = list(request.split())
+                joined_request = request.join(apps)
+                self.assertEqual("/v2/groups/dev/group-c", joined_request.path)
+                self.assertEqual(b"", joined_request.data)
+
+    @skip("Decidir como implementar PUT em /v2/groups")
+    def test_join_group_write_PUT_request(self):
+        self.fail()
 
 
 class GetOriginalGroupTest(TestCase):

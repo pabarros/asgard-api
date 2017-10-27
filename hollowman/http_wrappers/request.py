@@ -68,8 +68,8 @@ class Request(HTTPWrapper):
                     yield MarathonApp(), app
                 return
             elif self.is_group_request():
-                group = self._get_original_group(self.request.user, self.group_id)
-                for app in group.iterate_apps():
+                self.group = self._get_original_group(self.request.user, self.group_id)
+                for app in self.group.iterate_apps():
                     yield MarathonApp(), app
                 return
             else:
@@ -89,16 +89,15 @@ class Request(HTTPWrapper):
                 yield request_app, app
 
 
-    def _adjust_request_path_if_needed(self, request, modified_app):
+    def _adjust_request_path_if_needed(self, request, modified_app_or_group):
         original_path = request.path.rstrip("/")
         if original_path.startswith("/v2/apps") and original_path != "/v2/apps":
-            request.path = "/v2/apps{}".format(modified_app.id or self.app_id)
+            request.path = "/v2/apps{}".format(modified_app_or_group.id or self.app_id)
+        if original_path.startswith("/v2/groups"):
+            request.path = "/v2/groups{}".format(modified_app_or_group.id or (self.group_id or "/"))
 
     def join(self, apps: Apps) -> HollowmanRequest:
         request = HollowmanRequest(environ=self.request.environ, shallow=True)
-
-        if self.is_group_request():
-            raise NotImplementedError()
 
         if self.is_read_request() and self.is_app_request():
             """
@@ -108,6 +107,11 @@ class Request(HTTPWrapper):
             request_app, original_app = apps[0]
             self._adjust_request_path_if_needed(self.request, original_app)
             return self.request
+
+        if self.is_read_request() and self.is_group_request():
+            self._adjust_request_path_if_needed(self.request, self.group)
+            return self.request
+
         if self.is_list_apps_request():
             apps_json_repr = [request_app.json_repr(minimal=True)
                               for request_app, _ in apps]
