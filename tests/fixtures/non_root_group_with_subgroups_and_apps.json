@@ -1,0 +1,139 @@
+{
+   "version" : "2017-10-26T16:11:51.755Z",
+   "dependencies" : [],
+   "apps" : [
+      {
+         "ports" : [
+            10002
+         ],
+         "residency" : null,
+         "taskKillGracePeriodSeconds" : null,
+         "backoffFactor" : 1.15,
+         "version" : "2017-10-26T16:11:51.755Z",
+         "dependencies" : [],
+         "maxLaunchDelaySeconds" : 3600,
+         "container" : {
+            "type" : "DOCKER",
+            "volumes" : [],
+            "docker" : {
+               "forcePullImage" : false,
+               "network" : "BRIDGE",
+               "image" : "alpine:3.4",
+               "parameters" : [],
+               "portMappings" : null,
+               "privileged" : false
+            }
+         },
+         "labels" : {},
+         "upgradeStrategy" : {
+            "minimumHealthCapacity" : 1,
+            "maximumOverCapacity" : 1
+         },
+         "cpus" : 1,
+         "executor" : "",
+         "mem" : 128,
+         "gpus" : 0,
+         "instances" : 1,
+         "storeUrls" : [],
+         "ipAddress" : null,
+         "secrets" : {},
+         "id" : "/group-b/appb0",
+         "cmd" : "sleep 4000",
+         "acceptedResourceRoles" : null,
+         "user" : null,
+         "healthChecks" : [],
+         "portDefinitions" : [
+            {
+               "protocol" : "tcp",
+               "labels" : {},
+               "port" : 10002
+            }
+         ],
+         "fetch" : [],
+         "uris" : [],
+         "constraints" : [],
+         "disk" : 0,
+         "readinessChecks" : [],
+         "args" : null,
+         "versionInfo" : {
+            "lastConfigChangeAt" : "2017-10-26T16:11:51.755Z",
+            "lastScalingAt" : "2017-10-26T16:11:51.755Z"
+         },
+         "backoffSeconds" : 1,
+         "requirePorts" : false,
+         "env" : {}
+      }
+   ],
+   "id" : "/group-b",
+   "groups" : [
+      {
+         "id" : "/group-b/group-b0",
+         "groups" : [],
+         "apps" : [
+            {
+               "cmd" : null,
+               "id" : "/group-b/group-b0/app0",
+               "secrets" : {},
+               "ipAddress" : null,
+               "storeUrls" : [],
+               "instances" : 2,
+               "gpus" : 0,
+               "mem" : 128,
+               "executor" : "",
+               "cpus" : 0.1,
+               "labels" : {},
+               "upgradeStrategy" : {
+                  "minimumHealthCapacity" : 1,
+                  "maximumOverCapacity" : 1
+               },
+               "container" : {
+                  "type" : "DOCKER",
+                  "docker" : {
+                     "forcePullImage" : false,
+                     "network" : "BRIDGE",
+                     "image" : "alpine:3.4",
+                     "parameters" : [],
+                     "portMappings" : null,
+                     "privileged" : false
+                  },
+                  "volumes" : []
+               },
+               "maxLaunchDelaySeconds" : 3600,
+               "dependencies" : [],
+               "version" : "2017-10-26T16:11:28.204Z",
+               "backoffFactor" : 1.15,
+               "taskKillGracePeriodSeconds" : null,
+               "residency" : null,
+               "ports" : [
+                  10001
+               ],
+               "env" : {},
+               "requirePorts" : false,
+               "backoffSeconds" : 1,
+               "versionInfo" : {
+                  "lastScalingAt" : "2017-10-26T16:11:28.204Z",
+                  "lastConfigChangeAt" : "2017-10-26T16:11:28.204Z"
+               },
+               "args" : null,
+               "readinessChecks" : [],
+               "disk" : 0,
+               "constraints" : [],
+               "uris" : [],
+               "portDefinitions" : [
+                  {
+                     "protocol" : "tcp",
+                     "port" : 10001,
+                     "labels" : {}
+                  }
+               ],
+               "fetch" : [],
+               "healthChecks" : [],
+               "user" : null,
+               "acceptedResourceRoles" : null
+            }
+         ],
+         "version" : "2017-10-26T16:11:51.755Z",
+         "dependencies" : []
+      }
+   ]
+}
