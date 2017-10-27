@@ -262,6 +262,11 @@ class SplitTests(unittest.TestCase):
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
 class JoinTests(unittest.TestCase):
+
+    def setUp(self):
+        self.user = User(tx_name="User One", tx_email="user@host.com")
+        self.user.current_account = Account(name="Dev", namespace="dev", owner="company")
+
     @with_json_fixture('single_full_app.json')
     def test_it_recreates_a_get_response_for_a_single_app(self, fixture):
         with application.test_request_context('/v2/apps//foo',
@@ -338,4 +343,31 @@ class JoinTests(unittest.TestCase):
             self.assertIsInstance(joined_response, FlaskResponse)
             self.assertDictEqual(json.loads(joined_response.data),
                                  {'apps': []})
+
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
+    def test_join_groups(self, group_dev_namespace_fixture):
+        self.maxDiff = None
+        with application.test_request_context('/v2/groups/', method='GET') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(group_dev_namespace_fixture),
+                status=HTTPStatus.OK,
+                headers={}
+            )
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture)), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/a',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][0])), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-c',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][2])), status=200)
+
+                ctx.request.user = self.user
+                response = Response(ctx.request, response)
+                groups_tuple = list(response.split())
+                joined_response = response.join(groups_tuple)
+                self.assertDictEqual(group_dev_namespace_fixture, json.loads(joined_response.data))
 

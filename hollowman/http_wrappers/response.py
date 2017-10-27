@@ -47,8 +47,6 @@ class Response(HTTPWrapper):
         yield SieveMarathonApp(), self.marathon_client.get_app(self.app_id)
 
     def join(self, apps: Apps) -> FlaskResponse:
-        if self.is_group_request():
-            raise NotImplementedError()
 
         if self.is_list_apps_request():
             apps_json_repr = [response_app.json_repr(minimal=True)
@@ -61,6 +59,9 @@ class Response(HTTPWrapper):
             # do response, ou seja, quem fez o request não pode visualizar esses dados, portanto, 404.
             response_app = apps[0][0] if apps else SieveMarathonApp()
             body = {'app': response_app.json_repr(minimal=True)}
+        elif self.is_read_request() and self.is_group_request():
+            response_group = apps[0][0] if apps else SieveAppGroup()
+            body = response_group.json_repr(minimal=True)
 
         return FlaskResponse(
             response=json.dumps(body, cls=self.json_encoder),

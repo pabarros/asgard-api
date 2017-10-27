@@ -1,23 +1,19 @@
 {
    "groups" : [
       {
-         "groups" : [],
          "apps" : [
             {
                "id" : "/dev/a/app0"
             }
          ],
          "id" : "/dev/a",
-         "version" : "2017-10-26T16:11:51.755Z",
-         "dependencies" : []
+         "version" : "2017-10-26T16:11:51.755Z"
       },
       {
          "id" : "/dev/group-b",
          "groups" : [
             {
-               "dependencies" : [],
                "version" : "2017-10-26T16:11:51.755Z",
-               "groups" : [],
                "apps" : [
                   {
                      "id" : "/dev/group-b/group-b0/app0"
@@ -31,19 +27,13 @@
                "id" : "/dev/group-b/appb0"
             }
          ],
-         "version" : "2017-10-26T16:11:51.755Z",
-         "dependencies" : []
+         "version" : "2017-10-26T16:11:51.755Z"
       },
       {
-         "dependencies" : [],
          "version" : "2017-10-26T16:11:51.755Z",
-         "groups" : [],
-         "apps" : [],
          "id" : "/dev/group-c"
       }
    ],
-   "apps" : [],
    "id" : "/dev",
-   "version" : "2017-10-26T16:11:51.755Z",
-   "dependencies" : []
+   "version" : "2017-10-26T16:11:51.755Z"
 }
