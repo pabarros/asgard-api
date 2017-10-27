@@ -2,6 +2,7 @@ from typing import Iterable
 from flask import Response as FlaskResponse
 import json
 
+from hollowman.filters.basicconstraint import BasicConstraintFilter
 from hollowman.marathonapp import SieveMarathonApp
 
 from hollowman.filters.trim import TrimRequestFilter
@@ -24,6 +25,7 @@ FILTERS_PIPELINE = {
             TrimRequestFilter(),
             AddAppNameFilter(),
             AddOwnerConstraintFilter(),
+            BasicConstraintFilter(),
         )
     },
     FilterType.RESPONSE: (
