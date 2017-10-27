@@ -77,14 +77,17 @@ class Request(HTTPWrapper):
                 yield MarathonApp(), app
                 return
 
-        for app in self.get_request_data():
-            request_app = MarathonApp.from_json(app)
-            try:
-                app = self._get_original_app(self.request.user, self.app_id or request_app.id)
-            except NotFoundError:
-                app = MarathonApp()
+        # Request is a WRITE
+        if self.is_app_request():
+            for app in self.get_request_data():
+                request_app = MarathonApp.from_json(app)
+                try:
+                    app = self._get_original_app(self.request.user, self.app_id or request_app.id)
+                except NotFoundError:
+                    app = MarathonApp()
 
-            yield request_app, app
+                yield request_app, app
+
 
     def _adjust_request_path_if_needed(self, request, modified_app):
         original_path = request.path.rstrip("/")

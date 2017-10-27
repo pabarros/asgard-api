@@ -1,5 +1,5 @@
 import json
-from unittest import TestCase
+from unittest import TestCase, skip
 from unittest.mock import patch, Mock
 import responses
 from copy import deepcopy
@@ -218,12 +218,61 @@ class SplitTests(TestCase):
                     (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/appb0"})),
                     (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})),
                 ]
+                self.assertEqual(expected_apps, apps)
 
+    @skip("Temos que pensar sobre esse method no grupo")
     def test_split_groups_write_PUT_on_group(self):
-        self.fail()
+        """
+        Atualmente, o único body que chega em um PUT em /v2/groups é:
+            {"scaleBy": <N>}
+        onde `<N>` é o fator que será multiplicado pelo atual número de TASK_RUNNING de cada app.
 
-    def test_split_group_nonroot_empty_group(self):
-        self.fail()
+        O problema é que o Request.split() retorna uma lista de apps, e o Request.join() potencialmente
+        vai reconstruir um body com essa lista de apps. O problema é que isso gera um request body *diferente* do orignal,
+        já que agora temos um body contendo um APP_GROUP com todas suas apps (e sub apps).
+
+        E se fazemos apenas isso, a informação do "scaleBy" se perdeu, pois se mandamos um request com o TASK_GROUP inteiro para o
+        upstream, nada vai mudar já que as apps não foram modificadas.
+
+        Uma ideia é o Core do hollowman decobrir essa ação de scaleBy e chamar o métoro "scale_by" dos filtros, já com a request_app tendo seu
+        atributo "instances" multiplicado pelo fator. Opcionalmente o fator poderia ser passado como parametro para o filtro.
+
+        Isso nos daria a possibilidade de "corrigir" um problema atual do scaleby que é:
+            Quando damos scale_by = 2 em um app que está suspended, ela continua suspended já que 2 * 0 = 0. A ideia é que suspended apps também sejam
+            ligadas considerando esse fator. O que faríamos no filtro seria, para toda app que instances = 0, consideramos instances = 1 e multiplicamos pelo fator.
+
+        Enfim, apenas uma ideia. Temos que ver o que fazemos com esse teste aqui.
+        """
+
+        with application.test_request_context('/v2/groups/group-b', method='PUT') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                         body=json.dumps(group_b_fixture), status=200)
+
+                apps = list(request_parser.split())
+                self.assertEqual(2, len(apps))
+
+                expected_apps = [
+                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/appb0"})),
+                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})),
+                ]
+                self.assertEqual(expected_apps, apps)
+
+    @with_json_fixture("non_root_group_empty.json")
+    def test_split_group_nonroot_empty_group(self, non_root_group_empty_fixture):
+        with application.test_request_context('/v2/groups/group-c', method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-c',
+                         body=json.dumps(non_root_group_empty_fixture), status=200)
+
+                apps = list(request_parser.split())
+                self.assertEqual(0, len(apps))
+
+                self.assertEqual([], apps)
 
 
 class JoinTests(TestCase):
