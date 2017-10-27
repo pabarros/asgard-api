@@ -426,6 +426,10 @@ class JoinTests(TestCase):
 
     @skip("Decidir como implementar PUT em /v2/groups")
     def test_join_group_write_PUT_request(self):
+        """
+        O resultado o body do request deve ser a represebtação de todo o grupo,
+        com seus subgrupos e apps.
+        """
         self.fail()
 
 
