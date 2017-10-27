@@ -1,12 +1,13 @@
 import abc
 from typing import Tuple, List
 
-from marathon import MarathonApp
+from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
 
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType
 from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathon.group import SieveAppGroup
 
 
 Apps = List[Tuple[SieveMarathonApp, MarathonApp]]
@@ -75,3 +76,29 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             'versions',
         ]
         return self._get_object_id(reserved_paths, "v2/apps")
+
+    def _get_original_app(self, user, app_id):
+        try:
+            if not user:
+                return self.marathon_client.get_app(app_id)
+
+            app_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
+                                                    app_id.strip("/"))
+            try:
+                return self.marathon_client.get_app(app_id_with_namespace)
+            except NotFoundError as e:
+                return self.marathon_client.get_app(app_id)
+        except NotFoundError:
+            return MarathonApp()
+
+    def _get_original_group(self, user, group_id):
+        try:
+
+            group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
+                                                    (group_id or "/").strip("/"))
+            try:
+                return SieveAppGroup(self.marathon_client.get_group(group_id_with_namespace))
+            except NotFoundError as e:
+                return SieveAppGroup(self.marathon_client.get_group(group_id))
+        except NotFoundError:
+            return SieveAppGroup()

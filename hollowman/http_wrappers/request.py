@@ -33,32 +33,6 @@ class Request(HTTPWrapper):
             return [data]
         return data
 
-    def _get_original_app(self, user, app_id):
-        try:
-            if not user:
-                return self.marathon_client.get_app(app_id)
-
-            app_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
-                                                    app_id.strip("/"))
-            try:
-                return self.marathon_client.get_app(app_id_with_namespace)
-            except NotFoundError as e:
-                return self.marathon_client.get_app(app_id)
-        except NotFoundError:
-            return MarathonApp()
-
-    def _get_original_group(self, user, group_id):
-        try:
-
-            group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
-                                                    (group_id or "/").strip("/"))
-            try:
-                return SieveAppGroup(self.marathon_client.get_group(group_id_with_namespace))
-            except NotFoundError as e:
-                return SieveAppGroup(self.marathon_client.get_group(group_id))
-        except NotFoundError:
-            return SieveAppGroup()
-
     def split(self) -> Apps:
 
         if self.is_read_request():
