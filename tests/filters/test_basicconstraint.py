@@ -18,7 +18,7 @@ class TestBasicConstraintFilter(unittest.TestCase):
     def test_it_adds_default_constraints_if_none_present(self):
         self.request_app.constraints = []
         result_app = self.filter.write(self.user, self.request_app, self.original_app)
-        self.assertEqual(self.request_app.constraints, list(self.filter.required_constraints))
+        self.assertEqual(self.request_app.constraints, list(self.filter.constraints))
 
     def test_it_doesnt_change_current_constraints_if_constraints_isnt_empty(self):
         original_constraints = deepcopy(self.request_app.constraints)
