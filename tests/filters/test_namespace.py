@@ -1,11 +1,18 @@
 
 
 import unittest
+import json
+from flask import Response as FlaskResponse
+from marathon.models.group import MarathonGroup
+
+from http import HTTPStatus
 
 
+from hollowman.app import application
 from hollowman.models import Account, User
 from hollowman.marathonapp import SieveMarathonApp
 from hollowman.filters.namespace import NameSpaceFilter
+from hollowman.http_wrappers.response import Response
 from tests.utils import with_json_fixture
 
 class TestNamespaceFilter(unittest.TestCase):
@@ -72,12 +79,39 @@ class TestNamespaceFilter(unittest.TestCase):
         self.assertEqual("/infra/foo", self.filter._remove_namespace(self.user, "/infra/foo"))
         self.assertEqual("/", self.filter._remove_namespace(self.user, "/"))
 
-    def test_response_group_remove_namespace_from_group_name(self):
-        self.fail()
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
+    def test_response_group_remove_namespace_from_group_name(self, group_dev_namespace_fixture):
+        with application.test_request_context("/v2/groups/group-b", method="GET") as ctx:
+            ctx.request.user = self.user
+            ok_response = FlaskResponse(
+                response=json.dumps(group_dev_namespace_fixture['groups'][1]),
+                status=HTTPStatus.OK,
+                headers={}
+            )
+            response_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])
+            response_wrapper = Response(ctx.request, ok_response)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
+            self.assertEqual("/group-b", filtered_group.id)
+            self.assertEqual(1, len(filtered_group.groups))
+            # Não removemos o namespace de subgrupos.
+            self.assertEqual("/dev/group-b/group-b0", filtered_group.groups[0].id)
 
-    def test_response_group_remove_namespace_from_app_name(self):
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
+    def test_response_group_remove_namespace_from_app_name(self, group_dev_namespace_fixture):
         """
         Devemos remover o namespace de todas as apps to grupo.
         Mas não das apps dos subgrupos
         """
-        self.fail()
+        with application.test_request_context("/v2/groups/group-b", method="GET") as ctx:
+            ctx.request.user = self.user
+            ok_response = FlaskResponse(
+                response=json.dumps(group_dev_namespace_fixture['groups'][1]),
+                status=HTTPStatus.OK,
+                headers={}
+            )
+            response_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])
+            response_wrapper = Response(ctx.request, ok_response)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
+            self.assertEqual("/group-b", filtered_group.id)
+            self.assertEqual(1, len(filtered_group.apps))
+            self.assertEqual("/group-b/appb0", filtered_group.apps[0].id)
