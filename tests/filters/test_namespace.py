@@ -65,3 +65,19 @@ class TestNamespaceFilter(unittest.TestCase):
         modified_app = self.filter.response(None, self.request_app, SieveMarathonApp())
         self.assertEqual("/dev/foo", modified_app.id)
 
+    def test_remove_namspace_from_string(self):
+        self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev"))
+        self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev/"))
+        self.assertEqual("/foo/bar", self.filter._remove_namespace(self.user, "/dev/foo/bar"))
+        self.assertEqual("/infra/foo", self.filter._remove_namespace(self.user, "/infra/foo"))
+        self.assertEqual("/", self.filter._remove_namespace(self.user, "/"))
+
+    def test_response_group_remove_namespace_from_group_name(self):
+        self.fail()
+
+    def test_response_group_remove_namespace_from_app_name(self):
+        """
+        Devemos remover o namespace de todas as apps to grupo.
+        Mas não das apps dos subgrupos
+        """
+        self.fail()

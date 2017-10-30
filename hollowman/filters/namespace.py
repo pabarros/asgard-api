@@ -4,6 +4,12 @@ from hollowman.marathonapp import SieveMarathonApp
 class NameSpaceFilter():
     name = "namespace"
 
+    def _remove_namespace(self, user, id_):
+        id_without_ns = id_.replace("/{}".format(user.current_account.namespace), "")
+        if not id_without_ns:
+            id_without_ns = "/"
+        return id_without_ns
+
     def write(self, user, request_app, original_app):
 
         if not user:
@@ -34,3 +40,13 @@ class NameSpaceFilter():
             response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
 
         return response_app
+
+    def response_group(self, user, response_group, original_group):
+        original_app_current_namespace = original_group.id.strip("/").split("/")[0]
+        if (user.current_account.namespace == original_app_current_namespace):
+            response_group.id = self._remove_namespace(user, response_group.id)
+            for app in response_group.apps:
+                app.id = self._remove_namespace(user, app.id)
+
+        return response_group
+
