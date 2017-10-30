@@ -60,7 +60,7 @@ class Response(HTTPWrapper):
             response_app = apps[0][0] if apps else SieveMarathonApp()
             body = {'app': response_app.json_repr(minimal=True)}
         elif self.is_read_request() and self.is_group_request():
-            response_group = apps[0][0] if apps else SieveAppGroup()
+            response_group = apps[0][0] if apps else MarathonGroup()
             body = response_group.json_repr(minimal=True)
 
         return FlaskResponse(

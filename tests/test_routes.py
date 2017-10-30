@@ -28,26 +28,6 @@ class RoutesTest(unittest.TestCase):
 
             self.assertEqual(3, self.proxy_mock.call_count)
 
-    def test_v2_groups(self):
-        with application.test_client() as client:
-            client.get("/v2/groups") #delete/put/post/get
-            client.put("/v2/groups") #delete/put/post/get
-            client.delete("/v2/groups") #delete/put/post/get
-
-            client.get("/v2/groups/versions") #get
-
-            client.get("/v2/groups//infra") #get/post/put/delete
-            client.put("/v2/groups//infra") #get/post/put/delete
-            client.delete("/v2/groups//infra") #get/post/put/delete
-
-            client.get("/v2/groups/infra") #get/post/put/delete
-            client.put("/v2/groups/infra") #get/post/put/delete
-            client.delete("/v2/groups/infra") #get/post/put/delete
-
-            client.get("/v2/groups/infra/versions") #get
-            client.get("/v2/groups//infra/versions") #get
-        self.assertEqual(12, self.proxy_mock.call_count)
-
     def test_v2_tasks(self):
         with application.test_client() as client:
             client.get("/v2/tasks")
