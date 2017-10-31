@@ -3,6 +3,7 @@ from typing import Iterable, Dict
 
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
+from marathon.models.group import MarathonGroup
 
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
@@ -92,6 +93,17 @@ class Request(HTTPWrapper):
             if self.is_post():
                 # Post em /v2/apps nao poder ser uma lista, tem que ser apenas uma app.
                 apps_json_repr = apps_json_repr[0]
+        elif self.is_delete():
+            if self.is_group_request():
+                group_id = self.group_id
+                group_id_with_namespace = "/{}/{}".format(self.request.user.current_account.namespace, group_id.strip("/"))
+                self.request.path = "/v2/groups{}".format(group_id_with_namespace)
+            if self.is_app_request():
+                group_id = self.app_id
+                group_id_with_namespace = "/{}/{}".format(self.request.user.current_account.namespace, group_id.strip("/"))
+                self.request.path = "/v2/apps{}".format(group_id_with_namespace)
+
+            return self.request
         else:
             request_app, original_app = apps[0]
             self._adjust_request_path_if_needed(request, original_app)

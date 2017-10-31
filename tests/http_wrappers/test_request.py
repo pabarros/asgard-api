@@ -456,6 +456,38 @@ class JoinTests(TestCase):
             self.assertFalse(isinstance(joined_request_data, list), "Body não deveria ser uma lista")
             self.assertEqual("/foo", joined_request_data['id'])
 
+    def test_join_v2_groups_on_DELETE_method(self):
+        """
+        O request de DELETE tem o corpo vazio. Isso significa que o split()
+        não retornou nada, o que faz o join ser chamado assim: .join([]).
+        É isso que esse teste trata.
+        """
+        with application.test_request_context('/v2/groups/group',
+                                              method='DELETE') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+
+            joined_request = request_parser.join([])
+            self.assertIsInstance(joined_request, HollowmanRequest)
+            self.assertEqual(b'', joined_request.data, "Body deveria estar vazio")
+            self.assertEqual("/v2/groups/dev/group", joined_request.path)
+
+    def test_join_v2_apps_on_DELETE_method(self):
+        """
+        O request de DELETE tem o corpo vazio. Isso significa que o split()
+        não retornou nada, o que faz o join ser chamado assim: .join([]).
+        É isso que esse teste trata.
+        """
+        with application.test_request_context('/v2/apps/group',
+                                              method='DELETE') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+
+            joined_request = request_parser.join([])
+            self.assertIsInstance(joined_request, HollowmanRequest)
+            self.assertEqual(b'', joined_request.data, "Body deveria estar vazio")
+            self.assertEqual("/v2/apps/dev/group", joined_request.path)
+
 
 class GetOriginalGroupTest(TestCase):
 

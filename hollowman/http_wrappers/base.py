@@ -20,6 +20,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
     app_path_prefix = '/v2/apps'
     group_path_prefix = '/v2/groups'
 
+    def is_delete(self):
+        return self.request.method == "DELETE"
+
     def is_post(self):
         return self.request.method == "POST"
 
