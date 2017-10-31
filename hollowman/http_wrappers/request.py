@@ -75,7 +75,14 @@ class Request(HTTPWrapper):
             request.path = "/v2/apps{app_id}/{extra}".format(app_id=app_id.rstrip("/"), extra="/".join(extra))
             request.path = request.path.rstrip("/")
         if original_path.startswith("/v2/groups"):
-            request.path = "/v2/groups{}".format(modified_app_or_group.id or (self.group_id or "/"))
+            extra = []
+            app_id = modified_app_or_group.id or self.app_id
+            last_app_id_part = app_id.split("/")[-1]
+            if last_app_id_part in original_path_parts:
+                last_part_position = original_path_parts.index(last_app_id_part)
+                extra = original_path_parts[last_part_position+1:]
+            request.path = "/v2/groups{app_id}/{extra}".format(app_id=app_id.rstrip("/"), extra="/".join(extra))
+            request.path = request.path.rstrip("/")
 
     def join(self, apps: Apps) -> HollowmanRequest:
         request = HollowmanRequest(environ=self.request.environ, shallow=True)

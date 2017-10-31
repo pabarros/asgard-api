@@ -5,6 +5,7 @@ import responses
 from copy import deepcopy
 
 from marathon import NotFoundError, MarathonApp
+from marathon.models.group import MarathonGroup
 from responses import RequestsMock
 
 from hollowman import conf
@@ -552,3 +553,95 @@ class GetOriginalGroupTest(TestCase):
                 group = request._get_original_group(self.user, "/not-found")
                 self.assertEqual(SieveAppGroup(), group)
 
+class RequestWrapperTest(TestCase):
+
+
+    def test_adjust_groups_request_path(self):
+        with application.test_request_context('/v2/groups/my-group/',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonGroup(id="/dev/my-group")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/groups/dev/my-group", request_wrapper.request.path)
+
+    def test_adjust_groups_DELETE_request_path(self):
+        with application.test_request_context('/v2/groups/my-group/',
+                                              method='DELETE') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonGroup(id="/dev/my-group")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/groups/dev/my-group", request_wrapper.request.path)
+
+    def test_adjust_groups_versions_request_path(self):
+        with application.test_request_context('/v2/groups/versions',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonGroup(id="/dev")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/groups/dev/versions", request_wrapper.request.path)
+
+
+    def test_adjust_groups_versions_request_path(self):
+        with application.test_request_context('/v2/groups/my-group/versions',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonGroup(id="/dev/my-group")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/groups/dev/my-group/versions", request_wrapper.request.path)
+
+
+    def test_adjust_apps_tasks_request_path(self):
+        with application.test_request_context('/v2/apps/my-app/tasks',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/my-app")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/my-app/tasks", request_wrapper.request.path)
+
+    def test_adjust_apps_tasks_DELETE_request_path(self):
+        with application.test_request_context('/v2/apps/my-app/tasks',
+                                              method='DELETE') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/my-app")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/my-app/tasks", request_wrapper.request.path)
+
+    def test_adjust_apps_tasks_task_id_DELETE_request_path(self):
+        with application.test_request_context('/v2/apps/my-app/tasks/task_id',
+                                              method='DELETE') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/my-app")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/my-app/tasks/task_id", request_wrapper.request.path)
+
+    def test_adjust_apps_restart_request_path(self):
+        with application.test_request_context('/v2/apps/my-app/restart',
+                                              method='GEPOST') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/my-app")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/my-app/restart", request_wrapper.request.path)
+
+    def test_adjust_apps_request_path_keep_aaditional_paths_multiple_paths(self):
+        with application.test_request_context('/v2/apps/my-app/versions/2017-10-31T13:01:07.768Z',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/my-app")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/my-app/versions/2017-10-31T13:01:07.768Z", request_wrapper.request.path)
+
+    def test_adjust_apps_versions_request_path(self):
+        with application.test_request_context('/v2/apps/my-app/versions',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/my-app")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/my-app/versions", request_wrapper.request.path)
+
+    def test_adjust_apps_request_path_no_aaditional_paths(self):
+        with application.test_request_context('/v2/apps/my-app',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/my-app")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/my-app", request_wrapper.request.path)
