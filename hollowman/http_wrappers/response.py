@@ -39,7 +39,7 @@ class Response(HTTPWrapper):
                     yield current_group, original_group
                 return
             else:
-                response_app = SieveMarathonApp.from_json(response_content['app'])
+                response_app = SieveMarathonApp.from_json(response_content.get('app') or response_content)
                 app = self.marathon_client.get_app(self.app_id)
                 yield response_app, app
                 return
@@ -53,12 +53,14 @@ class Response(HTTPWrapper):
                               for response_app, _ in apps]
             body = {'apps': apps_json_repr}
         elif self.is_read_request() and self.is_app_request():
-            # TODO: Retornar 404 nesse caso. Pensar em como fazer.
-            # No caso de ser um acesso a uma app específica, e ainda sim recebermos apps = [],
-            # deveríamos retornar 404. Chegar uma lista vazia qui significa que a app foi removida
-            # do response, ou seja, quem fez o request não pode visualizar esses dados, portanto, 404.
-            response_app = apps[0][0] if apps else SieveMarathonApp()
-            body = {'app': response_app.json_repr(minimal=True)}
+                # TODO: Retornar 404 nesse caso. Pensar em como fazer.
+                # No caso de ser um acesso a uma app específica, e ainda sim recebermos apps = [],
+                # deveríamos retornar 404. Chegar uma lista vazia qui significa que a app foi removida
+                # do response, ou seja, quem fez o request não pode visualizar esses dados, portanto, 404.
+                response_app = apps[0][0] if apps else SieveMarathonApp()
+                body = {'app': response_app.json_repr(minimal=True)}
+                if 'versions/' in self.request.path:
+                    body = body['app']
         elif self.is_read_request() and self.is_group_request():
             response_group = apps[0][0] if apps else MarathonGroup()
             body = response_group.json_repr(minimal=True)

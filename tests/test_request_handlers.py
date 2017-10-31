@@ -124,6 +124,29 @@ class RequestHandlersTests(TestCase):
                 self.assertEqual(200, response.status_code)
                 self.assertEqual(0, resp_pipeline_mock.call_count)
 
+    @with_json_fixture("../fixtures/single_full_app.json")
+    def test_versions_endpoint_returns_app_on_root_json(self, single_full_app_fixture):
+        """
+        Apesar de um GET /v2/apps/<app-id> retornat a app em:
+            {"app": <app-definition}
+        um GET /v2/apps/<app-id>/versions/<version-id> retorna em:
+            {<app-definition>}
+
+        Aqui conferimos que nosso pipeline retorna um response consistente com
+        essa regra
+        """
+        auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
+        single_full_app_fixture['id'] = "/dev/foo"
+        with application.test_client() as client:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps/dev/foo/versions/2017-10-31T13:01:07.768Z',
+                         body=json.dumps(single_full_app_fixture), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                         body=json.dumps({"app": single_full_app_fixture}), status=200)
+                response = client.get("/v2/apps/foo/versions/2017-10-31T13:01:07.768Z", headers=auth_header)
+                self.assertEqual(200, response.status_code)
+                self.assertEqual("/foo", json.loads(response.data)['id'])
+
 
 class DispatchResponse404Test(TestCase):
 

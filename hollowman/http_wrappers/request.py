@@ -66,8 +66,14 @@ class Request(HTTPWrapper):
 
     def _adjust_request_path_if_needed(self, request, modified_app_or_group):
         original_path = request.path.rstrip("/")
+        original_path_parts = original_path.split("/")
         if original_path.startswith("/v2/apps") and original_path != "/v2/apps":
-            request.path = "/v2/apps{}".format(modified_app_or_group.id or self.app_id)
+            app_id = modified_app_or_group.id or self.app_id
+            last_app_id_part = app_id.split("/")[-1]
+            last_part_position = original_path_parts.index(last_app_id_part)
+            extra = original_path_parts[last_part_position+1:]
+            request.path = "/v2/apps{app_id}/{extra}".format(app_id=app_id.rstrip("/"), extra="/".join(extra))
+            request.path = request.path.rstrip("/")
         if original_path.startswith("/v2/groups"):
             request.path = "/v2/groups{}".format(modified_app_or_group.id or (self.group_id or "/"))
 
