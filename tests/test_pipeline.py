@@ -125,3 +125,11 @@ class ResponsePipelineTest(unittest.TestCase):
                 self.assertEqual("/foo/dummy/dev/group-b/appb0", returned_group.apps[0].id)
                 self.assertEqual("/foo/dummy/dev/group-b/group-b0/app0", returned_group.groups[0].apps[0].id)
 
+
+    @unittest.skip("Temos que decidir se vamos retornar o group com minimal=True ou False")
+    def test_an_empty_root_group_should_return_and_empty_group_definition(self):
+        """
+        A UI parece aceitar bem um representação de group sem alguns campos, o que é equivalente
+        ao minimal=True.
+        """
+        self.fail()
