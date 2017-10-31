@@ -32,7 +32,7 @@ def deployments(uuid):
 @application.route("/v2/groups/<path:group>", methods=["GET", "PUT", "DELETE"])
 @auth_required()
 def groups(*args, **kwargs):
-    return raw_proxy()
+    return request_handlers.new(http_wrappers.Request(request))
 
 @application.route("/v2/tasks", methods=["GET"])
 @application.route("/v2/tasks/delete", methods=["POST"])
