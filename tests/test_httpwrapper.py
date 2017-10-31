@@ -88,3 +88,8 @@ class HTTPWrapperTest(TestCase):
             parser = Request(Mock(path=request_path))
             self.assertEqual(parser.group_id, expected_marathon_path)
 
+    def test_is_post(self):
+        with application.test_request_context('/v2/apps/',
+                                              method='POST', data=b'') as ctx:
+            request_parser = Request(ctx.request)
+            self.assertTrue(request_parser.is_post())

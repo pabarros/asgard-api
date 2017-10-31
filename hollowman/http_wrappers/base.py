@@ -20,6 +20,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
     app_path_prefix = '/v2/apps'
     group_path_prefix = '/v2/groups'
 
+    def is_post(self):
+        return self.request.method == "POST"
+
     def is_read_request(self) -> bool:
         return OperationType.READ in self.request.operations
 

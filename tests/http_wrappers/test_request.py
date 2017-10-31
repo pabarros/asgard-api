@@ -432,6 +432,30 @@ class JoinTests(TestCase):
         """
         self.fail()
 
+    @with_json_fixture("../fixtures/single_full_app.json")
+    def test_join_one_app_should_produce_one_app_not_a_list(self, fixture):
+        """
+        Um POST em /v2/apps, apesar de receber no body apens uma app ({...}),
+        após o request.join(), restá produzindo um request com uma lista de apps:
+            [{...}], e a API do marathon não aceita lista no POST apenas no PUT.
+
+            O problema parece ser no request.join():89, onde fazemos if self.is_list_app_request().
+            Precisamos olhar se é PUT ou POST e gerar list() ou dict() apropriadamente.
+        """
+        with application.test_request_context('/v2/apps/',
+                                              method='POST',
+                                              data=json.dumps(fixture)) as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+            mock_app = get_fixture('single_full_app.json')
+            mock_apps = [(MarathonApp.from_json(mock_app), Mock())]
+
+            joined_request = request_parser.join(mock_apps)
+            self.assertIsInstance(joined_request, HollowmanRequest)
+            joined_request_data = json.loads(joined_request.data)
+            self.assertFalse(isinstance(joined_request_data, list), "Body não deveria ser uma lista")
+            self.assertEqual("/foo", joined_request_data['id'])
+
 
 class GetOriginalGroupTest(TestCase):
 
