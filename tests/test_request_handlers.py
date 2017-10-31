@@ -97,14 +97,6 @@ class RequestHandlersTests(TestCase):
                                                 request_app=ANY,
                                                 app=ANY)
 
-    @skip("Existe a chance de trocarmos esse teste por um ponta a ponta")
-    def test_dispatches_response_pipeline_read_multi_app(self):
-        self.fail()
-
-    @skip("Existe a chance de trocarmos esse teste por um ponta a ponta")
-    def test_dispatches_response_pipeline_read_single_app(self):
-        self.fail()
-
     @with_json_fixture("single_full_app.json")
     def test_do_not_dispatch_response_pipeline_write_single_app(self, single_full_app_fixture):
         auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
