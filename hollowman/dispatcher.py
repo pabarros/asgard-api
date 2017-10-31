@@ -19,6 +19,7 @@ FILTERS_PIPELINE = {
         ),
 
         OperationType.WRITE: (
+            NameSpaceFilter(),
             ForcePullFilter(),
             TrimRequestFilter(),
             AddAppNameFilter(),
