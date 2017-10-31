@@ -24,7 +24,7 @@ def raw_proxy():
 def deployments(uuid):
     return raw_proxy()
 
-@application.route("/v2/groups", defaults={"group_id": ""}, methods=["GET", "PUT", "DELETE"])
+@application.route("/v2/groups", defaults={"group_id": ""}, methods=["GET", "DELETE"])
 @application.route("/v2/groups//<path:group>/versions", methods=["GET"])
 @application.route("/v2/groups/<path:group>/versions", methods=["GET"])
 @application.route("/v2/groups/versions", defaults={"group": ""}, methods=["GET"])
