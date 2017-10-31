@@ -269,6 +269,7 @@ class JoinTests(unittest.TestCase):
 
     @with_json_fixture('single_full_app.json')
     def test_it_recreates_a_get_response_for_a_single_app(self, fixture):
+        self.maxDiff = None
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
             response = FlaskResponse(response=json.dumps({"app": fixture}),
@@ -344,7 +345,7 @@ class JoinTests(unittest.TestCase):
             self.assertDictEqual(json.loads(joined_response.data),
                                  {'apps': []})
 
-    @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
+    @with_json_fixture("../fixtures/group_dev_namespace_with_one_full_app.json")
     def test_join_groups(self, group_dev_namespace_fixture):
         self.maxDiff = None
         with application.test_request_context('/v2/groups/', method='GET') as ctx:
@@ -356,18 +357,19 @@ class JoinTests(unittest.TestCase):
             with RequestsMock() as rsps:
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture)), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/a',
-                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][0])), status=200)
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
-                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
-                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-c',
-                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][2])), status=200)
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][0])), status=200)
 
                 ctx.request.user = self.user
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 joined_response = response.join(groups_tuple)
-                self.assertDictEqual(group_dev_namespace_fixture, json.loads(joined_response.data))
+
+                joined_response_data = json.loads(joined_response.data)
+                self.assertEqual("/dev", joined_response_data['id'])
+                self.assertEqual("/dev/group-b", joined_response_data['groups'][0]['id'])
+                self.assertEqual([], joined_response_data['dependencies']) # Groups should be reendered in full
+                self.assertEqual(1, len(joined_response_data['groups'][0]['apps']))
+                self.assertEqual([], joined_response_data['groups'][0]['apps'][0]['constraints']) # Apps should also be renderen in full
+
 

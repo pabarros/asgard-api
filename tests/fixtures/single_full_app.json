@@ -46,7 +46,9 @@
             {
                 "containerPath": "/docker_storage",
                 "hostPath": "/hdd/tools/docker/registry",
-                "mode": "RW"
+                "mode": "RW",
+                "persistent": null,
+                "external": null
             }
         ]
     },

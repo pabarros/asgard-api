@@ -2,7 +2,7 @@ import abc
 from typing import Tuple, List
 
 from marathon import MarathonApp, NotFoundError
-from marathon.util import MarathonMinimalJsonEncoder
+from marathon.util import MarathonJsonEncoder
 
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType
@@ -14,7 +14,7 @@ Apps = List[Tuple[SieveMarathonApp, MarathonApp]]
 
 
 class HTTPWrapper(metaclass=abc.ABCMeta):
-    json_encoder = MarathonMinimalJsonEncoder
+    json_encoder = MarathonJsonEncoder
     marathon_client = conf.marathon_client
 
     app_path_prefix = '/v2/apps'

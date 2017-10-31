@@ -63,7 +63,7 @@ class Response(HTTPWrapper):
                     body = body['app']
         elif self.is_read_request() and self.is_group_request():
             response_group = apps[0][0] if apps else MarathonGroup()
-            body = response_group.json_repr(minimal=True)
+            body = response_group.json_repr(minimal=False)
 
         return FlaskResponse(
             response=json.dumps(body, cls=self.json_encoder),
