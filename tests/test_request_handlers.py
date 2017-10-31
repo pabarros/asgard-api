@@ -3,6 +3,7 @@ from unittest.mock import patch, ANY, MagicMock
 import responses
 from responses import RequestsMock
 import json
+from copy import deepcopy
 
 from marathon import MarathonApp
 
@@ -147,6 +148,20 @@ class RequestHandlersTests(TestCase):
                 self.assertEqual(200, response.status_code)
                 self.assertEqual("/foo", json.loads(response.data)['id'])
 
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
+    def test_groups_endpoint_returns_group_on_root_json(self, group_dev_namespace_fixture):
+        auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
+        with application.test_client() as client:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups/dev/group-b',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
+                         body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
+                response = client.get("/v2/groups/group-b", headers=auth_header)
+                self.assertEqual(200, response.status_code)
+                self.assertEqual("/group-b", json.loads(response.data)['id'])
 
 class DispatchResponse404Test(TestCase):
 
