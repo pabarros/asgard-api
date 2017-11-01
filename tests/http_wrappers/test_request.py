@@ -496,28 +496,6 @@ class GetOriginalGroupTest(TestCase):
         self.user = User(tx_name="User One", tx_email="user@host.com")
         self.user.current_account = Account(name="Dev", namespace="dev", owner="company")
 
-    def test_get_original_group_not_yet_migrated(self):
-        found_group = {
-            "id": "/not-migrated",
-            "apps": [],
-            "groups": [],
-        }
-        with application.test_request_context('/v2/groups//not-migrated',
-                                              method='GET') as ctx:
-            with RequestsMock() as rsps:
-                rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/not-migrated',
-                         status=404)
-                rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/groups//not-migrated',
-                         body=json.dumps(found_group),
-                         status=200)
-                ctx.request.user = self.user
-                request = Request(ctx.request)
-
-                group = request._get_original_group(self.user, "/not-migrated")
-                self.assertEqual(SieveAppGroup().from_json(found_group), group)
-
     def test_get_original_group_migrated(self):
         found_group = {
             "id": "/dev/foo",
@@ -546,12 +524,11 @@ class GetOriginalGroupTest(TestCase):
                                               method='GET') as ctx:
             with RequestsMock() as rsps:
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/not-found', status=404)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//not-found', status=404)
                 ctx.request.user = self.user
                 request = Request(ctx.request)
 
                 group = request._get_original_group(self.user, "/not-found")
-                self.assertEqual(SieveAppGroup(), group)
+                self.assertEqual(SieveAppGroup(MarathonGroup().from_json({"id": "/dev/not-found"})), group)
 
 class RequestWrapperTest(TestCase):
 

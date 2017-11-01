@@ -3,6 +3,7 @@ from typing import Tuple, List
 
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonJsonEncoder
+from marathon.models.group import MarathonGroup
 
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType
@@ -98,13 +99,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             return MarathonApp()
 
     def _get_original_group(self, user, group_id):
+        group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
+                                                (group_id or "/").strip("/"))
         try:
-
-            group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
-                                                    (group_id or "/").strip("/"))
-            try:
-                return SieveAppGroup(self.marathon_client.get_group(group_id_with_namespace))
-            except NotFoundError as e:
-                return SieveAppGroup(self.marathon_client.get_group(group_id))
-        except NotFoundError:
-            return SieveAppGroup()
+            return SieveAppGroup(self.marathon_client.get_group(group_id_with_namespace))
+        except NotFoundError as e:
+            return SieveAppGroup(MarathonGroup().from_json({"id": group_id_with_namespace}))
