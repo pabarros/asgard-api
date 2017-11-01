@@ -40,6 +40,7 @@ def jwt_generate_user_info(user, current_account):
         },
         "current_account": {
             "id": current_account.id,
-            "name": current_account.name
+            "name": current_account.name,
+            "namespace": current_account.namespace
         }
     }

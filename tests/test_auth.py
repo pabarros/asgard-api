@@ -264,6 +264,7 @@ class TestAuthentication(TestCase):
             self.assertEqual(self.user.tx_name, token_content["user"]["name"])
             self.assertEqual(self.user.accounts[0].id, token_content["current_account"]["id"])
             self.assertEqual(self.user.accounts[0].name, token_content["current_account"]["name"])
+            self.assertEqual(self.user.accounts[0].namespace, token_content["current_account"]["namespace"])
 
     def test_add_default_account_on_first_jwt_token(self):
         """
