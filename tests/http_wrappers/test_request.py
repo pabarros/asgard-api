@@ -541,6 +541,14 @@ class RequestWrapperTest(TestCase):
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/groups/dev/my-group", request_wrapper.request.path)
 
+    def test_adjust_groups_root_request_path(self):
+        with application.test_request_context('/v2/groups/',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonGroup(id="/dev/")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/groups/dev", request_wrapper.request.path)
+
     def test_adjust_groups_DELETE_request_path(self):
         with application.test_request_context('/v2/groups/my-group/',
                                               method='DELETE') as ctx:
