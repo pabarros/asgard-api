@@ -1,0 +1,79 @@
+{
+   "groups" : [
+      {
+         "apps" : [
+            {
+               "id" : "/dev/a/app0",
+               "tasks": [
+                {
+                          "ipAddresses" : [
+                            {
+                              "ipAddress" : "172.17.0.23",
+                              "protocol" : "IPv4"
+                            }
+                          ],
+                        "ports" : [
+                          31694
+                        ],
+                        "appId" : "/dev/a/app0",
+                        "host" : "10.168.200.92",
+                        "slaveId" : "dd34c73f-9680-4f50-98db-5b0331af4d19-S8",
+                        "stagedAt" : "2017-10-31T17:48:00.579Z",
+                        "id" : "dev_a_app0.a31dfafb-be63-11e7-8ef1-0242a8c1e33e",
+                        "state" : "TASK_RUNNING",
+                        "startedAt" : "2017-10-31T17:48:43.809Z",
+                        "version" : "2017-10-31T17:47:55.418Z"
+                },
+{
+                          "ipAddresses" : [
+                            {
+                              "ipAddress" : "172.17.0.23",
+                              "protocol" : "IPv4"
+                            }
+                          ],
+                        "ports" : [
+                          31694
+                        ],
+                        "appId" : "/dev/a/app0",
+                        "host" : "10.168.200.92",
+                        "slaveId" : "dd34c73f-9680-4f50-98db-5b0331af4d19-S8",
+                        "stagedAt" : "2017-10-31T17:48:00.579Z",
+                        "id" : "dev_a_app0.a31dfafb-be63-11e7-8ef1-0242a8c1e44o",
+                        "state" : "TASK_RUNNING",
+                        "startedAt" : "2017-10-31T17:48:43.809Z",
+                        "version" : "2017-10-31T17:47:55.418Z"
+                }
+              ]
+            }
+         ],
+         "id" : "/dev/a",
+         "version" : "2017-10-26T16:11:51.755Z"
+      },
+      {
+         "id" : "/dev/group-b",
+         "groups" : [
+            {
+               "version" : "2017-10-26T16:11:51.755Z",
+               "apps" : [
+                  {
+                     "id" : "/dev/group-b/group-b0/app0"
+                  }
+               ],
+               "id" : "/dev/group-b/group-b0"
+            }
+         ],
+         "apps" : [
+            {
+               "id" : "/dev/group-b/appb0"
+            }
+         ],
+         "version" : "2017-10-26T16:11:51.755Z"
+      },
+      {
+         "version" : "2017-10-26T16:11:51.755Z",
+         "id" : "/dev/group-c"
+      }
+   ],
+   "id" : "/dev",
+   "version" : "2017-10-26T16:11:51.755Z"
+}

@@ -1,0 +1,146 @@
+{
+    "id": "/dev/foo",
+    "instances": 2,
+    "cmd": "sleep 1000",
+    "cpus": 0.1,
+    "disk": 0,
+    "mem": 16,
+    "args": [
+        "sleep",
+        "100"
+    ],
+    "constraints": [
+        [
+            "hostname",
+            "LIKE",
+            "srv2.*"
+        ]
+    ],
+    "container": {
+        "docker": {
+            "forcePullImage": false,
+            "image": "mesosphere:marathon/latest",
+            "network": "BRIDGE",
+            "parameters": [
+                {
+                    "key": "name",
+                    "value": "kdc"
+                }
+            ],
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "servicePort": 10019,
+                    "name": "http",
+                    "labels": {
+                        "vip": "192.168.0.1:80"
+                    }
+                }
+            ],
+            "privileged": false
+        },
+        "type": "DOCKER",
+        "volumes": [
+            {
+                "containerPath": "/docker_storage",
+                "hostPath": "/hdd/tools/docker/registry",
+                "mode": "RW",
+                "persistent": null,
+                "external": null
+            }
+        ]
+    },
+    "dependencies": [
+        "/prod/group"
+    ],
+    "env": {
+        "XPS1": "Test",
+        "XPS2": "Rest"
+    },
+    "labels": {
+        "owner": "zeus",
+        "note": "Away from olympus"
+    },
+    "fetch": [
+        {
+            "uri": "https://foo.com/setup.py"
+        },
+        {
+            "uri": "https://foo.com/archive.zip",
+            "executable": false,
+            "extract": true,
+            "cache": true,
+            "outputFile": "newname.zip"
+        }
+    ],
+    "user": "root",
+    "secrets": {
+        "secret1": {
+            "source": "/db/password"
+        },
+        "secret3": {
+            "source": "/foo2"
+        }
+    },
+    "tasks": [
+         {
+            "ipAddresses" : [
+               {
+                  "ipAddress" : "172.17.0.25",
+                  "protocol" : "IPv4"
+               }
+            ],
+            "appId" : "/dev/foo",
+            "ports" : [
+               31579
+            ],
+            "slaveId" : "dd34c73f-9680-4f50-98db-5b0331af4d19-S8",
+            "id" : "dev_foo.a29b3666-be63-11e7-8ef1-0242a8c1e33e",
+            "stagedAt" : "2017-10-31T17:47:59.721Z",
+            "host" : "10.168.200.92",
+            "version" : "2017-10-31T17:47:55.418Z",
+            "startedAt" : "2017-10-31T17:48:42.979Z",
+            "state" : "TASK_RUNNING"
+         },
+         {
+            "slaveId" : "dd34c73f-9680-4f50-98db-5b0331af4d19-S7",
+            "id" : "dev_foo.a31e220e-be63-11e7-8ef1-0242a8c1e33e",
+            "stagedAt" : "2017-10-31T17:48:00.579Z",
+            "host" : "10.168.200.93",
+            "startedAt" : "2017-10-31T17:48:40.662Z",
+            "version" : "2017-10-31T17:47:55.418Z",
+            "state" : "TASK_RUNNING",
+            "ipAddresses" : [
+               {
+                  "protocol" : "IPv4",
+                  "ipAddress" : "172.17.0.22"
+               }
+            ],
+            "appId" : "/dev/foo",
+            "ports" : [
+               31452
+            ]
+         },
+         {
+            "ipAddresses" : [
+               {
+                  "ipAddress" : "172.17.0.23",
+                  "protocol" : "IPv4"
+               }
+            ],
+            "ports" : [
+               31694
+            ],
+            "appId" : "/dev/foo",
+            "host" : "10.168.200.92",
+            "slaveId" : "dd34c73f-9680-4f50-98db-5b0331af4d19-S8",
+            "stagedAt" : "2017-10-31T17:48:00.579Z",
+            "id" : "dev_foo.a31dfafb-be63-11e7-8ef1-0242a8c1e33e",
+            "state" : "TASK_RUNNING",
+            "startedAt" : "2017-10-31T17:48:43.809Z",
+            "version" : "2017-10-31T17:47:55.418Z"
+         }
+      ]
+}

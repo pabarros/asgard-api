@@ -62,12 +62,39 @@ class TestNamespaceFilter(unittest.TestCase):
         modified_app = self.filter.write(None, self.request_app, SieveMarathonApp())
         self.assertEqual("/foo", modified_app.id)
 
-    def test_response_remove_namespace_if_original_app_already_have_namespace(self):
+    @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
+    def test_response_apps_remove_namespace_from_all_tasks(self, single_full_app_with_tasks_fixture):
+        request_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+
+        self.assertEqual(3, len(request_app.tasks))
+        modified_app = self.filter.response(self.user, request_app, original_app)
+        self.assertEqual("foo.a29b3666-be63-11e7-8ef1-0242a8c1e33e", modified_app.tasks[0].id)
+        self.assertEqual("/foo", modified_app.tasks[0].app_id)
+
+        self.assertEqual("foo.a31e220e-be63-11e7-8ef1-0242a8c1e33e", modified_app.tasks[1].id)
+        self.assertEqual("/foo", modified_app.tasks[1].app_id)
+
+        self.assertEqual("foo.a31dfafb-be63-11e7-8ef1-0242a8c1e33e", modified_app.tasks[2].id)
+        self.assertEqual("/foo", modified_app.tasks[2].app_id)
+
+    @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
+    def test_response_apps_remove_namespace_from_all_tasks_empty_task_list(self, single_full_app_with_tasks_fixture):
+        request_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        request_app.id = "/dev/foo"
+        request_app.tasks = []
+        original_app.id = "/dev/foo"
+        original_app.tasks = []
+        self.assertEqual(0, len(request_app.tasks))
+
+        modified_app = self.filter.response(self.user, request_app, original_app)
+        self.assertEqual(0, len(self.request_app.tasks))
+
+    def test_response_apps__remove_namespace_if_original_app_already_have_namespace(self):
         self.original_app.id = "/dev/foo"
         modified_app = self.filter.response(self.user, self.request_app, self.original_app)
         self.assertEqual("/foo", modified_app.id)
 
-    def test_response_does_nothing_if_user_is_none(self):
+    def test_response_apps_does_nothing_if_user_is_none(self):
         self.request_app.id = "/dev/foo"
         modified_app = self.filter.response(None, self.request_app, SieveMarathonApp())
         self.assertEqual("/dev/foo", modified_app.id)
@@ -115,3 +142,42 @@ class TestNamespaceFilter(unittest.TestCase):
             self.assertEqual("/group-b", filtered_group.id)
             self.assertEqual(1, len(filtered_group.apps))
             self.assertEqual("/group-b/appb0", filtered_group.apps[0].id)
+
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps_with_tasks.json")
+    def test_response_group_remove_namespace_from_all_tasks_of_all_apps(self, group_dev_namespace_fixture):
+        with application.test_request_context("/v2/groups/a", method="GET") as ctx:
+            ctx.request.user = self.user
+            ok_response = FlaskResponse(
+                response=json.dumps(group_dev_namespace_fixture['groups'][0]),
+                status=HTTPStatus.OK,
+                headers={}
+            )
+            response_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][0])
+            response_wrapper = Response(ctx.request, ok_response)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
+            self.assertEqual(1, len(filtered_group.apps))
+
+            self.assertEqual("a_app0.a31dfafb-be63-11e7-8ef1-0242a8c1e33e", filtered_group.apps[0].tasks[0].id)
+            self.assertEqual("/a/app0", filtered_group.apps[0].tasks[0].app_id)
+
+            self.assertEqual("a_app0.a31dfafb-be63-11e7-8ef1-0242a8c1e44o", filtered_group.apps[0].tasks[1].id)
+            self.assertEqual("/a/app0", filtered_group.apps[0].tasks[1].app_id)
+
+
+    @with_json_fixture("../fixtures/group_dev_namespace_with_apps_with_tasks.json")
+    def test_response_group_remove_namespace_from_all_tasks_of_all_apps_empty_task_list(self, group_dev_namespace_fixture):
+        with application.test_request_context("/v2/groups/a", method="GET") as ctx:
+            ctx.request.user = self.user
+            ok_response = FlaskResponse(
+                response=json.dumps(group_dev_namespace_fixture['groups'][0]),
+                status=HTTPStatus.OK,
+                headers={}
+            )
+            response_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][0])
+            response_group.apps[0].tasks = []
+            original_group.apps[0].tasks = []
+            response_wrapper = Response(ctx.request, ok_response)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
+            self.assertEqual(1, len(filtered_group.apps))
+            self.assertEqual(0, len(filtered_group.apps[0].tasks))
+

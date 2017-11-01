@@ -1,4 +1,8 @@
+
+from flask import request
+
 from hollowman.marathonapp import SieveMarathonApp
+
 
 
 class NameSpaceFilter():
@@ -31,6 +35,11 @@ class NameSpaceFilter():
         appname_part = request_app.id.strip("/")
         request_app.id = "/".join([namespace_part, appname_part])
 
+    def _remove_namespace_from_tasks(self, task_list, namespace):
+        for task in task_list:
+            task.id = task.id.replace("{}_".format(namespace), "")
+            task.app_id = task.app_id.replace("/{}/".format(namespace), "/")
+
     def response(self, user, response_app, original_app) -> SieveMarathonApp:
         if not user:
             return response_app
@@ -38,6 +47,7 @@ class NameSpaceFilter():
         original_app_current_namespace = original_app.id.strip("/").split("/")[0]
         if (user.current_account.namespace == original_app_current_namespace):
             response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
+            self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
 
         return response_app
 
@@ -47,6 +57,7 @@ class NameSpaceFilter():
             response_group.id = self._remove_namespace(user, response_group.id)
             for app in response_group.apps:
                 app.id = self._remove_namespace(user, app.id)
+                self._remove_namespace_from_tasks(app.tasks, user.current_account.namespace)
 
         return response_group
 
