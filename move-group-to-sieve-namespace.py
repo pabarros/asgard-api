@@ -7,21 +7,28 @@ from marathon.util import MarathonJsonEncoder
 import sys
 import json
 
-c = MarathonClient(["http://127.0.0.1:9090"])
 
-group_name = sys.argv[1]
+def _patch_docker_params(params):
+    for p in params:
+        for k, v in p.items():
+            if "=" in v:
+                idx_ = v.index("=")
+                parts = v.split("=")
+                v = parts[0] + "=" + "/sieve" + parts[1]
+                p[k] = v
 
-_group = SieveAppGroup(c.get_group(group_name))
+_group = SieveAppGroup(MarathonGroup().from_json(json.loads(sys.stdin.read())))
 
 for group in _group.iterate_groups():
     group.id = "/sieve{}".format(group.id)
     del group.version
-    #print(group.id)
+    print(group.id, file=sys.stderr)
     for app in group.apps:
         app.id = "/sieve{}".format(app.id)
         app.fetch = []
         del app.version
-        #print(" >", app.id)
+        _patch_docker_params([p for p in app.container.docker.parameters if p['value'].startswith("hollowman.appname")])
+        print(" >", app.id, app.container.docker.parameters, file=sys.stderr)
 
 print(json.dumps(_group._marathon_group, cls=MarathonJsonEncoder))
 
