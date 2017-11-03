@@ -196,9 +196,7 @@ class DispatchResponse404Test(TestCase):
                 with RequestsMock() as rsps:
                     rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
                              body=json.dumps({'message': "App /foo not found"}), status=404)
-                    rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
-                             body=json.dumps({'message': "App /foo not found"}), status=404)
-                    rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps/foo',
+                    rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps/dev/foo',
                              body=json.dumps({'message': "App /foo not found"}), status=404)
                     response = client.get("/v2/apps/foo", headers=auth_header)
                     self.assertEqual(404, response.status_code)

@@ -85,18 +85,15 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         return self._get_object_id(reserved_paths, "v2/apps")
 
     def _get_original_app(self, user, app_id):
-        try:
-            if not user:
-                return self.marathon_client.get_app(app_id)
+        if not user:
+            return self.marathon_client.get_app(app_id)
 
-            app_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
-                                                    app_id.strip("/"))
-            try:
-                return self.marathon_client.get_app(app_id_with_namespace)
-            except NotFoundError as e:
-                return self.marathon_client.get_app(app_id)
-        except NotFoundError:
-            return MarathonApp()
+        app_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
+                                                app_id.strip("/"))
+        try:
+            return self.marathon_client.get_app(app_id_with_namespace)
+        except NotFoundError as e:
+            return MarathonApp().from_json({"id": app_id_with_namespace})
 
     def _get_original_group(self, user, group_id):
         group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
