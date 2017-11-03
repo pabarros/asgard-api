@@ -52,18 +52,6 @@ class TestAuthentication(TestCase):
         self.session.close()
         responses.stop()
 
-    def test_jwt_disable_auth_if_env_is_present_even_if_invalid_token(self):
-        """
-        Env temporária para podermos desligar/ligar a autenticação sem
-        precisar comitar código.
-        """
-        with patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False), \
-             application.app_context(), \
-             application.test_client() as test_client:
-                jwt_token =  jwt_auth.jwt_encode_callback({"email": "user@host.com.br", "account_id": 1})
-                r = test_client.get("/v2/apps", headers={"Authorization": "JWT {}".format(jwt_token.decode("utf8"))})
-                self.assertEqual(200, r.status_code)
-
     def test_populate_request_user_if_key_is_valid(self):
         """
         Populates request.user if authentication is successful

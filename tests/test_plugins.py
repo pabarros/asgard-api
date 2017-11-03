@@ -13,8 +13,7 @@ class PluginEndpointTest(unittest.TestCase):
 
 
     def test_return_only_registered_plugins_empty(self):
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}), \
-             mock.patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual({"plugins": []}, json.loads(response.data))
 
@@ -29,8 +28,7 @@ class PluginEndpointTest(unittest.TestCase):
                 }
             ]
         }
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}), \
-             mock.patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
             register_plugin("some-example-plugin")
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual({}, json.loads(response.data))
@@ -49,8 +47,7 @@ class PluginEndpointTest(unittest.TestCase):
                 plugin_registry["some-example-plugin"]
             ]
         }
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = plugin_registry), \
-             mock.patch.multiple(decorators, HOLLOWMAN_ENFORCE_AUTH=False):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = plugin_registry):
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual(plugin_data, json.loads(response.data))
 

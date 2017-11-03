@@ -6,7 +6,7 @@ import json
 from flask import request, make_response
 from alchemytools.context import managed
 
-from hollowman.conf import SECRET_KEY, HOLLOWMAN_ENFORCE_AUTH
+from hollowman.conf import SECRET_KEY
 from hollowman.models import HollowmanSession, User
 from hollowman.log import logger
 from hollowman.auth import _get_user_by_email, _get_user_by_authkey, _get_account_by_id
@@ -59,25 +59,24 @@ def auth_required():
                 token_type, token = auth_header.strip().split(" ")
                 user = AUTH_TYPES[token_type](token)
 
-                if HOLLOWMAN_ENFORCE_AUTH:
-                    if not user:
-                        return make_response(invalid_token_response_body, 401)
+                if not user:
+                    return make_response(invalid_token_response_body, 401)
 
-                    if not user.accounts:
-                        return make_response(no_associated_account_response_error, 401)
+                if not user.accounts:
+                    return make_response(no_associated_account_response_error, 401)
 
-                    request_account_id = request.args.get("account_id") or _extract_account_id_from_jwt(token)
-                    request_account_on_db = _get_account_by_id(request_account_id or user.accounts[0].id)
-                    if request_account_id and not request_account_on_db:
-                        return make_response(account_does_not_exist_response_error, 401)
+                request_account_id = request.args.get("account_id") or _extract_account_id_from_jwt(token)
+                request_account_on_db = _get_account_by_id(request_account_id or user.accounts[0].id)
+                if request_account_id and not request_account_on_db:
+                    return make_response(account_does_not_exist_response_error, 401)
 
-                    user_account_ids = [acc.id for acc in user.accounts]
-                    if request_account_on_db.id and request_account_on_db.id not in user_account_ids:
-                        return make_response(permission_denied_on_account_response_body, 401)
+                user_account_ids = [acc.id for acc in user.accounts]
+                if request_account_on_db.id and request_account_on_db.id not in user_account_ids:
+                    return make_response(permission_denied_on_account_response_body, 401)
 
 
-                    request.user = user
-                    request.user.current_account = request_account_on_db
+                request.user = user
+                request.user.current_account = request_account_on_db
 
                 return fn(*args, **kwargs)
             except Exception as e:
