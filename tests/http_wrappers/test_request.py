@@ -160,28 +160,6 @@ class SplitTests(TestCase):
                 expected_app = (MarathonApp(), MarathonApp.from_json(single_full_app_fixture))
                 self.assertEqual(apps, [expected_app])
 
-    @with_json_fixture("single_full_app.json")
-    def test_can_read_app_still_not_migradted(self, single_full_app_fixture):
-        """
-        Conferimos que é possível fazer um GET em
-        /v2/apps/<app-id> para uma app que já *não* está migrada.
-        O <app-id> usado é sempre *sem* namespace
-        """
-        request_data = deepcopy(single_full_app_fixture)
-        with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
-            ctx.request.user = self.user
-            request_parser = Request(ctx.request)
-            with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
-                         body=json.dumps({'message': "App /foo not found"}), status=404)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
-                         body=json.dumps({'app': single_full_app_fixture}), status=200)
-
-                apps = list(request_parser.split())
-
-                expected_app = (MarathonApp(), MarathonApp.from_json(single_full_app_fixture))
-                self.assertEqual(apps, [expected_app])
-
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
     def test_split_groups_read_on_root_group(self, group_dev_namespace_fixture):
 
