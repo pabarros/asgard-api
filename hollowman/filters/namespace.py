@@ -23,10 +23,7 @@ class NameSpaceFilter():
             self._add_namespace_to_appid(request_app, user.current_account.namespace)
             return request_app
 
-        original_app_current_namespace = original_app.id.strip("/").split("/")[0]
-
-        if (user.current_account.namespace == original_app_current_namespace):
-            self._add_namespace_to_appid(request_app, user.current_account.namespace)
+        self._add_namespace_to_appid(request_app, user.current_account.namespace)
 
         return request_app
 
@@ -44,20 +41,16 @@ class NameSpaceFilter():
         if not user:
             return response_app
 
-        original_app_current_namespace = original_app.id.strip("/").split("/")[0]
-        if (user.current_account.namespace == original_app_current_namespace):
-            response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
-            self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
+        response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
+        self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
 
         return response_app
 
     def response_group(self, user, response_group, original_group):
-        original_app_current_namespace = original_group.id.strip("/").split("/")[0]
-        if (user.current_account.namespace == original_app_current_namespace):
-            response_group.id = self._remove_namespace(user, response_group.id)
-            for app in response_group.apps:
-                app.id = self._remove_namespace(user, app.id)
-                self._remove_namespace_from_tasks(app.tasks, user.current_account.namespace)
+        response_group.id = self._remove_namespace(user, response_group.id)
+        for app in response_group.apps:
+            app.id = self._remove_namespace(user, app.id)
+            self._remove_namespace_from_tasks(app.tasks, user.current_account.namespace)
 
         return response_group
 

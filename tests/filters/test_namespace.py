@@ -42,15 +42,6 @@ class TestNamespaceFilter(unittest.TestCase):
         modified_app = self.filter.write(self.user, self.request_app, self.original_app)
         self.assertEqual("/dev/dev/foo", modified_app.id)
 
-    def test_do_not_add_namespace_if_original_app_does_not_already_have_it(self):
-        """
-        Durante o periodo de migração, o filtro não vaai mexer em apps que ainda não foram
-        migradas. Antes de convidar alguém para usar nosso sistema, todas as apps da sieve precisam
-        ser migradas para `/sieve`
-        """
-        modified_app = self.filter.write(self.user, self.request_app, self.original_app)
-        self.assertEqual("/foo", modified_app.id)
-
     def test_add_namespace_create_new_app(self):
         """
         Para novas apps, sempre vamos adicionar o prefixo.
