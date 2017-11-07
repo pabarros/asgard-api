@@ -85,7 +85,6 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 * HOLLOWMAN_SECRET_KEY: Secret usado pelo Flask
 * HOLLOWMAN_REDIRECT_AFTER_LOGIN: URL pra onde o usuário será redirecionado após o fluxo do oauth2. O redirect é feito pra: `URL?jwt=<token_jwt>`
 * HOLLOWMAN_DB_ECHO: Define se os logs do SQLAlchemy estão ligados: Valores possíveis: 1|0. Default 0
-* HOLLOWMAN_ENFORCE_AUTH: Define se o códifo vai exigir autenticaçáo em todos os requests. Valores possíveis: 1|0. Default 0
 * HOLLOWMAN_DB_URL: URL completa (com user, pwd, host, schema) do banco de dados: Formato: `postgresql://<user>:<pwd>@<host>/<schema>`
 
 
