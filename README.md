@@ -5,7 +5,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
-* next
+* 0.0.42
   - Implementado response pipeline. Agora é possível modificar os responses devolvidos pelo marathon usando filtros
   - Immplementado suporte a GET/DELETE em /v2/groups/
   - Removido código que lidava com requests não autenticados. Agora a autenticção é sempre requerida;
