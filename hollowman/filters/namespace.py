@@ -21,17 +21,24 @@ class NameSpaceFilter():
             return request_app
 
         if not original_app.id:
-            self._add_namespace_to_appid(request_app, user.current_account.namespace)
+            request_app.id = self._add_namespace_to_appid(
+                app_id=request_app.id,
+                namespace=user.current_account.namespace
+            )
             return request_app
 
-        self._add_namespace_to_appid(request_app, user.current_account.namespace)
+        request_app.id = self._add_namespace_to_appid(
+            app_id=request_app.id,
+            namespace=user.current_account.namespace
+        )
 
         return request_app
 
-    def _add_namespace_to_appid(self, request_app, namespace):
+    def _add_namespace_to_appid(self, app_id: str, namespace: str) -> str:
         namespace_part = "/{namespace}".format(namespace=namespace)
-        appname_part = request_app.id.strip("/")
-        request_app.id = f"{namespace_part}/{appname_part}"
+        appname_part = app_id.strip("/")
+
+        return f"{namespace_part}/{appname_part}"
 
     def _remove_namespace_from_tasks(self, task_list, namespace):
         for task in task_list:
