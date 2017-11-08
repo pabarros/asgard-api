@@ -175,7 +175,7 @@ class TestNamespaceFilter(unittest.TestCase):
             self.assertEqual(1, len(filtered_group.apps))
             self.assertEqual(0, len(filtered_group.apps[0].tasks))
 
-    @with_json_fixture("deployments.json")
+    @with_json_fixture("deployments/get.json")
     def test_response_deployments_remove_namespace_from_all_app_ids(self, fixture):
         deployment = MarathonDeployment.from_json(fixture[0])
         self.filter.response_deployment(self.user, deployment)
