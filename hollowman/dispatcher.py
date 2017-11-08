@@ -2,6 +2,8 @@ from typing import Iterable
 from flask import Response as FlaskResponse
 import json
 
+from marathon.models import MarathonDeployment
+
 from hollowman.marathonapp import SieveMarathonApp
 
 from hollowman.filters.trim import TrimRequestFilter
@@ -75,8 +77,22 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
                     filtered_group = filter_.response_group(user, filtered_group, original_group)
             filtered_response_groups.append((filtered_group, original_group))
         return response.join(filtered_response_groups)
+    elif response.is_deployment():
+        content = json.loads(response.response.data)
+        deployments = (MarathonDeployment.from_json(deploy) for deploy in content)
 
+        filtered_deployments = []
+        for deployment in deployments:
+            for filter_ in filters_pipeline:
+                if hasattr(filter_, "response_deployment"):
+                    filter_.response_deployment(user, deployment)
+            filtered_deployments.append(deployment)
 
+        return FlaskResponse(
+            response=json.dumps(filtered_deployments, cls=Response.json_encoder),
+            status=response.response.status,
+            headers=response.response.headers
+        )
 
 
 def merge_marathon_apps(base_app, modified_app):
