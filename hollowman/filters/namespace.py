@@ -21,20 +21,20 @@ class NameSpaceFilter():
             return request_app
 
         if not original_app.id:
-            request_app.id = self._add_namespace_to_appid(
+            request_app.id = self._add_namespace(
                 app_id=request_app.id,
                 namespace=user.current_account.namespace
             )
             return request_app
 
-        request_app.id = self._add_namespace_to_appid(
+        request_app.id = self._add_namespace(
             app_id=request_app.id,
             namespace=user.current_account.namespace
         )
 
         return request_app
 
-    def _add_namespace_to_appid(self, app_id: str, namespace: str) -> str:
+    def _add_namespace(self, app_id: str, namespace: str) -> str:
         namespace_part = "/{namespace}".format(namespace=namespace)
         appname_part = app_id.strip("/")
 
@@ -62,3 +62,19 @@ class NameSpaceFilter():
 
         return response_group
 
+    def response_deployment(self, user, deployment: MarathonDeployment) -> MarathonDeployment:
+        deployment.affected_apps = [
+            self._add_namespace(app_id, user.current_account.namespace)
+            for app_id in deployment.affected_apps
+        ]
+
+        for action in deployment.current_actions:
+            action.app = self._add_namespace(action.app,
+                                             user.current_account.namespace)
+
+        for step in deployment.steps:
+            for action in step.actions:
+                action.app = self._add_namespace(action.app,
+                                                 user.current_account.namespace)
+
+        return deployment
