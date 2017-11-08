@@ -29,14 +29,6 @@ class RoutesTest(unittest.TestCase):
         self.session.close()
         self.proxy_mock_patcher.stop()
 
-    def test_v2_deployments(self):
-        with application.test_client() as client:
-            client.get("/v2/deployments", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-            client.get("/v2/deployments/uuid", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-            client.delete("/v2/deployments/uuid", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-
-            self.assertEqual(3, self.proxy_mock.call_count)
-
     def test_v2_tasks(self):
         with application.test_client() as client:
             client.get("/v2/tasks", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
