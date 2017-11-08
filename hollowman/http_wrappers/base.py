@@ -20,6 +20,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
 
     app_path_prefix = '/v2/apps'
     group_path_prefix = '/v2/groups'
+    deployment_prefix = '/v2/deployments'
 
     def is_delete(self):
         return self.request.method == "DELETE"
@@ -48,6 +49,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         """
         return self.request.path.startswith(self.group_path_prefix)
 
+    def is_deployment(self) -> bool:
+        return self.request.path.startswith(self.deployment_prefix)
+
     def _get_object_id(self, reserved_paths, endpoint_prefix):
         split_ = self.request.path.split('/')
         api_paths = reserved_paths
@@ -70,8 +74,8 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
     @property
     def app_id(self) -> str:
         """
-        self.request.path = '/v2/apps//marathon/app/id' -> '//marathon/app/id'
-        self.request.path = '/v2/apps/marathon/app/id' -> '/marathon/app/id'
+        self.wrapped_request.path = '/v2/apps//marathon/app/id' -> '//marathon/app/id'
+        self.wrapped_request.path = '/v2/apps/marathon/app/id' -> '/marathon/app/id'
 
 
         Marathon's api accept both double or single slashes at the beginning
