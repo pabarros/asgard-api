@@ -52,9 +52,8 @@ def dispatch(operations, user, request_app, app,
 
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
-    filtered_response_apps = []
-
     if response.is_app_request():
+        filtered_response_apps = []
         for response_app, original_app in response.split():
             filtered_app = response_app
             for filter_ in filters_pipeline:
@@ -67,7 +66,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             #    filtered_response_apps.append((filtered_app, original_app))
             filtered_response_apps.append((filtered_app, original_app))
         return response.join(filtered_response_apps)
-    if response.is_group_request():
+    elif response.is_group_request():
         filtered_response_groups = []
         for response_group, original_group in response.split():
             filtered_group = response_group
@@ -76,6 +75,8 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
                     filtered_group = filter_.response_group(user, filtered_group, original_group)
             filtered_response_groups.append((filtered_group, original_group))
         return response.join(filtered_response_groups)
+
+
 
 
 def merge_marathon_apps(base_app, modified_app):
