@@ -2,7 +2,10 @@
 
 import unittest
 import json
+from itertools import chain
+
 from flask import Response as FlaskResponse
+from marathon.models import MarathonDeployment
 from marathon.models.group import MarathonGroup
 
 from http import HTTPStatus
@@ -34,7 +37,7 @@ class TestNamespaceFilter(unittest.TestCase):
     def test_add_namespace_request_app_already_have_namespace(self):
         """
         Independente de qualquer coisa, temos *sempre* que adicionar
-        o namespace ao request app. Isso evita que alguém consiga acessar
+        o namespace ao wrapped_request app. Isso evita que alguém consiga acessar
         uma app de outro namespace.
         """
         self.original_app.id = "/dev/foo"
@@ -172,3 +175,16 @@ class TestNamespaceFilter(unittest.TestCase):
             self.assertEqual(1, len(filtered_group.apps))
             self.assertEqual(0, len(filtered_group.apps[0].tasks))
 
+    @with_json_fixture("deployments.json")
+    def test_response_deployments_remove_namespace_from_all_app_ids(self, fixture):
+        deployment = MarathonDeployment.from_json(fixture[0])
+        self.filter.response_deployment(self.user, deployment)
+
+        self.assertEqual(deployment.affected_apps, ['/dev/foo'])
+
+        current_action_apps = [action.app for action in deployment.current_actions]
+        self.assertEqual(current_action_apps, ['/dev/foo'])
+
+        actions = [step.actions for step in deployment.steps]
+        step_apps = [action.app for action in  chain.from_iterable(actions)]
+        self.assertEqual(step_apps, ['/dev/foo', '/dev/foo'])
