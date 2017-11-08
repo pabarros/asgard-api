@@ -1,12 +1,9 @@
-
-from flask import request
 from marathon.models import MarathonDeployment
 
 from hollowman.marathonapp import SieveMarathonApp
 
 
-
-class NameSpaceFilter():
+class NameSpaceFilter:
     name = "namespace"
 
     def _remove_namespace(self, user, id_):
