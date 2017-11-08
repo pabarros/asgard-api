@@ -1,10 +1,18 @@
+import abc
+from typing import Optional
+
 from flask import Response
 from http import HTTPStatus
 
-from hollowman.dispatcher import dispatch, dispatch_response_pipeline
-from hollowman.hollowman_flask import HollowmanRequest
+from marathon.models import MarathonDeployment
+from werkzeug.utils import cached_property
+
+from hollowman.dispatcher import dispatch, dispatch_response_pipeline, \
+    FILTERS_PIPELINE
+from hollowman.hollowman_flask import HollowmanRequest, FilterType
 from hollowman import upstream, conf, http_wrappers
 from hollowman.hollowman_flask import OperationType
+from hollowman.models import User
 
 
 def upstream_request(request: HollowmanRequest, run_filters=True) -> Response:
@@ -14,8 +22,37 @@ def upstream_request(request: HollowmanRequest, run_filters=True) -> Response:
                     headers=dict(resp.headers))
 
 
-def new(request: http_wrappers.Request) -> Response:
+class RequestHandler(metaclass=abc.ABCMeta):
+    def __init__(self, request: HollowmanRequest):
+        self.wrapped_request = http_wrappers.Request(request)
 
+    @cached_property
+    def user(self) -> Optional[User]:
+        try:
+            return self.wrapped_request.request.user
+        except:
+            return None
+
+
+class Deployments(RequestHandler):
+    def _should_apply_response_filters(self) -> bool:
+        return self.wrapped_request.is_read_request()
+
+    def _apply_response_filters(self, response) -> Response:
+        response_wrapper = http_wrappers.Response(self.wrapped_request.request,
+                                                  response)
+        return dispatch_response_pipeline(self.user, response_wrapper)
+
+    def handle(self) -> Response:
+        response = upstream_request(self.wrapped_request.request)
+
+        if self._should_apply_response_filters():
+            return self._apply_response_filters(response)
+
+        return response
+
+
+def new(request: http_wrappers.Request) -> Response:
     filtered_apps = []
     for request_app, app in request.split():
         filtered_request_app = dispatch(operations=request.request.operations,
