@@ -1,5 +1,6 @@
 
 from flask import request
+from marathon.models import MarathonDeployment
 
 from hollowman.marathonapp import SieveMarathonApp
 
@@ -30,7 +31,7 @@ class NameSpaceFilter():
     def _add_namespace_to_appid(self, request_app, namespace):
         namespace_part = "/{namespace}".format(namespace=namespace)
         appname_part = request_app.id.strip("/")
-        request_app.id = "/".join([namespace_part, appname_part])
+        request_app.id = f"{namespace_part}/{appname_part}"
 
     def _remove_namespace_from_tasks(self, task_list, namespace):
         for task in task_list:
