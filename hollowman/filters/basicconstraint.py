@@ -10,10 +10,6 @@ class BasicConstraintFilter:
     constraints = (mesos_constraint, workload_constraint)
 
     def write(self, user, request_app: SieveMarathonApp, app):
-        if not request_app.constraints:
-            request_app.constraints = list(self.constraints)
-            return request_app
-
         if not request_app.has_constraint(self.mesos_constraint.field):
             request_app.constraints.append(self.mesos_constraint)
         if not request_app.has_constraint(self.workload_constraint.field):
