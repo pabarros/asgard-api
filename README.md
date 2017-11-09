@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.43
+  - Atualizando plugin session-checker-plugin
+
 * 0.0.42
   - Implementado response pipeline. Agora é possível modificar os responses devolvidos pelo marathon usando filtros
   - Immplementado suporte a GET/DELETE em /v2/groups/
