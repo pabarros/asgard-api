@@ -43,7 +43,7 @@ class TestBasicConstraintFilter(unittest.TestCase):
 
         self.assertEqual(result_app.constraints, list(self.filter.constraints))
 
-    def test_it_adds_only_mesos_constraint_if_request_app_has_workload_constraint(self):
+    def test_it_adds_only_workload_constraint_if_request_app_does_not_have_any_workload_constraint(self):
         self.request_app.constraints = [
             MarathonConstraint.from_json('workload:LIKE:xablau'.split(':'))
         ]
@@ -57,7 +57,7 @@ class TestBasicConstraintFilter(unittest.TestCase):
             ]
         )
 
-    def test_it_adds_only_workload_constraint_if_request_app_has_mesos_constraint(self):
+    def test_it_adds_only_workload_constraint_if_request_app_does_not_hanve_any_mesos_constraint(self):
         self.request_app.constraints = [
             MarathonConstraint.from_json('mesos:LIKE:xena'.split(':')),
         ]
