@@ -37,15 +37,15 @@ class TestNamespaceFilter(unittest.TestCase):
         """
         self.request_app.instances = 0
         self.original_app.instances = 0
-        self.request_app.labels["hollowman.default_scale"] = 5
+        self.request_app.labels["hollowman.default_scale"] = "5"
         filtered_app = self.filter.write(self.user, self.request_app, self.original_app)
-        self.assertEqual(5, filtered_app.labels["hollowman.default_scale"])
+        self.assertEqual("5", filtered_app.labels["hollowman.default_scale"])
 
     def test_update_running_app_set_instances_to_zero(self):
         self.original_app.instances = 10
         self.request_app.instances = 0
         filtered_app = self.filter.write(self.user, self.request_app, self.original_app)
-        self.assertEqual(10, filtered_app.labels["hollowman.default_scale"])
+        self.assertEqual("10", filtered_app.labels["hollowman.default_scale"])
 
     def test_scale_down_should_not_change_default_scale(self):
         self.original_app.instances = 10
