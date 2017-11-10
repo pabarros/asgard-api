@@ -16,32 +16,34 @@ class TestBasicConstraintFilter(unittest.TestCase):
         self.request_app = SieveMarathonApp.from_json(self.single_full_app_fixture)
         self.original_app = Mock()
         self.user = Mock()
+        self.constraints = (BasicConstraintFilter.mesos_constraint, BasicConstraintFilter.workload_constraint)
+
 
     def test_it_adds_default_constraints_if_none_present(self):
         self.request_app.constraints = []
         result_app = self.filter.write(self.user, self.request_app, self.original_app)
-        self.assertEqual(result_app.constraints, list(self.filter.constraints))
+        self.assertEqual(result_app.constraints, list(self.constraints))
 
     def test_it_doesnt_change_current_constraints_if_constraints_isnt_empty(self):
         original_constraints = deepcopy(self.request_app.constraints)
         result_app = self.filter.write(self.user, self.request_app, self.original_app)
         self.assertEqual(result_app.constraints,
-                         original_constraints + list(self.filter.constraints))
+                         original_constraints + list(self.constraints))
 
     def test_request_app_has_all_constraints_original_app_constraints_is_empty(self):
-        self.request_app.constraints = list(self.filter.constraints)
+        self.request_app.constraints = list(self.constraints)
         self.original_app.constraints = []
         result_app = self.filter.write(self.user, self.request_app, self.original_app)
 
-        self.assertEqual(result_app.constraints, list(self.filter.constraints))
+        self.assertEqual(result_app.constraints, list(self.constraints))
 
     def test_request_app_has_single_constraint_original_app_constraints_is_empty(self):
-        self.request_app.constraints = [self.filter.constraints[0]]
+        self.request_app.constraints = [self.constraints[0]]
         self.original_app.constraints = []
         result_app = self.filter.write(self.user, self.request_app,
                                        self.original_app)
 
-        self.assertEqual(result_app.constraints, list(self.filter.constraints))
+        self.assertEqual(result_app.constraints, list(self.constraints))
 
     def test_it_adds_only_workload_constraint_if_request_app_does_not_have_any_workload_constraint(self):
         self.request_app.constraints = [
