@@ -3,14 +3,14 @@
     "id": "97c136bf-5a28-4821-9d94-480d9fbb01c8",
     "version": "2015-09-30T09:09:17.614Z",
     "affectedApps": [
-      "/foo"
+      "/dev/foo"
     ],
     "steps": [
       {
         "actions": [
           {
             "action": "StartApplication",
-            "app": "/foo"
+            "app": "/dev/foo"
           }
         ]
       },
@@ -18,7 +18,7 @@
         "actions": [
           {
             "action": "ScaleApplication",
-            "app": "/foo"
+            "app": "/dev/foo"
           }
         ]
       }
@@ -26,7 +26,7 @@
     "currentActions": [
       {
         "action": "ScaleApplication",
-        "app": "/foo",
+        "app": "/dev/foo",
         "readinessCheckResults": [
           {
             "taskId": "foo.c9de6033",
