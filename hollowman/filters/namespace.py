@@ -61,17 +61,15 @@ class NameSpaceFilter:
 
     def response_deployment(self, user, deployment: MarathonDeployment) -> MarathonDeployment:
         deployment.affected_apps = [
-            self._add_namespace(app_id, user.current_account.namespace)
+            self._remove_namespace(user, app_id)
             for app_id in deployment.affected_apps
         ]
 
         for action in deployment.current_actions:
-            action.app = self._add_namespace(action.app,
-                                             user.current_account.namespace)
+            action.app = self._remove_namespace(user, action.app)
 
         for step in deployment.steps:
             for action in step.actions:
-                action.app = self._add_namespace(action.app,
-                                                 user.current_account.namespace)
+                action.app = self._remove_namespace(user, action.app)
 
         return deployment
