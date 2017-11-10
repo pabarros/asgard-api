@@ -24,7 +24,7 @@ FILTERS_PIPELINE = {
             ForcePullFilter(),
             TrimRequestFilter(),
             AddAppNameFilter(),
-            BasicConstraintFilter(),    # BasicConstraint tem ser executado antes de AddOwner
+            BasicConstraintFilter(),
             AddOwnerConstraintFilter(),
         )
     },
