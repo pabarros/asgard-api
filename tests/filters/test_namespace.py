@@ -180,11 +180,11 @@ class TestNamespaceFilter(unittest.TestCase):
         deployment = MarathonDeployment.from_json(fixture[0])
         self.filter.response_deployment(self.user, deployment)
 
-        self.assertEqual(deployment.affected_apps, ['/dev/foo'])
+        self.assertEqual(deployment.affected_apps, ['/foo'])
 
         current_action_apps = [action.app for action in deployment.current_actions]
-        self.assertEqual(current_action_apps, ['/dev/foo'])
+        self.assertEqual(current_action_apps, ['/foo'])
 
         actions = [step.actions for step in deployment.steps]
         step_apps = [action.app for action in  chain.from_iterable(actions)]
-        self.assertEqual(step_apps, ['/dev/foo', '/dev/foo'])
+        self.assertEqual(step_apps, ['/foo', '/foo'])
