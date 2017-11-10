@@ -34,11 +34,11 @@ class DeploymentsTests(BaseApiTests, TestCase):
                 json.loads(response.data),
                 [
                     {
-                        'affectedApps': ['/dev/foo'],
+                        'affectedApps': ['/foo'],
                         'currentActions': [
                             {
                                 'action': 'ScaleApplication',
-                                'app': '/dev/foo',
+                                'app': '/foo',
                                 'apps': None,
                                 'pod': None,
                                 'type': None,
@@ -63,7 +63,7 @@ class DeploymentsTests(BaseApiTests, TestCase):
                              'actions': [
                                  {
                                      'action': 'StartApplication',
-                                     'app': '/dev/foo',
+                                     'app': '/foo',
                                      'apps': None,
                                      'pod': None,
                                      'type': None,
@@ -75,7 +75,7 @@ class DeploymentsTests(BaseApiTests, TestCase):
                              'actions': [
                                  {
                                      'action': 'ScaleApplication',
-                                     'app': '/dev/foo',
+                                     'app': '/foo',
                                      'apps': None,
                                      'pod': None,
                                      'type': None,
