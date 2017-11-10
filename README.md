@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.44
+  - Filtro que adiciona constrains mesos:LIKE:slave e workload:LIKE:general, caso não existam.
+
 * 0.0.43
   - Atualizando plugin session-checker-plugin
 
