@@ -7,6 +7,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 * next
   - Implementação parcial do endpoint /v2/deployments. As apps do seu namespace já aparecem certo (sem o prefixo), mas ainda aparecem apps de outros namespaces.
+  - Implementação do filtro que preenche a label de defaultscale.
 
 * 0.0.44
   - Filtro que adiciona constrains mesos:LIKE:slave e workload:LIKE:general, caso não existam.
