@@ -57,3 +57,17 @@ class SieveMarathonAppTest(unittest.TestCase):
     def test_has_constraint_it_does_not_exist(self):
         self.assertFalse(self.sieve_marathon_app.has_constraint("owner"))
 
+    def test_label_update_non_existent_label(self):
+        app = SieveMarathonApp(labels={"label1": "value1"})
+        app.update_label("label2", "value2")
+
+        self.assertEqual(2, len(app.labels.keys()))
+        self.assertEqual("value2", app.labels["label2"])
+
+    def test_label_update_existing_label(self):
+        app = SieveMarathonApp(labels={"label1": "value1"})
+        app.update_label("label1", "new-value")
+
+        self.assertEqual(1, len(app.labels.keys()))
+        self.assertEqual("new-value", app.labels["label1"])
+

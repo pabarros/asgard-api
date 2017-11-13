@@ -22,3 +22,12 @@ class SieveMarathonApp(MarathonApp):
     def has_constraint(self, name):
         return len(self.get_constraints_by_name(name))
 
+    def update_label(self, label_name, label_value):
+        """Updates a specific App label
+
+        :label_name: TODO
+        :label_value: TODO
+        :returns: TODO
+
+        """
+        self.labels[label_name] = label_value

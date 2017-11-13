@@ -13,6 +13,7 @@ from hollowman.filters.appname import AddAppNameFilter
 from hollowman.filters.namespace import NameSpaceFilter
 from hollowman.hollowman_flask import OperationType, FilterType
 from hollowman.filters.owner import AddOwnerConstraintFilter
+from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.http_wrappers.response import Response
 
 
@@ -22,6 +23,7 @@ FILTERS_PIPELINE = {
         ),
 
         OperationType.WRITE: (
+            DefaultScaleFilter(),
             NameSpaceFilter(),
             ForcePullFilter(),
             TrimRequestFilter(),
