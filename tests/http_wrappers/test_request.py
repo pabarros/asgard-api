@@ -519,13 +519,21 @@ class RequestWrapperTest(TestCase):
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/groups/dev/my-group", request_wrapper.request.path)
 
-    def test_adjust_groups_request_path_repeating_parts(self):
-        with application.test_request_context('/v2/groups/grp0/grp0/',
+    def test_adjust_groups_request_path_repeating_final_part(self):
+        with application.test_request_context('/v2/groups/grp0/other/parts/grp0/',
                                               method='GET') as ctx:
             request_wrapper = Request(ctx.request)
             original_app = MarathonGroup(id="/dev/grp0/grp0")
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/groups/dev/grp0/grp0", request_wrapper.request.path)
+
+    def test_adjust_groups_request_path_repeating_parts(self):
+        with application.test_request_context('/v2/groups/grp0/grp0/grp1',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonGroup(id="/dev/grp0/grp0/grp1")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/groups/dev/grp0/grp0/grp1", request_wrapper.request.path)
 
     def test_adjust_groups_root_request_path(self):
         with application.test_request_context('/v2/groups/',
@@ -617,10 +625,18 @@ class RequestWrapperTest(TestCase):
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/apps/dev/my-app", request_wrapper.request.path)
 
-    def test_adjust_apps_request_path_repeating_path(self):
+    def test_adjust_apps_request_path_repeating_final_path(self):
         with application.test_request_context('/v2/apps/app0/app0',
                                               method='GET') as ctx:
             request_wrapper = Request(ctx.request)
             original_app = MarathonApp(id="/dev/app0/app0")
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/apps/dev/app0/app0", request_wrapper.request.path)
+
+    def test_adjust_apps_request_path_repeating_non_final_path(self):
+        with application.test_request_context('/v2/apps/app0/app0/app1',
+                                              method='GET') as ctx:
+            request_wrapper = Request(ctx.request)
+            original_app = MarathonApp(id="/dev/app0/app0/app1")
+            request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
+            self.assertEqual("/v2/apps/dev/app0/app0/app1", request_wrapper.request.path)
