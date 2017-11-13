@@ -63,6 +63,12 @@ class Request(HTTPWrapper):
 
                 yield request_app, app
 
+    def _rindex(self, iterable, value):
+        """
+        Busca o valor de `value` dentro do iterável `iterable`, mas começando do final.
+        https://stackoverflow.com/questions/522372/finding-first-and-last-index-of-some-value-in-a-list-in-python
+        """
+        return len(iterable) - iterable[::-1].index(value) - 1
 
     def _adjust_request_path_if_needed(self, request, modified_app_or_group):
         original_path = request.path.rstrip("/")
@@ -70,7 +76,7 @@ class Request(HTTPWrapper):
         if original_path.startswith("/v2/apps") and original_path != "/v2/apps":
             app_id = modified_app_or_group.id or self.app_id
             last_app_id_part = app_id.split("/")[-1]
-            last_part_position = original_path_parts.index(last_app_id_part)
+            last_part_position = self._rindex(original_path_parts, last_app_id_part)
             extra = original_path_parts[last_part_position+1:]
             request.path = "/v2/apps{app_id}/{extra}".format(app_id=app_id.rstrip("/"), extra="/".join(extra))
             request.path = request.path.rstrip("/")
@@ -80,7 +86,7 @@ class Request(HTTPWrapper):
             group_id = group_id.rstrip("/")
             last_app_id_part = group_id.split("/")[-1]
             if last_app_id_part in original_path_parts:
-                last_part_position = original_path_parts.index(last_app_id_part)
+                last_part_position = self._rindex(original_path_parts, last_app_id_part)
                 extra = original_path_parts[last_part_position+1:]
             request.path = "/v2/groups{group_id}/{extra}".format(group_id=group_id.rstrip("/"), extra="/".join(extra))
             request.path = request.path.rstrip("/")
