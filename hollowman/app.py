@@ -50,7 +50,6 @@ def handler_500(error):
     return Response(
         response=json.dumps({
             "message": str(error),
-            "traceback": frame_data,
             "traceback": traceback.format_exc()
             }
         ),

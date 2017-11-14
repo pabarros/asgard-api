@@ -11,6 +11,8 @@ from hollowman import decorators
 import hollowman.upstream
 from hollowman.upstream import replay_request
 from hollowman.models import HollowmanSession, User, Account
+from hollowman import dispatcher
+from hollowman.hollowman_flask import FilterType, OperationType
 
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
@@ -52,7 +54,10 @@ class TestApp(TestCase):
             self.assertEqual(401, response.status_code)
 
     def test_unexpected_error_returns_HTTP_500(self):
-        self.fail()
+        with application.test_client() as client:
+            response = client.get("/v2/apps", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
+            self.assertEqual(500, response.status_code)
+            self.assertEqual("No remaining Marathon servers to try", json.loads(response.data)['message'])
 
     def test_remove_transfer_encoding_header(self):
         with application.test_request_context("/v2/apps", method="GET") as ctx:
