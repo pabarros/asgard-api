@@ -163,6 +163,27 @@ class RequestHandlersTests(TestCase):
                 self.assertEqual(200, response.status_code)
                 self.assertEqual("/group-b", json.loads(response.data)['id'])
 
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_queue_removes_queued_appps_from_other_namespaces(self, queue_get_fixture):
+        """
+        Removemos todas as apps que não sejam do namespace atual.
+        Esse teste tambéem confirma que o namespace é removido dos elementos
+        que voltam no response.
+        """
+        auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
+        with application.test_client() as client:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ENDPOINT + '/v2/queue',
+                         status=200,
+                         body=json.dumps(queue_get_fixture))
+
+                response = client.get("/v2/queue", headers=auth_header)
+                self.assertEqual(200, response.status_code)
+                response_data = json.loads(response.data)
+                self.assertEqual(1, len(response_data['queue']))
+                self.assertEqual("/waiting", response_data['queue'][0]['app']['id'])
+
 class DispatchResponse404Test(TestCase):
 
     @with_json_fixture("single_full_app.json")

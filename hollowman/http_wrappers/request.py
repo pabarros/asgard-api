@@ -103,6 +103,9 @@ class Request(HTTPWrapper):
             self._adjust_request_path_if_needed(self.request, self.group)
             return self.request
 
+        if self.is_read_request() and self.is_queue_request():
+            return self.request
+
         if self.is_list_apps_request():
             apps_json_repr = [request_app.json_repr(minimal=True)
                               for request_app, _ in apps]

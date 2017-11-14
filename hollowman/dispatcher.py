@@ -97,6 +97,20 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             status=response.response.status,
             headers=response.response.headers
         )
+    elif response.is_queue_request():
+        queue_data = json.loads(response.response.data)
+        current_namespace = user.current_account.namespace
+        filtered_queue_data = []
+        for queued_app in queue_data['queue']:
+            if queued_app['app']['id'].startswith("/{}".format(current_namespace)):
+                queued_app['app']['id'] = queued_app['app']['id'].replace("/{}".format(current_namespace), "")
+                filtered_queue_data.append(queued_app)
+
+        return FlaskResponse(
+            response=json.dumps({"queue": filtered_queue_data}, cls=Response.json_encoder),
+            status=response.response.status,
+            headers=response.response.headers
+        )
 
 
 def merge_marathon_apps(base_app, modified_app):

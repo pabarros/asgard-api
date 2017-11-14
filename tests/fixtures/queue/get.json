@@ -1,0 +1,152 @@
+{
+   "queue" : [
+      {
+         "app" : {
+            "id" : "/infra/otherapp",
+            "portDefinitions" : [
+               {
+                  "port" : 10035,
+                  "labels" : {},
+                  "protocol" : "tcp"
+               }
+            ],
+            "ports" : [
+               10035
+            ],
+            "ipAddress" : null,
+            "user" : null,
+            "container" : {
+               "volumes" : [],
+               "docker" : {
+                  "parameters" : [
+                  ],
+                  "forcePullImage" : true,
+                  "privileged" : false,
+                  "portMappings" : null,
+                  "image" : "alpinee:3.4",
+                  "network" : "BRIDGE"
+               },
+               "type" : "DOCKER"
+            },
+            "instances" : 1,
+            "labels" : {
+               "hollowman.default_scale" : "8"
+            },
+            "constraints" : [
+            ],
+            "versionInfo" : {
+               "lastScalingAt" : "2017-11-14T12:02:31.153Z",
+               "lastConfigChangeAt" : "2017-11-14T12:02:31.153Z"
+            },
+            "cpus" : 0.1,
+            "version" : "2017-11-14T12:02:31.153Z",
+            "uris" : [],
+            "taskKillGracePeriodSeconds" : null,
+            "requirePorts" : false,
+            "args" : null,
+            "storeUrls" : [],
+            "mem" : 135,
+            "dependencies" : [],
+            "cmd" : "slee",
+            "residency" : null,
+            "readinessChecks" : [],
+            "backoffSeconds" : 1,
+            "backoffFactor" : 10,
+            "env" : {},
+            "fetch" : [],
+            "disk" : 0,
+            "healthChecks" : [],
+            "maxLaunchDelaySeconds" : 3600,
+            "secrets" : {},
+            "acceptedResourceRoles" : [
+               "*"
+            ],
+            "executor" : "",
+            "upgradeStrategy" : {
+               "minimumHealthCapacity" : 1,
+               "maximumOverCapacity" : 1
+            },
+            "gpus" : 0
+         },
+         "count" : 1,
+         "delay" : {
+            "timeLeftSeconds" : 2,
+            "overdue" : false
+         }
+      },
+      {
+         "count" : 1,
+         "app" : {
+            "cpus" : 0.1,
+            "version" : "2017-11-14T08:47:59.690Z",
+            "taskKillGracePeriodSeconds" : null,
+            "uris" : [],
+            "requirePorts" : false,
+            "args" : null,
+            "storeUrls" : [],
+            "mem" : 135,
+            "id" : "/dev/waiting",
+            "portDefinitions" : [
+               {
+                  "port" : 10025,
+                  "labels" : {},
+                  "protocol" : "tcp"
+               }
+            ],
+            "ports" : [
+               10025
+            ],
+            "ipAddress" : null,
+            "container" : {
+               "docker" : {
+                  "forcePullImage" : true,
+                  "parameters" : [
+                  ],
+                  "privileged" : false,
+                  "image" : "alpinee:3.4",
+                  "portMappings" : null,
+                  "network" : "BRIDGE"
+               },
+               "volumes" : [],
+               "type" : "DOCKER"
+            },
+            "instances" : 1,
+            "user" : null,
+            "labels" : {
+               "hollowman.default_scale" : "8"
+            },
+            "versionInfo" : {
+               "lastScalingAt" : "2017-11-14T08:47:59.690Z",
+               "lastConfigChangeAt" : "2017-11-14T08:47:59.690Z"
+            },
+            "constraints" : [
+            ],
+            "fetch" : [],
+            "backoffFactor" : 10,
+            "env" : {},
+            "disk" : 0,
+            "healthChecks" : [],
+            "maxLaunchDelaySeconds" : 3600,
+            "secrets" : {},
+            "acceptedResourceRoles" : [
+               "*"
+            ],
+            "executor" : "",
+            "upgradeStrategy" : {
+               "minimumHealthCapacity" : 1,
+               "maximumOverCapacity" : 1
+            },
+            "gpus" : 0,
+            "dependencies" : [],
+            "cmd" : "slee",
+            "residency" : null,
+            "readinessChecks" : [],
+            "backoffSeconds" : 1
+         },
+         "delay" : {
+            "overdue" : false,
+            "timeLeftSeconds" : 286
+         }
+      }
+   ]
+}
