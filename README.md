@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.46
+  - BUGFIX: Apps que tinham a ultima parte do path repetidos retornavam 404
+
 * 0.0.45
   - Implementação parcial do endpoint /v2/deployments. As apps do seu namespace já aparecem certo (sem o prefixo), mas ainda aparecem apps de outros namespaces.
   - Implementação do filtro que preenche a label de defaultscale.
