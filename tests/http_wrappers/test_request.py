@@ -253,6 +253,14 @@ class SplitTests(TestCase):
 
                 self.assertEqual([], apps)
 
+    def test_split_queue_should_return_empty_iterator(self):
+        with application.test_request_context('/v2/queue', method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+
+            apps = list(request_parser.split())
+            self.assertEqual(0, len(apps))
+            self.assertEqual([], apps)
 
 class JoinTests(TestCase):
 
@@ -466,6 +474,20 @@ class JoinTests(TestCase):
             self.assertIsInstance(joined_request, HollowmanRequest)
             self.assertEqual(b'', joined_request.data, "Body deveria estar vazio")
             self.assertEqual("/v2/apps/dev/group", joined_request.path)
+
+    def test_join_queue_should_return_original_request_with_path_adjusted(self):
+        """
+        No momento d join() devemos ajustar o app_id para adicionar o namespace.
+        """
+        with application.test_request_context('/v2/queue/myapp/multi/path/delay',
+                                              method='DELETE') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+
+            joined_request = request_parser.join([])
+            self.assertIsInstance(joined_request, HollowmanRequest)
+            self.assertEqual(b'', joined_request.data, "Body deveria estar vazio")
+            self.assertEqual("/v2/queue/dev/myapp/multi/path/delay", joined_request.path)
 
 
 class GetOriginalGroupTest(TestCase):

@@ -61,17 +61,6 @@ class RoutesTest(unittest.TestCase):
             client.delete("/v2/leader", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
             self.assertEqual(2, self.proxy_mock.call_count)
 
-    def test_v2_queue(self):
-        with application.test_client() as client:
-            client.get("/v2/queue", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-
-            client.get("/v2/queue/app/id/delay", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-            client.delete("/v2/queue/app/id/delay", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-
-            client.get("/v2/queue//app/id/delay", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-            client.delete("/v2/queue//app/id/delay", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})
-            self.assertEqual(5, self.proxy_mock.call_count)
-
     def test_v2_info(self):
         with application.test_client() as client:
             client.get("/v2/info", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"})

@@ -64,7 +64,7 @@ def leader(*args, **kwargs):
 @application.route("/v2/queue//<path:app>/delay", methods=["GET", "DELETE"])
 @auth_required()
 def queue(*args, **kwargs):
-    return raw_proxy()
+    return request_handlers.new(http_wrappers.Request(request))
 
 @application.route("/ping", methods=["GET"])
 @auth_required()

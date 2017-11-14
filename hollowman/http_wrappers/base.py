@@ -21,6 +21,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
     app_path_prefix = '/v2/apps'
     group_path_prefix = '/v2/groups'
     deployment_prefix = '/v2/deployments'
+    queue_prefix = '/v2/queue'
 
     def is_delete(self):
         return self.request.method == "DELETE"
@@ -51,6 +52,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
 
     def is_deployment(self) -> bool:
         return self.request.path.startswith(self.deployment_prefix)
+
+    def is_queue_request(self) -> bool:
+        return self.request.path.startswith(self.queue_prefix)
 
     def _get_object_id(self, reserved_paths, endpoint_prefix):
         split_ = self.request.path.split('/')
@@ -86,6 +90,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             'tasks',
             'versions',
         ]
+        if self.is_queue_request():
+            return self._get_object_id(["delay"], "v2/queue")
+
         return self._get_object_id(reserved_paths, "v2/apps")
 
     def _get_original_app(self, user, app_id):
