@@ -3,7 +3,7 @@ from flask import Response as FlaskResponse
 import json
 
 from hollowman.filters.basicconstraint import BasicConstraintFilter
-from marathon.models import MarathonDeployment
+from marathon.models import MarathonDeployment, MarathonQueueItem
 
 from hollowman.marathonapp import SieveMarathonApp
 
@@ -98,9 +98,10 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
         queue_data = json.loads(response.response.data)
         current_namespace = user.current_account.namespace
         filtered_queue_data = []
-        for queued_app in queue_data['queue']:
-            if queued_app['app']['id'].startswith("/{}".format(current_namespace)):
-                queued_app['app']['id'] = queued_app['app']['id'].replace("/{}".format(current_namespace), "")
+        queued_apps = (MarathonQueueItem.from_json(queue_item) for queue_item in queue_data['queue'])
+        for queued_app in queued_apps:
+            if queued_app.app.id.startswith("/{}".format(current_namespace)):
+                queued_app.app.id = queued_app.app.id.replace("/{}".format(current_namespace), "")
                 filtered_queue_data.append(queued_app)
 
         return FlaskResponse(
