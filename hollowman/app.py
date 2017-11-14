@@ -1,8 +1,10 @@
 #encoding: utf-8
 
 from datetime import timedelta
+import json
+import traceback
 
-from flask import request, Blueprint
+from flask import request, Blueprint, Response
 from flask_cors import CORS
 
 from hollowman.hollowman_flask import HollowmanFlask
@@ -42,6 +44,18 @@ def after_request(response):
         }
     )
     return response
+
+@application.errorhandler(Exception)
+def handler_500(error):
+    return Response(
+        response=json.dumps({
+            "message": str(error),
+            "traceback": frame_data,
+            "traceback": traceback.format_exc()
+            }
+        ),
+        status=500
+    )
 
 import marathon
 marathon.log = logger

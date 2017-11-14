@@ -78,9 +78,10 @@ def auth_required():
                 request.user = user
                 request.user.current_account = request_account_on_db
 
-                return fn(*args, **kwargs)
             except Exception as e:
                 logger.exception({"exc": e, "step": "auth"})
                 return make_response(invalid_token_response_body, 401)
+
+            return fn(*args, **kwargs)
         return decorator
     return wrapper
