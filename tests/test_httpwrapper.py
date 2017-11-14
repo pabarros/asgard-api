@@ -58,7 +58,10 @@ class HTTPWrapperTest(TestCase):
             '/v2/apps/xablau/tasks': '/xablau',
             '/v2/apps//xablau/tasks': '/xablau',
             '/v2/apps/xablau/versions': '/xablau',
-            '/v2/apps//xablau/versions': '/xablau'
+            '/v2/apps//xablau/versions': '/xablau',
+
+            '/v2/queue//xablau/delay': '/xablau',
+            '/v2/queue/xablau/delay': '/xablau'
         }
 
         for request_path, expected_marathon_path in expected_paths.items():
@@ -99,3 +102,9 @@ class HTTPWrapperTest(TestCase):
                                               method='POST', data=b'') as ctx:
             request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_post())
+
+    def test_is_queue_request(self):
+        with application.test_request_context('/v2/queue/',
+                                              method='GET') as ctx:
+            request_parser = Request(ctx.request)
+            self.assertTrue(request_parser.is_queue_request())

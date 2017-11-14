@@ -47,6 +47,8 @@ class Request(HTTPWrapper):
                 for app in self.group.iterate_apps():
                     yield MarathonApp(), app
                 return
+            elif self.is_queue_request():
+                return
             else:
                 app = self._get_original_app(self.request.user, self.app_id)
                 yield MarathonApp(), app
@@ -122,6 +124,10 @@ class Request(HTTPWrapper):
                 group_id = self.app_id
                 group_id_with_namespace = "/{}/{}".format(self.request.user.current_account.namespace, group_id.strip("/"))
                 self.request.path = "/v2/apps{}".format(group_id_with_namespace)
+            if self.is_queue_request():
+                app_id = self.app_id
+                app_id_with_namespace = "/{}/{}".format(self.request.user.current_account.namespace, app_id.strip("/"))
+                self.request.path = "/v2/queue{}/delay".format(app_id_with_namespace)
 
             return self.request
         else:
