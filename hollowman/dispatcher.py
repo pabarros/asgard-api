@@ -1,5 +1,5 @@
 from typing import Iterable
-from flask import Response as FlaskResponse
+from flask import Response as FlaskResponse, request
 import json
 
 from hollowman.filters.basicconstraint import BasicConstraintFilter
@@ -49,12 +49,13 @@ def dispatch(operations, user, request_app, app,
 
     todo: (user, request_app, app) podem ser refatorados em uma classe de domínio
     """
+    merged_app = merge_marathon_apps(base_app=app, modified_app=request_app)
     for operation in operations:
         for filter_ in filters_pipeline[operation]:
             func = getattr(filter_, operation.value)
-            request_app = func(user, merge_marathon_apps(base_app=app, modified_app=request_app), app)
+            merged_app = func(user, merged_app, app)
 
-    return request_app
+    return merged_app
 
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
@@ -100,6 +101,21 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
 
 def merge_marathon_apps(base_app, modified_app):
+    removable_keys = {
+        "constraints": [],
+        "labels": {},
+        "env": {},
+        "healthChecks": [],
+        "upgradeStrategy": None,
+    }
     merged = base_app.json_repr(minimal=False)
     merged.update(modified_app.json_repr(minimal=True))
+    try:
+        raw_request_data = json.loads(request.data)
+        for key, default_value in removable_keys.items():
+            if not raw_request_data.get(key, default_value):
+                merged[key] = default_value
+    except Exception as e:
+        pass
     return SieveMarathonApp.from_json(merged)
+
