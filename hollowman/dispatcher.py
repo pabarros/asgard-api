@@ -65,12 +65,9 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             for filter_ in filters_pipeline:
                 filtered_app = filter_.response(user, filtered_app, original_app)
 
-            #if user:
-            #    if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
-            #        filtered_response_apps.append((filtered_app, original_app))
-            #else:
-            #    filtered_response_apps.append((filtered_app, original_app))
-            filtered_response_apps.append((filtered_app, original_app))
+            if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
+                filtered_response_apps.append((filtered_app, original_app))
+
         return response.join(filtered_response_apps)
     elif response.is_group_request():
         filtered_response_groups = []
