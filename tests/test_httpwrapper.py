@@ -67,7 +67,7 @@ class HTTPWrapperTest(TestCase):
         for request_path, expected_marathon_path in expected_paths.items():
             # noinspection PyTypeChecker
             parser = Request(Mock(path=request_path))
-            self.assertEqual(parser.app_id, expected_marathon_path)
+            self.assertEqual(parser.object_id, expected_marathon_path)
 
     def test_it_parses_marathon_group_id(self):
         expected_paths = {
@@ -89,7 +89,32 @@ class HTTPWrapperTest(TestCase):
         for request_path, expected_marathon_path in expected_paths.items():
             # noinspection PyTypeChecker
             parser = Request(Mock(path=request_path))
-            self.assertEqual(parser.group_id, expected_marathon_path)
+            self.assertEqual(parser.object_id, expected_marathon_path)
+
+    def test_it_parses_deployment_id(self):
+        expected_paths = {
+            '/v2/deployments/727ece1a-0496-4bc0-84a3-c3b69c49f8e6': '/727ece1a-0496-4bc0-84a3-c3b69c49f8e6',
+            '/v2/deployments//727ece1a-0496-4bc0-84a3-c3b69c49f8e6': '/727ece1a-0496-4bc0-84a3-c3b69c49f8e6',
+            '/v2/deployments/': None,
+            '/v2/deployments///': None,
+        }
+
+        for request_path, expected_marathon_path in expected_paths.items():
+            # noinspection PyTypeChecker
+            request_wrappper = Request(Mock(path=request_path))
+            self.assertEqual(request_wrappper.object_id, expected_marathon_path)
+
+    def test_it_parses_task_id(self):
+        expected_paths = {
+            '/v2/tasks': None,
+            '/v2/tasks/': None,
+            '/v2/tasks/delete': None,
+        }
+
+        for request_path, expected_marathon_path in expected_paths.items():
+            # noinspection PyTypeChecker
+            request_wrappper = Request(Mock(path=request_path))
+            self.assertEqual(request_wrappper.object_id, expected_marathon_path)
 
     def test_is_delete(self):
         with application.test_request_context('/v2/apps/app0',
@@ -108,3 +133,10 @@ class HTTPWrapperTest(TestCase):
                                               method='GET') as ctx:
             request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_queue_request())
+
+    def test_is_tasks_request(self):
+        with application.test_request_context('/v2/tasks/',
+                                              method='GET') as ctx:
+            request_parser = Request(ctx.request)
+            self.assertTrue(request_parser.is_tasks_request())
+
