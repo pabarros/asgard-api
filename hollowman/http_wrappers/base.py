@@ -21,7 +21,16 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
     app_path_prefix = '/v2/apps'
     group_path_prefix = '/v2/groups'
     deployment_prefix = '/v2/deployments'
+    tasks_prefix = '/v2/tasks'
     queue_prefix = '/v2/queue'
+
+    API_RESERVED_PATHS_PER_ENDPOINT = {
+        "apps": ['restart', 'tasks', 'versions'],
+        "groups": ["versions"],
+        "deployments": [],
+        "tasks": [],
+        "queue": ["delay"],
+    }
 
     def is_delete(self):
         return self.request.method == "DELETE"
@@ -31,6 +40,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
 
     def is_read_request(self) -> bool:
         return OperationType.READ in self.request.operations
+
+    def is_tasks_request(self):
+        return self.request.path.startswith(self.tasks_prefix)
 
     def is_app_request(self):
         """
@@ -74,6 +86,14 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             "versions",
         ]
         return self._get_object_id(reserved_paths, "v2/groups")
+
+    @property
+    def object_id(self) -> str:
+        if self.is_tasks_request():
+            return None
+        base_path = [p for p in self.request.path.split("/") if p][:2]
+        endpoint_name = base_path[1]
+        return self._get_object_id(self.API_RESERVED_PATHS_PER_ENDPOINT.get(endpoint_name, []), "/".join(base_path))
 
     @property
     def app_id(self) -> str:
