@@ -5,6 +5,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* next
+  - Removendo do response apps que não pertencem ao namespace atual (/v2/apps)
+  - Separando erros de autenticação em HTTP 401 e erros não tratados em HTTP 500. O Stacktrace é retornado no response JSON.
+
 * 0.0.46
   - BUGFIX: Apps que tinham a ultima parte do path repetidos retornavam 404
 
