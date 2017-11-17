@@ -39,6 +39,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
     def is_post(self):
         return self.request.method == "POST"
 
+    def is_write_request(self) -> bool:
+        return OperationType.WRITE in self.request.operations
+
     def is_read_request(self) -> bool:
         return OperationType.READ in self.request.operations
 
