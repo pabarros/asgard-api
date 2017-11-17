@@ -1,8 +1,11 @@
 #encoding: utf-8
 
 from datetime import timedelta
+import json
+import traceback
+import sys
 
-from flask import request, Blueprint
+from flask import request, Blueprint, Response
 from flask_cors import CORS
 
 from hollowman.hollowman_flask import HollowmanFlask
@@ -28,6 +31,12 @@ CORS(application, origins=CORS_WHITELIST)
 jwt_auth.init_app(application)
 
 
+def _get_current_exception_if_exists(current_request):
+    try:
+        return current_request.current_exception
+    except Exception as e:
+        return None
+
 @application.after_request
 def after_request(response):
     logger.info(
@@ -38,10 +47,25 @@ def after_request(response):
             "user": (hasattr(request, "user") and request.user.tx_email) or None,
             "account_id": (hasattr(request, "user") and request.user.current_account.id) or None,
             "location": response.headers.get("Location"),
-            "qstring": request.args
+            "qstring": request.args,
+            "error": _get_current_exception_if_exists(request)
         }
     )
     return response
+
+@application.errorhandler(Exception)
+def handler_500(error):
+    current_exception = {
+        "message": str(error),
+        "traceback": traceback.format_exc(),
+        "type": sys.exc_info()[0].__name__,
+    }
+    request.current_exception = current_exception
+
+    return Response(
+        response=json.dumps(current_exception),
+        status=500
+    )
 
 import marathon
 marathon.log = logger
