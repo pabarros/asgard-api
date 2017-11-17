@@ -54,7 +54,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         """
         It's a request at /v2/apps/$ ?
         """
-        return self.is_app_request() and self.app_id is None
+        return self.is_app_request() and self.object_id is None
 
     def is_group_request(self):
         """
@@ -81,28 +81,12 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         return '/'.join(split_).replace(endpoint_prefix, '') or None
 
     @property
-    def group_id(self) -> str:
-        return self.object_id
-
-    @property
     def object_id(self) -> str:
         if self.is_tasks_request():
             return None
         base_path = [p for p in self.request.path.split("/") if p][:2]
         endpoint_name = base_path[1]
         return self._get_object_id(self.API_RESERVED_PATHS_PER_ENDPOINT.get(endpoint_name, []), "/".join(base_path))
-
-    @property
-    def app_id(self) -> str:
-        """
-        self.wrapped_request.path = '/v2/apps//marathon/app/id' -> '//marathon/app/id'
-        self.wrapped_request.path = '/v2/apps/marathon/app/id' -> '/marathon/app/id'
-
-
-        Marathon's api accept both double or single slashes at the beginning
-
-        """
-        return self.object_id
 
     def _get_original_app(self, user, app_id):
         if not user:
