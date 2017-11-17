@@ -1,5 +1,6 @@
 import abc
 from typing import Tuple, List
+from werkzeug.utils import cached_property
 
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonJsonEncoder
@@ -80,7 +81,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         split_ = [part for part in split_ if part]
         return '/'.join(split_).replace(endpoint_prefix, '') or None
 
-    @property
+    @cached_property
     def object_id(self) -> str:
         if self.is_tasks_request():
             return None
