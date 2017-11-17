@@ -82,10 +82,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
 
     @property
     def group_id(self) -> str:
-        reserved_paths = [
-            "versions",
-        ]
-        return self._get_object_id(reserved_paths, "v2/groups")
+        return self.object_id
 
     @property
     def object_id(self) -> str:
@@ -105,15 +102,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         Marathon's api accept both double or single slashes at the beginning
 
         """
-        reserved_paths = [
-            'restart',
-            'tasks',
-            'versions',
-        ]
-        if self.is_queue_request():
-            return self._get_object_id(["delay"], "v2/queue")
-
-        return self._get_object_id(reserved_paths, "v2/apps")
+        return self.object_id
 
     def _get_original_app(self, user, app_id):
         if not user:
