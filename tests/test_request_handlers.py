@@ -176,7 +176,7 @@ class RequestHandlersTests(TestCase):
                 rsps.add(method='GET',
                          url=conf.MARATHON_ENDPOINT + '/v2/queue',
                          status=200,
-                         body=json.dumps(queue_get_fixture))
+                         json=queue_get_fixture)
 
                 response = client.get("/v2/queue", headers=auth_header)
                 self.assertEqual(200, response.status_code)
