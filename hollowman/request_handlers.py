@@ -54,6 +54,9 @@ class Deployments(RequestHandler):
 
 def new(request: http_wrappers.Request) -> Response:
     filtered_apps = []
+    if request.request.method == "PUT":
+        import ipdb
+        ipdb.set_trace()
     for request_app, app in request.split():
         filtered_request_app = dispatch(operations=request.request.operations,
                                         user=_get_user_from_request(request.request),

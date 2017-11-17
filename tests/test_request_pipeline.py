@@ -10,7 +10,8 @@ from marathon.models.app import MarathonUpgradeStrategy
 
 from hollowman.app import application
 from hollowman.http_wrappers.response import Response
-from hollowman.dispatcher import dispatch
+from hollowman.http_wrappers.base import HTTPWrapper
+from hollowman.dispatcher import dispatch, REMOVABLE_KEYS
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType, FilterType
 from hollowman.models import User, Account
@@ -50,6 +51,33 @@ class RequestPipelineTest(unittest.TestCase):
                                               headers={"Content-type": "application/json"}) as ctx:
             filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
             self.assertEqual(0, len(filtered_app.constraints))
+            self._check_other_fields("constraints", filtered_app)
+
+    def test_update_app_change_all_constraints(self):
+        """
+        Devemos respeitar as constraints quem estão da request,
+        elas devem substituir as constrains da app original
+        """
+        class DummyFilter:
+            def write(self, user, request_app, original_app):
+                return request_app
+
+        pipeline = {
+                OperationType.WRITE: [DummyFilter(), ]
+        }
+
+        request_data = {"constraints": [["hostname", "LIKE", "myhost"]]}
+        request_app = SieveMarathonApp.from_json(request_data)
+        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+
+        with application.test_request_context("/v2/apps/foo",
+                                              method="PUT",
+                                              data=json.dumps(request_data),
+                                              headers={"Content-type": "application/json"}) as ctx:
+            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
+            self.assertEqual(1, len(filtered_app.constraints))
+            self.assertEqual(["hostname", "LIKE", "myhost"], filtered_app.constraints[0].json_repr())
+            self._check_other_fields("constraints", filtered_app)
 
     def test_preserve_constraints_added_by_filter(self):
         """
@@ -76,7 +104,14 @@ class RequestPipelineTest(unittest.TestCase):
 
             filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
             self.assertEqual(1, len(filtered_app.constraints))
-            self.assertEqual(["key", "LIKE", "value"], filtered_app.constraints[0].json_repr())
+            self._check_other_fields("constraints", filtered_app)
+
+    def _check_other_fields(self, skip_field_names, filtered_app):
+        json_repr = json.loads(json.dumps(filtered_app, cls=HTTPWrapper.json_encoder))
+
+        for key in REMOVABLE_KEYS:
+            if key not in skip_field_names:
+                self.assertEqual(self.single_full_app_fixture[key], json_repr[key], "key `{}` foi alterada".format(key))
 
     def test_preserve_labels_added_by_filter(self):
         class AddNewLabelFilter:
@@ -100,6 +135,7 @@ class RequestPipelineTest(unittest.TestCase):
             filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
             self.assertEqual(1, len(filtered_app.labels.keys()))
             self.assertEqual({"label1": "value1"}, filtered_app.labels)
+            self._check_other_fields("labels", filtered_app)
 
     def test_preserve_upgrade_strategy_added_by_filter(self):
         class AddNewUpgradeStrategyFilter:
@@ -129,6 +165,7 @@ class RequestPipelineTest(unittest.TestCase):
 
             self.assertEqual(1, filtered_app.upgrade_strategy.maximum_over_capacity)
             self.assertEqual(0.75, filtered_app.upgrade_strategy.minimum_health_capacity)
+            self._check_other_fields("upgradeStrategy", filtered_app)
 
     def test_preserve_envs_added_by_filter(self):
         class AddNewEnvFilter:
@@ -139,7 +176,7 @@ class RequestPipelineTest(unittest.TestCase):
         pipeline = {
                 OperationType.WRITE: [AddNewEnvFilter(), ]
         }
-        request_data = {}
+        request_data = {"env": []}
 
         request_app = SieveMarathonApp.from_json(request_data)
         original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
@@ -152,6 +189,7 @@ class RequestPipelineTest(unittest.TestCase):
             filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
             self.assertEqual(1, len(filtered_app.env.keys()))
             self.assertEqual({"env1": "env-value1"}, filtered_app.env)
+            self._check_other_fields("env", filtered_app)
 
     def test_preserve_healthchecks_added_by_filter(self):
         class AddNewHealthCheckFilter:
@@ -189,4 +227,6 @@ class RequestPipelineTest(unittest.TestCase):
             filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
             self.assertEqual(1, len(filtered_app.health_checks))
             self.assertEqual("/marathon/healthcheck", filtered_app.health_checks[0].json_repr()['path'])
+            self._check_other_fields("healthChecks", filtered_app)
+
 
