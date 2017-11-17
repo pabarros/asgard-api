@@ -41,13 +41,7 @@ FILTERS_PIPELINE = {
 # Keys que são multi-valor e que devem
 # ser mergeados de forma especial quando
 # juntamos a request_app com a original_app
-REMOVABLE_KEYS = {
-    "constraints": [],
-    "labels": {},
-    "env": {},
-    "healthChecks": [],
-    "upgradeStrategy": None,
-}
+REMOVABLE_KEYS = ["constraints", "labels", "env", "healthChecks", "upgradeStrategy"]
 
 def dispatch(operations, user, request_app, app,
              filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> SieveMarathonApp:
@@ -115,7 +109,7 @@ def merge_marathon_apps(base_app, modified_app):
     merged.update(modified_app.json_repr(minimal=True))
     try:
         raw_request_data = json.loads(request.data)
-        for key, _ in REMOVABLE_KEYS.items():
+        for key in REMOVABLE_KEYS:
             if key in raw_request_data:
                 merged[key] = raw_request_data[key]
     except Exception as e:
