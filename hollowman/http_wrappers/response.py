@@ -27,7 +27,7 @@ class Response(HTTPWrapper):
             if self.is_list_apps_request():
                 for app in response_content['apps']:
                     response_app = SieveMarathonApp.from_json(app)
-                    app = self.marathon_client.get_app(self.app_id or response_app.id)
+                    app = self.marathon_client.get_app(self.object_id or response_app.id)
                     yield response_app, app
                 return
             elif self.is_group_request():
@@ -40,11 +40,11 @@ class Response(HTTPWrapper):
                 return
             else:
                 response_app = SieveMarathonApp.from_json(response_content.get('app') or response_content)
-                app = self.marathon_client.get_app(self.app_id)
+                app = self.marathon_client.get_app(self.object_id)
                 yield response_app, app
                 return
 
-        yield SieveMarathonApp(), self.marathon_client.get_app(self.app_id)
+        yield SieveMarathonApp(), self.marathon_client.get_app(self.object_id)
 
     def join(self, apps: Apps) -> FlaskResponse:
 
