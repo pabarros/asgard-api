@@ -70,7 +70,8 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
         for response_app, original_app in response.split():
             filtered_app = response_app
             for filter_ in filters_pipeline:
-                filtered_app = filter_.response(user, filtered_app, original_app)
+                if hasattr(filter_, "response"):
+                    filtered_app = filter_.response(user, filtered_app, original_app)
 
             if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
                 filtered_response_apps.append((filtered_app, original_app))

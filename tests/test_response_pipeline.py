@@ -118,3 +118,29 @@ class ResponsePipelineTest(unittest.TestCase):
                 self.assertEqual("/foo", response_data['apps'][0]['id'])
                 self.assertEqual("/other-app", response_data['apps'][1]['id'])
 
+    def test_do_not_call_filter_if_it_doesnt_implement_response_method(self):
+        class DummyRequestFilter:
+            def write(self, user, request_app, original_app):
+                return request_app
+
+        with application.test_request_context("/v2/apps/foo", method="GET") as ctx:
+            single_full_app_one = deepcopy(self.single_full_app_fixture)
+            single_full_app_one['id'] = "/dev/foo"
+
+            with RequestsMock() as rsps:
+                #rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                #         json={"app": single_full_app_one}, status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                         json={"app": single_full_app_one}, status=200)
+
+                original_response = FlaskResponse(response=json.dumps({"app": single_full_app_one}),
+                                                  status=200, headers={})
+
+                response_wrapper = Response(ctx.request, original_response)
+                final_response = dispatch_response_pipeline(user=self.user,
+                                                            response=response_wrapper,
+                                                            filters_pipeline=[DummyRequestFilter()])
+                response_data = json.loads(final_response.data)
+                self.assertEqual(200, final_response.status_code)
+                self.assertEqual("/dev/foo", response_data['app']['id'])
+
