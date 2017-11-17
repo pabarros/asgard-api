@@ -41,7 +41,7 @@ class ResponsePipelineTest(unittest.TestCase):
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
                          url=_url,
-                         body=json.dumps({'app': single_full_app_one}),
+                         json={'app': single_full_app_one},
                          status=200)
                 original_response = FlaskResponse(response=json.dumps({'app': single_full_app_one}),
                                                   status=200,
