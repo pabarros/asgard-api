@@ -41,7 +41,7 @@ FILTERS_PIPELINE = {
 # Keys que são multi-valor e que devem
 # ser mergeados de forma especial quando
 # juntamos a request_app com a original_app
-REMOVABLE_KEYS = ["constraints", "labels", "env", "healthChecks", "upgradeStrategy"]
+REMOVABLE_KEYS = {"constraints", "labels", "env", "healthChecks", "upgradeStrategy"}
 
 def dispatch(operations, user, request_app, app,
              filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> SieveMarathonApp:
@@ -105,6 +105,22 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
 
 def merge_marathon_apps(base_app, modified_app):
+    """
+    A junção das duas apps (request_app (aqui modified_app) e original_app (aqui base_app)) é
+    sempre feita pegando todos os dados da original_app e jogando os dados da requst_app "em cima".
+    Não podemos usar o `minimal=Fase` na request_app pois para requests que estão *incompletos*, ou seja,
+    sem alguns vampos (já veremos exemplo) se esássemos minimal=False, iríramos apagar esses "campos faltantes"
+    da original_app. Exemplos:
+
+        request_app = {"instances": 10}
+        original_app está completa, com envs, constraints e tudo mais.
+
+        se usamos `minimal=False` na request_app, teremos um JSON com *todos* os campos em branco, menos o "instances".
+        Então quando fizermos `merged.update(modified_app.json_repr(minimal=False))`, vamos no final ter um JSON apenas com
+        o campo "instances" perrnchido e todo o restante vazio.
+
+
+    """
     merged = base_app.json_repr(minimal=False)
     merged.update(modified_app.json_repr(minimal=True))
     try:
