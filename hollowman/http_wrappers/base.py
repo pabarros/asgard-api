@@ -1,5 +1,6 @@
 import abc
 from typing import Tuple, List
+from werkzeug.utils import cached_property
 
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonJsonEncoder
@@ -21,7 +22,16 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
     app_path_prefix = '/v2/apps'
     group_path_prefix = '/v2/groups'
     deployment_prefix = '/v2/deployments'
+    tasks_prefix = '/v2/tasks'
     queue_prefix = '/v2/queue'
+
+    API_RESERVED_PATHS_PER_ENDPOINT = {
+        "apps": ['restart', 'tasks', 'versions'],
+        "groups": ["versions"],
+        "deployments": [],
+        "tasks": [],
+        "queue": ["delay"],
+    }
 
     def is_delete(self):
         return self.request.method == "DELETE"
@@ -31,6 +41,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
 
     def is_read_request(self) -> bool:
         return OperationType.READ in self.request.operations
+
+    def is_tasks_request(self):
+        return self.request.path.startswith(self.tasks_prefix)
 
     def is_app_request(self):
         """
@@ -42,7 +55,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         """
         It's a request at /v2/apps/$ ?
         """
-        return self.is_app_request() and self.app_id is None
+        return self.is_app_request() and self.object_id is None
 
     def is_group_request(self):
         """
@@ -68,32 +81,13 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         split_ = [part for part in split_ if part]
         return '/'.join(split_).replace(endpoint_prefix, '') or None
 
-    @property
-    def group_id(self) -> str:
-        reserved_paths = [
-            "versions",
-        ]
-        return self._get_object_id(reserved_paths, "v2/groups")
-
-    @property
-    def app_id(self) -> str:
-        """
-        self.wrapped_request.path = '/v2/apps//marathon/app/id' -> '//marathon/app/id'
-        self.wrapped_request.path = '/v2/apps/marathon/app/id' -> '/marathon/app/id'
-
-
-        Marathon's api accept both double or single slashes at the beginning
-
-        """
-        reserved_paths = [
-            'restart',
-            'tasks',
-            'versions',
-        ]
-        if self.is_queue_request():
-            return self._get_object_id(["delay"], "v2/queue")
-
-        return self._get_object_id(reserved_paths, "v2/apps")
+    @cached_property
+    def object_id(self) -> str:
+        if self.is_tasks_request():
+            return None
+        base_path = [p for p in self.request.path.split("/") if p][:2]
+        endpoint_name = base_path[1]
+        return self._get_object_id(self.API_RESERVED_PATHS_PER_ENDPOINT.get(endpoint_name, []), "/".join(base_path))
 
     def _get_original_app(self, user, app_id):
         if not user:

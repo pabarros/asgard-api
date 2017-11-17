@@ -43,14 +43,14 @@ class Request(HTTPWrapper):
                     yield MarathonApp(), app
                 return
             elif self.is_group_request():
-                self.group = self._get_original_group(self.request.user, self.group_id)
+                self.group = self._get_original_group(self.request.user, self.object_id)
                 for app in self.group.iterate_apps():
                     yield MarathonApp(), app
                 return
             elif self.is_queue_request():
                 return
             else:
-                app = self._get_original_app(self.request.user, self.app_id)
+                app = self._get_original_app(self.request.user, self.object_id)
                 yield MarathonApp(), app
                 return
 
@@ -59,7 +59,7 @@ class Request(HTTPWrapper):
             for app in self.get_request_data():
                 request_app = MarathonApp.from_json(app)
                 try:
-                    app = self._get_original_app(self.request.user, self.app_id or request_app.id)
+                    app = self._get_original_app(self.request.user, self.object_id or request_app.id)
                 except NotFoundError:
                     app = MarathonApp()
 
@@ -70,7 +70,7 @@ class Request(HTTPWrapper):
         original_path = request.path.rstrip("/")
         original_path_parts = original_path.split("/")
         if original_path.startswith("/v2/apps") and original_path != "/v2/apps":
-            app_id = modified_app_or_group.id or self.app_id
+            app_id = modified_app_or_group.id or self.object_id
             last_app_id_part = app_id.split("/")[-1]
             last_part_position = original_path_parts.index(last_app_id_part)
             extra = original_path_parts[last_part_position+1:]
@@ -114,15 +114,15 @@ class Request(HTTPWrapper):
                 apps_json_repr = apps_json_repr[0]
         elif self.is_delete():
             if self.is_group_request():
-                group_id = self.group_id
+                group_id = self.object_id
                 group_id_with_namespace = "/{}/{}".format(self.request.user.current_account.namespace, group_id.strip("/"))
                 self.request.path = "/v2/groups{}".format(group_id_with_namespace)
             if self.is_app_request():
-                group_id = self.app_id
+                group_id = self.object_id
                 group_id_with_namespace = "/{}/{}".format(self.request.user.current_account.namespace, group_id.strip("/"))
                 self.request.path = "/v2/apps{}".format(group_id_with_namespace)
             if self.is_queue_request():
-                app_id = self.app_id
+                app_id = self.object_id
                 app_id_with_namespace = "/{}/{}".format(self.request.user.current_account.namespace, app_id.strip("/"))
                 self.request.path = "/v2/queue{}/delay".format(app_id_with_namespace)
 
