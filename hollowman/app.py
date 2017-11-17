@@ -32,11 +32,10 @@ jwt_auth.init_app(application)
 
 
 def _get_current_exception_if_exists(current_request):
-    if hasattr(current_request, "current_exception"):
+    try:
         return current_request.current_exception
-    return None
-
-
+    except Exception as e:
+        return None
 
 @application.after_request
 def after_request(response):
