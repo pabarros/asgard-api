@@ -352,3 +352,51 @@ class JoinTests(unittest.TestCase):
                 self.assertEqual(1, len(joined_response_data['groups'][0]['apps']))
                 self.assertEqual([], joined_response_data['groups'][0]['apps'][0]['constraints']) # Apps should also be renderen in full
 
+    @with_json_fixture("../fixtures/tasks/get_single_namespace.json")
+    def test_join_tasks_GET(self, tasks_single_namespace_fixture):
+        with application.test_request_context('/v2/tasks/', method='GET') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_single_namespace_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+            joined_response = response.join(tasks_tuple)
+
+            joined_response_data = json.loads(joined_response.data)
+            self.assertEqual(3, len(joined_response_data['tasks']))
+
+    @with_json_fixture("../fixtures/tasks/post?scale=true.json")
+    def test_join_tasks_POST_scale_true(self, tasks_post_fixture):
+        with application.test_request_context('/v2/tasks/delete?scale=true', method='POST') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_post_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+            joined_response = response.join(tasks_tuple)
+
+            joined_response_data = json.loads(joined_response.data)
+            self.assertEqual("5ed4c0c5-9ff8-4a6f-a0cd-f57f59a34b43", joined_response_data['deploymentId'])
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_join_tasks_POST_scale_false(self, tasks_get_fixture):
+        with application.test_request_context('/v2/tasks/delete?scale=false', method='POST') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_get_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+            joined_response = response.join(tasks_tuple)
+
+            joined_response_data = json.loads(joined_response.data)
+            self.assertEqual(3, len(joined_response_data['tasks']))
+
