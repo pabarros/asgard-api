@@ -142,3 +142,86 @@ class ResponsePipelineTest(unittest.TestCase):
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual("/dev/foo", response_data['app']['id'])
 
+    @with_json_fixture("../fixtures/tasks/get_single_infra_namespace.json")
+    def test_response_task_returns_empty_response_when_all_tasks_are_from_other_namespace(self, tasks_namespace_infra_fixture):
+        with application.test_request_context("/v2/tasks/", method="GET") as ctx:
+
+            original_response = FlaskResponse(response=json.dumps(tasks_namespace_infra_fixture),
+                                              status=200)
+
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch_response_pipeline(user=self.user,
+                                                        response=response_wrapper,
+                                                        filters_pipeline=[])
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(0, len(response_data['tasks']))
+
+    @with_json_fixture("../fixtures/tasks/get_single_namespace.json")
+    def test_response_task_filter_modifies_task(self, tasks_get_fixture):
+        class ModifyTaskFilter:
+            def response_task(self, user, response_task, original_task):
+                response_task.id = f"{response_task.id}_bla"
+                return response_task
+
+        with application.test_request_context("/v2/tasks/", method="GET") as ctx:
+
+            original_response = FlaskResponse(response=json.dumps(tasks_get_fixture),
+                                              status=200)
+
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch_response_pipeline(user=self.user,
+                                                        response=response_wrapper,
+                                                        filters_pipeline=[ModifyTaskFilter()])
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(3, len(response_data['tasks']))
+            self.assertEqual([
+                "dev_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638_bla",
+                "dev_waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638_bla",
+                "dev_waiting.75b2ed9c-ce9c-11e7-8144-2a27410e5638_bla"
+            ], [task['id'] for task in response_data['tasks']])
+
+    @with_json_fixture("../fixtures/tasks/get_multi_namespace.json")
+    def test_response_task_remove_from_response_tasks_outside_namespace(self, tasks_multinamespace_fixure):
+        class ModifyTaskFilter:
+            def response_task(self, user, response_task, original_task):
+                response_task.id = response_task.id.replace(f"{user.current_account.namespace}_", "")
+                return response_task
+
+        with application.test_request_context("/v2/tasks/", method="GET") as ctx:
+
+            original_response = FlaskResponse(response=json.dumps(tasks_multinamespace_fixure),
+                                              status=200)
+
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch_response_pipeline(user=self.user,
+                                                        response=response_wrapper,
+                                                        filters_pipeline=[ModifyTaskFilter()])
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(2, len(response_data['tasks']))
+            self.assertEqual([
+                "waiting.01339ffa-ce9c-11e7-8144-2a27410e5638",
+                "waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
+            ], [task['id'] for task in response_data['tasks']])
+
+    @with_json_fixture("../fixtures/tasks/post?scale=true.json")
+    def test_response_task_do_not_dispatch_pipeline_if_response_is_deployment(self, tasks_post_fixture):
+        """
+        Se o request for de escrita em /v2/tasks e foi passado `?scale=true`, não devemos
+        rodar o pipeline, já que nesse response tem apenas um DeploymentId
+        """
+        with application.test_request_context("/v2/tasks/delete?scale=true", method="POST") as ctx:
+
+            original_response = FlaskResponse(response=json.dumps(tasks_post_fixture),
+                                              status=200)
+
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch_response_pipeline(user=self.user,
+                                                        response=response_wrapper,
+                                                        filters_pipeline=[])
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual("5ed4c0c5-9ff8-4a6f-a0cd-f57f59a34b43", response_data['deploymentId'])
+

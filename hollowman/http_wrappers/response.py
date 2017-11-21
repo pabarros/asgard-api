@@ -80,14 +80,15 @@ class Response(HTTPWrapper):
             response_group = apps[0][0] if apps else MarathonGroup()
             body = response_group.json_repr(minimal=False)
         elif self.is_tasks_requests():
-            if not apps:
-                # Se não fizemos o split, então deixamos o response passar do jeito que está.
-                # não fazeer o split significa que não tinham tasks no response original
-                return self.response
+            original_response_data = json.loads(self.response.data)
             all_tasks = []
             for task, _ in apps:
                 all_tasks.append(task.json_repr(minimal=False))
             body = {'tasks': all_tasks}
+            try:
+                original_response_data['tasks']
+            except KeyError:
+                body = original_response_data
 
         return FlaskResponse(
             response=json.dumps(body, cls=self.json_encoder),

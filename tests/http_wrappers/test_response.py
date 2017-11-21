@@ -368,6 +368,25 @@ class JoinTests(unittest.TestCase):
             joined_response_data = json.loads(joined_response.data)
             self.assertEqual(3, len(joined_response_data['tasks']))
 
+
+    def test_join_tasks_empty_list_GET(self):
+        """
+        Se o request for GET e a lista de tasks for vazia, significa que todas as tasks
+        foram removidas do response, isso significa que temos que retornar um response vazio.
+        """
+        with application.test_request_context('/v2/tasks/', method='GET') as ctx:
+            response = FlaskResponse(
+                response=json.dumps({"tasks": [{"id":"some-filtered-task"}]}),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            joined_response = response.join([])
+
+            joined_response_data = json.loads(joined_response.data)
+            self.assertEqual(0, len(joined_response_data['tasks']))
+
     @with_json_fixture("../fixtures/tasks/post?scale=true.json")
     def test_join_tasks_POST_scale_true(self, tasks_post_fixture):
         with application.test_request_context('/v2/tasks/delete?scale=true', method='POST') as ctx:

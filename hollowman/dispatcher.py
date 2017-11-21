@@ -4,6 +4,7 @@ import json
 
 from hollowman.filters.basicconstraint import BasicConstraintFilter
 from marathon.models import MarathonDeployment, MarathonQueueItem
+from marathon.models.task import MarathonTask
 
 from hollowman.marathonapp import SieveMarathonApp
 
@@ -117,6 +118,26 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             status=response.response.status,
             headers=response.response.headers
         )
+    elif response.is_tasks_requests():
+        content = json.loads(response.response.data)
+        filtered_tasks = content
+        try:
+            tasks = (MarathonTask.from_json(task) for task in content['tasks'])
+            
+            filtered_tasks = []
+            for task in tasks:
+                task_original_idd = task.id
+                for filter_ in filters_pipeline:
+                    if hasattr(filter_, "response_task"):
+                        filter_.response_task(user, task, task)
+
+                if task_original_idd.startswith(f"{user.current_account.namespace}_"):
+                    filtered_tasks.append((task, task))
+        except KeyError:
+            # resposne sem lista de task, retornamos sem mexer
+            return response.response
+
+        return response.join(filtered_tasks)
 
 
 def merge_marathon_apps(base_app, modified_app):
