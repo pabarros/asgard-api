@@ -64,7 +64,7 @@ def new(request: http_wrappers.Request) -> Response:
     joined_request = request.join(filtered_apps)
     response = upstream_request(joined_request, run_filters=False)
 
-    if not request.is_write_request() and response.status_code == HTTPStatus.OK:
+    if response.status_code == HTTPStatus.OK:
         response_wrapper = http_wrappers.Response(request.request, response)
         final_response = dispatch_response_pipeline(user=_get_user_from_request(request.request),
                                                    response=response_wrapper)

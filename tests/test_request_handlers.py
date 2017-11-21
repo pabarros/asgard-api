@@ -98,33 +98,6 @@ class RequestHandlersTests(TestCase):
                                                 request_app=ANY,
                                                 app=ANY)
 
-    @with_json_fixture("single_full_app.json")
-    def test_do_not_dispatch_response_pipeline_write_single_app(self, single_full_app_fixture):
-        auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
-        with application.test_client() as client:
-            with patch('hollowman.request_handlers.dispatch_response_pipeline') as resp_pipeline_mock:
-                with RequestsMock() as rsps:
-                    rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
-                             body=json.dumps({'app': single_full_app_fixture}), status=200)
-                    rsps.add(method='POST', url=conf.MARATHON_ENDPOINT + '/v2/apps/foo',
-                               body=json.dumps({'apps': [single_full_app_fixture]}), status=200)
-                    response = client.post("/v2/apps/foo", data=json.dumps(single_full_app_fixture), headers=auth_header)
-                    self.assertEqual(200, response.status_code)
-                    self.assertEqual(0, resp_pipeline_mock.call_count)
-
-    @with_json_fixture("single_full_app.json")
-    def test_do_not_dispatch_response_pipeline_write_multi_app(self, single_full_app_fixture):
-        auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
-        with application.test_client() as client:
-            with patch('hollowman.request_handlers.dispatch_response_pipeline') as resp_pipeline_mock:
-                responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
-                         body=json.dumps({'app': single_full_app_fixture}), status=200)
-                responses.add(method='POST', url=conf.MARATHON_ENDPOINT + '/v2/apps/',
-                           body=json.dumps({}), status=200)
-                response = client.post("/v2/apps/", data=json.dumps([single_full_app_fixture]), headers=auth_header)
-                self.assertEqual(200, response.status_code)
-                self.assertEqual(0, resp_pipeline_mock.call_count)
-
     @with_json_fixture("../fixtures/single_full_app.json")
     def test_versions_endpoint_returns_app_on_root_json(self, single_full_app_fixture):
         """

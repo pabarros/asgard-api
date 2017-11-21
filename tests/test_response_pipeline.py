@@ -128,8 +128,6 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_one['id'] = "/dev/foo"
 
             with RequestsMock() as rsps:
-                #rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
-                #         json={"app": single_full_app_one}, status=200)
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
                          json={"app": single_full_app_one}, status=200)
 
