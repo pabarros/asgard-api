@@ -140,3 +140,9 @@ class HTTPWrapperTest(TestCase):
             request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_tasks_request())
 
+    def test_is_tasks_reqiest(self):
+        with application.test_request_context('/v2/tasks/delete',
+                                              method='POST', data=b'') as ctx:
+            request_parser = Request(ctx.request)
+            self.assertTrue(request_parser.is_tasks_requests())
+
