@@ -7,6 +7,7 @@ from itertools import chain
 from flask import Response as FlaskResponse
 from marathon.models import MarathonDeployment
 from marathon.models.group import MarathonGroup
+from marathon.models.task import MarathonTask 
 
 from http import HTTPStatus
 
@@ -51,6 +52,17 @@ class TestNamespaceFilter(unittest.TestCase):
         """
         modified_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
         self.assertEqual("/dev/foo", modified_app.id)
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_request_add_namespace_to_all_tasks(self, tasks_get_fixture):
+        """
+        Um POST em /v2/tasks/delete deve ajustar o ID de todas as tasks
+        envolvidas
+        """
+        task = MarathonTask.from_json(tasks_get_fixture['tasks'][0])
+        filtered_task  = self.filter.write(self.user, task, task)
+        self.assertEqual("dev_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
+        self.assertEqual("/dev/waiting", filtered_task.app_id)
 
     def test_does_nothing_if_user_is_none(self):
         modified_app = self.filter.write(None, self.request_app, SieveMarathonApp())
@@ -188,3 +200,13 @@ class TestNamespaceFilter(unittest.TestCase):
         actions = [step.actions for step in deployment.steps]
         step_apps = [action.app for action in  chain.from_iterable(actions)]
         self.assertEqual(step_apps, ['/foo', '/foo'])
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_response_tasks_remove_namespace_from_all_tasks(self, tasks_get_fixture):
+        task =  MarathonTask.from_json(tasks_get_fixture['tasks'][0])
+        task.id = "dev_" + task.id
+        task.app_id = "/dev" + task.app_id
+        filtered_task = self.filter.response_task(self.user, task, task)
+        self.assertEqual("waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
+        self.assertEqual("/waiting", filtered_task.app_id)
+

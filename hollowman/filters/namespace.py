@@ -1,4 +1,5 @@
 from marathon.models import MarathonDeployment
+from marathon.models.task import MarathonTask
 
 from hollowman.marathonapp import SieveMarathonApp
 
@@ -16,6 +17,15 @@ class NameSpaceFilter:
 
         if not user:
             return request_app
+
+        if isinstance(request_app, MarathonTask):
+            request_task = request_app
+            request_task.app_id = self._add_namespace(
+                app_id=request_task.app_id,
+                namespace=user.current_account.namespace
+            )
+            request_task.id = "{namespace}_{task_id}".format(namespace=user.current_account.namespace, task_id=request_task.id)
+            return request_task
 
         if not original_app.id:
             request_app.id = self._add_namespace(
@@ -73,3 +83,17 @@ class NameSpaceFilter:
                 action.app = self._remove_namespace(user, action.app)
 
         return deployment
+
+    def response_task(self, user, response_task, original_task):
+        """
+        Método para filtrar tasks que estejam sendo retornadas no
+        response
+
+        :response_task: Task que está presende no response
+        :original_task: Task original, por enquanto é o mesmo objeto do response_task
+        :returns: response_task modificado
+
+        """
+        self._remove_namespace_from_tasks([response_task], user.current_account.namespace)
+        return response_task
+
