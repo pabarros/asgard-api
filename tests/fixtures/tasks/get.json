@@ -1,9 +1,9 @@
 {
   "tasks": [
     {
-      "appId": "/sieve/waiting",
+      "appId": "/waiting",
       "host": "10.168.200.93",
-      "id": "sieve_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638",
+      "id": "waiting.01339ffa-ce9c-11e7-8144-2a27410e5638",
       "ipAddresses": [
         {
           "ipAddress": "172.17.0.2",
@@ -23,9 +23,9 @@
       "version": "2017-11-21T08:55:00.437Z"
     },
     {
-      "appId": "/sieve/waiting",
+      "appId": "/waiting",
       "host": "10.168.200.95",
-      "id": "sieve_waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
+      "id": "waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
       "ipAddresses": [
         {
           "ipAddress": "172.17.0.8",
@@ -45,9 +45,9 @@
       "version": "2017-11-21T08:55:00.437Z"
     },
     {
-      "appId": "/sieve/waiting",
+      "appId": "/waiting",
       "host": "10.168.200.96",
-      "id": "sieve_waiting.75b2ed9c-ce9c-11e7-8144-2a27410e5638",
+      "id": "waiting.75b2ed9c-ce9c-11e7-8144-2a27410e5638",
       "ipAddresses": [
         {
           "ipAddress": "172.17.0.5",
