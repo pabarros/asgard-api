@@ -2,6 +2,7 @@ import json
 from flask import Response as FlaskResponse
 
 from marathon.models.group import MarathonGroup
+from marathon.models.task import MarathonTask
 
 from hollowman.http_wrappers.base import HTTPWrapper, Apps
 from hollowman.marathonapp import SieveMarathonApp
@@ -38,13 +39,27 @@ class Response(HTTPWrapper):
                     original_group = self._get_original_group(self.request.user, group_id_without_namespace)
                     yield current_group, original_group
                 return
+            elif self.is_tasks_requests():
+                for task in response_content['tasks']:
+                    response_task = MarathonTask.from_json(task)
+                    yield response_task, response_task
+                return
             else:
                 response_app = SieveMarathonApp.from_json(response_content.get('app') or response_content)
                 app = self.marathon_client.get_app(self.object_id)
                 yield response_app, app
                 return
 
-        yield SieveMarathonApp(), self.marathon_client.get_app(self.object_id)
+        if self.is_write_request():
+            response_content = json.loads(self.response.data)
+            if 'tasks' in response_content:
+                for task in response_content['tasks']:
+                    response_task = MarathonTask.from_json(task)
+                    yield response_task, response_task
+                return
+            return                
+
+        yield SieveMarathonApp(), self.marathon_client.get_app(self.app_id)
 
     def join(self, apps: Apps) -> FlaskResponse:
 

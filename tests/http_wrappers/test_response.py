@@ -7,6 +7,7 @@ from unittest.mock import patch, Mock, call
 
 from marathon import NotFoundError, MarathonApp
 from marathon.models.group import MarathonGroup
+from marathon.models.task import MarathonTask
 from flask import Response as FlaskResponse
 from responses import RequestsMock
 
@@ -92,7 +93,10 @@ class SplitTests(unittest.TestCase):
         )
 
     @with_json_fixture('single_full_app.json')
-    def test_a_response_for_restart_operation_with_appid_in_url_path_returns_a_tuple_of_marathonapp(self, fixture):
+    def test_a_response_for_restart_operation_with_appid_in_url_path_does_not_split_response(self, fixture):
+        """
+        Quando o response retorna um Deployment, não fazemos split.
+        """
         with application.test_request_context('/v2/apps/xablau/restart',
                                               method='PUT',
                                               data=b'{"force": true}') as ctx:
@@ -102,89 +106,8 @@ class SplitTests(unittest.TestCase):
                 headers={}
             )
             response = Response(ctx.request, response)
-            with RequestsMock() as rsps:
-                rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps//xablau',
-                         body=json.dumps({'app': fixture}),
-                         status=200)
-                apps = list(response.split())
-
-                self.assertEqual(apps, [
-                    (SieveMarathonApp(), SieveMarathonApp.from_json(fixture))
-                ])
-
-    @with_json_fixture('single_full_app.json')
-    def test_a_response_for_write_operation_with_appid_in_url_path_returns_a_tuple_of_marathonapp(self, fixture):
-        scale_up = {'instances': 10}
-        with application.test_request_context('/v2/apps//foo',
-                                              method='PUT',
-                                              data=json.dumps(scale_up)) as ctx:
-            response = FlaskResponse(
-                response=b'{}',
-                status=HTTPStatus.OK,
-                headers={}
-            )
-            response = Response(ctx.request, response)
-            with RequestsMock() as rsps:
-                rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
-                         body=json.dumps({'app': fixture}),
-                         status=200)
-                apps = list(response.split())
-
-                self.assertEqual(apps, [
-                    (SieveMarathonApp(), SieveMarathonApp.from_json(fixture))
-                ])
-
-    @unittest.skip("Pode ser que esse teste nao faça sentido, já que PUT em /v2/apps/ retorna um Deployment")
-    @with_json_fixture('single_full_app.json')
-    def test_a_response_for_write_operation_on_multiple_apps_on_root_path_returns_tuples_of_marathonapp(self, fixture):
-        request_data = [
-            {
-                "id": "/foo",
-                "cmd": "sleep 60",
-                "cpus": 0.3,
-                "instances": 2,
-                "mem": 9,
-                "dependencies": [
-                    "/test/sleep120",
-                    "/other/namespace/or/app"
-                ]
-            },
-            {
-                "id": "/xablau",
-                "cmd": "sleep 120",
-                "cpus": 0.3,
-                "instances": 2,
-                "mem": 9
-            }
-        ]
-        with application.test_request_context('/v2/apps/',
-                                              method='PUT',
-                                              data=json.dumps(request_data)) as ctx:
-            response = FlaskResponse(
-                response=b'{}',
-                status=HTTPStatus.OK,
-                headers={}
-            )
-            response = Response(ctx.request, response)
-            with RequestsMock() as rsps:
-                rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
-                         body=json.dumps({'app': deepcopy(fixture)}),
-                         status=200)
-                xablau_app = deepcopy(fixture)
-                xablau_app['id'] = '/xablau'
-                rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps//xablau',
-                         body=json.dumps({'app': xablau_app}),
-                         status=200)
-                apps = list(response.split())
-
-            self.assertEqual(apps, [
-                (SieveMarathonApp(), SieveMarathonApp.from_json(fixture)),
-                (SieveMarathonApp(), SieveMarathonApp.from_json(xablau_app))
-            ])
+            apps = list(response.split())
+            self.assertEqual(0, len(apps))
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
     def test_split_groups_read_on_root_group(self, group_dev_namespace_fixture):
@@ -347,7 +270,6 @@ class JoinTests(unittest.TestCase):
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_one_full_app.json")
     def test_join_groups(self, group_dev_namespace_fixture):
-        self.maxDiff = None
         with application.test_request_context('/v2/groups/', method='GET') as ctx:
             response = FlaskResponse(
                 response=json.dumps(group_dev_namespace_fixture),
@@ -372,4 +294,60 @@ class JoinTests(unittest.TestCase):
                 self.assertEqual(1, len(joined_response_data['groups'][0]['apps']))
                 self.assertEqual([], joined_response_data['groups'][0]['apps'][0]['constraints']) # Apps should also be renderen in full
 
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_split_tasks_GET(self, tasks_get_fixture):
+        """
+        No cado de um GET, o retorno sempre é uma lista de apps.
+        """
+        with application.test_request_context('/v2/tasks/', method='GET') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_get_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+
+            self.assertEqual([MarathonTask.from_json(task) for task in tasks_get_fixture['tasks']],
+                             [task[0] for task in tasks_tuple])
+
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_split_staks_POST_scale_false(self, tasks_get_fixture):
+        """
+        No caso do POST com `?scale=false` o retorno é:
+            - Lista de apps que foram killed
+        Por isso usamos a fixture de tasks/get.json aqui
+        """
+        with application.test_request_context('/v2/tasks/delete?scale=false', method='POST') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_get_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+
+            self.assertEqual([MarathonTask.from_json(task) for task in tasks_get_fixture['tasks']],
+                             [task[0] for task in tasks_tuple])
+
+    @with_json_fixture("../fixtures/tasks/post?scale=true.json")
+    def test_split_staks_POST_scale_true(self, tasks_post_fixture):
+        """
+        No caso do POST com `?scale=true` o retorno é:
+            - Deployment Id
+        Isso significa que não faremos split do response
+        """
+        with application.test_request_context('/v2/tasks/delete?scale=true', method='POST') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_post_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+            self.assertEqual(0, len(tasks_tuple))
 
