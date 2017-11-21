@@ -184,6 +184,64 @@ class SplitTests(unittest.TestCase):
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_split_tasks_GET(self, tasks_get_fixture):
+        """
+        No cado de um GET, o retorno sempre é uma lista de apps.
+        """
+        with application.test_request_context('/v2/tasks/', method='GET') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_get_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+
+            self.assertEqual([MarathonTask.from_json(task) for task in tasks_get_fixture['tasks']],
+                             [task[0] for task in tasks_tuple])
+
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_split_staks_POST_scale_false(self, tasks_get_fixture):
+        """
+        No caso do POST com `?scale=false` o retorno é:
+            - Lista de apps que foram killed
+        Por isso usamos a fixture de tasks/get.json aqui
+        """
+        with application.test_request_context('/v2/tasks/delete?scale=false', method='POST') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_get_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+
+            self.assertEqual([MarathonTask.from_json(task) for task in tasks_get_fixture['tasks']],
+                             [task[0] for task in tasks_tuple])
+
+    @with_json_fixture("../fixtures/tasks/post?scale=true.json")
+    def test_split_staks_POST_scale_true(self, tasks_post_fixture):
+        """
+        No caso do POST com `?scale=true` o retorno é:
+            - Deployment Id
+        Isso significa que não faremos split do response
+        """
+        with application.test_request_context('/v2/tasks/delete?scale=true', method='POST') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(tasks_post_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            tasks_tuple = list(response.split())
+            self.assertEqual(0, len(tasks_tuple))
+
+
 class JoinTests(unittest.TestCase):
 
     def setUp(self):
@@ -293,61 +351,4 @@ class JoinTests(unittest.TestCase):
                 self.assertEqual([], joined_response_data['dependencies']) # Groups should be reendered in full
                 self.assertEqual(1, len(joined_response_data['groups'][0]['apps']))
                 self.assertEqual([], joined_response_data['groups'][0]['apps'][0]['constraints']) # Apps should also be renderen in full
-
-    @with_json_fixture("../fixtures/tasks/get.json")
-    def test_split_tasks_GET(self, tasks_get_fixture):
-        """
-        No cado de um GET, o retorno sempre é uma lista de apps.
-        """
-        with application.test_request_context('/v2/tasks/', method='GET') as ctx:
-            response = FlaskResponse(
-                response=json.dumps(tasks_get_fixture),
-                status=HTTPStatus.OK
-            )
-
-            ctx.request.user = self.user
-            response = Response(ctx.request, response)
-            tasks_tuple = list(response.split())
-
-            self.assertEqual([MarathonTask.from_json(task) for task in tasks_get_fixture['tasks']],
-                             [task[0] for task in tasks_tuple])
-
-
-    @with_json_fixture("../fixtures/tasks/get.json")
-    def test_split_staks_POST_scale_false(self, tasks_get_fixture):
-        """
-        No caso do POST com `?scale=false` o retorno é:
-            - Lista de apps que foram killed
-        Por isso usamos a fixture de tasks/get.json aqui
-        """
-        with application.test_request_context('/v2/tasks/delete?scale=false', method='POST') as ctx:
-            response = FlaskResponse(
-                response=json.dumps(tasks_get_fixture),
-                status=HTTPStatus.OK
-            )
-
-            ctx.request.user = self.user
-            response = Response(ctx.request, response)
-            tasks_tuple = list(response.split())
-
-            self.assertEqual([MarathonTask.from_json(task) for task in tasks_get_fixture['tasks']],
-                             [task[0] for task in tasks_tuple])
-
-    @with_json_fixture("../fixtures/tasks/post?scale=true.json")
-    def test_split_staks_POST_scale_true(self, tasks_post_fixture):
-        """
-        No caso do POST com `?scale=true` o retorno é:
-            - Deployment Id
-        Isso significa que não faremos split do response
-        """
-        with application.test_request_context('/v2/tasks/delete?scale=true', method='POST') as ctx:
-            response = FlaskResponse(
-                response=json.dumps(tasks_post_fixture),
-                status=HTTPStatus.OK
-            )
-
-            ctx.request.user = self.user
-            response = Response(ctx.request, response)
-            tasks_tuple = list(response.split())
-            self.assertEqual(0, len(tasks_tuple))
 
