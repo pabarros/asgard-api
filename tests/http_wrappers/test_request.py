@@ -262,6 +262,26 @@ class SplitTests(TestCase):
             self.assertEqual(0, len(apps))
             self.assertEqual([], apps)
 
+    @with_json_fixture("../fixtures/tasks/post.json")
+    def test_split_tasks_POST(self, tasks_post_fixture):
+        """
+        Quadno recebemos um POST em /v2/tasks/delete,
+        devemos fazer o split da lista e tasks e passar para os filtros
+        """
+        with application.test_request_context('/v2/tasks/delete',
+                                              method='POST',
+                                              data=json.dumps(tasks_post_fixture)) as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+
+            tasks = list(request_parser.split())
+            self.assertEqual(3, len(tasks))
+
+            # Confere os ids olhando o "request_task"
+            self.assertEqual([task[0].id for task in tasks],
+                                 [task_id for task_id in tasks_post_fixture['ids']])
+
+
 class JoinTests(TestCase):
 
     def setUp(self):
@@ -502,6 +522,24 @@ class JoinTests(TestCase):
             self.assertIsInstance(joined_request, HollowmanRequest)
             self.assertEqual(b'', joined_request.data, "Body deveria estar vazio")
             self.assertEqual("/v2/queue", joined_request.path)
+
+    @with_json_fixture("../fixtures/tasks/post.json")
+    def test_join_tasks_POST(self, tasks_post_fixture):
+        """
+        O join deve juntar apenas o id das tasks. O body do request é apenas:
+            {"ids": ["...", "...", ...]}
+        """
+        with application.test_request_context('/v2/tasks/delete',
+                                              method='POST',
+                                              data=json.dumps(tasks_post_fixture)) as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+
+            joined_request = request_parser.join(list(request_parser.split()))
+            joined_request_data = json.loads(joined_request.data)
+
+            self.assertEqual([task_id for task_id in joined_request_data['ids']],
+                                 [task_id for task_id in tasks_post_fixture['ids']])
 
 
 class GetOriginalGroupTest(TestCase):

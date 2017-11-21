@@ -4,6 +4,7 @@ from typing import Iterable, Dict
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
 from marathon.models.group import MarathonGroup
+from marathon.models.task import MarathonTask
 
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
@@ -64,6 +65,12 @@ class Request(HTTPWrapper):
                     app = MarathonApp()
 
                 yield request_app, app
+        elif self.is_tasks_requests():
+            request_data = self.request.get_json()
+            for task_id in request_data['ids']:
+                request_task = MarathonTask.from_json({"id": task_id})
+                yield request_task, request_task
+            return
 
     def _rindex(self, iterable, value):
         """
@@ -133,6 +140,14 @@ class Request(HTTPWrapper):
                 self.request.path = "/v2/queue{}/delay".format(app_id_with_namespace)
 
             return self.request
+        elif self.is_tasks_requests():
+            if self.is_read_request():
+                return self.request
+            if self.is_write_request():
+                apps_json_repr = {"ids": []}
+                for request_task, _ in apps:
+                    apps_json_repr["ids"].append(request_task.id)
+
         else:
             request_app, original_app = apps[0]
             self._adjust_request_path_if_needed(request, original_app)
