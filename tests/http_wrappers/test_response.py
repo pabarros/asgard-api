@@ -248,6 +248,26 @@ class JoinTests(unittest.TestCase):
         self.user = User(tx_name="User One", tx_email="user@host.com")
         self.user.current_account = Account(name="Dev", namespace="dev", owner="company")
 
+    def test_join_a_uknown_response(self):
+        """
+        Como o repsonse roda para qualquer requiest que retornou 200 no upstream,
+        muitas vezes pode passar por ele um request que ele "não trata", ou seja,
+        que ele não tem nada o que fazer.
+        Esse teste certifica que o join() não quebra em casos como esse
+        """
+        with application.test_request_context('/v2/apps/myapp/restart', method='POST') as ctx:
+            response = FlaskResponse(
+                response=json.dumps({"deploymentId": "myId"}),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            joined_response = response.join([])
+
+            joined_response_data = json.loads(joined_response.data)
+            self.assertEqual("myId", joined_response_data['deploymentId'])
+
     @with_json_fixture('single_full_app.json')
     def test_it_recreates_a_get_response_for_a_single_app(self, fixture):
         self.maxDiff = None

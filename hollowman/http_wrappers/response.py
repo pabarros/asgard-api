@@ -63,6 +63,7 @@ class Response(HTTPWrapper):
 
     def join(self, apps: Apps) -> FlaskResponse:
 
+        body = json.loads(self.response.data)
         if self.is_list_apps_request():
             apps_json_repr = [response_app.json_repr(minimal=True)
                               for response_app, _ in apps]
