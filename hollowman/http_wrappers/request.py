@@ -50,6 +50,8 @@ class Request(HTTPWrapper):
                 return
             elif self.is_queue_request():
                 return
+            elif self.is_tasks_request():
+                return
             else:
                 app = self._get_original_app(self.request.user, self.object_id)
                 yield MarathonApp(), app

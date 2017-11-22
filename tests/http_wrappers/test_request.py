@@ -281,6 +281,20 @@ class SplitTests(TestCase):
             self.assertEqual([task[0].id for task in tasks],
                                  [task_id for task_id in tasks_post_fixture['ids']])
 
+    def test_split_tasks_GET(self):
+        """
+        Quadno recebemos um GET em /v2/tasks/delete,
+        não temos o que fazer, entãoo request pode passar direto.
+        Isso significa que o spit retorna []
+        """
+        with application.test_request_context('/v2/tasks/delete',
+                                              method='GET') as ctx:
+            ctx.request.user = self.user
+            request_parser = Request(ctx.request)
+
+            tasks = list(request_parser.split())
+            self.assertEqual(0, len(tasks))
+
 
 class JoinTests(TestCase):
 
