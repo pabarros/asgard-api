@@ -5,7 +5,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
-* 0.0.48
+* 0.0.48/0.0.49
   - Suporte ao endpoint /v2/queue
   - Refactoring interno para generalizar o forma como pegamos o ID do resource sendo acessado
 
