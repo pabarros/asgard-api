@@ -42,20 +42,15 @@ class Request(HTTPWrapper):
                 apps = self.marathon_client.list_apps()
                 for app in apps:
                     yield MarathonApp(), app
-                return
+            elif self.is_app_request():
+                app = self._get_original_app(self.request.user, self.object_id)
+                yield MarathonApp(), app
             elif self.is_group_request():
                 self.group = self._get_original_group(self.request.user, self.object_id)
                 for app in self.group.iterate_apps():
                     yield MarathonApp(), app
-                return
-            elif self.is_queue_request():
-                return
-            elif self.is_tasks_request():
-                return
-            else:
-                app = self._get_original_app(self.request.user, self.object_id)
-                yield MarathonApp(), app
-                return
+
+            return
 
         # Request is a WRITE
         if self.is_app_request():
