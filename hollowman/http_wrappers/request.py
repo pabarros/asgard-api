@@ -136,7 +136,7 @@ class Request(HTTPWrapper):
         else:
             request_app, original_app = apps[0]
             self._adjust_request_path_if_needed(request, original_app)
-            apps_json_repr = request_app.json_repr(minimal=True)
+            apps_json_repr = request_app.json_repr(minimal=False)
 
         request.data = json.dumps(apps_json_repr, cls=self.json_encoder)
         return request
