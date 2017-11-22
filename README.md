@@ -5,6 +5,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.48
+  - Suporte ao endpoint /v2/queue
+  - Refactoring interno para generalizar o forma como pegamos o ID do resource sendo acessado
+
 * 0.0.47
   - Removendo do response apps que não pertencem ao namespace atual (/v2/apps)
   - Separando erros de autenticação em HTTP 401 e erros não tratados em HTTP 500. O Stacktrace é retornado no response JSON.
