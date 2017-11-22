@@ -46,6 +46,9 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         return OperationType.READ in self.request.operations
 
     def is_tasks_request(self):
+        """
+        It's a request at /v2/tasks/* ?
+        """
         return self.request.path.startswith(self.tasks_prefix)
 
     def is_app_request(self):
@@ -65,12 +68,6 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         It's a request at /v2/groups/* ?
         """
         return self.request.path.startswith(self.group_path_prefix)
-
-    def is_tasks_requests(self):
-        """
-        It's a request at /v2/tasks/* ?
-        """
-        return self.request.path.startswith(self.tasks_prefix)
 
     def is_deployment(self) -> bool:
         return self.request.path.startswith(self.deployment_prefix)

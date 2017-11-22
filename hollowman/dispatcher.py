@@ -118,7 +118,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             status=response.response.status,
             headers=response.response.headers
         )
-    elif response.is_tasks_requests():
+    elif response.is_tasks_request():
         content = json.loads(response.response.data)
         filtered_tasks = content
         try:

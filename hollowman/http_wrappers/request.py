@@ -65,7 +65,7 @@ class Request(HTTPWrapper):
                     app = MarathonApp()
 
                 yield request_app, app
-        elif self.is_tasks_requests():
+        elif self.is_tasks_request():
             request_data = self.request.get_json()
             for task_id in request_data['ids']:
                 request_task = MarathonTask.from_json({"id": task_id})
@@ -140,7 +140,7 @@ class Request(HTTPWrapper):
                 self.request.path = "/v2/queue{}/delay".format(app_id_with_namespace)
 
             return self.request
-        elif self.is_tasks_requests():
+        elif self.is_tasks_request():
             if self.is_read_request():
                 return self.request
             if self.is_write_request():

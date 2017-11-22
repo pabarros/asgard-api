@@ -39,7 +39,7 @@ class Response(HTTPWrapper):
                     original_group = self._get_original_group(self.request.user, group_id_without_namespace)
                     yield current_group, original_group
                 return
-            elif self.is_tasks_requests():
+            elif self.is_tasks_request():
                 for task in response_content['tasks']:
                     response_task = MarathonTask.from_json(task)
                     yield response_task, response_task
@@ -79,7 +79,7 @@ class Response(HTTPWrapper):
         elif self.is_read_request() and self.is_group_request():
             response_group = apps[0][0] if apps else MarathonGroup()
             body = response_group.json_repr(minimal=False)
-        elif self.is_tasks_requests():
+        elif self.is_tasks_request():
             original_response_data = json.loads(self.response.data)
             all_tasks = []
             for task, _ in apps:
