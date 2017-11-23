@@ -60,9 +60,21 @@ class TestNamespaceFilter(unittest.TestCase):
         envolvidas
         """
         task = MarathonTask.from_json(tasks_get_fixture['tasks'][0])
-        filtered_task  = self.filter.write(self.user, task, task)
+        filtered_task  = self.filter.write_task(self.user, task, task)
         self.assertEqual("dev_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
         self.assertEqual("/dev/waiting", filtered_task.app_id)
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_request_add_namespace_to_all_tasks_empty_app_id(self, tasks_get_fixture):
+        """
+        Um POST em /v2/tasks/delete deve ajustar o ID de todas as tasks
+        envolvidas
+        """
+        task = MarathonTask.from_json(tasks_get_fixture['tasks'][0])
+        task.app_id = None
+        filtered_task  = self.filter.write_task(self.user, task, task)
+        self.assertEqual("dev_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
+        self.assertIsNone(filtered_task.app_id)
 
     def test_does_nothing_if_user_is_none(self):
         modified_app = self.filter.write(None, self.request_app, SieveMarathonApp())

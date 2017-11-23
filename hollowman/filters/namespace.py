@@ -13,19 +13,21 @@ class NameSpaceFilter:
             id_without_ns = "/"
         return id_without_ns
 
-    def write(self, user, request_app, original_app):
-
-        if not user:
-            return request_app
-
-        if isinstance(request_app, MarathonTask):
-            request_task = request_app
+    def write_task(self, user, request_task, original_task):
+        try:
             request_task.app_id = self._add_namespace(
                 app_id=request_task.app_id,
                 namespace=user.current_account.namespace
             )
-            request_task.id = "{namespace}_{task_id}".format(namespace=user.current_account.namespace, task_id=request_task.id)
-            return request_task
+        except AttributeError as e:
+            pass
+        request_task.id = "{namespace}_{task_id}".format(namespace=user.current_account.namespace, task_id=request_task.id)
+        return request_task
+
+    def write(self, user, request_app, original_app):
+
+        if not user:
+            return request_app
 
         if not original_app.id:
             request_app.id = self._add_namespace(
