@@ -4,11 +4,13 @@ from copy import deepcopy
 import unittest
 import json
 import responses
+from mock import patch
 
 from marathon.models import MarathonConstraint, MarathonHealthCheck
 from marathon.models.app import MarathonUpgradeStrategy
 
 from hollowman.app import application
+from hollowman.http_wrappers import Request
 from hollowman.http_wrappers.response import Response
 from hollowman.http_wrappers.base import HTTPWrapper
 from hollowman.dispatcher import dispatch, REMOVABLE_KEYS
@@ -49,9 +51,13 @@ class RequestPipelineTest(unittest.TestCase):
                                               method="PUT",
                                               data=json.dumps(request_data),
                                               headers={"Content-type": "application/json"}) as ctx:
-            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
-            self.assertEqual(0, len(filtered_app.constraints))
-            self._check_other_fields("constraints", filtered_app)
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with patch.object(request, "split", return_value=[(request_app, original_app)]):
+                filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+                filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+                self.assertEqual(0, len(filtered_app.constraints))
+                self._check_other_fields("constraints", filtered_app)
 
     def test_update_app_change_all_constraints(self):
         """
@@ -74,10 +80,15 @@ class RequestPipelineTest(unittest.TestCase):
                                               method="PUT",
                                               data=json.dumps(request_data),
                                               headers={"Content-type": "application/json"}) as ctx:
-            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
-            self.assertEqual(1, len(filtered_app.constraints))
-            self.assertEqual(["hostname", "LIKE", "myhost"], filtered_app.constraints[0].json_repr())
-            self._check_other_fields("constraints", filtered_app)
+
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with patch.object(request, "split", return_value=[(request_app, original_app)]):
+                filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+                filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+                self.assertEqual(1, len(filtered_app.constraints))
+                self.assertEqual(["hostname", "LIKE", "myhost"], filtered_app.constraints[0].json_repr())
+                self._check_other_fields("constraints", filtered_app)
 
     def test_preserve_constraints_added_by_filter(self):
         """
@@ -102,9 +113,13 @@ class RequestPipelineTest(unittest.TestCase):
                                               headers={"Content-type": "application/json"},
                                               data=json.dumps(request_data)) as ctx:
 
-            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
-            self.assertEqual(1, len(filtered_app.constraints))
-            self._check_other_fields("constraints", filtered_app)
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with patch.object(request, "split", return_value=[(request_app, original_app)]):
+                filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+                filtered_request_app = SieveMarathonApp.from_json(filtered_request.get_json())
+                self.assertEqual(1, len(filtered_request_app.constraints))
+                self._check_other_fields("constraints", filtered_request_app)
 
     def _check_other_fields(self, skip_field_names, filtered_app):
         json_repr = json.loads(json.dumps(filtered_app, cls=HTTPWrapper.json_encoder))
@@ -132,10 +147,14 @@ class RequestPipelineTest(unittest.TestCase):
                                               headers={"Content-type": "application/json"},
                                               data=json.dumps(request_data)) as ctx:
 
-            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
-            self.assertEqual(1, len(filtered_app.labels.keys()))
-            self.assertEqual({"label1": "value1"}, filtered_app.labels)
-            self._check_other_fields("labels", filtered_app)
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with patch.object(request, "split", return_value=[(request_app, original_app)]):
+                filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+                filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+                self.assertEqual(1, len(filtered_app.labels.keys()))
+                self.assertEqual({"label1": "value1"}, filtered_app.labels)
+                self._check_other_fields("labels", filtered_app)
 
     def test_preserve_upgrade_strategy_added_by_filter(self):
         class AddNewUpgradeStrategyFilter:
@@ -161,11 +180,14 @@ class RequestPipelineTest(unittest.TestCase):
                                               headers={"Content-type": "application/json"},
                                               data=json.dumps(request_data)) as ctx:
 
-            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
-
-            self.assertEqual(1, filtered_app.upgrade_strategy.maximum_over_capacity)
-            self.assertEqual(0.75, filtered_app.upgrade_strategy.minimum_health_capacity)
-            self._check_other_fields("upgradeStrategy", filtered_app)
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with patch.object(request, "split", return_value=[(request_app, original_app)]):
+                filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+                filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+                self.assertEqual(1, filtered_app.upgrade_strategy.maximum_over_capacity)
+                self.assertEqual(0.75, filtered_app.upgrade_strategy.minimum_health_capacity)
+                self._check_other_fields("upgradeStrategy", filtered_app)
 
     def test_preserve_envs_added_by_filter(self):
         class AddNewEnvFilter:
@@ -186,10 +208,14 @@ class RequestPipelineTest(unittest.TestCase):
                                               headers={"Content-type": "application/json"},
                                               data=json.dumps(request_data)) as ctx:
 
-            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
-            self.assertEqual(1, len(filtered_app.env.keys()))
-            self.assertEqual({"env1": "env-value1"}, filtered_app.env)
-            self._check_other_fields("env", filtered_app)
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with patch.object(request, "split", return_value=[(request_app, original_app)]):
+                filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+                filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+                self.assertEqual(1, len(filtered_app.env.keys()))
+                self.assertEqual({"env1": "env-value1"}, filtered_app.env)
+                self._check_other_fields("env", filtered_app)
 
     def test_preserve_healthchecks_added_by_filter(self):
         class AddNewHealthCheckFilter:
@@ -224,9 +250,13 @@ class RequestPipelineTest(unittest.TestCase):
                                               headers={"Content-type": "application/json"},
                                               data=json.dumps(request_data)) as ctx:
 
-            filtered_app = dispatch([OperationType.WRITE], self.user, request_app, original_app, filters_pipeline=pipeline)
-            self.assertEqual(1, len(filtered_app.health_checks))
-            self.assertEqual("/marathon/healthcheck", filtered_app.health_checks[0].json_repr()['path'])
-            self._check_other_fields("healthChecks", filtered_app)
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with patch.object(request, "split", return_value=[(request_app, original_app)]):
+                filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+                filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+                self.assertEqual(1, len(filtered_app.health_checks))
+                self.assertEqual("/marathon/healthcheck", filtered_app.health_checks[0].json_repr()['path'])
+                self._check_other_fields("healthChecks", filtered_app)
 
 
