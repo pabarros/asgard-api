@@ -61,7 +61,13 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
         for operation in request.request.operations:
             merged_app = merge_marathon_apps(base_app=original_app, modified_app=request_app)
             for filter_ in filters_pipeline[operation]:
-                func = getattr(filter_, operation.value)
+                func = lambda user, request_obj, original_obj: request_obj
+                if request.is_tasks_request():
+                    method_name = f"{operation.value}_task"
+                    if hasattr(filter_, method_name):
+                        func = getattr(filter_, method_name)
+                else:
+                    func = getattr(filter_, operation.value)
                 merged_app = func(user, merged_app, original_app)
         filtered_apps.append((merged_app, original_app))
 
@@ -168,5 +174,7 @@ def merge_marathon_apps(base_app, modified_app):
                 merged[key] = raw_request_data[key]
     except Exception as e:
         pass
+    if isinstance(base_app, MarathonTask):
+        return MarathonTask.from_json(merged)
     return SieveMarathonApp.from_json(merged)
 
