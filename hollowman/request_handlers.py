@@ -54,17 +54,18 @@ class Deployments(RequestHandler):
 
 def new(request: http_wrappers.Request) -> Response:
 
-    final_response = dispatch(user=_get_user_from_request(request.request), request=request)
+    user = _get_user_from_request(request.request)
 
-    response = upstream_request(final_response, run_filters=False)
+    filtered_request = dispatch(user=user, request=request)
 
-    if response.status_code == HTTPStatus.OK:
-        response_wrapper = http_wrappers.Response(request.request, response)
-        final_response = dispatch_response_pipeline(user=_get_user_from_request(request.request),
-                                                   response=response_wrapper)
-        return final_response
+    upstream_response = upstream_request(filtered_request, run_filters=False)
 
-    return response
+    if upstream_response.status_code == HTTPStatus.OK:
+        response_wrapper = http_wrappers.Response(request.request, upstream_response)
+        filtered_response = dispatch_response_pipeline(user=user, response=response_wrapper)
+        return filtered_response
+
+    return upstream_response
 
 
 def _get_user_from_request(request):
