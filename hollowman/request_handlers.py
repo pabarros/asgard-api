@@ -15,7 +15,7 @@ from hollowman.hollowman_flask import OperationType
 from hollowman.models import User
 
 
-def upstream_request(request: HollowmanRequest, run_filters=True) -> Response:
+def upstream_request(request: HollowmanRequest) -> Response:
     resp = upstream.replay_request(request, conf.MARATHON_ENDPOINT)
     return Response(response=resp.content,
                     status=resp.status_code,
@@ -56,7 +56,7 @@ def new(request: http_wrappers.Request) -> Response:
 
     filtered_request = dispatch(user=request.request.user, request=request)
 
-    upstream_response = upstream_request(filtered_request, run_filters=False)
+    upstream_response = upstream_request(filtered_request)
 
     if upstream_response.status_code == HTTPStatus.OK:
         response_wrapper = http_wrappers.Response(request.request, upstream_response)
