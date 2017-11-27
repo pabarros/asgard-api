@@ -53,16 +53,10 @@ class Deployments(RequestHandler):
 
 
 def new(request: http_wrappers.Request) -> Response:
-    filtered_apps = []
-    for request_app, app in request.split():
-        filtered_request_app = dispatch(operations=request.request.operations,
-                                        user=_get_user_from_request(request.request),
-                                        request_app=request_app,
-                                        app=app)
-        filtered_apps.append((filtered_request_app, app))
 
-    joined_request = request.join(filtered_apps)
-    response = upstream_request(joined_request, run_filters=False)
+    final_response = dispatch(user=_get_user_from_request(request.request), request=request)
+
+    response = upstream_request(final_response, run_filters=False)
 
     if response.status_code == HTTPStatus.OK:
         response_wrapper = http_wrappers.Response(request.request, response)

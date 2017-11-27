@@ -13,7 +13,7 @@ from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
 from hollowman.filters.namespace import NameSpaceFilter
-from hollowman.hollowman_flask import OperationType, FilterType
+from hollowman.hollowman_flask import OperationType, FilterType, HollowmanRequest
 from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.http_wrappers.response import Response
@@ -46,24 +46,26 @@ FILTERS_PIPELINE = {
 # juntamos a request_app com a original_app
 REMOVABLE_KEYS = {"constraints", "labels", "env", "healthChecks", "upgradeStrategy"}
 
-def dispatch(operations, user, request_app, app,
-             filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> SieveMarathonApp:
+def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> HollowmanRequest:
     """
-    :type operations: Iterable[OperationType]
-    :type request_app: MarathonApp
-    :type app: MarathonApp
+    :type user: User
+    :type request: http_wrappers.Request
     :type filters_pipeline: Dict[OperationType, Iterable[BaseFilter]]
 
-    todo: (user, request_app, app) podem ser refatorados em uma classe de domínio
+    todo: (user, request_app, original_app) podem ser refatorados em uma classe de domínio
     """
-    merged_app = merge_marathon_apps(base_app=app, modified_app=request_app)
-    for operation in operations:
-        for filter_ in filters_pipeline[operation]:
-            func = getattr(filter_, operation.value)
-            merged_app = func(user, merged_app, app)
 
-    return merged_app
+    filtered_apps = []
 
+    for request_app, original_app in request.split():
+        for operation in request.request.operations:
+            merged_app = merge_marathon_apps(base_app=original_app, modified_app=request_app)
+            for filter_ in filters_pipeline[operation]:
+                func = getattr(filter_, operation.value)
+                merged_app = func(user, merged_app, original_app)
+        filtered_apps.append((merged_app, original_app))
+
+    return request.join(filtered_apps)
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
     if response.is_app_request():
