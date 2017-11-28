@@ -68,7 +68,8 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
                         func = getattr(filter_, method_name)
                 else:
                     func = getattr(filter_, operation.value)
-                merged_app = func(user, merged_app, original_app)
+
+                func(user, merged_app, original_app)
         filtered_apps.append((merged_app, original_app))
 
     return request.join(filtered_apps)
@@ -80,7 +81,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             filtered_app = response_app
             for filter_ in filters_pipeline:
                 if hasattr(filter_, "response"):
-                    filtered_app = filter_.response(user, filtered_app, original_app)
+                    filter_.response(user, filtered_app, original_app)
 
             if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
                 filtered_response_apps.append((filtered_app, original_app))
@@ -92,7 +93,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             filtered_group = response_group
             for filter_ in filters_pipeline:
                 if hasattr(filter_, "response_group"):
-                    filtered_group = filter_.response_group(user, filtered_group, original_group)
+                    filter_.response_group(user, filtered_group, original_group)
             filtered_response_groups.append((filtered_group, original_group))
         return response.join(filtered_response_groups)
     elif response.is_deployment():
