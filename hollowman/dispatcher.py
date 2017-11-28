@@ -80,7 +80,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             filtered_app = response_app
             for filter_ in filters_pipeline:
                 if hasattr(filter_, "response"):
-                    filter_.response(user, filtered_app, original_app)
+                    filter_.response(user, filtered_app)
 
             if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
                 filtered_response_apps.append((filtered_app, original_app))
@@ -92,7 +92,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             filtered_group = response_group
             for filter_ in filters_pipeline:
                 if hasattr(filter_, "response_group"):
-                    filter_.response_group(user, filtered_group, original_group)
+                    filter_.response_group(user, filtered_group)
             filtered_response_groups.append((filtered_group, original_group))
         return response.join(filtered_response_groups)
     elif response.is_deployment():
@@ -137,7 +137,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
                 task_original_idd = task.id
                 for filter_ in filters_pipeline:
                     if hasattr(filter_, "response_task"):
-                        filter_.response_task(user, task, task)
+                        filter_.response_task(user, task)
 
                 if task_original_idd.startswith(f"{user.current_account.namespace}_"):
                     filtered_tasks.append((task, task))

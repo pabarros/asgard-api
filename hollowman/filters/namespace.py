@@ -54,7 +54,7 @@ class NameSpaceFilter:
             task.id = task.id.replace("{}_".format(namespace), "")
             task.app_id = task.app_id.replace("/{}/".format(namespace), "/")
 
-    def response(self, user, response_app, original_app) -> SieveMarathonApp:
+    def response(self, user, response_app) -> SieveMarathonApp:
         if not user:
             return response_app
 
@@ -63,7 +63,7 @@ class NameSpaceFilter:
 
         return response_app
 
-    def response_group(self, user, response_group, original_group):
+    def response_group(self, user, response_group):
         response_group.id = self._remove_namespace(user, response_group.id)
         for app in response_group.apps:
             app.id = self._remove_namespace(user, app.id)
@@ -86,7 +86,7 @@ class NameSpaceFilter:
 
         return deployment
 
-    def response_task(self, user, response_task, original_task):
+    def response_task(self, user, response_task):
         """
         Método para filtrar tasks que estejam sendo retornadas no
         response

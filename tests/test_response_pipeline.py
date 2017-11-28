@@ -15,7 +15,7 @@ from tests.utils import with_json_fixture
 
 
 class RemoveNSFilter:
-    def response(self, user, response_app, original_app):
+    def response(self, user, response_app):
         response_app.id = response_app.id.replace("/dev/", "/")
         return response_app
 
@@ -155,7 +155,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
     def test_do_not_call_filter_if_it_doesnt_implement_response_method(self):
         class DummyRequestFilter:
-            def write(self, user, request_app, original_app):
+            def write(self, user, request_app):
                 return request_app
 
         with application.test_request_context("/v2/apps/foo", method="GET") as ctx:
@@ -195,7 +195,7 @@ class ResponsePipelineTest(unittest.TestCase):
     @with_json_fixture("../fixtures/tasks/get_single_namespace.json")
     def test_response_task_filter_modifies_task(self, tasks_get_fixture):
         class ModifyTaskFilter:
-            def response_task(self, user, response_task, original_task):
+            def response_task(self, user, response_task):
                 response_task.id = f"{response_task.id}_bla"
                 return response_task
 
@@ -220,7 +220,7 @@ class ResponsePipelineTest(unittest.TestCase):
     @with_json_fixture("../fixtures/tasks/get_multi_namespace.json")
     def test_response_task_remove_from_response_tasks_outside_namespace(self, tasks_multinamespace_fixure):
         class ModifyTaskFilter:
-            def response_task(self, user, response_task, original_task):
+            def response_task(self, user, response_task):
                 response_task.id = response_task.id.replace(f"{user.current_account.namespace}_", "")
                 return response_task
 
