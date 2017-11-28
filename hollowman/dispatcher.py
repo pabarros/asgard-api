@@ -36,7 +36,6 @@ FILTERS_PIPELINE = {
         )
     },
     FilterType.RESPONSE: (
-        AddAppNameFilter(),
         NameSpaceFilter(),
     )
 }
