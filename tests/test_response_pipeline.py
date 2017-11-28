@@ -206,6 +206,29 @@ class ResponsePipelineTest(unittest.TestCase):
                 "waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
             ], [task['id'] for task in response_data['tasks']])
 
+    @with_json_fixture("../fixtures/tasks/get_multi_namespace.json")
+    def test_response_task_remove_from_response_tasks_outside_same_prefix_namespace(self, tasks_multinamespace_fixure):
+        """
+        Confirmamos que uma task do namespace "developers" *deve ser removida* quando o usuário faz parte
+        do namespace "dev", mesmo esses dois namespaces começando pelo mesmo prefixo
+        """
+        with application.test_request_context("/v2/tasks/", method="GET") as ctx:
+
+            original_response = FlaskResponse(response=json.dumps(tasks_multinamespace_fixure),
+                                              status=200)
+
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch_response_pipeline(user=self.user,
+                                                        response=response_wrapper,
+                                                        filters_pipeline=[])
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual([
+                "dev_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638",
+                "dev_waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
+            ], [task['id'] for task in response_data['tasks']])
+            self.assertEqual(2, len(response_data['tasks']))
+
     @with_json_fixture("../fixtures/tasks/post?scale=true.json")
     def test_response_task_do_not_dispatch_pipeline_if_response_is_deployment(self, tasks_post_fixture):
         """
