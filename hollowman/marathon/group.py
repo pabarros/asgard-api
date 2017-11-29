@@ -18,7 +18,7 @@ class SieveAppGroup():
         return self.id == other.id
 
     def from_json(self, data):
-        self._marathon_group = MarathonGroup().from_json(data)
+        self._marathon_group = MarathonGroup.from_json(data)
         return self
 
     def __iterate(self, groups):
@@ -35,3 +35,7 @@ class SieveAppGroup():
         for g in self.iterate_groups():
             for app in g.apps:
                 yield app
+
+    @classmethod
+    def from_json(cls, *args, **kwargs):
+        return SieveAppGroup(MarathonGroup.from_json(*args, **kwargs))
