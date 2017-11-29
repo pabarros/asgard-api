@@ -25,6 +25,16 @@ class AddURIFilterTest(unittest.TestCase):
         self.assertEqual(3, len(filtered_app.uris))
         self.assertEqual(self.base_uris + [self.docker_auth_uri], filtered_app.uris)
 
+    def test_update_app_do_not_add_uri_if_exist_with_spaces(self):
+        """
+        Não precisamos fazer o strip nos valores originais pois o Marathon já faz isso pra nós.
+        """
+        self.single_full_app_fixture['uris'] = copy(self.base_uris) + ["      " + self.docker_auth_uri]
+        self.request_app = SieveMarathonApp.from_json(self.single_full_app_fixture)
+        filtered_app = self.filter.write(None, self.request_app, self.original_app)
+        self.assertEqual(3, len(filtered_app.uris))
+        self.assertEqual(self.base_uris + ["      " + self.docker_auth_uri], filtered_app.uris)
+
     def test_update_app_add_uri_with_other_existing_uris(self):
         """
         Mesmo se a app já tiver utras uris, temos que adicionar a nossa
