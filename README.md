@@ -4,7 +4,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* next
+* 0.0.51
   - IN-2344 Suporte ao endpoint /v2/tasks
   - IN-2355 Usando passgem por referencia nos filtros
   - IN-2356 Não passamos `original_*` para os métodos de response filters
