@@ -17,7 +17,7 @@ def _patch_docker_params(params):
                 v = parts[0] + "=" + "/sieve" + parts[1]
                 p[k] = v
 
-_group = SieveAppGroup(MarathonGroup().from_json(json.loads(sys.stdin.read())))
+_group = SieveAppGroup(MarathonGroup.from_json(json.loads(sys.stdin.read())))
 
 for group in _group.iterate_groups():
     group.id = "/sieve{}".format(group.id)

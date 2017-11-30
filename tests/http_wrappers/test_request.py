@@ -528,7 +528,7 @@ class GetOriginalGroupTest(TestCase):
 
                 group = request._get_original_group(self.user, "/foo")
                 self.assertTrue(isinstance(group, SieveAppGroup))
-                self.assertEqual(SieveAppGroup().from_json(found_group), group)
+                self.assertEqual(SieveAppGroup.from_json(found_group), group)
 
     def test_get_original_group_not_found(self):
         """
@@ -542,7 +542,7 @@ class GetOriginalGroupTest(TestCase):
                 request = Request(ctx.request)
 
                 group = request._get_original_group(self.user, "/not-found")
-                self.assertEqual(SieveAppGroup(MarathonGroup().from_json({"id": "/dev/not-found"})), group)
+                self.assertEqual(SieveAppGroup(MarathonGroup.from_json({"id": "/dev/not-found"})), group)
 
 class RequestWrapperTest(TestCase):
 

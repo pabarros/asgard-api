@@ -210,7 +210,7 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(5, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup().from_json(group_dev_namespace_fixture)).iterate_groups()]
+                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture)).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
@@ -231,7 +231,7 @@ class SplitTests(unittest.TestCase):
                 groups_tuple = list(response.split())
                 self.assertEqual(1, len(groups_tuple))
                 expected_groups = [SieveAppGroup(g)
-                                   for g in SieveAppGroup(MarathonGroup().from_json(group_dev_namespace_fixture['groups'][2])).iterate_groups()]
+                                   for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][2])).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
@@ -257,7 +257,7 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(2, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup().from_json(group_dev_namespace_fixture['groups'][1])).iterate_groups()]
+                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 

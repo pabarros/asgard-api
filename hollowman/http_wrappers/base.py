@@ -98,7 +98,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         try:
             return self.marathon_client.get_app(app_id_with_namespace)
         except NotFoundError as e:
-            return MarathonApp().from_json({"id": app_id_with_namespace})
+            return MarathonApp.from_json({"id": app_id_with_namespace})
 
     def _get_original_group(self, user, group_id):
         group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
@@ -106,4 +106,4 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         try:
             return SieveAppGroup(self.marathon_client.get_group(group_id_with_namespace))
         except NotFoundError as e:
-            return SieveAppGroup(MarathonGroup().from_json({"id": group_id_with_namespace}))
+            return SieveAppGroup(MarathonGroup.from_json({"id": group_id_with_namespace}))

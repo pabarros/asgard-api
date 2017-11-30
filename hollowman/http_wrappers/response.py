@@ -31,7 +31,7 @@ class Response(HTTPWrapper):
                     yield response_app, app
                 return
             elif self.is_group_request():
-                response_group = SieveAppGroup(MarathonGroup().from_json(response_content))
+                response_group = SieveAppGroup(MarathonGroup.from_json(response_content))
                 for current_group in response_group.iterate_groups():
                     group_id = current_group.id
                     group_id_without_namespace = self._remove_namespace_if_exists(self.request.user.current_account.namespace, group_id)
