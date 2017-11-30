@@ -5,6 +5,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 * next
+  - IN-2344 Suporte ao endpoint /v2/tasks
   - IN-2355 Usando passgem por referencia nos filtros
   - IN-2356 Não passamos `original_*` para os métodos de response filters
   - IN-2357 Adiçao do AddURIFilter que adiciona a autenticação do docker registry
