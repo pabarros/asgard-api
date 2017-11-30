@@ -7,6 +7,7 @@ from marathon.models import MarathonDeployment, MarathonQueueItem
 
 from hollowman.marathonapp import SieveMarathonApp
 
+from hollowman.filters.uri import AddURIFilter
 from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
@@ -23,6 +24,7 @@ FILTERS_PIPELINE = {
         ),
 
         OperationType.WRITE: (
+            AddURIFilter(),
             DefaultScaleFilter(),
             NameSpaceFilter(),
             ForcePullFilter(),
