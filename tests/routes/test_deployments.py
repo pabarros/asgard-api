@@ -107,3 +107,18 @@ class DeploymentsTests(BaseApiTests, TestCase):
 
             self.assertFalse(_apply_response_filters.called)
             self.assertEqual(json.loads(response.data), fixture)
+
+    @with_json_fixture("../fixtures/deployments/get-multi-namespace.json")
+    def test_deployments_remove_all_from_other_namespaces(self, multi_namespace_deployments_fixture):
+        with application.test_client() as client, RequestsMock() as rsps:
+            rsps.add(
+                url=f'{conf.MARATHON_ENDPOINT}/v2/deployments',
+                body=json.dumps(multi_namespace_deployments_fixture),
+                method='GET',
+                status=200
+            )
+            response = client.get("/v2/deployments", headers=self.auth_header)
+            response_data = json.loads(response.data)
+            self.assertEqual(1, len(response_data))
+            self.assertEqual("/foo", response_data[0]['affectedApps'][0])
+
