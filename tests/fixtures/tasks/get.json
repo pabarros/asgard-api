@@ -1,0 +1,70 @@
+{
+  "tasks": [
+    {
+      "appId": "/waiting",
+      "host": "10.168.200.93",
+      "id": "waiting.01339ffa-ce9c-11e7-8144-2a27410e5638",
+      "ipAddresses": [
+        {
+          "ipAddress": "172.17.0.2",
+          "protocol": "IPv4"
+        }
+      ],
+      "ports": [
+        31291
+      ],
+      "servicePorts": [
+        10025
+      ],
+      "slaveId": "47474c91-b589-4fe3-a2b0-524f4f1d738f-S2",
+      "stagedAt": "2017-11-21T09:11:48.848Z",
+      "startedAt": "2017-11-21T09:11:55.683Z",
+      "state": "TASK_RUNNING",
+      "version": "2017-11-21T08:55:00.437Z"
+    },
+    {
+      "appId": "/waiting",
+      "host": "10.168.200.95",
+      "id": "waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
+      "ipAddresses": [
+        {
+          "ipAddress": "172.17.0.8",
+          "protocol": "IPv4"
+        }
+      ],
+      "ports": [
+        31348
+      ],
+      "servicePorts": [
+        10025
+      ],
+      "slaveId": "47474c91-b589-4fe3-a2b0-524f4f1d738f-S3",
+      "stagedAt": "2017-11-21T09:11:53.877Z",
+      "startedAt": "2017-11-21T09:11:57.918Z",
+      "state": "TASK_RUNNING",
+      "version": "2017-11-21T08:55:00.437Z"
+    },
+    {
+      "appId": "/waiting",
+      "host": "10.168.200.96",
+      "id": "waiting.75b2ed9c-ce9c-11e7-8144-2a27410e5638",
+      "ipAddresses": [
+        {
+          "ipAddress": "172.17.0.5",
+          "protocol": "IPv4"
+        }
+      ],
+      "ports": [
+        31150
+      ],
+      "servicePorts": [
+        10025
+      ],
+      "slaveId": "47474c91-b589-4fe3-a2b0-524f4f1d738f-S4",
+      "stagedAt": "2017-11-21T09:15:04.297Z",
+      "startedAt": "2017-11-21T09:15:11.388Z",
+      "state": "TASK_RUNNING",
+      "version": "2017-11-21T08:55:00.437Z"
+    }
+  ]
+}

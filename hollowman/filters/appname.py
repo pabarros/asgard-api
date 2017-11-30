@@ -25,5 +25,3 @@ class AddAppNameFilter:
 
         return request_app
 
-    def response(self, user, response_app, original_app) -> SieveMarathonApp:
-        return response_app

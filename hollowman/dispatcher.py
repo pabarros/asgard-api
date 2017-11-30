@@ -4,6 +4,7 @@ import json
 
 from hollowman.filters.basicconstraint import BasicConstraintFilter
 from marathon.models import MarathonDeployment, MarathonQueueItem
+from marathon.models.task import MarathonTask
 
 from hollowman.marathonapp import SieveMarathonApp
 
@@ -12,7 +13,7 @@ from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
 from hollowman.filters.namespace import NameSpaceFilter
-from hollowman.hollowman_flask import OperationType, FilterType
+from hollowman.hollowman_flask import OperationType, FilterType, HollowmanRequest
 from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.http_wrappers.response import Response
@@ -35,7 +36,6 @@ FILTERS_PIPELINE = {
         )
     },
     FilterType.RESPONSE: (
-        AddAppNameFilter(),
         NameSpaceFilter(),
     )
 }
@@ -45,24 +45,33 @@ FILTERS_PIPELINE = {
 # juntamos a request_app com a original_app
 REMOVABLE_KEYS = {"constraints", "labels", "env", "healthChecks", "upgradeStrategy"}
 
-def dispatch(operations, user, request_app, app,
-             filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> SieveMarathonApp:
+def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> HollowmanRequest:
     """
-    :type operations: Iterable[OperationType]
-    :type request_app: MarathonApp
-    :type app: MarathonApp
+    :type user: User
+    :type request: http_wrappers.Request
     :type filters_pipeline: Dict[OperationType, Iterable[BaseFilter]]
 
-    todo: (user, request_app, app) podem ser refatorados em uma classe de domínio
+    todo: (user, request_app, original_app) podem ser refatorados em uma classe de domínio
     """
-    merged_app = merge_marathon_apps(base_app=app, modified_app=request_app)
-    for operation in operations:
-        for filter_ in filters_pipeline[operation]:
-            func = getattr(filter_, operation.value)
-            merged_app = func(user, merged_app, app)
 
-    return merged_app
+    filtered_apps = []
 
+    for request_app, original_app in request.split():
+        for operation in request.request.operations:
+            merged_app = merge_marathon_apps(base_app=original_app, modified_app=request_app)
+            for filter_ in filters_pipeline[operation]:
+                func = lambda user, request_obj, original_obj: request_obj
+                if request.is_tasks_request():
+                    method_name = f"{operation.value}_task"
+                    if hasattr(filter_, method_name):
+                        func = getattr(filter_, method_name)
+                else:
+                    func = getattr(filter_, operation.value)
+
+                func(user, merged_app, original_app)
+        filtered_apps.append((merged_app, original_app))
+
+    return request.join(filtered_apps)
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
     if response.is_app_request():
@@ -70,7 +79,8 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
         for response_app, original_app in response.split():
             filtered_app = response_app
             for filter_ in filters_pipeline:
-                filtered_app = filter_.response(user, filtered_app, original_app)
+                if hasattr(filter_, "response"):
+                    filter_.response(user, filtered_app)
 
             if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
                 filtered_response_apps.append((filtered_app, original_app))
@@ -82,7 +92,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             filtered_group = response_group
             for filter_ in filters_pipeline:
                 if hasattr(filter_, "response_group"):
-                    filtered_group = filter_.response_group(user, filtered_group, original_group)
+                    filter_.response_group(user, filtered_group)
             filtered_response_groups.append((filtered_group, original_group))
         return response.join(filtered_response_groups)
     elif response.is_deployment():
@@ -116,6 +126,26 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             status=response.response.status,
             headers=response.response.headers
         )
+    elif response.is_tasks_request():
+        content = json.loads(response.response.data)
+        filtered_tasks = content
+        try:
+            tasks = (MarathonTask.from_json(task) for task in content['tasks'])
+            
+            filtered_tasks = []
+            for task in tasks:
+                task_original_idd = task.id
+                for filter_ in filters_pipeline:
+                    if hasattr(filter_, "response_task"):
+                        filter_.response_task(user, task)
+
+                if task_original_idd.startswith(f"{user.current_account.namespace}_"):
+                    filtered_tasks.append((task, task))
+        except KeyError:
+            # resposne sem lista de task, retornamos sem mexer
+            return response.response
+
+        return response.join(filtered_tasks)
 
 
 def merge_marathon_apps(base_app, modified_app):
@@ -144,5 +174,7 @@ def merge_marathon_apps(base_app, modified_app):
                 merged[key] = raw_request_data[key]
     except Exception as e:
         pass
+    if isinstance(base_app, MarathonTask):
+        return MarathonTask.from_json(merged)
     return SieveMarathonApp.from_json(merged)
 

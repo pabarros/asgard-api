@@ -40,7 +40,7 @@ def groups(*args, **kwargs):
 @application.route("/v2/tasks/delete", methods=["POST"])
 @auth_required()
 def tasks():
-    return raw_proxy()
+    return request_handlers.new(http_wrappers.Request(request))
 
 @application.route("/v2/artifacts", methods=["GET"])
 @application.route("/v2/artifacts/<path:path>", methods=["GET", "PUT", "POST", "DELETE"])

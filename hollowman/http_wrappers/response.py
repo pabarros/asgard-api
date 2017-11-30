@@ -2,6 +2,7 @@ import json
 from flask import Response as FlaskResponse
 
 from marathon.models.group import MarathonGroup
+from marathon.models.task import MarathonTask
 
 from hollowman.http_wrappers.base import HTTPWrapper, Apps
 from hollowman.marathonapp import SieveMarathonApp
@@ -38,16 +39,31 @@ class Response(HTTPWrapper):
                     original_group = self._get_original_group(self.request.user, group_id_without_namespace)
                     yield current_group, original_group
                 return
+            elif self.is_tasks_request():
+                for task in response_content['tasks']:
+                    response_task = MarathonTask.from_json(task)
+                    yield response_task, response_task
+                return
             else:
                 response_app = SieveMarathonApp.from_json(response_content.get('app') or response_content)
                 app = self.marathon_client.get_app(self.object_id)
                 yield response_app, app
                 return
 
-        yield SieveMarathonApp(), self.marathon_client.get_app(self.object_id)
+        if self.is_write_request():
+            response_content = json.loads(self.response.data)
+            if 'tasks' in response_content:
+                for task in response_content['tasks']:
+                    response_task = MarathonTask.from_json(task)
+                    yield response_task, response_task
+                return
+            return                
+
+        yield SieveMarathonApp(), self.marathon_client.get_app(self.app_id)
 
     def join(self, apps: Apps) -> FlaskResponse:
 
+        body = json.loads(self.response.data)
         if self.is_list_apps_request():
             apps_json_repr = [response_app.json_repr(minimal=True)
                               for response_app, _ in apps]
@@ -64,6 +80,16 @@ class Response(HTTPWrapper):
         elif self.is_read_request() and self.is_group_request():
             response_group = apps[0][0] if apps else MarathonGroup()
             body = response_group.json_repr(minimal=False)
+        elif self.is_tasks_request():
+            original_response_data = json.loads(self.response.data)
+            all_tasks = []
+            for task, _ in apps:
+                all_tasks.append(task.json_repr(minimal=False))
+            body = {'tasks': all_tasks}
+            try:
+                original_response_data['tasks']
+            except KeyError:
+                body = original_response_data
 
         return FlaskResponse(
             response=json.dumps(body, cls=self.json_encoder),

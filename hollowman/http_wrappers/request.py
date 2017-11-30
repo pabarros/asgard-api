@@ -4,6 +4,7 @@ from typing import Iterable, Dict
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonMinimalJsonEncoder
 from marathon.models.group import MarathonGroup
+from marathon.models.task import MarathonTask
 
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
@@ -41,18 +42,15 @@ class Request(HTTPWrapper):
                 apps = self.marathon_client.list_apps()
                 for app in apps:
                     yield MarathonApp(), app
-                return
+            elif self.is_app_request():
+                app = self._get_original_app(self.request.user, self.object_id)
+                yield MarathonApp(), app
             elif self.is_group_request():
                 self.group = self._get_original_group(self.request.user, self.object_id)
                 for app in self.group.iterate_apps():
                     yield MarathonApp(), app
-                return
-            elif self.is_queue_request():
-                return
-            else:
-                app = self._get_original_app(self.request.user, self.object_id)
-                yield MarathonApp(), app
-                return
+
+            return
 
         # Request is a WRITE
         if self.is_app_request():
@@ -64,6 +62,12 @@ class Request(HTTPWrapper):
                     app = MarathonApp()
 
                 yield request_app, app
+        elif self.is_tasks_request():
+            request_data = self.request.get_json()
+            for task_id in request_data['ids']:
+                request_task = MarathonTask.from_json({"id": task_id})
+                yield request_task, request_task
+            return
 
     def _rindex(self, iterable, value):
         """
@@ -133,6 +137,14 @@ class Request(HTTPWrapper):
                 self.request.path = "/v2/queue{}/delay".format(app_id_with_namespace)
 
             return self.request
+        elif self.is_tasks_request():
+            if self.is_read_request():
+                return self.request
+            if self.is_write_request():
+                apps_json_repr = {"ids": []}
+                for request_task, _ in apps:
+                    apps_json_repr["ids"].append(request_task.id)
+
         else:
             request_app, original_app = apps[0]
             self._adjust_request_path_if_needed(request, original_app)
