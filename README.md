@@ -5,12 +5,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 * next
-  - IN-2357 Adiçao do AddURIFilter que adiciona a autenticação do docker registry
-  - IN-2361 Mudando todas as chamdas de `().from_json()` para `.from_json()`
-
-* next
   - IN-2355 Usando passgem por referencia nos filtros
   - IN-2356 Não passamos `original_*` para os métodos de response filters
+  - IN-2357 Adiçao do AddURIFilter que adiciona a autenticação do docker registry
+  - IN-2361 Mudando todas as chamdas de `().from_json()` para `.from_json()`
 
 * 0.0.50
   - Implementção da possibilidade de remover campos que são multi-valor (constraints, labels, env, etc)
