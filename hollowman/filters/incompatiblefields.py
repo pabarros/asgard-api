@@ -21,5 +21,6 @@ class IncompatibleFieldsFilter:
         Método que altera uma app quando há uma escrita.
         """
         request_app.ports = []
+        request_app.port_definitions = []
         return request_app
 
