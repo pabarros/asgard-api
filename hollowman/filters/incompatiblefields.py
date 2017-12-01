@@ -10,7 +10,7 @@ class IncompatibleFieldsFilter:
     Um exmeplo de campo é o `ports`. Quando você pega uma app que tem portas definidas
     o JSON contém o campo `ports` preenchido com a lista de `container.docker.portMappings[].servicePort`
     O problema é que quando você tenta criar uma app com um JSON onde você tem ambos os campos:
-        - container.docker.portMappings[].servicePort
+        - port_definitions
         - ports
 
         O marathon recusa a criar a app, retornando o erro: "You cannot specify both ports and port definitions"
