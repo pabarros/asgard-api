@@ -1,0 +1,137 @@
+[
+  {
+    "id": "97c136bf-5a28-4821-9d94-480d9fbb01c8",
+    "version": "2015-09-30T09:09:17.614Z",
+    "affectedApps": [
+      "/dev/foo"
+    ],
+    "steps": [
+      {
+        "actions": [
+          {
+            "action": "StartApplication",
+            "app": "/dev/foo"
+          }
+        ]
+      },
+      {
+        "actions": [
+          {
+            "action": "ScaleApplication",
+            "app": "/dev/foo"
+          }
+        ]
+      }
+    ],
+    "currentActions": [
+      {
+        "action": "ScaleApplication",
+        "app": "/dev/foo",
+        "readinessCheckResults": [
+          {
+            "taskId": "foo.c9de6033",
+            "lastResponse": {
+              "body": "{}",
+              "contentType": "application/json",
+              "status": 500
+            },
+            "name": "myReadyCheck",
+            "ready": false
+          }
+        ]
+      }
+    ],
+    "currentStep": 2,
+    "totalSteps": 2
+  },
+  {
+      "id": "0e2998fc-4802-45e4-aa95-683541bd09f2",
+      "version": "2015-09-30T09:09:17.614Z",
+      "affectedApps": [
+        "/othernamespace/foo"
+      ],
+      "steps": [
+        {
+          "actions": [
+            {
+              "action": "StartApplication",
+              "app": "/othernamespace/foo"
+            }
+          ]
+        },
+        {
+          "actions": [
+            {
+              "action": "ScaleApplication",
+              "app": "/othernamespace/foo"
+            }
+          ]
+        }
+      ],
+      "currentActions": [
+        {
+          "action": "ScaleApplication",
+          "app": "/othernamespace/foo",
+          "readinessCheckResults": [
+            {
+              "taskId": "foo.c9de6033",
+              "lastResponse": {
+                "body": "{}",
+                "contentType": "application/json",
+                "status": 500
+              },
+              "name": "myReadyCheck",
+              "ready": false
+            }
+          ]
+        }
+      ],
+      "currentStep": 2,
+      "totalSteps": 2
+    },
+    {
+          "id": "0e2998fc-4802-45e4-aa95-683541bd09f2",
+          "version": "2015-09-30T09:09:17.614Z",
+          "affectedApps": [
+            "/developer/foo"
+          ],
+          "steps": [
+            {
+              "actions": [
+                {
+                  "action": "StartApplication",
+                  "app": "/developer/foo"
+                }
+              ]
+            },
+            {
+              "actions": [
+                {
+                  "action": "ScaleApplication",
+                  "app": "/developer/foo"
+                }
+              ]
+            }
+          ],
+          "currentActions": [
+            {
+              "action": "ScaleApplication",
+              "app": "/developer/foo",
+              "readinessCheckResults": [
+                {
+                  "taskId": "foo.c9de6033",
+                  "lastResponse": {
+                    "body": "{}",
+                    "contentType": "application/json",
+                    "status": 500
+                  },
+                  "name": "myReadyCheck",
+                  "ready": false
+                }
+              ]
+            }
+          ],
+          "currentStep": 2,
+          "totalSteps": 2
+        }
+]

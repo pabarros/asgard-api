@@ -101,10 +101,14 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
         filtered_deployments = []
         for deployment in deployments:
+            # Não teremos deployments que afetam apps de múltiplos namespaces,
+            # por isos podemos olhar apenas umas das apps.
+            original_affected_apps_id = deployment.affected_apps[0]
             for filter_ in filters_pipeline:
                 if hasattr(filter_, "response_deployment"):
                     filter_.response_deployment(user, deployment)
-            filtered_deployments.append(deployment)
+            if original_affected_apps_id.startswith("/{}/".format(user.current_account.namespace)):
+                filtered_deployments.append(deployment)
 
         return FlaskResponse(
             response=json.dumps(filtered_deployments, cls=Response.json_encoder),
