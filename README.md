@@ -4,6 +4,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.52
+  - IN-2354 Removendo deployments de outros namespaces
+  - IN-2365 Filto que remove campos que o marathon nao aceita quando fazemos POST/PUT
+
 * 0.0.51
   - IN-2344 Suporte ao endpoint /v2/tasks
   - IN-2355 Usando passgem por referencia nos filtros
