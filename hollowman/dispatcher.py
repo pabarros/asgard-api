@@ -16,6 +16,7 @@ from hollowman.filters.namespace import NameSpaceFilter
 from hollowman.hollowman_flask import OperationType, FilterType, HollowmanRequest
 from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.filters.defaultscale import DefaultScaleFilter
+from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
 from hollowman.http_wrappers.response import Response
 
 
@@ -33,10 +34,12 @@ FILTERS_PIPELINE = {
             AddAppNameFilter(),
             BasicConstraintFilter(),
             AddOwnerConstraintFilter(),
+            IncompatibleFieldsFilter(),
         )
     },
     FilterType.RESPONSE: (
         NameSpaceFilter(),
+        IncompatibleFieldsFilter(),
     )
 }
 
@@ -135,7 +138,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
         filtered_tasks = content
         try:
             tasks = (MarathonTask.from_json(task) for task in content['tasks'])
-            
+
             filtered_tasks = []
             for task in tasks:
                 task_original_idd = task.id
