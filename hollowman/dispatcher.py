@@ -17,6 +17,7 @@ from hollowman.hollowman_flask import OperationType, FilterType, HollowmanReques
 from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
+from hollowman.filters.labels import LabelsFilter
 from hollowman.http_wrappers.response import Response
 
 
@@ -35,6 +36,7 @@ FILTERS_PIPELINE = {
             BasicConstraintFilter(),
             AddOwnerConstraintFilter(),
             IncompatibleFieldsFilter(),
+            LabelsFilter(),
         )
     },
     FilterType.RESPONSE: (
