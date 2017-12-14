@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+
+  - IN-2404 Remove label traefik.backend para que não exista a possibilidade de duas apps terem o mesmo backend
+
 * 0.0.52
   - IN-2354 Removendo deployments de outros namespaces
   - IN-2365 Filto que remove campos que o marathon nao aceita quando fazemos POST/PUT
