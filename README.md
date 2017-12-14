@@ -5,6 +5,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+  - Mudança no nome da imagem para `/sieve/infra/asgard-api`
   - IN-2404 Remove label traefik.backend para que não exista a possibilidade de duas apps terem o mesmo backend
 
 * 0.0.52
