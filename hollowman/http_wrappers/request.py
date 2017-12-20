@@ -9,8 +9,13 @@ from marathon.models.task import MarathonTask
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
 from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathonapp import SieveMarathonApp
 
 
+# Keys que são multi-valor e que devem
+# ser mergeados de forma especial quando
+# juntamos a request_app com a original_app
+REMOVABLE_KEYS = {"constraints", "labels", "env", "healthChecks", "upgradeStrategy"}
 class Request(HTTPWrapper):
     json_encoder = MarathonMinimalJsonEncoder
 
@@ -19,6 +24,37 @@ class Request(HTTPWrapper):
 
     def __init__(self, request: HollowmanRequest):
         self.request = request
+
+    def merge_marathon_apps(self, modified_app, base_app):
+        """
+        A junção das duas apps (request_app (aqui modified_app) e original_app (aqui base_app)) é
+        sempre feita pegando todos os dados da original_app e jogando os dados da requst_app "em cima".
+        Não podemos usar o `minimal=Fase` na request_app pois para requests que estão *incompletos*, ou seja,
+        sem alguns vampos (já veremos exemplo) se esássemos minimal=False, iríramos apagar esses "campos faltantes"
+        da original_app. Exemplos:
+
+            request_app = {"instances": 10}
+            original_app está completa, com envs, constraints e tudo mais.
+
+            se usamos `minimal=False` na request_app, teremos um JSON com *todos* os campos em branco, menos o "instances".
+            Então quando fizermos `merged.update(modified_app.json_repr(minimal=False))`, vamos no final ter um JSON apenas com
+            o campo "instances" perrnchido e todo o restante vazio.
+
+
+        """
+
+        merged = base_app.json_repr(minimal=False)
+        merged.update(modified_app.json_repr(minimal=True))
+        try:
+            raw_request_data = json.loads(self.request.data)
+            for key in REMOVABLE_KEYS:
+                if key in raw_request_data:
+                    merged[key] = raw_request_data[key]
+        except Exception as e:
+            pass
+        if isinstance(base_app, MarathonTask):
+            return MarathonTask.from_json(merged)
+        return MarathonApp.from_json(merged)
 
     def get_request_data(self) -> Iterable[Dict]:
         if not self.request.data:
@@ -41,14 +77,14 @@ class Request(HTTPWrapper):
             if self.is_list_apps_request():
                 apps = self.marathon_client.list_apps()
                 for app in apps:
-                    yield MarathonApp(), app
+                    yield self.merge_marathon_apps(MarathonApp(), app), app
             elif self.is_app_request():
                 app = self._get_original_app(self.request.user, self.object_id)
-                yield MarathonApp(), app
+                yield self.merge_marathon_apps(MarathonApp(), app), app
             elif self.is_group_request():
                 self.group = self._get_original_group(self.request.user, self.object_id)
                 for app in self.group.iterate_apps():
-                    yield MarathonApp(), app
+                    yield self.merge_marathon_apps(MarathonApp(), app), app
 
             return
 
@@ -61,7 +97,7 @@ class Request(HTTPWrapper):
                 except NotFoundError:
                     app = MarathonApp()
 
-                yield request_app, app
+                yield self.merge_marathon_apps(request_app, app), app
         elif self.is_tasks_request():
             request_data = self.request.get_json()
             for task_id in request_data['ids']:

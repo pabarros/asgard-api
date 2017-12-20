@@ -38,13 +38,14 @@ class SplitTests(TestCase):
             request_parser = Request(ctx.request)
 
             with patch.object(request_parser, 'marathon_client') as client:
-                client.get_app.return_value = MarathonApp.from_json(fixture)
+                original_app = MarathonApp.from_json(fixture)
+                client.get_app.return_value = original_app
                 apps = list(request_parser.split())
 
             self.assertEqual(
                 apps,
                 [
-                    (MarathonApp(), client.get_app.return_value)
+                    (request_parser.merge_marathon_apps(MarathonApp(), original_app), client.get_app.return_value)
                 ])
 
     @with_json_fixture('requests/get-v2apps-all-apps.json')
@@ -59,10 +60,10 @@ class SplitTests(TestCase):
                          status=200)
                 apps = list(request_parser.split())
 
-                request_apps = [request_app for request_app, _ in apps]
-                self.assertEqual(request_apps, [MarathonApp()] * 4)
+                self.assertEqual([request_app for request_app, _ in apps],
+                                 [request_parser.merge_marathon_apps(request_app, original_app) for request_app, original_app in apps])
 
-                self.assertEqual([app.id for _, app in apps],
+                self.assertEqual([app.id for app, _ in apps],
                                  [app['id'] for app in fixture['apps']])
 
     @with_json_fixture('single_full_app.json')
@@ -99,8 +100,9 @@ class SplitTests(TestCase):
                          body=json.dumps({'app': fixture}),
                          status=200)
                 apps = list(request_parser.split())
-                expected_app = (MarathonApp(**scale_up), MarathonApp.from_json(fixture))
-                self.assertEqual(apps, [expected_app])
+                original_app = MarathonApp.from_json(fixture)
+                expected_apps = (request_parser.merge_marathon_apps(MarathonApp.from_json(scale_up), original_app), original_app)
+                self.assertEqual(apps, [expected_apps])
 
     @with_json_fixture('single_full_app.json')
     def test_a_request_for_restart_operation_with_appid_in_url_path_returns_a_tuple_of_marathonapp(self, fixture):
@@ -116,7 +118,8 @@ class SplitTests(TestCase):
                          status=200)
                 apps = list(request_parser.split())
 
-                expected_app = (MarathonApp(), MarathonApp.from_json(fixture))
+                original_app = MarathonApp.from_json(fixture)
+                expected_app = (request_parser.merge_marathon_apps(MarathonApp(), original_app), original_app)
                 self.assertEqual(apps, [expected_app])
 
     @with_json_fixture('single_full_app.json')
@@ -134,7 +137,8 @@ class SplitTests(TestCase):
                          status=200)
                 apps = list(request_parser.split())
 
-                expected_app = (MarathonApp.from_json(request_data), MarathonApp.from_json(fixture))
+                original_app = MarathonApp.from_json(fixture)
+                expected_app = (request_parser.merge_marathon_apps(MarathonApp.from_json(request_data), original_app), original_app)
                 self.assertEqual(apps, [expected_app])
 
     @with_json_fixture("single_full_app.json")
@@ -150,14 +154,13 @@ class SplitTests(TestCase):
             ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
-                #rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
-                #         body=json.dumps({'message': "App /foo not found"}), status=404)
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
                          body=json.dumps({'app': single_full_app_fixture}), status=200)
 
                 apps = list(request_parser.split())
 
-                expected_app = (MarathonApp(), MarathonApp.from_json(single_full_app_fixture))
+                original_app = MarathonApp.from_json(single_full_app_fixture)
+                expected_app = (request_parser.merge_marathon_apps(MarathonApp(), original_app), original_app)
                 self.assertEqual(apps, [expected_app])
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
@@ -173,10 +176,13 @@ class SplitTests(TestCase):
                 apps = list(request_parser.split())
                 self.assertEqual(3, len(apps))
 
+                original_app_one = MarathonApp.from_json({"id": "/dev/a/app0"})
+                original_app_two = MarathonApp.from_json({"id": "/dev/group-b/appb0"})
+                original_app_three = MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})
                 expected_apps = [
-                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/a/app0"})),
-                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/appb0"})),
-                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})),
+                    (request_parser.merge_marathon_apps(MarathonApp(), original_app_one), original_app_one),
+                    (request_parser.merge_marathon_apps(MarathonApp(), original_app_two), original_app_two),
+                    (request_parser.merge_marathon_apps(MarathonApp(), original_app_three), original_app_three),
                 ]
                 self.assertEqual(apps, expected_apps)
 
@@ -193,9 +199,11 @@ class SplitTests(TestCase):
                 apps = list(request_parser.split())
                 self.assertEqual(2, len(apps))
 
+                original_app_one = MarathonApp.from_json({"id": "/dev/group-b/appb0"})
+                original_app_two = MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})
                 expected_apps = [
-                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/appb0"})),
-                    (MarathonApp(), MarathonApp.from_json({"id": "/dev/group-b/group-b0/app0"})),
+                    (request_parser.merge_marathon_apps(MarathonApp(), original_app_one), original_app_one),
+                    (request_parser.merge_marathon_apps(MarathonApp(), original_app_two), original_app_two),
                 ]
                 self.assertEqual(expected_apps, apps)
 
