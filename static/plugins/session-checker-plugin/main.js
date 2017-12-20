@@ -78,7 +78,6 @@
 	var _window$marathonPlugi = window.marathonPluginInterface,
 	    PluginActions = _window$marathonPlugi.PluginActions,
 	    PluginHelper = _window$marathonPlugi.PluginHelper,
-	    ajaxWrapper = _window$marathonPlugi.ajaxWrapper,
 	    config = _window$marathonPlugi.config,
 	    Sieve = _window$marathonPlugi.Sieve;
 
@@ -103,7 +102,7 @@
 	Sieve.DialogStore.on("DIALOG_EVENTS_ACCEPT_DIALOG", acceptDialog);
 
 	function checkSession() {
-	  ajaxWrapper({
+	  Sieve.ajaxWrapper({
 	    url: config.apiURL + "v2/deployments",
 	    concurrent: true
 	  }).error(function (error) {
@@ -145,7 +144,6 @@
 	    PluginActions = _window$marathonPlugi.PluginActions,
 	    PluginHelper = _window$marathonPlugi.PluginHelper,
 	    Sieve = _window$marathonPlugi.Sieve,
-	    ajaxWrapper = _window$marathonPlugi.ajaxWrapper,
 	    config = _window$marathonPlugi.config;
 	/* eslint-disable camelcase */
 
@@ -181,7 +179,7 @@
 	    var _this = this;
 
 	    if (dialog.myid === "session-account-change") {
-	      ajaxWrapper({
+	      Sieve.ajaxWrapper({
 	        url: config.apiURL + "hollow/account/next",
 	        method: "POST"
 	      }).error(function (error) {
@@ -205,7 +203,7 @@
 	    var _this2 = this;
 
 	    /* eslint-disable no-unused-vars */
-	    ajaxWrapper({ url: config.apiURL + "hollow/account/me", method: "GET" }).error(function (error) {
+	    Sieve.ajaxWrapper({ url: config.apiURL + "hollow/account/me", method: "GET" }).error(function (error) {
 	      /* Não temos muito o que fazer aqui. Se retornar erro,
 	       * já estamos deslogados e isso já é tratado por outra
 	       * parte desse plugin. E se estamos deslogados,
