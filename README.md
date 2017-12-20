@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.54
+  - Atualizando session-checker-plugin para usar o ajaxWrapper de dentro do objeto Sieve.
+
 * 0.0.53
   - Mudança no nome da imagem para `/sieve/infra/asgard-api`
   - IN-2404 Remove label traefik.backend para que não exista a possibilidade de duas apps terem o mesmo backend
