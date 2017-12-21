@@ -45,6 +45,17 @@ FILTERS_PIPELINE = {
     )
 }
 
+def _get_filter_callable(request, operation, filter_):
+    func = lambda user, request_obj, original_obj: request_obj
+    if request.is_tasks_request():
+        method_name = f"{operation.value}_task"
+    else:
+        method_name = operation.value
+
+    if hasattr(filter_, method_name):
+        func = getattr(filter_, method_name)
+    return func
+
 def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> HollowmanRequest:
     """
     :type user: User
@@ -56,46 +67,35 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
 
     filtered_apps = []
 
-    for request_app, original_app in request.split():
-        filtered_apps = _dispatch(request, filters_pipeline, request_app, original_app)
+    for operation in request.request.operations:
+        for request_app, original_app in request.split():
+            _dispatch(request,
+                      filters_pipeline[operation],
+                      operation,
+                      _get_filter_callable,
+                      request_app, original_app)
+            filtered_apps.append((request_app, original_app))
 
     return request.join(filtered_apps)
 
-
-
-def _get_filter_callable(request, operation, filter_):
-    func = lambda user, request_obj, original_obj: request_obj
-    if request.is_tasks_request():
-        method_name = f"{operation.value}_task"
-    else:
-        method_name = operation.value
-    if hasattr(filter_, method_name):
-        func = getattr(filter_, method_name)
-    return func
-
-
-def _dispatch(request, filters_pipeline, *filter_args):
-    filtered_apps = []
-    for operation in request.request.operations:
-        for filter_ in filters_pipeline[operation]:
-            func = _get_filter_callable(request, operation, filter_)
+def _dispatch(request, filters_pipeline, operation, get_filter_callable_callback, *filter_args):
+    for filter_ in filters_pipeline:
+        func = get_filter_callable_callback(request, operation, filter_)
+        if func:
             func(request.request.user, *filter_args)
-    filtered_apps.append(filter_args)
 
-    return filtered_apps
-
+def _get_response_callable_app_request(request, operation, filter_):
+    if hasattr(filter_, "response"):
+        return getattr(filter_, "response")
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
     if response.is_app_request():
         filtered_response_apps = []
         for response_app, original_app in response.split():
-            filtered_app = response_app
-            for filter_ in filters_pipeline:
-                if hasattr(filter_, "response"):
-                    filter_.response(user, filtered_app)
+            _dispatch(response, filters_pipeline, None, _get_response_callable_app_request, response_app)
 
             if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
-                filtered_response_apps.append((filtered_app, original_app))
+                filtered_response_apps.append((response_app, original_app))
 
         return response.join(filtered_response_apps)
     elif response.is_group_request():

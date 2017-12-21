@@ -47,6 +47,7 @@ class ResponsePipelineTest(unittest.TestCase):
                                                   status=200,
                                                   headers={})
 
+                ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
@@ -76,6 +77,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two]}),
                                                   status=200, headers={})
 
+                ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
@@ -108,6 +110,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two, single_full_app_three]}),
                                                   status=200, headers={})
 
+                ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
@@ -144,6 +147,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two, single_full_app_three]}),
                                                   status=200, headers={})
 
+                ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
@@ -169,6 +173,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 original_response = FlaskResponse(response=json.dumps({"app": single_full_app_one}),
                                                   status=200, headers={})
 
+                ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
