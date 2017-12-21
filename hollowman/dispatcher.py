@@ -57,20 +57,33 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
     filtered_apps = []
 
     for request_app, original_app in request.split():
-        for operation in request.request.operations:
-            for filter_ in filters_pipeline[operation]:
-                func = lambda user, request_obj, original_obj: request_obj
-                if request.is_tasks_request():
-                    method_name = f"{operation.value}_task"
-                    if hasattr(filter_, method_name):
-                        func = getattr(filter_, method_name)
-                else:
-                    func = getattr(filter_, operation.value)
-
-                func(user, request_app, original_app)
-        filtered_apps.append((request_app, original_app))
+        filtered_apps = _dispatch(request, filters_pipeline, request_app, original_app)
 
     return request.join(filtered_apps)
+
+
+
+def _get_filter_callable(request, operation, filter_):
+    func = lambda user, request_obj, original_obj: request_obj
+    if request.is_tasks_request():
+        method_name = f"{operation.value}_task"
+    else:
+        method_name = operation.value
+    if hasattr(filter_, method_name):
+        func = getattr(filter_, method_name)
+    return func
+
+
+def _dispatch(request, filters_pipeline, *filter_args):
+    filtered_apps = []
+    for operation in request.request.operations:
+        for filter_ in filters_pipeline[operation]:
+            func = _get_filter_callable(request, operation, filter_)
+            func(request.request.user, *filter_args)
+    filtered_apps.append(filter_args)
+
+    return filtered_apps
+
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
     if response.is_app_request():
