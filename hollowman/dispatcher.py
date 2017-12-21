@@ -78,11 +78,12 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
 def _get_callable_if_exist(filter_, method_name):
     if hasattr(filter_, method_name):
         return getattr(filter_, method_name)
+    return lambda *args: True
 
 def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter_args):
     for filter_ in filters_pipeline:
         func = _get_callable_if_exist(filter_, filter_method_name)
-        if func and func(request_or_response.request.user, *filter_args):
+        if func(request_or_response.request.user, *filter_args):
             continue
         return False
     return True
@@ -111,11 +112,8 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
         filtered_deployments = []
         for deployment in deployments:
-            # Não teremos deployments que afetam apps de múltiplos namespaces,
-            # por isos podemos olhar apenas umas das apps.
             original_affected_apps_id = deployment.affected_apps[0]
-            _dispatch(response, filters_pipeline, "response_deployment", deployment)
-            if original_affected_apps_id.startswith(f"/{user.current_account.namespace}/"):
+            if _dispatch(response, filters_pipeline, "response_deployment", deployment):
                 filtered_deployments.append(deployment)
 
         return FlaskResponse(

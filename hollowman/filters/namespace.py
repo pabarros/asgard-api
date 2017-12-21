@@ -72,6 +72,9 @@ class NameSpaceFilter:
         return response_group
 
     def response_deployment(self, user, deployment: MarathonDeployment) -> MarathonDeployment:
+        # Não teremos deployments que afetam apps de múltiplos namespaces,
+        # por isos podemos olhar apenas umas das apps.
+        original_affected_apps_id = deployment.affected_apps[0]
         deployment.affected_apps = [
             self._remove_namespace(user, app_id)
             for app_id in deployment.affected_apps
@@ -84,7 +87,9 @@ class NameSpaceFilter:
             for action in step.actions:
                 action.app = self._remove_namespace(user, action.app)
 
-        return deployment
+        if original_affected_apps_id.startswith(f"/{user.current_account.namespace}/"):
+            return deployment
+        return None
 
     def response_task(self, user, response_task):
         """
