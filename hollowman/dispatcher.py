@@ -112,10 +112,8 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             # Não teremos deployments que afetam apps de múltiplos namespaces,
             # por isos podemos olhar apenas umas das apps.
             original_affected_apps_id = deployment.affected_apps[0]
-            for filter_ in filters_pipeline:
-                if hasattr(filter_, "response_deployment"):
-                    filter_.response_deployment(user, deployment)
-            if original_affected_apps_id.startswith("/{}/".format(user.current_account.namespace)):
+            _dispatch(response, filters_pipeline, "response_deployment", deployment)
+            if original_affected_apps_id.startswith(f"/{user.current_account.namespace}/"):
                 filtered_deployments.append(deployment)
 
         return FlaskResponse(
@@ -147,14 +145,12 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             filtered_tasks = []
             for task in tasks:
                 task_original_idd = task.id
-                for filter_ in filters_pipeline:
-                    if hasattr(filter_, "response_task"):
-                        filter_.response_task(user, task)
+                _dispatch(response, filters_pipeline, "response_task", task)
 
                 if task_original_idd.startswith(f"{user.current_account.namespace}_"):
                     filtered_tasks.append((task, task))
         except KeyError:
-            # resposne sem lista de task, retornamos sem mexer
+            # response sem lista de task, retornamos sem mexer
             return response.response
 
         return response.join(filtered_tasks)

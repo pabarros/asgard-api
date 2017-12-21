@@ -209,6 +209,7 @@ class ResponsePipelineTest(unittest.TestCase):
             original_response = FlaskResponse(response=json.dumps(tasks_get_fixture),
                                               status=200)
 
+            ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
             final_response = dispatch_response_pipeline(user=self.user,
                                                         response=response_wrapper,
@@ -234,6 +235,7 @@ class ResponsePipelineTest(unittest.TestCase):
             original_response = FlaskResponse(response=json.dumps(tasks_multinamespace_fixure),
                                               status=200)
 
+            ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
             final_response = dispatch_response_pipeline(user=self.user,
                                                         response=response_wrapper,
