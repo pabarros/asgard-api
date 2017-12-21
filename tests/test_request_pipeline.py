@@ -7,7 +7,7 @@ import responses
 from mock import patch
 
 from marathon.models import MarathonConstraint, MarathonHealthCheck, MarathonTask
-from marathon.models.app import MarathonUpgradeStrategy
+from marathon.models.app import MarathonUpgradeStrategy, MarathonApp
 
 from hollowman.app import application
 from hollowman.http_wrappers.request import Request, REMOVABLE_KEYS
@@ -130,6 +130,35 @@ class RequestPipelineTest(unittest.TestCase):
             filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(0, len(filtered_app.constraints))
             self._check_other_fields("constraints", filtered_app)
+
+
+    def test_dispatch_should_pass_an_instance_if_SieveMarathonApp_to_filters(self):
+        """
+        Certifica que quando um request remove todas as constraints e algum filtro adiciona novas
+        constraints, essas constraints adicionadas pelo filtro são preservadas
+        """
+        class AddNewConstraintFilter:
+            def write(self, user, request_app, original_app):
+                assert isinstance(request_app, SieveMarathonApp)
+                return request_app
+
+        pipeline = {
+                OperationType.WRITE: [AddNewConstraintFilter(), ]
+        }
+
+        request_data = {"constraints": []}
+        request_app = SieveMarathonApp.from_json(request_data)
+        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+
+        with application.test_request_context("/v2/apps/foo",
+                                              method="PUT",
+                                              headers={"Content-type": "application/json"},
+                                              data=json.dumps(request_data)) as ctx:
+
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
+            # O assert está dentro do códgo do filtro, no início desse teste
 
     def test_update_app_change_all_constraints(self):
         """

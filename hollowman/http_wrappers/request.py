@@ -54,7 +54,7 @@ class Request(HTTPWrapper):
             pass
         if isinstance(base_app, MarathonTask):
             return MarathonTask.from_json(merged)
-        return MarathonApp.from_json(merged)
+        return SieveMarathonApp.from_json(merged)
 
     def get_request_data(self) -> Iterable[Dict]:
         if not self.request.data:
