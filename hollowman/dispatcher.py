@@ -41,7 +41,6 @@ FILTERS_PIPELINE = {
     },
     FilterType.RESPONSE: (
         NameSpaceFilter(),
-        IncompatibleFieldsFilter(),
     )
 }
 
