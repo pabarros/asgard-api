@@ -96,6 +96,8 @@ class NameSpaceFilter:
         :returns: response_task modificado
 
         """
-        self._remove_namespace_from_tasks([response_task], user.current_account.namespace)
-        return response_task
+        if response_task.id.startswith(f"{user.current_account.namespace}_"):
+            self._remove_namespace_from_tasks([response_task], user.current_account.namespace)
+            return response_task
+        return None
 

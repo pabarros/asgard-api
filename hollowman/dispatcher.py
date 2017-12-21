@@ -82,8 +82,10 @@ def _get_callable_if_exist(filter_, method_name):
 def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter_args):
     for filter_ in filters_pipeline:
         func = _get_callable_if_exist(filter_, filter_method_name)
-        if func:
-            func(request_or_response.request.user, *filter_args)
+        if func and func(request_or_response.request.user, *filter_args):
+            continue
+        return False
+    return True
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
     if response.is_app_request():
@@ -145,9 +147,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             filtered_tasks = []
             for task in tasks:
                 task_original_idd = task.id
-                _dispatch(response, filters_pipeline, "response_task", task)
-
-                if task_original_idd.startswith(f"{user.current_account.namespace}_"):
+                if _dispatch(response, filters_pipeline, "response_task", task):
                     filtered_tasks.append((task, task))
         except KeyError:
             # response sem lista de task, retornamos sem mexer

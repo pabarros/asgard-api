@@ -10,6 +10,7 @@ from hollowman.http_wrappers.response import Response
 from hollowman.dispatcher import dispatch_response_pipeline
 from hollowman import conf
 from hollowman.models import User, Account
+from hollowman.filters.namespace import NameSpaceFilter
 
 from tests.utils import with_json_fixture
 
@@ -189,10 +190,11 @@ class ResponsePipelineTest(unittest.TestCase):
             original_response = FlaskResponse(response=json.dumps(tasks_namespace_infra_fixture),
                                               status=200)
 
+            ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
             final_response = dispatch_response_pipeline(user=self.user,
                                                         response=response_wrapper,
-                                                        filters_pipeline=[])
+                                                        filters_pipeline=[NameSpaceFilter()])
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(0, len(response_data['tasks']))
@@ -239,7 +241,7 @@ class ResponsePipelineTest(unittest.TestCase):
             response_wrapper = Response(ctx.request, original_response)
             final_response = dispatch_response_pipeline(user=self.user,
                                                         response=response_wrapper,
-                                                        filters_pipeline=[ModifyTaskFilter()])
+                                                        filters_pipeline=[NameSpaceFilter()])
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(2, len(response_data['tasks']))
@@ -259,15 +261,16 @@ class ResponsePipelineTest(unittest.TestCase):
             original_response = FlaskResponse(response=json.dumps(tasks_multinamespace_fixure),
                                               status=200)
 
+            ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
             final_response = dispatch_response_pipeline(user=self.user,
                                                         response=response_wrapper,
-                                                        filters_pipeline=[])
+                                                        filters_pipeline=[NameSpaceFilter()])
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual([
-                "dev_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638",
-                "dev_waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
+                "waiting.01339ffa-ce9c-11e7-8144-2a27410e5638",
+                "waiting.0432fd4b-ce9c-11e7-8144-2a27410e5638",
             ], [task['id'] for task in response_data['tasks']])
             self.assertEqual(2, len(response_data['tasks']))
 

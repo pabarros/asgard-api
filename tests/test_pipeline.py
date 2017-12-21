@@ -116,6 +116,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
+                ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, ok_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
