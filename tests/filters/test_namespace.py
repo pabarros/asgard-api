@@ -200,6 +200,12 @@ class TestNamespaceFilter(unittest.TestCase):
             self.assertEqual(0, len(filtered_group.apps[0].tasks))
 
     @with_json_fixture("deployments/get.json")
+    def test_response_deployments_return_none_if_outside_current_namespace(self, fixture):
+        deployment = MarathonDeployment.from_json(fixture[0])
+        deployment.affected_apps = ["/othernamespace/foo"]
+        self.assertIsNone(self.filter.response_deployment(self.user, deployment))
+
+    @with_json_fixture("deployments/get.json")
     def test_response_deployments_remove_namespace_from_all_app_ids(self, fixture):
         deployment = MarathonDeployment.from_json(fixture[0])
         self.filter.response_deployment(self.user, deployment)
@@ -221,4 +227,11 @@ class TestNamespaceFilter(unittest.TestCase):
         filtered_task = self.filter.response_task(self.user, task)
         self.assertEqual("waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
         self.assertEqual("/waiting", filtered_task.app_id)
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_response_tasks_returns_none_if_group_outside_current_namespace(self, tasks_get_fixture):
+        task =  MarathonTask.from_json(tasks_get_fixture['tasks'][0])
+        task.id = "othernamespace_" + task.id
+        task.app_id = "/othernamespace" + task.app_id
+        self.assertIsNone(self.filter.response_task(self.user, task))
 
