@@ -14,13 +14,6 @@ from hollowman.filters.namespace import NameSpaceFilter
 
 from tests.utils import with_json_fixture
 
-
-class RemoveNSFilter:
-    def response(self, user, response_app):
-        response_app.id = response_app.id.replace("/dev/", "/")
-        return response_app
-
-
 class ResponsePipelineTest(unittest.TestCase):
 
     @with_json_fixture("single_full_app.json")
@@ -52,7 +45,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                           filters_pipeline=(RemoveNSFilter(),))
+                                                           filters_pipeline=(NameSpaceFilter(),))
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual("/foo", json.loads(final_response.data)['app']['id'])
 
@@ -82,7 +75,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                           filters_pipeline=(RemoveNSFilter(),))
+                                                           filters_pipeline=(NameSpaceFilter(),))
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -115,7 +108,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                           filters_pipeline=(RemoveNSFilter(),))
+                                                           filters_pipeline=(NameSpaceFilter(),))
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -152,7 +145,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                           filters_pipeline=(RemoveNSFilter(),))
+                                                           filters_pipeline=(NameSpaceFilter(),))
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))

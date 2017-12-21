@@ -91,9 +91,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
     if response.is_app_request():
         filtered_response_apps = []
         for response_app, original_app in response.split():
-            _dispatch(response, filters_pipeline, "response", response_app)
-
-            if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
+            if _dispatch(response, filters_pipeline, "response", response_app):
                 filtered_response_apps.append((response_app, original_app))
 
         return response.join(filtered_response_apps)

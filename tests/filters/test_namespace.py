@@ -107,10 +107,12 @@ class TestNamespaceFilter(unittest.TestCase):
         modified_app = self.filter.response(self.user, request_app)
         self.assertEqual(0, len(self.request_app.tasks))
 
-    def test_response_apps__remove_namespace_if_original_app_already_have_namespace(self):
-        self.original_app.id = "/dev/foo"
-        modified_app = self.filter.response(self.user, self.request_app)
-        self.assertEqual("/foo", modified_app.id)
+    @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
+    def test_response_apps_returns_none_if_outside_current_namespace(self, single_full_app_with_tasks_fixture):
+        request_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        request_app.id = "/othernamespace/foo"
+
+        self.assertIsNone(self.filter.response(self.user, request_app))
 
     def test_remove_namspace_from_string(self):
         self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev"))
