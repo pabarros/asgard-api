@@ -112,11 +112,6 @@ class TestNamespaceFilter(unittest.TestCase):
         modified_app = self.filter.response(self.user, self.request_app)
         self.assertEqual("/foo", modified_app.id)
 
-    def test_response_apps_does_nothing_if_user_is_none(self):
-        self.request_app.id = "/dev/foo"
-        modified_app = self.filter.response(None, self.request_app)
-        self.assertEqual("/dev/foo", modified_app.id)
-
     def test_remove_namspace_from_string(self):
         self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev"))
         self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev/"))

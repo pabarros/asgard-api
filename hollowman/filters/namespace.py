@@ -55,9 +55,6 @@ class NameSpaceFilter:
             task.app_id = task.app_id.replace("/{}/".format(namespace), "/")
 
     def response(self, user, response_app) -> SieveMarathonApp:
-        if not user:
-            return response_app
-
         response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
         self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
 
