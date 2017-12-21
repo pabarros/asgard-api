@@ -101,8 +101,8 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
     elif response.is_group_request():
         filtered_response_groups = []
         for response_group, original_group in response.split():
-            _dispatch(response, filters_pipeline, "response_group", response_group)
-            filtered_response_groups.append((response_group, original_group))
+            if _dispatch(response, filters_pipeline, "response_group", response_group):
+                filtered_response_groups.append((response_group, original_group))
         return response.join(filtered_response_groups)
 
     elif response.is_deployment():
