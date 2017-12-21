@@ -109,7 +109,6 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
         filtered_deployments = []
         for deployment in deployments:
-            original_affected_apps_id = deployment.affected_apps[0]
             if _dispatch(response, filters_pipeline, "response_deployment", deployment):
                 filtered_deployments.append(deployment)
 
@@ -141,7 +140,6 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
             filtered_tasks = []
             for task in tasks:
-                task_original_idd = task.id
                 if _dispatch(response, filters_pipeline, "response_task", task):
                     filtered_tasks.append((task, task))
         except KeyError:
