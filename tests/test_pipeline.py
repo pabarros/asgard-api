@@ -12,6 +12,7 @@ from copy import deepcopy
 
 from hollowman import conf
 from hollowman.http_wrappers.response import Response
+from hollowman.hollowman_flask import OperationType
 from hollowman.models import User, Account
 from hollowman.app import application
 from hollowman.dispatcher import dispatch_response_pipeline
@@ -62,7 +63,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, ok_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                            filters_pipeline=[DummyFilter()])
+                                                            filters_pipeline={OperationType.READ: [DummyFilter()]})
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/dummy/dev/group-b", returned_group.id)
@@ -70,7 +71,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
-    def test_filters_can_modifi_all_apps_from_group_and_subgroups(self, group_dev_namespace_fixture):
+    def test_filters_can_modify_all_apps_from_group_and_subgroups(self, group_dev_namespace_fixture):
         """
         Um fltro deve poder alterar todas as apps de todos os grupos de um response.
         """
@@ -90,7 +91,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, ok_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                            filters_pipeline=[DummyFilter()])
+                                                            filters_pipeline={OperationType.READ: [DummyFilter()]})
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/dummy/dev/group-b/appb0", returned_group.apps[0].id)
@@ -120,7 +121,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, ok_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                            filters_pipeline=[DummyFilter(), FooFilter()])
+                                                            filters_pipeline={OperationType.READ: [DummyFilter(), FooFilter()]})
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/foo/dummy/dev/group-b/appb0", returned_group.apps[0].id)

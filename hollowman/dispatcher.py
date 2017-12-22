@@ -40,9 +40,14 @@ FILTERS_PIPELINE = {
             LabelsFilter(),
         )
     },
-    FilterType.RESPONSE: (
-        NameSpaceFilter(),
-    )
+    FilterType.RESPONSE: {
+        OperationType.READ: (
+            NameSpaceFilter(),
+        ),
+        OperationType.WRITE: (
+            NameSpaceFilter(),
+        )
+    }
 }
 
 def _get_filter_callable_name(request, operation):
@@ -89,10 +94,6 @@ def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter
     return True
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
-    new_pipeline = {
-        OperationType.READ: filters_pipeline,
-        OperationType.WRITE: filters_pipeline,        
-    }
 
     FILTERS_METHOD_NAMES = {
         RequestResource.APPS: "response",
@@ -100,7 +101,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
     }
 
     if any([response.is_app_request(), response.is_group_request()]):
-        return dispatch(user, response, new_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
+        return dispatch(user, response, filters_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
 
     elif response.is_deployment():
         content = json.loads(response.response.data)
@@ -108,7 +109,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
         filtered_deployments = []
         for deployment in deployments:
-            if _dispatch(response, filters_pipeline, "response_deployment", deployment):
+            if _dispatch(response, filters_pipeline[OperationType.READ], "response_deployment", deployment):
                 filtered_deployments.append(deployment)
 
         return FlaskResponse(
@@ -139,7 +140,7 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
 
             filtered_tasks = []
             for task in tasks:
-                if _dispatch(response, filters_pipeline, "response_task", task):
+                if _dispatch(response, filters_pipeline[OperationType.READ], "response_task", task):
                     filtered_tasks.append((task, task))
         except KeyError:
             # response sem lista de task, retornamos sem mexer

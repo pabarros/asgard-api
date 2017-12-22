@@ -7,6 +7,7 @@ from responses import RequestsMock
 
 from hollowman.app import application
 from hollowman.http_wrappers.response import Response
+from hollowman.hollowman_flask import OperationType
 from hollowman.dispatcher import dispatch_response_pipeline
 from hollowman import conf
 from hollowman.models import User, Account
@@ -43,9 +44,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                           filters_pipeline=(NameSpaceFilter(),))
+                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual("/foo", json.loads(final_response.data)['app']['id'])
 
@@ -73,9 +72,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                           filters_pipeline=(NameSpaceFilter(),))
+                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -106,9 +103,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                           filters_pipeline=(NameSpaceFilter(),))
+                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -143,9 +138,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                           filters_pipeline=(NameSpaceFilter(),))
+                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -171,7 +164,7 @@ class ResponsePipelineTest(unittest.TestCase):
                 response_wrapper = Response(ctx.request, original_response)
                 final_response = dispatch_response_pipeline(user=self.user,
                                                             response=response_wrapper,
-                                                            filters_pipeline=[DummyRequestFilter()])
+                                                            filters_pipeline={OperationType.READ: [DummyRequestFilter()]})
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual("/dev/foo", response_data['app']['id'])
@@ -185,9 +178,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
             ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user,
-                                                        response=response_wrapper,
-                                                        filters_pipeline=[NameSpaceFilter()])
+            final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(0, len(response_data['tasks']))
@@ -208,7 +199,7 @@ class ResponsePipelineTest(unittest.TestCase):
             response_wrapper = Response(ctx.request, original_response)
             final_response = dispatch_response_pipeline(user=self.user,
                                                         response=response_wrapper,
-                                                        filters_pipeline=[ModifyTaskFilter()])
+                                                        filters_pipeline={OperationType.READ: [ModifyTaskFilter()]})
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(3, len(response_data['tasks']))
@@ -232,9 +223,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
             ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user,
-                                                        response=response_wrapper,
-                                                        filters_pipeline=[NameSpaceFilter()])
+            final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(2, len(response_data['tasks']))
@@ -256,9 +245,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
             ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user,
-                                                        response=response_wrapper,
-                                                        filters_pipeline=[NameSpaceFilter()])
+            final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual([
