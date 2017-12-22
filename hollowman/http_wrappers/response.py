@@ -41,14 +41,9 @@ class Response(HTTPWrapper):
                     yield current_group, original_group
                 return
             elif self.is_tasks_request():
-                try:
-                    for task in response_content['tasks']:
-                        response_task = MarathonTask.from_json(task)
-                        yield response_task, response_task
-                    return
-                except KeyError:
-                    # response sem lista de task, retornamos sem mexer
-                    return self.response
+                for task in response_content['tasks']:
+                    response_task = MarathonTask.from_json(task)
+                    yield response_task, response_task
                 return
             elif self.is_deployment():
                 content = response_content
