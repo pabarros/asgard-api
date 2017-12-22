@@ -7,7 +7,8 @@ from itertools import chain
 from flask import Response as FlaskResponse
 from marathon.models import MarathonDeployment
 from marathon.models.group import MarathonGroup
-from marathon.models.task import MarathonTask 
+from marathon.models.task import MarathonTask
+from marathon.models.queue import MarathonQueueItem
 
 from http import HTTPStatus
 
@@ -232,4 +233,25 @@ class TestNamespaceFilter(unittest.TestCase):
         task.id = "othernamespace_" + task.id
         task.app_id = "/othernamespace" + task.app_id
         self.assertIsNone(self.filter.response_task(self.user, task, task))
+
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_response_queue_return_none_if_queue_outside_namespace(self, queue_get_fixture):
+        queue = MarathonQueueItem.from_json(queue_get_fixture['queue'][0])
+        self.assertIsNone(self.filter.response_queue(self.user, queue, queue))
+
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_response_queue_remove_namespace_from_app_name(self, queue_get_fixture):
+        queue = MarathonQueueItem.from_json(queue_get_fixture['queue'][1])
+        filtered_queue = self.filter.response_queue(self.user, queue, queue)
+        self.assertEqual("/waiting", filtered_queue.app.id)
+
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_response_queue_return_none_if_namespace_has_same_prefix(self, queue_get_fixture):
+        """
+        Mesmo o namespace da app tendo o mesmo prefixo, devemos reconhecer que a queue não
+        pertence ao nosso namespace
+        """
+        queue = MarathonQueueItem.from_json(queue_get_fixture['queue'][1])
+        queue.app.id = "/developers/app"
+        self.assertIsNone(self.filter.response_queue(self.user, queue, queue))
 

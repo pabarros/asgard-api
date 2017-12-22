@@ -91,6 +91,13 @@ class NameSpaceFilter:
             return deployment
         return None
 
+    def response_queue(self, user, response_queue, original_queue):
+        current_namespace = user.current_account.namespace
+        if response_queue.app.id.startswith("/{}/".format(current_namespace)):
+            response_queue.app.id = self._remove_namespace(user, response_queue.app.id)
+            return response_queue
+        return None
+
     def response_task(self, user, response_task, original_task):
         """
         Método para filtrar tasks que estejam sendo retornadas no

@@ -100,23 +100,14 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
         RequestResource.GROUPS: "response_group",
         RequestResource.DEPLOYMENTS: "response_deployment",
         RequestResource.TASKS: "response_task",
+        RequestResource.QUEUE: "response_queue",
     }
 
-    if any([response.is_app_request(), response.is_group_request(), response.is_deployment(), response.is_tasks_request()]):
+    if any([response.is_app_request(),
+            response.is_group_request(),
+            response.is_deployment(),
+            response.is_tasks_request(),
+            response.is_queue_request()
+            ]):
         return dispatch(user, response, filters_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
 
-    elif response.is_queue_request():
-        queue_data = json.loads(response.response.data)
-        current_namespace = user.current_account.namespace
-        filtered_queue_data = []
-        queued_apps = (MarathonQueueItem.from_json(queue_item) for queue_item in queue_data['queue'])
-        for queued_app in queued_apps:
-            if queued_app.app.id.startswith("/{}".format(current_namespace)):
-                queued_app.app.id = queued_app.app.id.replace("/{}".format(current_namespace), "")
-                filtered_queue_data.append(queued_app)
-
-        return FlaskResponse(
-            response=json.dumps({"queue": filtered_queue_data}, cls=Response.json_encoder),
-            status=response.response.status,
-            headers=response.response.headers
-        )

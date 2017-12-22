@@ -21,6 +21,7 @@ class RequestResource(Enum):
     GROUPS = auto()
     DEPLOYMENTS = auto()
     TASKS = auto()
+    QUEUE = auto()
 
 class HTTPWrapper(metaclass=abc.ABCMeta):
     json_encoder = MarathonJsonEncoder
@@ -112,6 +113,8 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             return RequestResource.DEPLOYMENTS
         if self.is_tasks_request():
             return RequestResource.TASKS
+        if self.is_queue_request():
+            return RequestResource.QUEUE
 
     def _get_original_app(self, user, app_id):
         if not user:
