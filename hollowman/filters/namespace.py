@@ -91,7 +91,7 @@ class NameSpaceFilter:
             return deployment
         return None
 
-    def response_task(self, user, response_task):
+    def response_task(self, user, response_task, original_task):
         """
         Método para filtrar tasks que estejam sendo retornadas no
         response

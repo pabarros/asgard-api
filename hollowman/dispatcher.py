@@ -99,9 +99,10 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
         RequestResource.APPS: "response",
         RequestResource.GROUPS: "response_group",
         RequestResource.DEPLOYMENTS: "response_deployment",
+        RequestResource.TASKS: "response_task",
     }
 
-    if any([response.is_app_request(), response.is_group_request(), response.is_deployment()]):
+    if any([response.is_app_request(), response.is_group_request(), response.is_deployment(), response.is_tasks_request()]):
         return dispatch(user, response, filters_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
 
     elif response.is_queue_request():
@@ -119,19 +120,3 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
             status=response.response.status,
             headers=response.response.headers
         )
-    elif response.is_tasks_request():
-        content = json.loads(response.response.data)
-        filtered_tasks = content
-        try:
-            tasks = (MarathonTask.from_json(task) for task in content['tasks'])
-
-            filtered_tasks = []
-            for task in tasks:
-                if _dispatch(response, filters_pipeline[OperationType.READ], "response_task", task):
-                    filtered_tasks.append((task, task))
-        except KeyError:
-            # response sem lista de task, retornamos sem mexer
-            return response.response
-
-        return response.join(filtered_tasks)
-

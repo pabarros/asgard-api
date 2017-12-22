@@ -222,7 +222,7 @@ class TestNamespaceFilter(unittest.TestCase):
         task =  MarathonTask.from_json(tasks_get_fixture['tasks'][0])
         task.id = "dev_" + task.id
         task.app_id = "/dev" + task.app_id
-        filtered_task = self.filter.response_task(self.user, task)
+        filtered_task = self.filter.response_task(self.user, task, task)
         self.assertEqual("waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
         self.assertEqual("/waiting", filtered_task.app_id)
 
@@ -231,5 +231,5 @@ class TestNamespaceFilter(unittest.TestCase):
         task =  MarathonTask.from_json(tasks_get_fixture['tasks'][0])
         task.id = "othernamespace_" + task.id
         task.app_id = "/othernamespace" + task.app_id
-        self.assertIsNone(self.filter.response_task(self.user, task))
+        self.assertIsNone(self.filter.response_task(self.user, task, task))
 

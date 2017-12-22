@@ -186,7 +186,7 @@ class ResponsePipelineTest(unittest.TestCase):
     @with_json_fixture("../fixtures/tasks/get_single_namespace.json")
     def test_response_task_filter_modifies_task(self, tasks_get_fixture):
         class ModifyTaskFilter:
-            def response_task(self, user, response_task):
+            def response_task(self, user, response_task, original_task):
                 response_task.id = f"{response_task.id}_bla"
                 return response_task
 
