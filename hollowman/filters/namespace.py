@@ -64,8 +64,6 @@ class NameSpaceFilter:
         return response_app
 
     def response_group(self, user, response_group, original_group):
-        if not response_group.id.startswith(f"/{user.current_account.namespace}/"):
-            return None
         response_group.id = self._remove_namespace(user, response_group.id)
         for app in response_group.apps:
             app.id = self._remove_namespace(user, app.id)

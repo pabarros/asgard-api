@@ -197,23 +197,6 @@ class TestNamespaceFilter(unittest.TestCase):
             filtered_group = self.filter.response_group(self.user, response_group, original_group)
             self.assertEqual(1, len(filtered_group.apps))
 
-    @with_json_fixture("../fixtures/group_dev_namespace_with_apps_with_tasks.json")
-    def test_response_group_returns_none_when_outside_current_namespace(self, group_dev_namespace_fixture):
-        with application.test_request_context("/v2/groups/a", method="GET") as ctx:
-            ctx.request.user = self.user
-            ok_response = FlaskResponse(
-                response=json.dumps(group_dev_namespace_fixture['groups'][0]),
-                status=HTTPStatus.OK,
-                headers={}
-            )
-            response_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][0])
-            response_group.id = f"/othernamespace{group_dev_namespace_fixture['groups'][0]}"
-
-            original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][0])
-            original_group.id = f"/othernamespace{group_dev_namespace_fixture['groups'][0]}"
-            response_wrapper = Response(ctx.request, ok_response)
-            self.assertIsNone(self.filter.response_group(self.user, response_group, original_group))
-
     @with_json_fixture("deployments/get.json")
     def test_response_deployments_return_none_if_outside_current_namespace(self, fixture):
         deployment = MarathonDeployment.from_json(fixture[0])
