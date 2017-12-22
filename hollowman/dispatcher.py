@@ -19,6 +19,7 @@ from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
 from hollowman.filters.labels import LabelsFilter
 from hollowman.http_wrappers.response import Response
+from hollowman.http_wrappers.base import RequestResource
 
 
 FILTERS_PIPELINE = {
@@ -53,7 +54,7 @@ def _get_filter_callable_name(request, operation):
 
     return method_name
 
-def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> HollowmanRequest:
+def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST], filter_method_name_callback=_get_filter_callable_name) -> HollowmanRequest:
     """
     :type user: User
     :type request: http_wrappers.Request
@@ -66,11 +67,11 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
 
     for operation in request.request.operations:
         for request_app, original_app in request.split():
-            _dispatch(request,
+            if _dispatch(request,
                       filters_pipeline[operation],
-                      _get_filter_callable_name(request, operation),
-                      request_app, original_app)
-            filtered_apps.append((request_app, original_app))
+                      filter_method_name_callback(request, operation),
+                      request_app, original_app):
+                filtered_apps.append((request_app, original_app))
 
     return request.join(filtered_apps)
 
@@ -88,20 +89,18 @@ def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter
     return True
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
-    if response.is_app_request():
-        filtered_response_apps = []
-        for response_app, original_app in response.split():
-            if _dispatch(response, filters_pipeline, "response", response_app):
-                filtered_response_apps.append((response_app, original_app))
+    new_pipeline = {
+        OperationType.READ: filters_pipeline,
+        OperationType.WRITE: filters_pipeline,        
+    }
 
-        return response.join(filtered_response_apps)
+    FILTERS_METHOD_NAMES = {
+        RequestResource.APPS: "response",
+        RequestResource.GROUPS: "response_group",
+    }
 
-    elif response.is_group_request():
-        filtered_response_groups = []
-        for response_group, original_group in response.split():
-            if _dispatch(response, filters_pipeline, "response_group", response_group):
-                filtered_response_groups.append((response_group, original_group))
-        return response.join(filtered_response_groups)
+    if any([response.is_app_request(), response.is_group_request()]):
+        return dispatch(user, response, new_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
 
     elif response.is_deployment():
         content = json.loads(response.response.data)

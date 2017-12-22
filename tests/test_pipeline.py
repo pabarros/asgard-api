@@ -19,14 +19,14 @@ from tests.utils import with_json_fixture
 
 
 class DummyFilter:
-    def response_group(self, user, response_group):
+    def response_group(self, user, response_group, original_group):
         response_group.id = "/dummy" + response_group.id
         for app in response_group.apps:
             app.id = "/dummy" + app.id
         return response_group
 
 class FooFilter:
-    def response_group(self, user, response_group):
+    def response_group(self, user, response_group, original_group):
         for app in response_group.apps:
             app.id = "/foo" + app.id
         return response_group

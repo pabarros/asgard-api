@@ -4,6 +4,8 @@ from unittest.mock import Mock
 
 from hollowman.app import application
 from hollowman.http_wrappers.request import Request
+from hollowman.http_wrappers.response import Response
+from hollowman.http_wrappers.base import RequestResource
 
 class HTTPWrapperTest(TestCase):
 
@@ -139,4 +141,20 @@ class HTTPWrapperTest(TestCase):
                                               method='GET') as ctx:
             request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_tasks_request())
+
+    def test_return_correct_request_resource(self):
+        expected_request_resources = {
+            '/v2/apps': RequestResource.APPS,
+            '/v2/apps/': RequestResource.APPS,
+            '/v2/groups': RequestResource.GROUPS,
+            '/v2/groups/': RequestResource.GROUPS,
+        }
+
+        for request_path, expected_request_resource in expected_request_resources.items():
+            # noinspection PyTypeChecker
+            request_mock = Mock(path=request_path)
+            request_wrapper = Request(request_mock)
+            response_wrapper = Response(request_mock, Mock())
+            self.assertEqual(request_wrapper.request_resource, expected_request_resource)
+            self.assertEqual(response_wrapper.request_resource, expected_request_resource)
 

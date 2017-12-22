@@ -1,6 +1,7 @@
 import abc
 from typing import Tuple, List
 from werkzeug.utils import cached_property
+from enum import Enum, auto
 
 from marathon import MarathonApp, NotFoundError
 from marathon.util import MarathonJsonEncoder
@@ -14,6 +15,10 @@ from hollowman.marathon.group import SieveAppGroup
 
 Apps = List[Tuple[SieveMarathonApp, MarathonApp]]
 
+
+class RequestResource(Enum):
+    APPS = auto()
+    GROUPS = auto()
 
 class HTTPWrapper(metaclass=abc.ABCMeta):
     json_encoder = MarathonJsonEncoder
@@ -94,6 +99,13 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         base_path = [p for p in self.request.path.split("/") if p][:2]
         endpoint_name = base_path[1]
         return self._get_object_id(self.API_RESERVED_PATHS_PER_ENDPOINT.get(endpoint_name, []), "/".join(base_path))
+
+    @cached_property
+    def request_resource(self) -> RequestResource:
+        if self.is_app_request():
+            return RequestResource.APPS
+        if self.is_group_request():
+            return RequestResource.GROUPS
 
     def _get_original_app(self, user, app_id):
         if not user:

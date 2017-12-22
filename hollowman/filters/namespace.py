@@ -54,7 +54,7 @@ class NameSpaceFilter:
             task.id = task.id.replace("{}_".format(namespace), "")
             task.app_id = task.app_id.replace("/{}/".format(namespace), "/")
 
-    def response(self, user, response_app) -> SieveMarathonApp:
+    def response(self, user, response_app, original_app) -> SieveMarathonApp:
         if not response_app.id.startswith("/{}/".format(user.current_account.namespace)):
              return None
 
@@ -63,7 +63,7 @@ class NameSpaceFilter:
 
         return response_app
 
-    def response_group(self, user, response_group):
+    def response_group(self, user, response_group, original_group):
         if not response_group.id.startswith(f"/{user.current_account.namespace}/"):
             return None
         response_group.id = self._remove_namespace(user, response_group.id)
