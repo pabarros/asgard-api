@@ -103,8 +103,8 @@ class HTTPWrapperTest(TestCase):
 
         for request_path, expected_marathon_path in expected_paths.items():
             # noinspection PyTypeChecker
-            request_wrappper = Request(Mock(path=request_path))
-            self.assertEqual(request_wrappper.object_id, expected_marathon_path)
+            request_wrapper = Request(Mock(path=request_path))
+            self.assertEqual(request_wrapper.object_id, expected_marathon_path)
 
     def test_it_parses_task_id(self):
         expected_paths = {
@@ -115,8 +115,8 @@ class HTTPWrapperTest(TestCase):
 
         for request_path, expected_marathon_path in expected_paths.items():
             # noinspection PyTypeChecker
-            request_wrappper = Request(Mock(path=request_path))
-            self.assertEqual(request_wrappper.object_id, expected_marathon_path)
+            request_wrapper = Request(Mock(path=request_path))
+            self.assertEqual(request_wrapper.object_id, expected_marathon_path)
 
     def test_is_delete(self):
         with application.test_request_context('/v2/apps/app0',
