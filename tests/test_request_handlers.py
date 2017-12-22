@@ -41,8 +41,7 @@ class RequestHandlersTests(TestCase):
         """
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
             with patch('hollowman.request_handlers.upstream_request'), \
-                 patch('hollowman.request_handlers.dispatch') as dispatch_mock, \
-                 patch('hollowman.request_handlers.dispatch_response_pipeline'):
+                patch('hollowman.request_handlers.dispatch') as dispatch_mock:
                 user = MagicMock()
                 ctx.request.user = user
                 request_parser = Request(ctx.request)
@@ -126,13 +125,11 @@ class DispatchResponse404Test(TestCase):
     def test_do_not_dispatch_response_pipeline_if_upstream_returns_404(self):
         auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
         with application.test_client() as client:
-            with patch('hollowman.request_handlers.dispatch_response_pipeline') as resp_pipeline_mock:
-                with RequestsMock() as rsps:
-                    rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
-                             body=json.dumps({'message': "App /foo not found"}), status=404)
-                    rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps/dev/foo',
-                             body=json.dumps({'message': "App /foo not found"}), status=404)
-                    response = client.get("/v2/apps/foo", headers=auth_header)
-                    self.assertEqual(404, response.status_code)
-                    self.assertEqual(0, resp_pipeline_mock.call_count)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                         body=json.dumps({'message': "App /foo not found"}), status=404)
+                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps/dev/foo',
+                         body=json.dumps({'message': "App /foo not found"}), status=404)
+                response = client.get("/v2/apps/foo", headers=auth_header)
+                self.assertEqual(404, response.status_code)
 

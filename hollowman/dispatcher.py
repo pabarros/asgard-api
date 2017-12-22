@@ -101,6 +101,3 @@ def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter
         return False
     return True
 
-def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
-    return dispatch(user, response, filters_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
-

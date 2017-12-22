@@ -7,13 +7,21 @@ from http import HTTPStatus
 from marathon.models import MarathonDeployment
 from werkzeug.utils import cached_property
 
-from hollowman.dispatcher import dispatch, dispatch_response_pipeline, \
-    FILTERS_PIPELINE
+from hollowman.dispatcher import dispatch, FILTERS_PIPELINE
 from hollowman.hollowman_flask import HollowmanRequest, FilterType
 from hollowman import upstream, conf, http_wrappers
 from hollowman.hollowman_flask import OperationType
 from hollowman.models import User
+from hollowman.http_wrappers.base import RequestResource
 
+
+FILTERS_METHOD_NAMES = {
+    RequestResource.APPS: "response",
+    RequestResource.GROUPS: "response_group",
+    RequestResource.DEPLOYMENTS: "response_deployment",
+    RequestResource.TASKS: "response_task",
+    RequestResource.QUEUE: "response_queue",
+}
 
 def upstream_request(request: HollowmanRequest) -> Response:
     resp = upstream.replay_request(request, conf.MARATHON_ENDPOINT)
@@ -39,9 +47,13 @@ class Deployments(RequestHandler):
         return self.wrapped_request.is_read_request()
 
     def _apply_response_filters(self, response) -> Response:
-        response_wrapper = http_wrappers.Response(self.wrapped_request.request,
-                                                  response)
-        return dispatch_response_pipeline(self.user, response_wrapper)
+        response = http_wrappers.Response(self.wrapped_request.request, response)
+        return dispatch(
+            self.user,
+            response,
+            filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+            filter_method_name_callback=lambda response, *args: FILTERS_METHOD_NAMES[response.request_resource]
+        )
 
     def handle(self) -> Response:
         response = upstream_request(self.wrapped_request.request)
@@ -59,9 +71,13 @@ def new(request: http_wrappers.Request) -> Response:
     upstream_response = upstream_request(filtered_request)
 
     if upstream_response.status_code == HTTPStatus.OK:
-        response_wrapper = http_wrappers.Response(request.request, upstream_response)
-        filtered_response = dispatch_response_pipeline(user=request.request.user, response=response_wrapper)
-        return filtered_response
+        response = http_wrappers.Response(request.request, upstream_response)
+        return dispatch(
+            request.request.user,
+            response,
+            filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+            filter_method_name_callback=lambda response, *args: FILTERS_METHOD_NAMES[response.request_resource]
+        )
 
     return upstream_response
 

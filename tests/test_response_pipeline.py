@@ -8,7 +8,7 @@ from responses import RequestsMock
 from hollowman.app import application
 from hollowman.http_wrappers.response import Response
 from hollowman.hollowman_flask import OperationType
-from hollowman.dispatcher import dispatch_response_pipeline
+from hollowman.dispatcher import dispatch, FILTERS_PIPELINE, FilterType
 from hollowman import conf
 from hollowman.models import User, Account
 from hollowman.filters.namespace import NameSpaceFilter
@@ -44,7 +44,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                                          filter_method_name_callback=lambda *args: "response"
+                                 )
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual("/foo", json.loads(final_response.data)['app']['id'])
 
@@ -72,7 +76,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                                          filter_method_name_callback=lambda *args: "response"
+                                 )
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -103,7 +111,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                                          filter_method_name_callback=lambda *args: "response"
+                                 )
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -138,7 +150,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                                          filter_method_name_callback=lambda *args: "response"
+                                 )
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual(2, len(response_data['apps']))
@@ -162,9 +178,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                            filters_pipeline={OperationType.READ: [DummyRequestFilter()]})
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [DummyRequestFilter()]},
+                                          filter_method_name_callback=lambda *args: "response"
+                                 )
                 response_data = json.loads(final_response.data)
                 self.assertEqual(200, final_response.status_code)
                 self.assertEqual("/dev/foo", response_data['app']['id'])
@@ -178,7 +196,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
             ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
+            final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                                          filter_method_name_callback=lambda *args: "response"
+                                 )
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(0, len(response_data['tasks']))
@@ -197,9 +219,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
             ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user,
-                                                        response=response_wrapper,
-                                                        filters_pipeline={OperationType.READ: [ModifyTaskFilter()]})
+            final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [ModifyTaskFilter()]},
+                                          filter_method_name_callback=lambda *args: "response_task"
+                                 )
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(3, len(response_data['tasks']))
@@ -223,7 +247,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
             ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
+            final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                                          filter_method_name_callback=lambda *args: "response_task"
+                                 )
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual(2, len(response_data['tasks']))
@@ -245,7 +273,11 @@ class ResponsePipelineTest(unittest.TestCase):
 
             ctx.request.user = self.user
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user, response=response_wrapper)
+            final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                                          filter_method_name_callback=lambda *args: "response_task"
+                                 )
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual([
@@ -266,9 +298,11 @@ class ResponsePipelineTest(unittest.TestCase):
                                               status=200)
 
             response_wrapper = Response(ctx.request, original_response)
-            final_response = dispatch_response_pipeline(user=self.user,
-                                                        response=response_wrapper,
-                                                        filters_pipeline=[])
+            final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline=[],
+                                          filter_method_name_callback=lambda *args: "response_task"
+                                 )
             response_data = json.loads(final_response.data)
             self.assertEqual(200, final_response.status_code)
             self.assertEqual("5ed4c0c5-9ff8-4a6f-a0cd-f57f59a34b43", response_data['deploymentId'])

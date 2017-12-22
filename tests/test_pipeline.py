@@ -15,7 +15,7 @@ from hollowman.http_wrappers.response import Response
 from hollowman.hollowman_flask import OperationType
 from hollowman.models import User, Account
 from hollowman.app import application
-from hollowman.dispatcher import dispatch_response_pipeline
+from hollowman.dispatcher import dispatch
 from tests.utils import with_json_fixture
 
 
@@ -61,9 +61,10 @@ class ResponsePipelineTest(unittest.TestCase):
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
                 response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                            filters_pipeline={OperationType.READ: [DummyFilter()]})
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [DummyFilter()]},
+                                          filter_method_name_callback=lambda *args: "response_group")
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/dummy/dev/group-b", returned_group.id)
@@ -89,9 +90,10 @@ class ResponsePipelineTest(unittest.TestCase):
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
                 response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                            filters_pipeline={OperationType.READ: [DummyFilter()]})
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [DummyFilter()]},
+                                          filter_method_name_callback=lambda *args: "response_group")
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/dummy/dev/group-b/appb0", returned_group.apps[0].id)
@@ -119,9 +121,10 @@ class ResponsePipelineTest(unittest.TestCase):
 
                 ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                            filters_pipeline={OperationType.READ: [DummyFilter(), FooFilter()]})
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [DummyFilter(), FooFilter()]},
+                                          filter_method_name_callback=lambda *args: "response_group")
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/foo/dummy/dev/group-b/appb0", returned_group.apps[0].id)
