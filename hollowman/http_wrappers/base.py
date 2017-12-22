@@ -19,6 +19,7 @@ Apps = List[Tuple[SieveMarathonApp, MarathonApp]]
 class RequestResource(Enum):
     APPS = auto()
     GROUPS = auto()
+    DEPLOYMENTS = auto()
 
 class HTTPWrapper(metaclass=abc.ABCMeta):
     json_encoder = MarathonJsonEncoder
@@ -106,6 +107,8 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             return RequestResource.APPS
         if self.is_group_request():
             return RequestResource.GROUPS
+        if self.is_deployment():
+            return RequestResource.DEPLOYMENTS
 
     def _get_original_app(self, user, app_id):
         if not user:

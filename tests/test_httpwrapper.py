@@ -148,6 +148,8 @@ class HTTPWrapperTest(TestCase):
             '/v2/apps/': RequestResource.APPS,
             '/v2/groups': RequestResource.GROUPS,
             '/v2/groups/': RequestResource.GROUPS,
+            '/v2/deployments': RequestResource.DEPLOYMENTS,
+            '/v2/deployments/': RequestResource.DEPLOYMENTS,
         }
 
         for request_path, expected_request_resource in expected_request_resources.items():

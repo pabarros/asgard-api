@@ -98,25 +98,12 @@ def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTER
     FILTERS_METHOD_NAMES = {
         RequestResource.APPS: "response",
         RequestResource.GROUPS: "response_group",
+        RequestResource.DEPLOYMENTS: "response_deployment",
     }
 
-    if any([response.is_app_request(), response.is_group_request()]):
+    if any([response.is_app_request(), response.is_group_request(), response.is_deployment()]):
         return dispatch(user, response, filters_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
 
-    elif response.is_deployment():
-        content = json.loads(response.response.data)
-        deployments = (MarathonDeployment.from_json(deploy) for deploy in content)
-
-        filtered_deployments = []
-        for deployment in deployments:
-            if _dispatch(response, filters_pipeline[OperationType.READ], "response_deployment", deployment):
-                filtered_deployments.append(deployment)
-
-        return FlaskResponse(
-            response=json.dumps(filtered_deployments, cls=Response.json_encoder),
-            status=response.response.status,
-            headers=response.response.headers
-        )
     elif response.is_queue_request():
         queue_data = json.loads(response.response.data)
         current_namespace = user.current_account.namespace

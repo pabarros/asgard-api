@@ -201,12 +201,12 @@ class TestNamespaceFilter(unittest.TestCase):
     def test_response_deployments_return_none_if_outside_current_namespace(self, fixture):
         deployment = MarathonDeployment.from_json(fixture[0])
         deployment.affected_apps = ["/othernamespace/foo"]
-        self.assertIsNone(self.filter.response_deployment(self.user, deployment))
+        self.assertIsNone(self.filter.response_deployment(self.user, deployment, deployment))
 
     @with_json_fixture("deployments/get.json")
     def test_response_deployments_remove_namespace_from_all_app_ids(self, fixture):
         deployment = MarathonDeployment.from_json(fixture[0])
-        self.filter.response_deployment(self.user, deployment)
+        self.filter.response_deployment(self.user, deployment, deployment)
 
         self.assertEqual(deployment.affected_apps, ['/foo'])
 

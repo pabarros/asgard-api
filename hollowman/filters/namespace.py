@@ -71,7 +71,7 @@ class NameSpaceFilter:
 
         return response_group
 
-    def response_deployment(self, user, deployment: MarathonDeployment) -> MarathonDeployment:
+    def response_deployment(self, user, deployment: MarathonDeployment, original_deployment) -> MarathonDeployment:
         # Não teremos deployments que afetam apps de múltiplos namespaces,
         # por isos podemos olhar apenas umas das apps.
         original_affected_apps_id = deployment.affected_apps[0]
