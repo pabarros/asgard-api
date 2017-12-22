@@ -22,6 +22,14 @@ from hollowman.http_wrappers.response import Response
 from hollowman.http_wrappers.base import RequestResource
 
 
+FILTERS_METHOD_NAMES = {
+    RequestResource.APPS: "response",
+    RequestResource.GROUPS: "response_group",
+    RequestResource.DEPLOYMENTS: "response_deployment",
+    RequestResource.TASKS: "response_task",
+    RequestResource.QUEUE: "response_queue",
+}
+
 FILTERS_PIPELINE = {
     FilterType.REQUEST: {
         OperationType.READ: (
@@ -94,20 +102,5 @@ def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter
     return True
 
 def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
-
-    FILTERS_METHOD_NAMES = {
-        RequestResource.APPS: "response",
-        RequestResource.GROUPS: "response_group",
-        RequestResource.DEPLOYMENTS: "response_deployment",
-        RequestResource.TASKS: "response_task",
-        RequestResource.QUEUE: "response_queue",
-    }
-
-    if any([response.is_app_request(),
-            response.is_group_request(),
-            response.is_deployment(),
-            response.is_tasks_request(),
-            response.is_queue_request()
-            ]):
-        return dispatch(user, response, filters_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
+    return dispatch(user, response, filters_pipeline, lambda *args: FILTERS_METHOD_NAMES[response.request_resource])
 
