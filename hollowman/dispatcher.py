@@ -59,7 +59,6 @@ FILTERS_PIPELINE = {
 }
 
 def _get_filter_callable_name(request, operation):
-    func = lambda user, request_obj, original_obj: request_obj
     if request.is_tasks_request():
         method_name = f"{operation.value}_task"
     else:
