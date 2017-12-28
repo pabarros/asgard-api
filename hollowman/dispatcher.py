@@ -91,12 +91,11 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
 def _get_callable_if_exist(filter_, method_name):
     if hasattr(filter_, method_name):
         return getattr(filter_, method_name)
-    return lambda *args: True
 
 def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter_args):
     for filter_ in filters_pipeline:
         func = _get_callable_if_exist(filter_, filter_method_name)
-        if func(request_or_response.request.user, *filter_args):
+        if not func or func(request_or_response.request.user, *filter_args):
             continue
         return False
     return True
