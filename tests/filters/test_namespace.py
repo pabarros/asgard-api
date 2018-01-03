@@ -7,7 +7,8 @@ from itertools import chain
 from flask import Response as FlaskResponse
 from marathon.models import MarathonDeployment
 from marathon.models.group import MarathonGroup
-from marathon.models.task import MarathonTask 
+from marathon.models.task import MarathonTask
+from marathon.models.queue import MarathonQueueItem
 
 from http import HTTPStatus
 
@@ -85,7 +86,7 @@ class TestNamespaceFilter(unittest.TestCase):
         request_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
 
         self.assertEqual(3, len(request_app.tasks))
-        modified_app = self.filter.response(self.user, request_app)
+        modified_app = self.filter.response(self.user, request_app, original_app)
         self.assertEqual("foo.a29b3666-be63-11e7-8ef1-0242a8c1e33e", modified_app.tasks[0].id)
         self.assertEqual("/foo", modified_app.tasks[0].app_id)
 
@@ -104,18 +105,15 @@ class TestNamespaceFilter(unittest.TestCase):
         original_app.tasks = []
         self.assertEqual(0, len(request_app.tasks))
 
-        modified_app = self.filter.response(self.user, request_app)
+        modified_app = self.filter.response(self.user, request_app, original_app)
         self.assertEqual(0, len(self.request_app.tasks))
 
-    def test_response_apps__remove_namespace_if_original_app_already_have_namespace(self):
-        self.original_app.id = "/dev/foo"
-        modified_app = self.filter.response(self.user, self.request_app)
-        self.assertEqual("/foo", modified_app.id)
+    @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
+    def test_response_apps_returns_none_if_outside_current_namespace(self, single_full_app_with_tasks_fixture):
+        request_app = original_app =SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        request_app.id = original_app.id = "/othernamespace/foo"
 
-    def test_response_apps_does_nothing_if_user_is_none(self):
-        self.request_app.id = "/dev/foo"
-        modified_app = self.filter.response(None, self.request_app)
-        self.assertEqual("/dev/foo", modified_app.id)
+        self.assertIsNone(self.filter.response(self.user, request_app, original_app))
 
     def test_remove_namspace_from_string(self):
         self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev"))
@@ -134,8 +132,9 @@ class TestNamespaceFilter(unittest.TestCase):
                 headers={}
             )
             response_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])
+            original_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])
             response_wrapper = Response(ctx.request, ok_response)
-            filtered_group = self.filter.response_group(self.user, response_group)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
             self.assertEqual("/group-b", filtered_group.id)
             self.assertEqual(1, len(filtered_group.groups))
             # Não removemos o namespace de subgrupos.
@@ -155,8 +154,9 @@ class TestNamespaceFilter(unittest.TestCase):
                 headers={}
             )
             response_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])
+            original_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])
             response_wrapper = Response(ctx.request, ok_response)
-            filtered_group = self.filter.response_group(self.user, response_group)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
             self.assertEqual("/group-b", filtered_group.id)
             self.assertEqual(1, len(filtered_group.apps))
             self.assertEqual("/group-b/appb0", filtered_group.apps[0].id)
@@ -172,7 +172,7 @@ class TestNamespaceFilter(unittest.TestCase):
             )
             response_group = original_group = MarathonGroup.from_json(group_dev_namespace_fixture['groups'][0])
             response_wrapper = Response(ctx.request, ok_response)
-            filtered_group = self.filter.response_group(self.user, response_group)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
             self.assertEqual(1, len(filtered_group.apps))
 
             self.assertEqual("a_app0.a31dfafb-be63-11e7-8ef1-0242a8c1e33e", filtered_group.apps[0].tasks[0].id)
@@ -195,14 +195,19 @@ class TestNamespaceFilter(unittest.TestCase):
             response_group.apps[0].tasks = []
             original_group.apps[0].tasks = []
             response_wrapper = Response(ctx.request, ok_response)
-            filtered_group = self.filter.response_group(self.user, response_group)
+            filtered_group = self.filter.response_group(self.user, response_group, original_group)
             self.assertEqual(1, len(filtered_group.apps))
-            self.assertEqual(0, len(filtered_group.apps[0].tasks))
+
+    @with_json_fixture("deployments/get.json")
+    def test_response_deployments_return_none_if_outside_current_namespace(self, fixture):
+        deployment = MarathonDeployment.from_json(fixture[0])
+        deployment.affected_apps = ["/othernamespace/foo"]
+        self.assertIsNone(self.filter.response_deployment(self.user, deployment, deployment))
 
     @with_json_fixture("deployments/get.json")
     def test_response_deployments_remove_namespace_from_all_app_ids(self, fixture):
         deployment = MarathonDeployment.from_json(fixture[0])
-        self.filter.response_deployment(self.user, deployment)
+        self.filter.response_deployment(self.user, deployment, deployment)
 
         self.assertEqual(deployment.affected_apps, ['/foo'])
 
@@ -218,7 +223,35 @@ class TestNamespaceFilter(unittest.TestCase):
         task =  MarathonTask.from_json(tasks_get_fixture['tasks'][0])
         task.id = "dev_" + task.id
         task.app_id = "/dev" + task.app_id
-        filtered_task = self.filter.response_task(self.user, task)
+        filtered_task = self.filter.response_task(self.user, task, task)
         self.assertEqual("waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
         self.assertEqual("/waiting", filtered_task.app_id)
+
+    @with_json_fixture("../fixtures/tasks/get.json")
+    def test_response_tasks_returns_none_if_group_outside_current_namespace(self, tasks_get_fixture):
+        task =  MarathonTask.from_json(tasks_get_fixture['tasks'][0])
+        task.id = "othernamespace_" + task.id
+        task.app_id = "/othernamespace" + task.app_id
+        self.assertIsNone(self.filter.response_task(self.user, task, task))
+
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_response_queue_return_none_if_queue_outside_namespace(self, queue_get_fixture):
+        queue = MarathonQueueItem.from_json(queue_get_fixture['queue'][0])
+        self.assertIsNone(self.filter.response_queue(self.user, queue, queue))
+
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_response_queue_remove_namespace_from_app_name(self, queue_get_fixture):
+        queue = MarathonQueueItem.from_json(queue_get_fixture['queue'][1])
+        filtered_queue = self.filter.response_queue(self.user, queue, queue)
+        self.assertEqual("/waiting", filtered_queue.app.id)
+
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_response_queue_return_none_if_namespace_has_same_prefix(self, queue_get_fixture):
+        """
+        Mesmo o namespace da app tendo o mesmo prefixo, devemos reconhecer que a queue não
+        pertence ao nosso namespace
+        """
+        queue = MarathonQueueItem.from_json(queue_get_fixture['queue'][1])
+        queue.app.id = "/developers/app"
+        self.assertIsNone(self.filter.response_queue(self.user, queue, queue))
 

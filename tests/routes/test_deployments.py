@@ -34,6 +34,7 @@ class DeploymentsTests(BaseApiTests, TestCase):
                 json.loads(response.data),
                 [
                     {
+
                         'affectedApps': ['/foo'],
                         'currentActions': [
                             {
@@ -86,7 +87,6 @@ class DeploymentsTests(BaseApiTests, TestCase):
                      ],
                      'totalSteps': 2,
                      'version': '2015-09-30T09:09:17.614Z',
-                     'affectedPods': None
                      }
                 ]
             )
