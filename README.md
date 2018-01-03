@@ -5,6 +5,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 ## Changelog
 
 
+* 0.0.55
+  - IN-2362 Movendo o `merge_apps()` pra dentro do `.split()`
+  - IN-2379 Major refacroting no pipeline de request/response. Agora os dois fluxos são atendidos pelo mesmo dispatch()
+
 * 0.0.54
   - Atualizando session-checker-plugin para usar o ajaxWrapper de dentro do objeto Sieve.
 
