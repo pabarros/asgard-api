@@ -241,6 +241,19 @@ class SplitTests(unittest.TestCase):
             tasks_tuple = list(response.split())
             self.assertEqual(0, len(tasks_tuple))
 
+    @with_json_fixture("../fixtures/queue/get.json")
+    def test_split_queue_GET(self, queue_get_fixture):
+        with application.test_request_context('/v2/queue', method='GET') as ctx:
+            response = FlaskResponse(
+                response=json.dumps(queue_get_fixture),
+                status=HTTPStatus.OK
+            )
+
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            queue_tuples = list(response.split())
+            self.assertEqual(2, len(queue_tuples))
+
 
 class JoinTests(unittest.TestCase):
 

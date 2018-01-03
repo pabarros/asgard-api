@@ -22,9 +22,7 @@ def raw_proxy():
 @application.route("/v2/deployments/<string:uuid>", methods=["GET", "DELETE"])
 @auth_required()
 def deployments(uuid):
-    request_handler = request_handlers.Deployments(request)
-    response = request_handler.handle()
-    return response
+    return request_handlers.Deployments(request).handle()
 
 @application.route("/v2/groups", defaults={"group_id": ""}, methods=["GET", "DELETE"])
 @application.route("/v2/groups//<path:group>/versions", methods=["GET"])

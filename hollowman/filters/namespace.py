@@ -54,16 +54,16 @@ class NameSpaceFilter:
             task.id = task.id.replace("{}_".format(namespace), "")
             task.app_id = task.app_id.replace("/{}/".format(namespace), "/")
 
-    def response(self, user, response_app) -> SieveMarathonApp:
-        if not user:
-            return response_app
+    def response(self, user, response_app, original_app) -> SieveMarathonApp:
+        if not response_app.id.startswith("/{}/".format(user.current_account.namespace)):
+             return None
 
         response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
         self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
 
         return response_app
 
-    def response_group(self, user, response_group):
+    def response_group(self, user, response_group, original_group):
         response_group.id = self._remove_namespace(user, response_group.id)
         for app in response_group.apps:
             app.id = self._remove_namespace(user, app.id)
@@ -71,7 +71,10 @@ class NameSpaceFilter:
 
         return response_group
 
-    def response_deployment(self, user, deployment: MarathonDeployment) -> MarathonDeployment:
+    def response_deployment(self, user, deployment: MarathonDeployment, original_deployment) -> MarathonDeployment:
+        # Não teremos deployments que afetam apps de múltiplos namespaces,
+        # por isos podemos olhar apenas umas das apps.
+        original_affected_apps_id = deployment.affected_apps[0]
         deployment.affected_apps = [
             self._remove_namespace(user, app_id)
             for app_id in deployment.affected_apps
@@ -84,9 +87,18 @@ class NameSpaceFilter:
             for action in step.actions:
                 action.app = self._remove_namespace(user, action.app)
 
-        return deployment
+        if original_affected_apps_id.startswith(f"/{user.current_account.namespace}/"):
+            return deployment
+        return None
 
-    def response_task(self, user, response_task):
+    def response_queue(self, user, response_queue, original_queue):
+        current_namespace = user.current_account.namespace
+        if response_queue.app.id.startswith("/{}/".format(current_namespace)):
+            response_queue.app.id = self._remove_namespace(user, response_queue.app.id)
+            return response_queue
+        return None
+
+    def response_task(self, user, response_task, original_task):
         """
         Método para filtrar tasks que estejam sendo retornadas no
         response
@@ -96,6 +108,8 @@ class NameSpaceFilter:
         :returns: response_task modificado
 
         """
-        self._remove_namespace_from_tasks([response_task], user.current_account.namespace)
-        return response_task
+        if response_task.id.startswith(f"{user.current_account.namespace}_"):
+            self._remove_namespace_from_tasks([response_task], user.current_account.namespace)
+            return response_task
+        return None
 

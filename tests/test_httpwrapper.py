@@ -4,6 +4,8 @@ from unittest.mock import Mock
 
 from hollowman.app import application
 from hollowman.http_wrappers.request import Request
+from hollowman.http_wrappers.response import Response
+from hollowman.http_wrappers.base import RequestResource
 
 class HTTPWrapperTest(TestCase):
 
@@ -101,8 +103,8 @@ class HTTPWrapperTest(TestCase):
 
         for request_path, expected_marathon_path in expected_paths.items():
             # noinspection PyTypeChecker
-            request_wrappper = Request(Mock(path=request_path))
-            self.assertEqual(request_wrappper.object_id, expected_marathon_path)
+            request_wrapper = Request(Mock(path=request_path))
+            self.assertEqual(request_wrapper.object_id, expected_marathon_path)
 
     def test_it_parses_task_id(self):
         expected_paths = {
@@ -113,8 +115,8 @@ class HTTPWrapperTest(TestCase):
 
         for request_path, expected_marathon_path in expected_paths.items():
             # noinspection PyTypeChecker
-            request_wrappper = Request(Mock(path=request_path))
-            self.assertEqual(request_wrappper.object_id, expected_marathon_path)
+            request_wrapper = Request(Mock(path=request_path))
+            self.assertEqual(request_wrapper.object_id, expected_marathon_path)
 
     def test_is_delete(self):
         with application.test_request_context('/v2/apps/app0',
@@ -139,4 +141,26 @@ class HTTPWrapperTest(TestCase):
                                               method='GET') as ctx:
             request_parser = Request(ctx.request)
             self.assertTrue(request_parser.is_tasks_request())
+
+    def test_return_correct_request_resource(self):
+        expected_request_resources = {
+            '/v2/apps': RequestResource.APPS,
+            '/v2/apps/': RequestResource.APPS,
+            '/v2/groups': RequestResource.GROUPS,
+            '/v2/groups/': RequestResource.GROUPS,
+            '/v2/deployments': RequestResource.DEPLOYMENTS,
+            '/v2/deployments/': RequestResource.DEPLOYMENTS,
+            '/v2/tasks': RequestResource.TASKS,
+            '/v2/tasks/': RequestResource.TASKS,
+            '/v2/queue': RequestResource.QUEUE,
+            '/v2/queue/': RequestResource.QUEUE,
+        }
+
+        for request_path, expected_request_resource in expected_request_resources.items():
+            # noinspection PyTypeChecker
+            request_mock = Mock(path=request_path)
+            request_wrapper = Request(request_mock)
+            response_wrapper = Response(request_mock, Mock())
+            self.assertEqual(request_wrapper.request_resource, expected_request_resource)
+            self.assertEqual(response_wrapper.request_resource, expected_request_resource)
 

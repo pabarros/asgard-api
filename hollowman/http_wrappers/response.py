@@ -3,6 +3,8 @@ from flask import Response as FlaskResponse
 
 from marathon.models.group import MarathonGroup
 from marathon.models.task import MarathonTask
+from marathon.models.deployment import MarathonDeployment
+from marathon.models.queue import MarathonQueueItem
 
 from hollowman.http_wrappers.base import HTTPWrapper, Apps
 from hollowman.marathonapp import SieveMarathonApp
@@ -44,6 +46,19 @@ class Response(HTTPWrapper):
                     response_task = MarathonTask.from_json(task)
                     yield response_task, response_task
                 return
+            elif self.is_deployment():
+                content = response_content
+                deployments = (MarathonDeployment.from_json(deploy) for deploy in content)
+
+                for deployment in deployments:
+                    yield deployment, deployment
+                return
+            elif self.is_queue_request():
+                queue_data = response_content
+                queued_apps = (MarathonQueueItem.from_json(queue_item) for queue_item in queue_data['queue'])
+                for queued_app in queued_apps:
+                    yield queued_app, queued_app
+                return
             else:
                 response_app = SieveMarathonApp.from_json(response_content.get('app') or response_content)
                 app = self.marathon_client.get_app(self.object_id)
@@ -57,7 +72,7 @@ class Response(HTTPWrapper):
                     response_task = MarathonTask.from_json(task)
                     yield response_task, response_task
                 return
-            return                
+            return
 
         yield SieveMarathonApp(), self.marathon_client.get_app(self.app_id)
 
@@ -80,6 +95,14 @@ class Response(HTTPWrapper):
         elif self.is_read_request() and self.is_group_request():
             response_group = apps[0][0] if apps else MarathonGroup()
             body = response_group.json_repr(minimal=False)
+        elif self.is_read_request() and self.is_deployment():
+            deployments_json_repr = [response_deployment.json_repr(minimal=True)
+                                     for response_deployment, _ in apps]
+            body = deployments_json_repr
+        elif self.is_read_request() and self.is_queue_request():
+            queue_json_repr = [queue.json_repr(minimal=True)
+                               for queue, _ in apps]
+            body = {'queue': queue_json_repr}
         elif self.is_tasks_request():
             original_response_data = json.loads(self.response.data)
             all_tasks = []

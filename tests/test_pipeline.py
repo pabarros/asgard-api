@@ -12,21 +12,22 @@ from copy import deepcopy
 
 from hollowman import conf
 from hollowman.http_wrappers.response import Response
+from hollowman.hollowman_flask import OperationType
 from hollowman.models import User, Account
 from hollowman.app import application
-from hollowman.dispatcher import dispatch_response_pipeline
+from hollowman.dispatcher import dispatch
 from tests.utils import with_json_fixture
 
 
 class DummyFilter:
-    def response_group(self, user, response_group):
+    def response_group(self, user, response_group, original_group):
         response_group.id = "/dummy" + response_group.id
         for app in response_group.apps:
             app.id = "/dummy" + app.id
         return response_group
 
 class FooFilter:
-    def response_group(self, user, response_group):
+    def response_group(self, user, response_group, original_group):
         for app in response_group.apps:
             app.id = "/foo" + app.id
         return response_group
@@ -60,9 +61,10 @@ class ResponsePipelineTest(unittest.TestCase):
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
                 response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                            filters_pipeline=[DummyFilter()])
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [DummyFilter()]},
+                                          filter_method_name_callback=lambda *args: "response_group")
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/dummy/dev/group-b", returned_group.id)
@@ -70,7 +72,7 @@ class ResponsePipelineTest(unittest.TestCase):
 
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
-    def test_filters_can_modifi_all_apps_from_group_and_subgroups(self, group_dev_namespace_fixture):
+    def test_filters_can_modify_all_apps_from_group_and_subgroups(self, group_dev_namespace_fixture):
         """
         Um fltro deve poder alterar todas as apps de todos os grupos de um response.
         """
@@ -88,9 +90,10 @@ class ResponsePipelineTest(unittest.TestCase):
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
                 response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                            filters_pipeline=[DummyFilter()])
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [DummyFilter()]},
+                                          filter_method_name_callback=lambda *args: "response_group")
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/dummy/dev/group-b/appb0", returned_group.apps[0].id)
@@ -116,10 +119,12 @@ class ResponsePipelineTest(unittest.TestCase):
                 rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
+                ctx.request.user = self.user
                 response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch_response_pipeline(user=self.user,
-                                                            response=response_wrapper,
-                                                            filters_pipeline=[DummyFilter(), FooFilter()])
+                final_response = dispatch(user=self.user,
+                                          request=response_wrapper,
+                                          filters_pipeline={OperationType.READ: [DummyFilter(), FooFilter()]},
+                                          filter_method_name_callback=lambda *args: "response_group")
                 final_response_data = json.loads(final_response.data)
                 returned_group = MarathonGroup.from_json(final_response_data)
                 self.assertEqual("/foo/dummy/dev/group-b/appb0", returned_group.apps[0].id)

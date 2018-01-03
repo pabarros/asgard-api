@@ -19,7 +19,16 @@ from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
 from hollowman.filters.labels import LabelsFilter
 from hollowman.http_wrappers.response import Response
+from hollowman.http_wrappers.base import RequestResource
 
+
+FILTERS_METHOD_NAMES = {
+    RequestResource.APPS: "response",
+    RequestResource.GROUPS: "response_group",
+    RequestResource.DEPLOYMENTS: "response_deployment",
+    RequestResource.TASKS: "response_task",
+    RequestResource.QUEUE: "response_queue",
+}
 
 FILTERS_PIPELINE = {
     FilterType.REQUEST: {
@@ -27,9 +36,9 @@ FILTERS_PIPELINE = {
         ),
 
         OperationType.WRITE: (
+            NameSpaceFilter(),
             AddURIFilter(),
             DefaultScaleFilter(),
-            NameSpaceFilter(),
             ForcePullFilter(),
             TrimRequestFilter(),
             AddAppNameFilter(),
@@ -39,18 +48,25 @@ FILTERS_PIPELINE = {
             LabelsFilter(),
         )
     },
-    FilterType.RESPONSE: (
-        NameSpaceFilter(),
-        IncompatibleFieldsFilter(),
-    )
+    FilterType.RESPONSE: {
+        OperationType.READ: (
+            NameSpaceFilter(),
+        ),
+        OperationType.WRITE: (
+            NameSpaceFilter(),
+        )
+    }
 }
 
-# Keys que são multi-valor e que devem
-# ser mergeados de forma especial quando
-# juntamos a request_app com a original_app
-REMOVABLE_KEYS = {"constraints", "labels", "env", "healthChecks", "upgradeStrategy"}
+def _get_filter_callable_name(request, operation):
+    if request.is_tasks_request():
+        method_name = f"{operation.value}_task"
+    else:
+        method_name = operation.value
 
-def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST]) -> HollowmanRequest:
+    return method_name
+
+def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST], filter_method_name_callback=_get_filter_callable_name) -> HollowmanRequest:
     """
     :type user: User
     :type request: http_wrappers.Request
@@ -61,129 +77,25 @@ def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST
 
     filtered_apps = []
 
-    for request_app, original_app in request.split():
-        for operation in request.request.operations:
-            merged_app = merge_marathon_apps(base_app=original_app, modified_app=request_app)
-            for filter_ in filters_pipeline[operation]:
-                func = lambda user, request_obj, original_obj: request_obj
-                if request.is_tasks_request():
-                    method_name = f"{operation.value}_task"
-                    if hasattr(filter_, method_name):
-                        func = getattr(filter_, method_name)
-                else:
-                    func = getattr(filter_, operation.value)
-
-                func(user, merged_app, original_app)
-        filtered_apps.append((merged_app, original_app))
+    for operation in request.request.operations:
+        for request_app, original_app in request.split():
+            if _dispatch(request,
+                      filters_pipeline[operation],
+                      filter_method_name_callback(request, operation),
+                      request_app, original_app):
+                filtered_apps.append((request_app, original_app))
 
     return request.join(filtered_apps)
 
-def dispatch_response_pipeline(user, response: Response, filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE]) -> FlaskResponse:
-    if response.is_app_request():
-        filtered_response_apps = []
-        for response_app, original_app in response.split():
-            filtered_app = response_app
-            for filter_ in filters_pipeline:
-                if hasattr(filter_, "response"):
-                    filter_.response(user, filtered_app)
+def _get_callable_if_exist(filter_, method_name):
+    if hasattr(filter_, method_name):
+        return getattr(filter_, method_name)
 
-            if original_app.id.startswith("/{}/".format(user.current_account.namespace)):
-                filtered_response_apps.append((filtered_app, original_app))
-
-        return response.join(filtered_response_apps)
-    elif response.is_group_request():
-        filtered_response_groups = []
-        for response_group, original_group in response.split():
-            filtered_group = response_group
-            for filter_ in filters_pipeline:
-                if hasattr(filter_, "response_group"):
-                    filter_.response_group(user, filtered_group)
-            filtered_response_groups.append((filtered_group, original_group))
-        return response.join(filtered_response_groups)
-    elif response.is_deployment():
-        content = json.loads(response.response.data)
-        deployments = (MarathonDeployment.from_json(deploy) for deploy in content)
-
-        filtered_deployments = []
-        for deployment in deployments:
-            # Não teremos deployments que afetam apps de múltiplos namespaces,
-            # por isos podemos olhar apenas umas das apps.
-            original_affected_apps_id = deployment.affected_apps[0]
-            for filter_ in filters_pipeline:
-                if hasattr(filter_, "response_deployment"):
-                    filter_.response_deployment(user, deployment)
-            if original_affected_apps_id.startswith("/{}/".format(user.current_account.namespace)):
-                filtered_deployments.append(deployment)
-
-        return FlaskResponse(
-            response=json.dumps(filtered_deployments, cls=Response.json_encoder),
-            status=response.response.status,
-            headers=response.response.headers
-        )
-    elif response.is_queue_request():
-        queue_data = json.loads(response.response.data)
-        current_namespace = user.current_account.namespace
-        filtered_queue_data = []
-        queued_apps = (MarathonQueueItem.from_json(queue_item) for queue_item in queue_data['queue'])
-        for queued_app in queued_apps:
-            if queued_app.app.id.startswith("/{}".format(current_namespace)):
-                queued_app.app.id = queued_app.app.id.replace("/{}".format(current_namespace), "")
-                filtered_queue_data.append(queued_app)
-
-        return FlaskResponse(
-            response=json.dumps({"queue": filtered_queue_data}, cls=Response.json_encoder),
-            status=response.response.status,
-            headers=response.response.headers
-        )
-    elif response.is_tasks_request():
-        content = json.loads(response.response.data)
-        filtered_tasks = content
-        try:
-            tasks = (MarathonTask.from_json(task) for task in content['tasks'])
-
-            filtered_tasks = []
-            for task in tasks:
-                task_original_idd = task.id
-                for filter_ in filters_pipeline:
-                    if hasattr(filter_, "response_task"):
-                        filter_.response_task(user, task)
-
-                if task_original_idd.startswith(f"{user.current_account.namespace}_"):
-                    filtered_tasks.append((task, task))
-        except KeyError:
-            # resposne sem lista de task, retornamos sem mexer
-            return response.response
-
-        return response.join(filtered_tasks)
-
-
-def merge_marathon_apps(base_app, modified_app):
-    """
-    A junção das duas apps (request_app (aqui modified_app) e original_app (aqui base_app)) é
-    sempre feita pegando todos os dados da original_app e jogando os dados da requst_app "em cima".
-    Não podemos usar o `minimal=Fase` na request_app pois para requests que estão *incompletos*, ou seja,
-    sem alguns vampos (já veremos exemplo) se esássemos minimal=False, iríramos apagar esses "campos faltantes"
-    da original_app. Exemplos:
-
-        request_app = {"instances": 10}
-        original_app está completa, com envs, constraints e tudo mais.
-
-        se usamos `minimal=False` na request_app, teremos um JSON com *todos* os campos em branco, menos o "instances".
-        Então quando fizermos `merged.update(modified_app.json_repr(minimal=False))`, vamos no final ter um JSON apenas com
-        o campo "instances" perrnchido e todo o restante vazio.
-
-
-    """
-    merged = base_app.json_repr(minimal=False)
-    merged.update(modified_app.json_repr(minimal=True))
-    try:
-        raw_request_data = json.loads(request.data)
-        for key in REMOVABLE_KEYS:
-            if key in raw_request_data:
-                merged[key] = raw_request_data[key]
-    except Exception as e:
-        pass
-    if isinstance(base_app, MarathonTask):
-        return MarathonTask.from_json(merged)
-    return SieveMarathonApp.from_json(merged)
+def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter_args):
+    for filter_ in filters_pipeline:
+        func = _get_callable_if_exist(filter_, filter_method_name)
+        if not func or func(request_or_response.request.user, *filter_args):
+            continue
+        return False
+    return True
 
