@@ -24,14 +24,14 @@ class UpstreamTest(TestCase):
         HEADER_NAME_TRANSFER_ENCODING = "Transfer-Encoding"
         mock_get.return_value = RequestStub(headers={HEADER_NAME_CONTENT_ENCODING: "gzip", HEADER_NAME_TRANSFER_ENCODING: "chunked"})
         with application.test_request_context("/v2/apps", method="GET"):
-            response = replay_request(flask.request, "http://marathon:8080")
+            response = replay_request(flask.request)
             self.assertFalse(HEADER_NAME_CONTENT_ENCODING in response.headers.keys())
             self.assertFalse(HEADER_NAME_TRANSFER_ENCODING in response.headers.keys())
 
     @patch.object(requests, 'get')
     def test_remove_conent_length_header(self, mock_get):
         with application.test_request_context("/v2/apps", method="GET", headers={"Content-Length": 42}):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['headers']
             self.assertTrue('Content-Length' not in called_headers)
@@ -39,7 +39,7 @@ class UpstreamTest(TestCase):
     @patch.object(requests, 'get')
     def test_remove_conent_length_header_mixed_case(self, mock_get):
         with application.test_request_context("/v2/apps", method="GET", headers={"COntenT-LenGtH": 42}):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['headers']
             header_names = [k.lower() for k in called_headers.keys()]
@@ -49,7 +49,7 @@ class UpstreamTest(TestCase):
     @patch.multiple(hollowman.conf, MARATHON_AUTH_HEADER="bla")
     def test_add_authorization_header(self, mock_get):
         with application.test_request_context("/v2/apps", method="GET"):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['headers']['Authorization']
             self.assertEqual(called_headers, "bla")
@@ -57,7 +57,7 @@ class UpstreamTest(TestCase):
     @patch.object(requests, 'get')
     def test_add_query_string_from_original_request(self, mock_get):
         with application.test_request_context("/v2/apps?a=b&c=d", method="GET"):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['params']
             self.assertEqual(dict(called_headers), {"a": "b", "c": "d"})
@@ -65,7 +65,7 @@ class UpstreamTest(TestCase):
     @patch.object(requests, 'get')
     def test_add_original_payload_to_upstream_request(self, mock_get):
         with application.test_request_context("/v2/apps?a=b&c=d", method="GET", data="Request Data"):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['data']
             self.assertEqual(called_headers, b"Request Data")
@@ -73,7 +73,7 @@ class UpstreamTest(TestCase):
     @patch.object(requests, 'get')
     def test_original_headers_to_upstream_request(self, mock_get):
         with application.test_request_context("/v2/apps", method="GET", headers={"X-Header-A": 42, "X-Header-B": 10}):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_get.called)
             called_headers = mock_get.call_args[1]['headers']
             self.assertEqual(called_headers['X-Header-A'], "42")
@@ -86,7 +86,7 @@ class UpstreamTest(TestCase):
         O pop() da lista se comporta diferente do pop do dict. Temos que tratar isso.
         """
         with application.test_request_context("/v2/apps", method="PUT", data='[{"id": "/abc", "version": "0", "fetch": ["a", "b"]}]', headers={'Content-Type': 'application/json'}):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_put.called)
             called_data_json = json.loads(mock_put.call_args[1]['data'])
             self.assertFalse('version' in called_data_json[0])
@@ -102,7 +102,7 @@ class UpstreamTest(TestCase):
         accept a PUT/POST on this same app if these keys are present.
         """
         with application.test_request_context("/v2/apps", method="PUT", data='{"id": "/abc", "version": "0", "fetch": ["a", "b"]}', headers={'Content-Type': 'application/json'}):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_put.called)
             called_data_json = json.loads(mock_put.call_args[1]['data'])
             self.assertFalse('version' in called_data_json)
@@ -119,7 +119,7 @@ class UpstreamTest(TestCase):
         """
         with application.test_request_context("/v2/apps", method="POST", data='{"id": "/abc", "version": "0", "fetch": ["a", "b"]}', headers={'Content-Type': 'application/json'}):
             #flask.request.is_json = True
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_post.called)
             called_data_json = json.loads(mock_post.call_args[1]['data'])
             self.assertFalse('version' in called_data_json)
@@ -135,7 +135,7 @@ class UpstreamTest(TestCase):
         accept a PUT/POST on this same app if these keys are present.
         """
         with application.test_request_context("/v2/apps//foo/bar/restart", method="POST", data=''):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_post.called)
 
     @patch.object(requests, 'put')
@@ -148,7 +148,7 @@ class UpstreamTest(TestCase):
         accept a PUT/POST on this same app if these keys are present.
         """
         with application.test_request_context("/v2/apps//foo/bar/restart", method="PUT", data=''):
-            replay_request(flask.request, "http://marathon:8080")
+            replay_request(flask.request)
             self.assertTrue(mock_put.called)
 
     def test_make_request_raise_exception_if_all_fail(self):
