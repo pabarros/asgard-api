@@ -9,7 +9,6 @@ DISABLED = "0"
 
 MARATHON_CREDENTIALS = os.getenv("MARATHON_CREDENTIALS", "guest:guest")
 MARATHON_AUTH_HEADER = "Basic {}".format(base64.b64encode(MARATHON_CREDENTIALS.encode("utf-8")).decode('utf-8'))
-MARATHON_ENDPOINT = os.getenv("MARATHON_ENDPOINT", "http://127.0.0.1:8080")
 DEFAULT_MARATHON_ADDRESS = "http://127.0.0.1:8080"
 
 

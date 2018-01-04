@@ -24,7 +24,7 @@ FILTERS_METHOD_NAMES = {
 }
 
 def upstream_request(request: HollowmanRequest) -> Response:
-    resp = upstream.replay_request(request, conf.MARATHON_ENDPOINT)
+    resp = upstream.replay_request(request)
     return Response(response=resp.content,
                     status=resp.status_code,
                     headers=dict(resp.headers))

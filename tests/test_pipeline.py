@@ -55,9 +55,9 @@ class ResponsePipelineTest(unittest.TestCase):
                 headers={}
             )
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b/group-b0',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
                 response_wrapper = Response(ctx.request, ok_response)
@@ -84,9 +84,9 @@ class ResponsePipelineTest(unittest.TestCase):
                 headers={}
             )
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b/group-b0',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
                 response_wrapper = Response(ctx.request, ok_response)
@@ -114,9 +114,9 @@ class ResponsePipelineTest(unittest.TestCase):
                 headers={}
             )
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b/group-b0',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
 
                 ctx.request.user = self.user

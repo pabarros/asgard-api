@@ -65,9 +65,9 @@ class RequestHandlersTests(TestCase):
         single_full_app_fixture['id'] = "/dev/foo"
         with application.test_client() as client:
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps/dev/foo/versions/2017-10-31T13:01:07.768Z',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps/dev/foo/versions/2017-10-31T13:01:07.768Z',
                          body=json.dumps(single_full_app_fixture), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({"app": single_full_app_fixture}), status=200)
                 response = client.get("/v2/apps/foo/versions/2017-10-31T13:01:07.768Z", headers=auth_header)
                 self.assertEqual(200, response.status_code)
@@ -78,11 +78,11 @@ class RequestHandlersTests(TestCase):
         auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
         with application.test_client() as client:
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups/dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups/dev/group-b',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1])), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b/group-b0',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b/group-b0',
                          body=json.dumps(deepcopy(group_dev_namespace_fixture['groups'][1]['groups'][0])), status=200)
                 response = client.get("/v2/groups/group-b", headers=auth_header)
                 self.assertEqual(200, response.status_code)
@@ -99,7 +99,7 @@ class RequestHandlersTests(TestCase):
         with application.test_client() as client:
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/queue',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/queue',
                          status=200,
                          json=queue_get_fixture)
 
@@ -126,9 +126,9 @@ class DispatchResponse404Test(TestCase):
         auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
         with application.test_client() as client:
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'message': "App /foo not found"}), status=404)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps/dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps/dev/foo',
                          body=json.dumps({'message': "App /foo not found"}), status=404)
                 response = client.get("/v2/apps/foo", headers=auth_header)
                 self.assertEqual(404, response.status_code)

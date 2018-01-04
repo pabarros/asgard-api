@@ -15,7 +15,7 @@ from hollowman.plugins import get_plugin_registry_data
 
 
 def raw_proxy():
-    r = upstream.replay_request(request, conf.MARATHON_ENDPOINT)
+    r = upstream.replay_request(request, conf.MARATHON_ADDRESSES[0])
     return Response(response=r.content, status=r.status_code, headers=dict(r.headers))
 
 @application.route("/v2/deployments", defaults={"uuid": ""}, methods=["GET"])
@@ -89,7 +89,7 @@ def apiv2(path):
 
 @application.route("/healthcheck")
 def healhcheck():
-    r = requests.get(conf.MARATHON_ENDPOINT,
+    r = requests.get(conf.MARATHON_ADDRESSES[0],
                      headers={"Authorization": conf.MARATHON_AUTH_HEADER})
     return Response(response="", status=r.status_code)
 

@@ -8,7 +8,7 @@ import requests
 from hollowman import conf
 
 
-def replay_request(request, destination_url):
+def replay_request(request, destination_url=None):
     params = [(key, value)
               for key, value in request.args.items(multi=True)]
     headers = dict(request.headers)

@@ -42,9 +42,9 @@ class TestAuthentication(TestCase):
         self.session.add(self.account_with_no_user)
         self.session.commit()
         self.response_http_200 = MagicMock(status_code=200)
-        responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps',
+        responses.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps',
                          body=json.dumps({'apps': [fixture]}), status=200)
-        responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+        responses.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
                          body=json.dumps({'app': fixture}), status=200)
         responses.start()
 

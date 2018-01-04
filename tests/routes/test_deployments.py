@@ -24,7 +24,7 @@ class DeploymentsTests(BaseApiTests, TestCase):
     def test_v2_deployments_get(self, fixture):
         with application.test_client() as client, RequestsMock() as rsps:
             rsps.add(
-                url=f'{conf.MARATHON_ENDPOINT}/v2/deployments',
+                url=f'{conf.MARATHON_ADDRESSES[0]}/v2/deployments',
                 body=json.dumps(fixture),
                 method='GET',
                 status=200
@@ -98,7 +98,7 @@ class DeploymentsTests(BaseApiTests, TestCase):
              patch("hollowman.request_handlers.Deployments._apply_response_filters") as _apply_response_filters:
             response_data = json.dumps(fixture)
             rsps.add(
-                url=f'{conf.MARATHON_ENDPOINT}/v2/deployments/foo',
+                url=f'{conf.MARATHON_ADDRESSES[0]}/v2/deployments/foo',
                 body=response_data,
                 method='DELETE',
                 status=200
@@ -112,7 +112,7 @@ class DeploymentsTests(BaseApiTests, TestCase):
     def test_deployments_remove_all_from_other_namespaces(self, multi_namespace_deployments_fixture):
         with application.test_client() as client, RequestsMock() as rsps:
             rsps.add(
-                url=f'{conf.MARATHON_ENDPOINT}/v2/deployments',
+                url=f'{conf.MARATHON_ADDRESSES[0]}/v2/deployments',
                 body=json.dumps(multi_namespace_deployments_fixture),
                 method='GET',
                 status=200

@@ -32,7 +32,7 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_one = deepcopy(self.single_full_app_fixture)
             single_full_app_one['id'] = '/dev/foo'
 
-            _url = conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo'
+            _url = conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo'
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
                          url=_url,
@@ -66,9 +66,9 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_two['id'] = '/dev/other-app'
 
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'app': single_full_app_one}), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/other-app',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/other-app',
                          body=json.dumps({'app': single_full_app_two}), status=200)
 
                 original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two]}),
@@ -99,11 +99,11 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_three['id'] = '/othernamespace/other-app'
 
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'app': single_full_app_one}), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/other-app',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/other-app',
                          body=json.dumps({'app': single_full_app_two}), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//othernamespace/other-app',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//othernamespace/other-app',
                          body=json.dumps({'app': single_full_app_three}), status=200)
 
                 original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two, single_full_app_three]}),
@@ -138,11 +138,11 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_three['id'] = '/developers/other-app'
 
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'app': single_full_app_one}), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/other-app',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/other-app',
                          body=json.dumps({'app': single_full_app_two}), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//developers/other-app',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//developers/other-app',
                          body=json.dumps({'app': single_full_app_three}), status=200)
 
                 original_response = FlaskResponse(response=json.dumps({'apps': [single_full_app_one, single_full_app_two, single_full_app_three]}),
@@ -170,7 +170,7 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_one['id'] = "/dev/foo"
 
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
                          json={"app": single_full_app_one}, status=200)
 
                 original_response = FlaskResponse(response=json.dumps({"app": single_full_app_one}),

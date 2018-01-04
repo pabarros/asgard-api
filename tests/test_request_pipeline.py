@@ -29,7 +29,7 @@ class RequestPipelineTest(unittest.TestCase):
         self.single_full_app_fixture = single_full_app_fixture
         self.user = User(tx_name="User", tx_email="user@host.com")
         self.user.current_account = Account(name="Some Account", namespace="dev", owner="company")
-        responses.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+        responses.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'app': self.single_full_app_fixture}), status=200)
         responses.start()
 
