@@ -29,11 +29,11 @@ def replay_request(request, destination_url):
     return upstream_response
 
 def _make_request(path, method, params=None, headers=None, data=None):
-    for marathon_backend in conf.MARATHON_ADDRESSES:
+    for marathon_backend in [conf.MARATHON_LEADER] + conf.MARATHON_ADDRESSES:
         try:
             url = "{}{}".format(marathon_backend, path)
             response = getattr(requests, method)(url, params=params, headers=headers, data=data)
-            leader_addr = response.headers.pop("X-Marathon-Leader", None)
+            leader_addr = response.headers.pop("X-Marathon-Leader", conf.MARATHON_ADDRESSES[0])
             conf.MARATHON_LEADER = leader_addr
             return response
         except requests.exceptions.ConnectionError as e:
