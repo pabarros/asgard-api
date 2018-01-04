@@ -10,6 +10,7 @@ DISABLED = "0"
 MARATHON_CREDENTIALS = os.getenv("MARATHON_CREDENTIALS", "guest:guest")
 MARATHON_AUTH_HEADER = "Basic {}".format(base64.b64encode(MARATHON_CREDENTIALS.encode("utf-8")).decode('utf-8'))
 MARATHON_ENDPOINT = os.getenv("MARATHON_ENDPOINT", "http://127.0.0.1:8080")
+DEFAULT_MARATHON_ADDRESS = "http://127.0.0.1:8080"
 
 user, passw = MARATHON_CREDENTIALS.split(':')
 marathon_client = MarathonClient([MARATHON_ENDPOINT], username=user, password=passw)
@@ -21,10 +22,13 @@ def _build_cors_whitelist(env_value):
 
 def _build_marathon_addresses():
     addresses = {addr.rstrip("/") for addr in get_option("MARATHON", "ADDRESS")}
-    return sorted(list(addresses))
+    final_addresses = sorted(list(addresses))
+    if not final_addresses:
+        final_addresses = [DEFAULT_MARATHON_ADDRESS]
+    return final_addresses
 
-MARATHON_ADDRESSES = [MARATHON_ENDPOINT]
-MARATHON_LEADER = MARATHON_ENDPOINT
+MARATHON_ADDRESSES = _build_marathon_addresses()
+MARATHON_LEADER = MARATHON_ADDRESSES[0]
 CORS_WHITELIST = _build_cors_whitelist(os.getenv("HOLLOWMAN_CORS_WHITELIST"))
 
 REDIRECT_ROOTPATH_TO = os.getenv("HOLLOWMAN_REDIRECT_ROOTPATH_TO", "/v2/apps")

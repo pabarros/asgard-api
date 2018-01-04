@@ -24,6 +24,11 @@ class ConfTest(unittest.TestCase):
         self.assertEqual(base64.b64decode(auth_value).decode('utf-8'),
                          conf.MARATHON_CREDENTIALS)
 
+    def test_build_marathon_addresses_default_value(self):
+            addresses = list(conf._build_marathon_addresses())
+            self.assertEqual(1, len(addresses))
+            self.assertEqual("http://127.0.0.1:8080", addresses[0])
+
     def test_build_marathon_addresses(self):
         """
         Certificamos que o código le corretamentee as envs passadas
