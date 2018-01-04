@@ -9,7 +9,6 @@ from hollowman import conf
 
 
 def replay_request(request, destination_url):
-    to_url = "{}{}".format(destination_url, request.path)
     params = [(key, value)
               for key, value in request.args.items(multi=True)]
     headers = dict(request.headers)
@@ -24,10 +23,22 @@ def replay_request(request, destination_url):
         else:
             _remove_keys(request_data)
         request.data = json.dumps(request_data)
-    upstream_response = getattr(requests, method)(to_url, params=params, headers=headers, data=request.data)
+    upstream_response = _make_request(request.path, method, params=params, headers=headers, data=request.data)
     upstream_response.headers.pop("Content-Encoding", None)
     upstream_response.headers.pop("Transfer-Encoding", None) # Marathon 1.3.x returns all responses gziped
     return upstream_response
+
+def _make_request(path, method, params=None, headers=None, data=None):
+    for marathon_backend in conf.MARATHON_ADDRESSES:
+        try:
+            url = "{}{}".format(marathon_backend, path)
+            response = getattr(requests, method)(url, params=params, headers=headers, data=data)
+            leader_addr = response.headers.pop("X-Marathon-Leader", None)
+            conf.MARATHON_LEADER = leader_addr
+            return response
+        except requests.exceptions.ConnectionError as e:
+            pass
+    raise Exception("No Marathon servers found")
 
 def _remove_keys(data):
     data.pop("version", None)

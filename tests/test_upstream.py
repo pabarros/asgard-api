@@ -6,9 +6,12 @@ import mock
 import flask
 import requests
 import json
+from requests.exceptions import ConnectionError
+from responses import RequestsMock
+import responses
 
 from hollowman.app import application
-from hollowman.upstream import replay_request
+from hollowman.upstream import replay_request, _make_request
 import hollowman.conf
 from tests import RequestStub
 
@@ -147,3 +150,44 @@ class UpstreamTest(TestCase):
         with application.test_request_context("/v2/apps//foo/bar/restart", method="PUT", data=''):
             replay_request(flask.request, "http://marathon:8080")
             self.assertTrue(mock_put.called)
+
+    def test_make_request_raise_exception_if_all_fail(self):
+        marathon_addresses = ["http://127.0.0.1:8080", "http://172.30.0.1:8080", "http://172.31.0.1:8080"]
+        with RequestsMock() as rsps, \
+                patch.multiple(hollowman.conf, MARATHON_ADDRESSES=marathon_addresses):
+            self.assertRaises(Exception, _make_request, "/v2/apps", "get")
+
+    def test_make_request_return_response_from_first_connectable_host(self):
+        """
+        O primeiro server que conseguirmos conectar, ou seja, que não lance
+        ConnectionError, é a resposta que vamos retornar
+        Endpoints atuais:
+            http://127.0.0.1:8080 > Invalido
+            http://172.30.0.1:8080 > Vallido
+            http://172.31.0.1:8080 > Invalido
+        """
+        marathon_addresses = ["http://127.0.0.1:8080", "http://172.30.0.1:8080", "http://172.31.0.1:8080"]
+        with RequestsMock() as rsps, \
+                patch.multiple(hollowman.conf, MARATHON_ADDRESSES=marathon_addresses):
+            rsps.add("GET", url=marathon_addresses[1] + "/v2/apps", status=200, body="OK")
+            response = _make_request("/v2/apps", "get")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(b"OK", response.content)
+
+    def test_remove_x_marathon_leader_header_from_upsream_response(self):
+        marathon_addresses = ["http://127.0.0.1:8080"]
+        with RequestsMock() as rsps, \
+                patch.multiple(hollowman.conf, MARATHON_ADDRESSES=marathon_addresses):
+            rsps.add("GET", url=marathon_addresses[0] + "/v2/apps", status=200, body="OK", headers={"X-Marathon-Leader": marathon_addresses[0]})
+            response = _make_request("/v2/apps", "get")
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue('x-marathon-leader' not in response.headers.keys())
+
+    def test_make_request_update_new_marathon_leader(self):
+        marathon_addresses = ["http://172.29.0.1:8080", "http://172.30.0.1:8080"]
+        with RequestsMock() as rsps, \
+                patch.multiple(hollowman.conf, MARATHON_ADDRESSES=marathon_addresses):
+            rsps.add("GET", url=marathon_addresses[0] + "/v2/apps", status=200, body="OK", headers={"X-Marathon-Leader": marathon_addresses[1]})
+            response = _make_request("/v2/apps", "get")
+            self.assertEqual(hollowman.conf.MARATHON_LEADER, marathon_addresses[1])
+
