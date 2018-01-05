@@ -10,7 +10,7 @@ from flask_cors import CORS
 
 from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.conf import SECRET_KEY, CORS_WHITELIST
-from hollowman.log import logger
+from hollowman.log import logger, dev_null_logger
 from hollowman.plugins import register_plugin
 from hollowman.auth.jwt import jwt_auth
 
@@ -68,7 +68,7 @@ def handler_500(error):
     )
 
 import marathon
-marathon.log = logger
+marathon.log = dev_null_logger
 
 import hollowman.routes
 register_plugin("example-plugin")
