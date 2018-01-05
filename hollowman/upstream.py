@@ -6,6 +6,7 @@ import json
 import requests
 
 from hollowman import conf
+from hollowman.log import logger
 
 
 def replay_request(request):
@@ -35,6 +36,7 @@ def _make_request(path, method, params=None, headers=None, data=None):
             response = getattr(requests, method)(url, params=params, headers=headers, data=data)
             leader_addr = response.headers.pop("X-Marathon-Leader", conf.MARATHON_ADDRESSES[0])
             conf.MARATHON_LEADER = leader_addr
+            logger.info({"new_leader": conf.MARATHON_LEADER, "talked_to": marathon_backend})
             return response
         except requests.exceptions.ConnectionError as e:
             pass

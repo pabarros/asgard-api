@@ -84,18 +84,3 @@ class TestApp(TestCase):
     def test_apiv2_path(self):
         pass
 
-    def test_fail_healthcheck(self):
-        Response = namedtuple('Response', ["status_code"])
-
-        with patch('hollowman.routes.requests.get') as get_mock:
-            get_mock.return_value = Response(status_code=404)
-            response = application.test_client().open('/healthcheck')
-            self.assertEqual(response.status_code, 404)
-
-    def test_200_healthcheck(self):
-        Response = namedtuple('Response', ["status_code"])
-
-        with patch('hollowman.routes.requests.get') as get_mock:
-            get_mock.return_value = Response(status_code=200)
-            response = application.test_client().open('/healthcheck')
-            self.assertEqual(response.status_code, 200)
