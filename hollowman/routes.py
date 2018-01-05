@@ -15,7 +15,7 @@ from hollowman import conf, request_handlers, upstream, http_wrappers
 
 
 def raw_proxy():
-    r = upstream.replay_request(request, conf.MARATHON_ADDRESSES[0])
+    r = upstream.replay_request(request)
     return Response(response=r.content, status=r.status_code, headers=dict(r.headers))
 
 @application.route("/v2/deployments", defaults={"uuid": ""}, methods=["GET"])
