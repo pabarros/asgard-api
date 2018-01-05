@@ -1,0 +1,5 @@
+
+TAGS aplicadas às máquinas compartillhadas na AWS:
+project=asgard
+asgard-role={zookeeper,mesos-master,marathon,docker-registry}
+
