@@ -91,8 +91,3 @@ class OwnerFilterTest(unittest.TestCase):
         self.assertEqual(1, len(owner_constraint))
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
 
-    def test_do_nothing_if_user_not_authenticated(self):
-        filtered_app = self.filter.write(None, self.request_app, self.original_app)
-
-        self.assertEqual(1, len(filtered_app.constraints))
-

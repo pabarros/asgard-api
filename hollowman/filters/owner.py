@@ -6,8 +6,6 @@ class AddOwnerConstraintFilter():
     name = "owner"
 
     def write(self, user, request_app, original_app):
-        if not user:
-            return request_app
 
         owner_constraint = MarathonConstraint(field="owner", operator="LIKE", value=user.current_account.owner)
         if request_app.has_constraint("owner"):
