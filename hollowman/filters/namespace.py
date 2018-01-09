@@ -7,8 +7,8 @@ from hollowman.marathonapp import SieveMarathonApp
 class NameSpaceFilter:
     name = "namespace"
 
-    def _remove_namespace(self, user, id_):
-        id_without_ns = id_.replace("/{}".format(user.current_account.namespace), "")
+    def _remove_namespace(self, id_, namespace):
+        id_without_ns = id_.replace("/{}".format(namespace), "", 1)
         if not id_without_ns:
             id_without_ns = "/"
         return id_without_ns
@@ -48,22 +48,22 @@ class NameSpaceFilter:
 
     def _remove_namespace_from_tasks(self, task_list, namespace):
         for task in task_list:
-            task.id = task.id.replace("{}_".format(namespace), "")
-            task.app_id = task.app_id.replace("/{}/".format(namespace), "/")
+            task.id = task.id.replace("{}_".format(namespace), "", 1)
+            task.app_id = self._remove_namespace(task.app_id, namespace)
 
     def response(self, user, response_app, original_app) -> SieveMarathonApp:
         if not response_app.id.startswith("/{}/".format(user.current_account.namespace)):
              return None
 
-        response_app.id = response_app.id.replace("/{}/".format(user.current_account.namespace), "/")
+        response_app.id = self._remove_namespace(response_app.id, user.current_account.namespace)
         self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
 
         return response_app
 
     def response_group(self, user, response_group, original_group):
-        response_group.id = self._remove_namespace(user, response_group.id)
+        response_group.id = self._remove_namespace(response_group.id, user.current_account.namespace)
         for app in response_group.apps:
-            app.id = self._remove_namespace(user, app.id)
+            app.id = self._remove_namespace(app.id, user.current_account.namespace)
             self._remove_namespace_from_tasks(app.tasks, user.current_account.namespace)
 
         return response_group
@@ -73,16 +73,16 @@ class NameSpaceFilter:
         # por isos podemos olhar apenas umas das apps.
         original_affected_apps_id = deployment.affected_apps[0]
         deployment.affected_apps = [
-            self._remove_namespace(user, app_id)
+            self._remove_namespace(app_id, user.current_account.namespace)
             for app_id in deployment.affected_apps
         ]
 
         for action in deployment.current_actions:
-            action.app = self._remove_namespace(user, action.app)
+            action.app = self._remove_namespace(action.app, user.current_account.namespace)
 
         for step in deployment.steps:
             for action in step.actions:
-                action.app = self._remove_namespace(user, action.app)
+                action.app = self._remove_namespace(action.app, user.current_account.namespace)
 
         if original_affected_apps_id.startswith(f"/{user.current_account.namespace}/"):
             return deployment
@@ -91,7 +91,7 @@ class NameSpaceFilter:
     def response_queue(self, user, response_queue, original_queue):
         current_namespace = user.current_account.namespace
         if response_queue.app.id.startswith("/{}/".format(current_namespace)):
-            response_queue.app.id = self._remove_namespace(user, response_queue.app.id)
+            response_queue.app.id = self._remove_namespace(response_queue.app.id, user.current_account.namespace)
             return response_queue
         return None
 

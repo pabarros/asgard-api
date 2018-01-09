@@ -78,6 +78,17 @@ class TestNamespaceFilter(unittest.TestCase):
         self.assertIsNone(filtered_task.app_id)
 
     @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
+    def test_response_apps_remove_namespace_from_app_id_containig_namespace_in_its_name(self, single_full_app_with_tasks_fixture):
+        """
+        Uma app com id = "/<namespace>/some/other/path/<namespace>/other/app" deve ter apenas a primeira ocorrência de "/<namespace>" removida.
+        """
+        response_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        response_app.id = "/dev/some/other/path/dev/other/app"
+
+        modified_app = self.filter.response(self.user, response_app, original_app)
+        self.assertEqual("/some/other/path/dev/other/app", modified_app.id)
+
+    @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
     def test_response_apps_remove_namespace_from_all_tasks(self, single_full_app_with_tasks_fixture):
         request_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
 
@@ -111,12 +122,30 @@ class TestNamespaceFilter(unittest.TestCase):
 
         self.assertIsNone(self.filter.response(self.user, request_app, original_app))
 
-    def test_remove_namspace_from_string(self):
-        self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev"))
-        self.assertEqual("/", self.filter._remove_namespace(self.user, "/dev/"))
-        self.assertEqual("/foo/bar", self.filter._remove_namespace(self.user, "/dev/foo/bar"))
-        self.assertEqual("/infra/foo", self.filter._remove_namespace(self.user, "/infra/foo"))
-        self.assertEqual("/", self.filter._remove_namespace(self.user, "/"))
+    def test_remove_namspace_from_app_or_group_id(self):
+        self.assertEqual("/", self.filter._remove_namespace("/dev", self.user.current_account.namespace))
+        self.assertEqual("/", self.filter._remove_namespace("/dev/", self.user.current_account.namespace))
+        self.assertEqual("/foo/bar", self.filter._remove_namespace("/dev/foo/bar", self.user.current_account.namespace))
+        self.assertEqual("/infra/foo", self.filter._remove_namespace("/infra/foo", self.user.current_account.namespace))
+        self.assertEqual("/", self.filter._remove_namespace("/", self.user.current_account.namespace))
+
+        # Apps que possuem o proprio namespace como parte de seu nome
+        self.assertEqual("/dev/myapp", self.filter._remove_namespace("/dev/dev/myapp", self.user.current_account.namespace))
+        self.assertEqual("/myapp/dev/app", self.filter._remove_namespace("/dev/myapp/dev/app", self.user.current_account.namespace))
+        self.assertEqual("/dev/myapp/dev/dev/app", self.filter._remove_namespace("/dev/dev/myapp/dev/dev/app", self.user.current_account.namespace))
+        self.assertEqual("/dev/myapp/dev", self.filter._remove_namespace("/dev/dev/myapp/dev", self.user.current_account.namespace))
+        self.assertEqual("/dev", self.filter._remove_namespace("/dev/dev", self.user.current_account.namespace))
+
+    def test_remove_namespace_from_task(self):
+        """
+        Certifica que o namespace é removido corretamente, ou seja, apenas a primeira ocorrência deve
+        ser removida
+        """
+        tasks = [MarathonTask.from_json({"id": "dev_app_my_other_dev_path", "app_id": "/dev/app/my/other/dev/path"})]
+        expected_task_ids = ["app_my_other_dev_path"]
+
+        self.filter._remove_namespace_from_tasks(tasks, "dev")
+        self.assertEqual(expected_task_ids, [task.id for task in tasks])
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
     def test_response_group_remove_namespace_from_group_name(self, group_dev_namespace_fixture):
