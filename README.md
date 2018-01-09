@@ -4,6 +4,8 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* next
+  - IN-2104 Suporte a múltiplos Marathons
 
 * 0.0.55
   - IN-2362 Movendo o `merge_apps()` pra dentro do `.split()`
@@ -129,7 +131,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Env vars
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
-* MARATHON_ENDPOINT [required] Where to connect to find marathon api
+* HOLLOWMAN_MARATHON_ADDRESS_INDEX [required] Where to connect to find marathon api. List of Marathon IPs. <INDEX> starts at 0.
 * HOLLOWMAN_REDIRECT_ROOTPATH_TO: Env que diz para onde o usuario será redirecionado se acessar a raiz onde o hollowman está deployado. Defaults to `/v2/apps`
 * HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_ID: ID da app Oauth2, registrado no console do Google
 * HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_SECRET: Secret dessa app.

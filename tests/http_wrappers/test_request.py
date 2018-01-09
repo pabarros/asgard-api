@@ -55,7 +55,7 @@ class SplitTests(TestCase):
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps',
                          body=json.dumps(fixture),
                          status=200)
                 apps = list(request_parser.split())
@@ -96,7 +96,7 @@ class SplitTests(TestCase):
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
                          body=json.dumps({'app': fixture}),
                          status=200)
                 apps = list(request_parser.split())
@@ -113,7 +113,7 @@ class SplitTests(TestCase):
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps//xablau',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//xablau',
                          body=json.dumps({'app': fixture}),
                          status=200)
                 apps = list(request_parser.split())
@@ -132,7 +132,7 @@ class SplitTests(TestCase):
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
                          body=json.dumps({'app': fixture}),
                          status=200)
                 apps = list(request_parser.split())
@@ -154,7 +154,7 @@ class SplitTests(TestCase):
             ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'app': single_full_app_fixture}), status=200)
 
                 apps = list(request_parser.split())
@@ -170,7 +170,7 @@ class SplitTests(TestCase):
             ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/',
                          body=json.dumps(group_dev_namespace_fixture), status=200)
 
                 apps = list(request_parser.split())
@@ -193,7 +193,7 @@ class SplitTests(TestCase):
             ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b',
                          body=json.dumps(group_b_fixture), status=200)
 
                 apps = list(request_parser.split())
@@ -235,7 +235,7 @@ class SplitTests(TestCase):
             ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b',
                          body=json.dumps(group_b_fixture), status=200)
 
                 apps = list(request_parser.split())
@@ -253,7 +253,7 @@ class SplitTests(TestCase):
             ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-c',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-c',
                          body=json.dumps(non_root_group_empty_fixture), status=200)
 
                 apps = list(request_parser.split())
@@ -400,7 +400,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps//foo', method='PUT',
                                               data=json.dumps(fixture)) as ctx:
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//dev/foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                               body=json.dumps({'app': full_app_with_name_space}), status=200)
                 ctx.request.user = user
                 request_parser = Request(ctx.request)
@@ -417,7 +417,7 @@ class JoinTests(TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/',
                          body=json.dumps(group_dev_namespace_fixture), status=200)
 
                 apps = list(request.split())
@@ -431,7 +431,7 @@ class JoinTests(TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-b',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-b',
                          body=json.dumps(group_b_fixture), status=200)
 
                 apps = list(request.split())
@@ -445,7 +445,7 @@ class JoinTests(TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/group-c',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/group-c',
                          body=json.dumps(non_root_group_empty_fixture), status=200)
 
                 apps = list(request.split())
@@ -580,7 +580,7 @@ class GetOriginalGroupTest(TestCase):
                                               method='GET') as ctx:
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/foo',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/foo',
                          body=json.dumps(found_group),
                          status=200)
                 ctx.request.user = self.user
@@ -597,7 +597,7 @@ class GetOriginalGroupTest(TestCase):
         with application.test_request_context('/v2/groups//not-found',
                                               method='GET') as ctx:
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/groups//dev/not-found', status=404)
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/groups//dev/not-found', status=404)
                 ctx.request.user = self.user
                 request = Request(ctx.request)
 

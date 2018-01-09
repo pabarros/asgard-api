@@ -38,7 +38,7 @@ class TestApp(TestCase):
         self.user.accounts = [self.account_dev]
         self.session.commit()
         responses.add(method='GET',
-                         url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps',
                          body=json.dumps({'apps': [fixture]}),
                          status=200,
                          headers={"Content-Encoding": "chunked"})
@@ -61,7 +61,7 @@ class TestApp(TestCase):
 
     def test_remove_transfer_encoding_header(self):
         with application.test_request_context("/v2/apps", method="GET") as ctx:
-            response = replay_request(ctx.request, conf.MARATHON_ENDPOINT)
+            response = replay_request(ctx.request)
             self.assertTrue("Content-Encoding" not in response.headers)
             self.assertEqual(200, response.status_code)
 
@@ -84,18 +84,3 @@ class TestApp(TestCase):
     def test_apiv2_path(self):
         pass
 
-    def test_fail_healthcheck(self):
-        Response = namedtuple('Response', ["status_code"])
-
-        with patch('hollowman.routes.requests.get') as get_mock:
-            get_mock.return_value = Response(status_code=404)
-            response = application.test_client().open('/healthcheck')
-            self.assertEqual(response.status_code, 404)
-
-    def test_200_healthcheck(self):
-        Response = namedtuple('Response', ["status_code"])
-
-        with patch('hollowman.routes.requests.get') as get_mock:
-            get_mock.return_value = Response(status_code=200)
-            response = application.test_client().open('/healthcheck')
-            self.assertEqual(response.status_code, 200)

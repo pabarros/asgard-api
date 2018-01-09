@@ -7,11 +7,11 @@ ENV_NAME_PATTERN = "HOLLOWMAN_{namespace}_{option_name}"
 
 def get_option(namespace, option_name):
     """
-    Gets an options based on filter and option name.
+    Gets an options based on an namespace and an option name.
     All option are read from Environ variables. The formation name is:
-    HOLLOWMAN_FILTER_<FILTERNAME>_PARAM_<OPTIONNAME>
+    HOLLOWMAN_<NAMESPACE>_<OPTIONNAME>
     If OPTIONNAME is a multi-value (list) option a numver suffix can be used, eg:
-        HOLLOWMAN_FILTER_<FILTERNAME>_PARAM_<OPTIONNAME>_<INDEX>
+        HOLLOWMAN_<NAMESPACE>_<OPTIONNAME>_<INDEX>
 
 
     :name: Name of the filter who owns this option

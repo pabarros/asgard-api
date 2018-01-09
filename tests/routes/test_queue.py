@@ -24,7 +24,7 @@ class DeploymentsTests(BaseApiTests, TestCase):
     def test_v2_queue_get(self, fixture):
         with application.test_client() as client, RequestsMock() as rsps:
             rsps.add(
-                url=f'{conf.MARATHON_ENDPOINT}/v2/queue',
+                url=f'{conf.MARATHON_ADDRESSES[0]}/v2/queue',
                 body=json.dumps(fixture),
                 method='GET',
                 status=200

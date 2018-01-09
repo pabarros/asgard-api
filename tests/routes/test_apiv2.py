@@ -61,9 +61,9 @@ class TestAuthentication(TestCase):
         with application.app_context():
             auth_header = self.make_auth_header(self.normal_user, self.normal_user.accounts[0])
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps',
                          body=json.dumps({'apps': [fixture]}), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ENDPOINT + '/v2/apps//foo',
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
                          body=json.dumps({'app': fixture}), status=200)
                 r = test_client.get("/v2/apps", headers=auth_header)
                 self.assertEqual(200, r.status_code)

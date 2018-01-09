@@ -2,7 +2,6 @@ import json
 import requests
 from flask import url_for, redirect, Response, request, session, \
                   render_template, make_response
-from hollowman import conf, request_handlers, upstream, http_wrappers
 
 from hollowman.app import application
 from hollowman.auth import _get_user_by_email
@@ -12,10 +11,11 @@ from hollowman.decorators import auth_required
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from hollowman.plugins import get_plugin_registry_data
+from hollowman import conf, request_handlers, upstream, http_wrappers
 
 
 def raw_proxy():
-    r = upstream.replay_request(request, conf.MARATHON_ENDPOINT)
+    r = upstream.replay_request(request)
     return Response(response=r.content, status=r.status_code, headers=dict(r.headers))
 
 @application.route("/v2/deployments", defaults={"uuid": ""}, methods=["GET"])
@@ -86,12 +86,11 @@ def index():
 def apiv2(path):
     return request_handlers.new(http_wrappers.Request(request))
 
-
 @application.route("/healthcheck")
 def healhcheck():
-    r = requests.get(conf.MARATHON_ENDPOINT,
-                     headers={"Authorization": conf.MARATHON_AUTH_HEADER})
-    return Response(response="", status=r.status_code)
+    headers = {"Authorization": conf.MARATHON_AUTH_HEADER}
+    _r = upstream._make_request("/ping", "get", headers=headers)
+    return Response(response="", status=_r.status_code)
 
 
 @application.route("/login/google")
