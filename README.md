@@ -4,8 +4,8 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* next
-  - IN-2104 Suporte a múltiplos Marathons
+* 0.0.56
+  - IN-2104/IN-2408 Suporte a múltiplos Marathons
 
 * 0.0.55
   - IN-2362 Movendo o `merge_apps()` pra dentro do `.split()`
