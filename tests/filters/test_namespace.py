@@ -77,10 +77,6 @@ class TestNamespaceFilter(unittest.TestCase):
         self.assertEqual("dev_waiting.01339ffa-ce9c-11e7-8144-2a27410e5638", filtered_task.id)
         self.assertIsNone(filtered_task.app_id)
 
-    def test_does_nothing_if_user_is_none(self):
-        modified_app = self.filter.write(None, self.request_app, SieveMarathonApp())
-        self.assertEqual("/foo", modified_app.id)
-
     @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
     def test_response_apps_remove_namespace_from_all_tasks(self, single_full_app_with_tasks_fixture):
         request_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)

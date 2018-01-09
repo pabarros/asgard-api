@@ -26,9 +26,6 @@ class NameSpaceFilter:
 
     def write(self, user, request_app, original_app):
 
-        if not user:
-            return request_app
-
         if not original_app.id:
             request_app.id = self._add_namespace(
                 app_id=request_app.id,
