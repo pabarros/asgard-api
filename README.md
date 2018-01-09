@@ -4,6 +4,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.57
+  - Adicionando dump do schema do banco
+  - Silenciando os logs do marathon-python
+
 * 0.0.56
   - IN-2104/IN-2408 Suporte a múltiplos Marathons
 
