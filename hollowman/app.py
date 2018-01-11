@@ -5,17 +5,22 @@ import json
 import traceback
 import sys
 
+import newrelic.agent
+
 from flask import request, Blueprint, Response
 from flask_cors import CORS
 
 from hollowman.hollowman_flask import HollowmanFlask
-from hollowman.conf import SECRET_KEY, CORS_WHITELIST
+from hollowman.conf import SECRET_KEY, CORS_WHITELIST, NEW_RELIC_LICENSE_KEY, NEW_RELIC_APP_NAME
 from hollowman.log import logger, dev_null_logger
 from hollowman.plugins import register_plugin
 from hollowman.auth.jwt import jwt_auth
-
 from hollowman.metrics.zk.routes import zk_metrics_blueprint
 from hollowman.api.account import account_blueprint
+
+
+if NEW_RELIC_LICENSE_KEY and NEW_RELIC_APP_NAME:
+    newrelic.agent.initialize()
 
 application = HollowmanFlask(__name__)
 application.url_map.strict_slashes = False
