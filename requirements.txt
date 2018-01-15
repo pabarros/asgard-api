@@ -8,3 +8,4 @@ psycopg2==2.7.3
 requests==2.18.3
 simple-json-logger==0.2.0
 sqlalchemy==1.1.13
+newrelic==2.100.0.84
