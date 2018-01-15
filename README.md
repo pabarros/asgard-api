@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.0.59
+  - Ativando suporte ao newrelic APM
+
 * 0.0.58
   - IN-2407 Bugfix apps que continham em seu nome o valor de seu próprio namespace
 
