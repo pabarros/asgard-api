@@ -2,7 +2,15 @@
 
 set -x
 
+# VARIAVEIS COMUNS A TODOS OS PROCESSOS
 NETWORK_NAME="asgard"
+ZK_1_IP=172.18.0.2
+ZK_2_IP=172.18.0.3
+ZK_3_IP=172.18.0.4
+
+MESOS_MASTER_IP=172.18.0.11
+MESOS_SLAVE_IP=172.18.0.19
+MARATHON_IP=172.18.0.30
 
 docker network create --subnet 172.18.0.0/16 asgard
 
@@ -12,7 +20,7 @@ ZOO_SERVERS="server.1=172.18.0.2:2888:3888 server.2=172.18.0.3:2888:3888 server.
 ZOO_PURGE_INTERVAL=10
 docker run -d \
   --name asgard_zk_1 \
-  --rm -it --ip 172.18.0.2 \
+  --rm -it --ip ${ZK_1_IP} \
   -e ZOO_MY_ID=1 \
   --net ${NETWORK_NAME} \
   --env-file <(
@@ -20,7 +28,7 @@ echo ZOO_SERVERS=${ZOO_SERVERS}
 echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
 ) docker.sieve.com.br/infra/zookeeper:0.0.1
 
-docker run -d --rm -it --ip 172.18.0.3 \
+docker run -d --rm -it --ip ${ZK_2_IP} \
   --name asgard_zk_2 \
   -e ZOO_MY_ID=2 \
   --net ${NETWORK_NAME} \
@@ -29,7 +37,7 @@ echo ZOO_SERVERS=${ZOO_SERVERS}
 echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
 ) docker.sieve.com.br/infra/zookeeper:0.0.1
 
-docker run -d --rm -it --ip 172.18.0.4 \
+docker run -d --rm -it --ip ${ZK_3_IP} \
   --name asgard_zk_3 \
   -e ZOO_MY_ID=3 \
   --net ${NETWORK_NAME} \
@@ -43,19 +51,19 @@ echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
 
 
 MESOS_QUORUM=1
-MESOS_IP=10.168.26.72
+MESOS_IP=${MESOS_MASTER_IP}
 MESOS_WORK_DIR=/var/lib/mesos
 MESOS_HOSTNAME_LOOKUP=false
 MESOS_ZK=zk://172.18.0.2:2181,172.18.0.3:2181,172.18.0.4:2181/mesos
 #  volumes:
 #    - /var/lib/mesos/:/var/lib/mesos/:rw
 
-docker run -d --rm -it --ip 172.18.0.11 \
+docker run -d --rm -it --ip ${MESOS_MASTER_IP} \
   --name asgard_mesosmaster \
   --net ${NETWORK_NAME} \
   --env-file <(
 echo MESOS_QUORUM=${MESOS_QUORUM}
-echo MESOS_IP=172.18.0.11
+echo MESOS_IP=${MESOS_IP}
 echo MESOS_WORK_DIR=${MESOS_WORK_DIR}
 echo MESOS_HOSTNAME_LOOKUP=${MESOS_HOSTNAME_LOOKUP}
 echo MESOS_ZK=${MESOS_ZK}
@@ -63,8 +71,8 @@ echo MESOS_ZK=${MESOS_ZK}
 
 
 ## MESOS SLAVE
-MESOS_IP=172.18.0.19
-LIBPROCESS_ADVERTISE_IP=172.18.0.19
+MESOS_IP=${MESOS_SLAVE_IP}
+LIBPROCESS_ADVERTISE_IP=${MESOS_SLAVE_IP}
 MESOS_ATTRIBUTES=";owner:sieve;mesos:slave;workload:general"
 MESOS_MASTER=zk://172.18.0.2:2181,172.18.0.3:2181,172.18.0.4:2181/mesos
 MESOS_EXECUTOR_REGISTRATION_TIMEOUT=5mins
@@ -77,7 +85,7 @@ MESOS_DOCKER_REMOVE_DELAY=30mins
 MESOS_DOCKER_STOP_TIMEOUT=1mins
 
 
-docker run -d --rm -it --ip 172.18.0.19 \
+docker run -d --rm -it --ip ${MESOS_SLAVE_IP} \
   --name asgard_mesosslave \
   --net ${NETWORK_NAME} \
   --env-file <(
@@ -102,9 +110,9 @@ echo MESOS_DOCKER_STOP_TIMEOUT=${MESOS_DOCKER_STOP_TIMEOUT}
 
 
 ## MARATHON
-MARATHON_HOSTNAME=172.18.0.30
-MESOS_IP=172.18.0.30
-LIBPROCESS_IP=172.18.0.30
+MARATHON_HOSTNAME=${MARATHON_IP}
+MESOS_IP=${MARATHON_IP}
+LIBPROCESS_IP=${MARATHON_IP}
 MARATHON_MASTER=zk://172.18.0.2:2181,172.18.0.3:2181,172.18.0.4:2181/mesos
 MARATHON_ZK=zk://172.18.0.2:2181,172.18.0.3:2181,172.18.0.4:2181/mesos
 MARATHON_TASK_LOST_EXPUNGE_GC=150000
@@ -120,7 +128,7 @@ JAVA_OPTS=-Xms2g
 MARATHON_HTTP_CREDENTIALS=marathon:pwd
 MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=http://localhost:4200
 
-docker run -d --rm -it --ip 172.18.0.30 \
+docker run -d --rm -it --ip ${MARATHON_IP} \
   --name asgard_marathon \
   --net ${NETWORK_NAME} \
   --env-file <(
