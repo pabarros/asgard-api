@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 # VARIAVEIS COMUNS A TODOS OS PROCESSOS
 NETWORK_NAME="asgard"
 ZK_1_IP=172.18.0.2
@@ -19,6 +17,7 @@ docker network create --subnet 172.18.0.0/16 asgard
 
 ZOO_SERVERS="server.1=${ZK_1_IP}:2888:3888 server.2=${ZK_2_IP}:2888:3888 server.3=${ZK_3_IP}:2888:3888"
 ZOO_PURGE_INTERVAL=10
+echo -n "ZK (${ZK_1_IP}) "
 docker run -d \
   --name asgard_zk_1 \
   --rm -it --ip ${ZK_1_IP} \
@@ -29,6 +28,7 @@ echo ZOO_SERVERS=${ZOO_SERVERS}
 echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
 ) docker.sieve.com.br/infra/zookeeper:0.0.1
 
+echo -n "ZK (${ZK_2_IP}) "
 docker run -d --rm -it --ip ${ZK_2_IP} \
   --name asgard_zk_2 \
   -e ZOO_MY_ID=2 \
@@ -38,6 +38,7 @@ echo ZOO_SERVERS=${ZOO_SERVERS}
 echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
 ) docker.sieve.com.br/infra/zookeeper:0.0.1
 
+echo -n "ZK (${ZK_3_IP}) "
 docker run -d --rm -it --ip ${ZK_3_IP} \
   --name asgard_zk_3 \
   -e ZOO_MY_ID=3 \
@@ -59,6 +60,7 @@ MESOS_ZK=zk://${ZK_CLUSTER_IPS}/mesos
 #  volumes:
 #    - /var/lib/mesos/:/var/lib/mesos/:rw
 
+echo -n "Mesos Master (${MESOS_MASTER_IP}) "
 docker run -d --rm -it --ip ${MESOS_MASTER_IP} \
   --name asgard_mesosmaster \
   --net ${NETWORK_NAME} \
@@ -86,6 +88,7 @@ MESOS_DOCKER_REMOVE_DELAY=30mins
 MESOS_DOCKER_STOP_TIMEOUT=1mins
 
 
+echo -n "Mesos Slave (${MESOS_SLAVE_IP}) "
 docker run -d --rm -it --ip ${MESOS_SLAVE_IP} \
   --name asgard_mesosslave \
   --net ${NETWORK_NAME} \
@@ -129,6 +132,7 @@ JAVA_OPTS=-Xms2g
 MARATHON_HTTP_CREDENTIALS=marathon:pwd
 MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=http://localhost:4200
 
+echo -n "Marathon (${MARATHON_IP}) "
 docker run -d --rm -it --ip ${MARATHON_IP} \
   --name asgard_marathon \
   --net ${NETWORK_NAME} \
@@ -153,5 +157,7 @@ echo MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=${MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN
 ) \
   mesosphere/marathon:v1.3.13 --enable_features gpu_resources
 
+echo "Pressione ENTER para desligar o ambiente"
+echo "ATENÇÃO: Todos os dados serão perdidos"
 read
 docker rm -f $(docker ps -aq -f name=asgard_)
