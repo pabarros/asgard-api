@@ -71,7 +71,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 response_mock = Mock()
@@ -82,7 +82,7 @@ class SplitTests(TestCase):
             self.assertEqual(
                 apps,
                 [
-                    (MarathonApp.from_json(fixture), MarathonApp())
+                    (SieveMarathonApp.from_json(fixture), MarathonApp.from_json({"id": "/dev/foo"}))
                 ]
             )
 
