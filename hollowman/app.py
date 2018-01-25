@@ -9,6 +9,7 @@ import newrelic.agent
 
 from flask import request, Blueprint, Response
 from flask_cors import CORS
+import pkg_resources
 
 from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.conf import SECRET_KEY, CORS_WHITELIST, NEW_RELIC_LICENSE_KEY, NEW_RELIC_APP_NAME
@@ -17,6 +18,7 @@ from hollowman.plugins import register_plugin
 from hollowman.auth.jwt import jwt_auth
 from hollowman.metrics.zk.routes import zk_metrics_blueprint
 from hollowman.api.account import account_blueprint
+from hollowman.plugins import load_all_metrics_plugins
 
 
 if NEW_RELIC_LICENSE_KEY and NEW_RELIC_APP_NAME:
@@ -78,4 +80,4 @@ marathon.log = dev_null_logger
 import hollowman.routes
 register_plugin("example-plugin")
 register_plugin("session-checker-plugin")
-
+load_all_metrics_plugins(application)
