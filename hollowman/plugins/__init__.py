@@ -52,7 +52,14 @@ def load_all_metrics_plugins(flask_application):
             package_name = entrypoint.dist.project_name
             entrypoint_function = entrypoint.load()
             plugin_data = entrypoint_function()
-            flask_application.register_blueprint(plugin_data['blueprint'], url_prefix=f"/_cat/metrics/{package_name}")
+            url_prefix = f"/_cat/metrics/{package_name}"
+            flask_application.register_blueprint(plugin_data['blueprint'], url_prefix=url_prefix)
+            logger.info({
+                "msg": "Metrics plugin loaded",
+                "plugin_entrypoint": entrypoint,
+                "plugin_id": package_name,
+                "mountpoint URI": url_prefix,
+            })
         except Exception as e:
             logger.error({
                 "msg": "Failed to load plugin",
