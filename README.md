@@ -4,6 +4,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.60.0
+  - Mudança do versionamento para SemVer. Estávamos incrementando o `.patch` e não o `.minor`.
+  - IN-2422 Fix no scale após edição da app e que todas as apps eram renovadas
+
 * 0.0.59
   - Ativando suporte ao newrelic APM
 
