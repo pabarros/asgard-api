@@ -9,14 +9,6 @@ class PluginLoaderTest(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_plugin_load_all_plugins_from_one_entrypoint_group(self):
-        """
-        Testa que conseguimos carregar todos os Entrypoints de um
-        determinado grupo
-        """
-        plugins = load_entrypoint_group("asgard_api_metrics_mountpoint")
-        self.assertEqual(4, len(plugins))
-
     def test_plugin_load_metrics_plugins(self):
         """
         Plugins do tipo Metric Plugin devem fornecer um objeto do tipo flask.Blueprint.
