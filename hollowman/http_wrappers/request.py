@@ -92,10 +92,7 @@ class Request(HTTPWrapper):
         if self.is_app_request():
             for app in self.get_request_data():
                 request_app = MarathonApp.from_json(app)
-                try:
-                    app = self._get_original_app(self.request.user, self.object_id or request_app.id)
-                except NotFoundError:
-                    app = MarathonApp()
+                app = self._get_original_app(self.request.user, self.object_id or request_app.id)
 
                 yield self.merge_marathon_apps(request_app, app), app
         elif self.is_tasks_request():

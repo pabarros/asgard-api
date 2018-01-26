@@ -117,9 +117,6 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             return RequestResource.QUEUE
 
     def _get_original_app(self, user, app_id):
-        if not user:
-            return self.marathon_client.get_app(app_id)
-
         app_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
                                                 app_id.strip("/"))
         try:

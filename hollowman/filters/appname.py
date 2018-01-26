@@ -9,7 +9,7 @@ class AddAppNameFilter:
         if not hasattr(request_app.container, "docker"):
             return request_app
 
-        appname = "hollowman.appname={}".format(request_app.id)
+        appname = "hollowman.appname={}".format(original_app.id)
         params = request_app.container.docker.parameters
 
         for p in params:

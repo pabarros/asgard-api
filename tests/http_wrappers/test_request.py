@@ -34,7 +34,7 @@ class SplitTests(TestCase):
     def test_a_read_single_app_request_returns_a_single_marathonapp_if_app_exists(self, fixture):
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
 
             with patch.object(request_parser, 'marathon_client') as client:
@@ -51,7 +51,7 @@ class SplitTests(TestCase):
     @with_json_fixture('requests/get-v2apps-all-apps.json')
     def test_a_request_with_n_apps_returns_n_marathonapps(self, fixture):
         with application.test_request_context('/v2/apps/', method='GET') as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
@@ -71,7 +71,7 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 response_mock = Mock()
@@ -82,7 +82,7 @@ class SplitTests(TestCase):
             self.assertEqual(
                 apps,
                 [
-                    (MarathonApp.from_json(fixture), MarathonApp())
+                    (SieveMarathonApp.from_json(fixture), MarathonApp.from_json({"id": "/dev/foo"}))
                 ]
             )
 
@@ -92,11 +92,11 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/foo',
                                               method='PUT',
                                               data=json.dumps(scale_up)) as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'app': fixture}),
                          status=200)
                 apps = list(request_parser.split())
@@ -109,11 +109,11 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/xablau/restart',
                                               method='PUT',
                                               data=b'{"force": true}') as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//xablau',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/xablau',
                          body=json.dumps({'app': fixture}),
                          status=200)
                 apps = list(request_parser.split())
@@ -128,11 +128,11 @@ class SplitTests(TestCase):
         with application.test_request_context('/v2/apps/',
                                               method='PUT',
                                               data=json.dumps(request_data)) as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with RequestsMock() as rsps:
                 rsps.add(method='GET',
-                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({'app': fixture}),
                          status=200)
                 apps = list(request_parser.split())
@@ -314,7 +314,7 @@ class JoinTests(TestCase):
     def test_it_recreates_a_get_request_for_a_single_app(self, fixture):
         with application.test_request_context('/v2/apps//foo',
                                               method='GET', data=b'') as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
@@ -330,7 +330,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
@@ -345,7 +345,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps//foo',
                                               method='POST',
                                               data=json.dumps(fixture)) as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             with patch.object(request_parser, 'marathon_client') as client:
                 client.get_app.return_value = MarathonApp.from_json(fixture)
@@ -360,7 +360,7 @@ class JoinTests(TestCase):
         with application.test_request_context('/v2/apps/',
                                               method='PUT',
                                               data=json.dumps(fixture)) as ctx:
-            ctx.request.user = None
+            ctx.request.user = self.user
             request_parser = Request(ctx.request)
             mock_app = get_fixture('single_full_app.json')
             mock_apps = [(MarathonApp.from_json(mock_app), Mock()) for _ in range(2)]
