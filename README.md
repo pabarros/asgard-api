@@ -4,6 +4,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.61.0
+  - IN-2434 Implementação da uma estrutura simples para plugins no backend
+      > Adição do um primeiro plugin:  asgard-api-plugin-metrics-mesos==0.1.0
+
 * 0.60.0
   - Mudança do versionamento para SemVer. Estávamos incrementando o `.patch` e não o `.minor`.
   - IN-2422 Fix no scale após edição da app e que todas as apps eram renovadas

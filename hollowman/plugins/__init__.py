@@ -1,5 +1,16 @@
 #encoding: utf-8
 
+from enum import Enum
+import traceback
+import sys
+
+import pkg_resources
+
+from hollowman.log import logger
+
+class API_PLUGIN_TYPES(Enum):
+    API_METRIC_PLUGIN = "asgard_api_metrics_mountpoint"
+
 # Registry é um dict onde a key é o ID do plugin e o value
 # são meta-dados sobre o plugin, ex:
 #    * ID do plugin
@@ -30,4 +41,31 @@ def register_plugin(plugin_id):
 
 def get_plugin_registry_data():
     return {'plugins': list(PLUGIN_REGISTRY.values())}
+
+def load_entrypoint_group(groupname):
+    return list(pkg_resources.iter_entry_points(group=groupname))
+
+def load_all_metrics_plugins(flask_application):
+    all_metric_plugins = load_entrypoint_group(API_PLUGIN_TYPES.API_METRIC_PLUGIN.value)
+    for entrypoint in all_metric_plugins:
+        try:
+            package_name = entrypoint.dist.project_name
+            entrypoint_function = entrypoint.load()
+            plugin_data = entrypoint_function()
+            url_prefix = f"/_cat/metrics/{package_name}"
+            flask_application.register_blueprint(plugin_data['blueprint'], url_prefix=url_prefix)
+            logger.info({
+                "msg": "Metrics plugin loaded",
+                "plugin_entrypoint": entrypoint,
+                "plugin_id": package_name,
+                "mountpoint URI": url_prefix,
+            })
+        except Exception as e:
+            logger.error({
+                "msg": "Failed to load plugin",
+                "plugin_entrypoint": entrypoint,
+                "plugin_id": package_name,
+                "traceback": traceback.format_exc(),
+                "type": sys.exc_info()[0].__name__,
+            })
 
