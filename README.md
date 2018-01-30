@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.62.0
+  - IN-2451 Atualização do session-checker-plugin para usar o request pipelines
+
 * 0.61.0
   - IN-2434 Implementação da uma estrutura simples para plugins no backend
       > Adição do um primeiro plugin:  asgard-api-plugin-metrics-mesos==0.1.0
