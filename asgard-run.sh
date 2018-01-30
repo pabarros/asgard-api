@@ -70,7 +70,7 @@ echo MESOS_IP=${MESOS_IP}
 echo MESOS_WORK_DIR=${MESOS_WORK_DIR}
 echo MESOS_HOSTNAME_LOOKUP=${MESOS_HOSTNAME_LOOKUP}
 echo MESOS_ZK=${MESOS_ZK}
-) docker.sieve.com.br/centos7/mesos:0.0.3 /usr/sbin/mesos-master
+) daltonmatos/mesos:0.0.3 /usr/sbin/mesos-master
 
 
 ## MESOS SLAVE
@@ -109,9 +109,7 @@ echo MESOS_DOCKER_STOP_TIMEOUT=${MESOS_DOCKER_STOP_TIMEOUT}
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /etc/docker.tar.bz2:/etc/docker.tar.bz2 \
-  docker.sieve.com.br/centos7/mesos:0.0.3
-
-
+  daltonmatos/mesos:0.0.3
 
 ## MARATHON
 MARATHON_HOSTNAME=${MARATHON_IP}
