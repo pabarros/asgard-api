@@ -4,6 +4,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.62.0
+  - IN-2451 Atualização do session-checker-plugin para 0.2.0 (para usar o request pipelines);
+  - Essa versão da API só funciona com a versão da UI 0.12.0+. Pois a partir dessa versão já temos suporte a request pipeline.
+
 * 0.61.0
   - IN-2434 Implementação da uma estrutura simples para plugins no backend
       > Adição do um primeiro plugin:  asgard-api-plugin-metrics-mesos==0.1.0
