@@ -14,8 +14,8 @@ def get_fixture(file_name: str) -> Dict:
 
 def with_json_fixture(fixture_path):
     def wrapper(func):
-        def decorator(self):
+        def decorator(self, *args):
             fixture = get_fixture(fixture_path)
-            return func(self, fixture)
+            return func(self, *args, fixture)
         return decorator
     return wrapper
