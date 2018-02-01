@@ -18,10 +18,10 @@ setup(
 
     entry_points={
         'asgard_api_metrics_mountpoint': [
-            'init_ok = metrics:plugin_init_ok',
-            'init_wrong_blueprint = metrics:plugin_init_wrong_return',
-            'init_non_existant_entrypoint = metrics:does_not_exist',
-            'init_exception_on_load = metrics:plugin_init_exception',
+            'init_ok = metricpluginexample:plugin_init_ok',
+            'init_wrong_blueprint = metricpluginexample:plugin_init_wrong_return',
+            'init_non_existant_entrypoint = metricpluginexample:does_not_exist',
+            'init_exception_on_load = metricpluginexample:plugin_init_exception',
         ],
     },
 )
