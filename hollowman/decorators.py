@@ -50,7 +50,7 @@ AUTH_TYPES = defaultdict(lambda: not_authenticated)
 AUTH_TYPES[TokenTypes.USER_TOKEN] = check_auth_token
 AUTH_TYPES[TokenTypes.JWT] = check_jwt_token
 
-def auth_required():
+def auth_required(pass_user=False):
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
@@ -81,6 +81,8 @@ def auth_required():
             except Exception as e:
                 logger.exception({"exc": e, "step": "auth"})
                 return make_response(invalid_token_response_body, 401)
+            if pass_user:
+                kwargs['user'] = request.user
 
             return fn(*args, **kwargs)
         return decorator
