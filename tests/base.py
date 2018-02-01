@@ -18,6 +18,7 @@ class BaseApiTests:
         self.account_dev = Account(id=4, name="Dev Team", namespace="dev",
                                    owner="company")
         self.user.accounts = [self.account_dev]
+        self.user.current_account = self.account_dev
         self.session.add(self.account_dev)
         self.session.add(self.user)
         self.session.commit()
