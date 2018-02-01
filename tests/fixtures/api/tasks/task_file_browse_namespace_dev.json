@@ -1,0 +1,38 @@
+[
+   {
+      "mode" : "-rw-r--r--",
+      "nlink" : 1,
+      "uid" : "root",
+      "gid" : "root",
+      "size" : 3303,
+      "path" : "/tmp/mesos/slaves/2084863b-12d1-4319-b515-992eab91a53d-S1/frameworks/27b52920-3899-4b90-a1d6-bf83a87f3612-0000/executors/dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f/runs/e14d7537-c1d0-4846-a076-25d623d6a70f/stderr",
+      "mtime" : 1516194509
+   },
+   {
+      "nlink" : 1,
+      "uid" : "root",
+      "gid" : "root",
+      "mode" : "-rw-r--r--",
+      "mtime" : 1516194426,
+      "path" : "/tmp/mesos/slaves/2084863b-12d1-4319-b515-992eab91a53d-S1/frameworks/27b52920-3899-4b90-a1d6-bf83a87f3612-0000/executors/dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f/runs/e14d7537-c1d0-4846-a076-25d623d6a70f/stderr.logrotate.conf",
+      "size" : 245
+   },
+   {
+      "mtime" : 1516194414,
+      "path" : "/tmp/mesos/slaves/2084863b-12d1-4319-b515-992eab91a53d-S1/frameworks/27b52920-3899-4b90-a1d6-bf83a87f3612-0000/executors/dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f/runs/e14d7537-c1d0-4846-a076-25d623d6a70f/stdout",
+      "size" : 0,
+      "uid" : "root",
+      "gid" : "root",
+      "nlink" : 1,
+      "mode" : "-rw-r--r--"
+   },
+   {
+      "gid" : "root",
+      "uid" : "root",
+      "nlink" : 1,
+      "mode" : "-rw-r--r--",
+      "mtime" : 1516194426,
+      "path" : "/tmp/mesos/slaves/2084863b-12d1-4319-b515-992eab91a53d-S1/frameworks/27b52920-3899-4b90-a1d6-bf83a87f3612-0000/executors/dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f/runs/e14d7537-c1d0-4846-a076-25d623d6a70f/stdout.logrotate.conf",
+      "size" : 245
+   }
+]

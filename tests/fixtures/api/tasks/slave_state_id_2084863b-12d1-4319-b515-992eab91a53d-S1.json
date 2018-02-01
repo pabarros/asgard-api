@@ -1,0 +1,303 @@
+{
+   "reserved_resources" : {},
+   "version" : "1.4.1",
+   "completed_frameworks" : [ ],
+   "master_hostname" : "mesosslave",
+   "hostname" : "127.0.0.1",
+   "reserved_resources_full" : {},
+   "capabilities" : [
+      "MULTI_ROLE",
+      "HIERARCHICAL_ROLE",
+      "RESERVATION_REFINEMENT"
+   ],
+   "start_time" : 1516194407.77394,
+   "reserved_resources_allocated" : {},
+   "id" : "2084863b-12d1-4319-b515-992eab91a53d-S1",
+   "git_sha" : "c844db9ac7c0cef59be87438c6781bfb71adcc42",
+   "build_date" : "2017-11-18 02:08:04",
+   "unreserved_resources" : {
+      "disk" : 196746,
+      "gpus" : 0,
+      "mem" : 18000,
+      "ports" : "[31000-32000]",
+      "cpus" : 8
+   },
+   "frameworks" : [
+      {
+         "failover_timeout" : 604800,
+         "hostname" : "127.0.0.1",
+         "role" : "*",
+         "user" : "root",
+         "checkpoint" : true,
+         "id" : "27b52920-3899-4b90-a1d6-bf83a87f3612-0000",
+         "completed_executors" : [
+            {
+               "completed_tasks" : [
+                  {
+                     "role" : "*",
+                     "resources" : {
+                        "cpus" : 1,
+                        "disk" : 0,
+                        "ports" : "[31948-31948]",
+                        "mem" : 3096,
+                        "gpus" : 0
+                     },
+                     "id" : "dev_infra_mongodb_mongodb1.2580925d-0129-11e8-9a03-6e85ded2ca1e",
+                     "discovery" : {
+                        "ports" : {
+                           "ports" : [
+                              {
+                                 "protocol" : "tcp",
+                                 "number" : 31948
+                              }
+                           ]
+                        },
+                        "name" : "mongodb1.mongodb.infra.dev",
+                        "visibility" : "FRAMEWORK"
+                     },
+                     "labels" : [
+                        {
+                           "value" : "1",
+                           "key" : "hollowman.default_scale"
+                        }
+                     ],
+                     "slave_id" : "31fcae61-51a9-4ad1-8054-538503eb53a9-S5",
+                     "executor_id" : "",
+                     "container" : {
+                        "volumes" : [
+                           {
+                              "host_path" : "/data/mongodb",
+                              "mode" : "RW",
+                              "container_path" : "/data/db"
+                           }
+                        ],
+                        "type" : "DOCKER",
+                        "docker" : {
+                           "network" : "HOST",
+                           "privileged" : false,
+                           "parameters" : [
+                           ],
+                           "force_pull_image" : true,
+                           "image" : "mongodb34-hmg"
+                        }
+                     },
+                     "framework_id" : "27b52920-3899-4b90-a1d6-bf83a87f3612-0000",
+                     "statuses" : [
+                        {
+                           "container_status" : {
+                              "network_infos" : [
+                                 {
+                                    "ip_addresses" : [
+                                       {
+                                          "protocol" : "IPv4",
+                                          "ip_address" : "10.168.200.93"
+                                       }
+                                    ]
+                                 }
+                              ],
+                              "container_id" : {
+                                 "value" : "1ec0d0bf-0f11-49ba-8a03-2cf954ad1cfe"
+                              }
+                           },
+                           "state" : "TASK_RUNNING",
+                           "timestamp" : 1516813542.3423
+                        },
+                        {
+                           "container_status" : {
+                              "container_id" : {
+                                 "value" : "1ec0d0bf-0f11-49ba-8a03-2cf954ad1cfe"
+                              },
+                              "network_infos" : [
+                                 {
+                                    "ip_addresses" : [
+                                       {
+                                          "ip_address" : "10.168.200.93",
+                                          "protocol" : "IPv4"
+                                       }
+                                    ]
+                                 }
+                              ]
+                           },
+                           "timestamp" : 1516813542.34416,
+                           "state" : "TASK_FAILED"
+                        }
+                     ],
+                     "name" : "mongodb1.mongodb.infra.dev",
+                     "state" : "TASK_FAILED"
+                  }
+               ],
+               "name" : "Command Executor (Task: dev_infra_mongodb_mongodb1.2580925d-0129-11e8-9a03-6e85ded2ca1e) (Command: NO EXECUTABLE)",
+               "container" : "1ec0d0bf-0f11-49ba-8a03-2cf954ad1cfe",
+               "tasks" : [],
+               "labels" : [
+                  {
+                     "value" : "1",
+                     "key" : "hollowman.default_scale"
+                  }
+               ],
+               "source" : "dev_infra_mongodb_mongodb1.2580925d-0129-11e8-9a03-6e85ded2ca1e",
+               "queued_tasks" : [],
+               "role" : "*",
+               "resources" : {
+                  "mem" : 32,
+                  "gpus" : 0,
+                  "disk" : 0,
+                  "cpus" : 0.1
+               },
+               "id" : "dev_infra_mongodb_mongodb1.2580925d-0129-11e8-9a03-6e85ded2ca1e",
+               "directory" : "/tmp/mesos/slaves/31fcae61-51a9-4ad1-8054-538503eb53a9-S5/frameworks/27b52920-3899-4b90-a1d6-bf83a87f3612-0000/executors/dev_infra_mongodb_mongodb1.2580925d-0129-11e8-9a03-6e85ded2ca1e/runs/1ec0d0bf-0f11-49ba-8a03-2cf954ad1cfe"
+            }
+         ],
+         "name" : "marathon",
+         "executors" : [
+            {
+               "container" : "e14d7537-c1d0-4846-a076-25d623d6a70f",
+               "name" : "Command Executor (Task: dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f) (Command: sh -c 'docker-entry...')",
+               "id" : "dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f",
+               "resources" : {
+                  "mem" : 12320,
+                  "ports" : "[31461-31461]",
+                  "cpus" : 3.6,
+                  "gpus" : 0,
+                  "disk" : 0
+               },
+               "directory" : "/tmp/mesos/slaves/2084863b-12d1-4319-b515-992eab91a53d-S1/frameworks/27b52920-3899-4b90-a1d6-bf83a87f3612-0000/executors/dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f/runs/e14d7537-c1d0-4846-a076-25d623d6a70f",
+               "queued_tasks" : [],
+               "completed_tasks" : [],
+               "role" : "*",
+               "source" : "dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f",
+               "tasks" : [
+                  {
+                     "id" : "dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f",
+                     "name" : "mysql.infra.dev",
+                     "statuses" : [
+                        {
+                           "state" : "TASK_RUNNING",
+                           "timestamp" : 1516194429.20948,
+                           "container_status" : {
+                              "network_infos" : [
+                                 {
+                                    "ip_addresses" : [
+                                       {
+                                          "protocol" : "IPv4",
+                                          "ip_address" : "127.0.0.1"
+                                       }
+                                    ]
+                                 }
+                              ],
+                              "container_id" : {
+                                 "value" : "e14d7537-c1d0-4846-a076-25d623d6a70f"
+                              }
+                           }
+                        }
+                     ],
+                     "container" : {
+                        "type" : "DOCKER",
+                        "docker" : {
+                           "force_pull_image" : true,
+                           "image" : "mysql:5.6.30",
+                           "parameters" : [
+                           ],
+                           "privileged" : false,
+                           "network" : "HOST"
+                        },
+                        "volumes" : [
+                           {
+                              "mode" : "RW",
+                              "host_path" : "/var/lib/mysql/5.6.30/",
+                              "container_path" : "/var/lib/mysql/"
+                           }
+                        ]
+                     },
+                     "executor_id" : "",
+                     "slave_id" : "2084863b-12d1-4319-b515-992eab91a53d-S1",
+                     "state" : "TASK_RUNNING",
+                     "framework_id" : "27b52920-3899-4b90-a1d6-bf83a87f3612-0000",
+                     "discovery" : {
+                        "name" : "mysql.infra.dev",
+                        "ports" : {
+                           "ports" : [
+                              {
+                                 "number" : 31461,
+                                 "protocol" : "tcp"
+                              }
+                           ]
+                        },
+                        "visibility" : "FRAMEWORK"
+                     },
+                     "role" : "*",
+                     "resources" : {
+                        "disk" : 0,
+                        "gpus" : 0,
+                        "mem" : 12288,
+                        "ports" : "[31461-31461]",
+                        "cpus" : 3.5
+                     }
+                  }
+               ]
+            }
+         ]
+      }
+   ],
+   "unreserved_resources_allocated" : {
+      "disk" : 0,
+      "gpus" : 0,
+      "ports" : "[31031-31031, 31308-31308, 31408-31408, 31461-31461, 31540-31540, 31632-31632, 31742-31742, 31753-31753, 31939-31939]",
+      "mem" : 17756,
+      "cpus" : 8.8
+   },
+   "flags" : { },
+   "unreserved_resources_full" : [
+      {
+         "scalar" : {
+            "value" : 8
+         },
+         "name" : "cpus",
+         "role" : "*",
+         "type" : "SCALAR"
+      },
+      {
+         "scalar" : {
+            "value" : 18000
+         },
+         "name" : "mem",
+         "role" : "*",
+         "type" : "SCALAR"
+      },
+      {
+         "type" : "SCALAR",
+         "scalar" : {
+            "value" : 196746
+         },
+         "name" : "disk",
+         "role" : "*"
+      },
+      {
+         "ranges" : {
+            "range" : [
+               {
+                  "end" : 32000,
+                  "begin" : 31000
+               }
+            ]
+         },
+         "name" : "ports",
+         "role" : "*",
+         "type" : "RANGES"
+      }
+   ],
+   "resources" : {
+      "ports" : "[31000-32000]",
+      "mem" : 18000,
+      "cpus" : 8,
+      "gpus" : 0,
+      "disk" : 196746
+   },
+   "build_time" : 1510970884,
+   "git_tag" : "1.4.1",
+   "pid" : "slave(1)@127.0.0.1:5051",
+   "build_user" : "centos",
+   "attributes" : {
+      "workload" : "general"
+   }
+}

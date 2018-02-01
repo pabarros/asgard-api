@@ -18,6 +18,7 @@ from hollowman.plugins import register_plugin
 from hollowman.auth.jwt import jwt_auth
 from hollowman.metrics.zk.routes import zk_metrics_blueprint
 from hollowman.api.account import account_blueprint
+from hollowman.api.tasks import tasks_blueprint
 from hollowman.plugins import load_all_metrics_plugins
 
 
@@ -33,6 +34,7 @@ application.config["JWT_EXPIRATION_DELTA"] = timedelta(days=7)
 
 application.register_blueprint(zk_metrics_blueprint, url_prefix="/_cat/metrics/zk")
 application.register_blueprint(account_blueprint, url_prefix="/hollow/account")
+application.register_blueprint(tasks_blueprint, url_prefix="/tasks")
 
 CORS(application, origins=CORS_WHITELIST)
 jwt_auth.init_app(application)
