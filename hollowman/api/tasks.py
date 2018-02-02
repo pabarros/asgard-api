@@ -1,8 +1,9 @@
 
 import json
 import requests
+from http import HTTPStatus
 
-from flask import Blueprint, Response
+from flask import Blueprint, Response, request
 from hollowman.decorators import auth_required
 from hollowman.conf import MESOS_ADDRESSES
 
@@ -12,7 +13,11 @@ tasks_blueprint = Blueprint(__name__, __name__)
 def get_task_data(task_id):
 
     task_id_with_namespace = task_id
-    task_info = requests.get(f"{MESOS_ADDRESSES[0]}/tasks?task_id={task_id_with_namespace}").json()['tasks'][0]
+    task_info = requests.get(f"{MESOS_ADDRESSES[0]}/tasks?task_id={task_id_with_namespace}").json()['tasks']
+
+    if not task_info:
+        return None, None
+    task_info = task_info[0]
 
     framework_id = task_info['framework_id']
     slave_id = task_info['slave_id']
@@ -37,17 +42,35 @@ def get_task_data(task_id):
 def task_files_list(task_id, user):
     namespace = user.current_account.namespace
     slave_ip, sandbox_directory = get_task_data(f"{namespace}_{task_id}")
+    if not slave_ip:
+        return Response(response=json.dumps({}), status=404)
     files_info = requests.get(f"http://{slave_ip}:5051/files/browse?path={sandbox_directory}").json()
+    for file_data in files_info:
+        file_data['path'] = file_data['path'].replace(sandbox_directory, "", 1)
 
     return Response(response=json.dumps(files_info), status=200, mimetype="application/json")
 
-@tasks_blueprint.route("/<string:task_id>/files/read/<path:filepath>")
-#@auth_required()
-def task_files_read(task_id, filepath):
-    pass
+@tasks_blueprint.route("/<string:task_id>/files/read")
+@auth_required(pass_user=True)
+def task_files_read(task_id, user):
+    namespace = user.current_account.namespace
+    slave_ip, sandbox_directory = get_task_data(f"{namespace}_{task_id}")
+    if not slave_ip:
+        return Response(response=json.dumps({}), status=404)
+
+    offset = request.args.get("offset", 0)
+    length = request.args.get("length", 1024)
+    path = request.args.get("path", "")
+    files_info = requests.get(f"http://{slave_ip}:5051/files/read?path={sandbox_directory}{path}&offset={offset}&length={length}")
+
+    if files_info.status_code == HTTPStatus.NOT_FOUND:
+        return Response(response=json.dumps({}), status=404)
+    file_info_data = files_info.json()
+
+    return Response(response=json.dumps(file_info_data), status=200, mimetype="application/json")
 
 @tasks_blueprint.route("/<string:task_id>/files/download/<path:filepath>")
-#@auth_required()
+@auth_required()
 def task_files_download(task_id, filepath):
     """
         Fazer stream do resposne do mesos para o nosso response.
