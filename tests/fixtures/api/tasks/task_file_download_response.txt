@@ -1,0 +1,32 @@
+*** Starting uWSGI 2.0.14 (64bit) on [Tue Jan 30 16:24:06 2018] ***
+compiled with version: 5.3.0 on 24 January 2017 15:26:27
+os: Linux-4.4.0-92-generic #115-Ubuntu SMP Thu Aug 10 09:04:33 UTC 2017
+nodename: 8c5a06dbc2e9
+machine: x86_64
+clock source: unix
+detected number of CPU cores: 8
+current working directory: /opt/app
+detected binary path: /usr/bin/uwsgi
+!!! no internal routing support, rebuild with pcre support !!!
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) ***
+*** WARNING: you are running uWSGI without its master process manager ***
+your memory page size is 4096 bytes
+detected max file descriptor number: 65536
+building mime-types dictionary from file /etc/uwsgi.d/mime.types...97 entry found
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uWSGI http bound on 0.0.0.0:80 fd 4
+spawned uWSGI http 1 (pid: 11)
+uwsgi socket 0 bound to TCP address 127.0.0.1:38206 (port auto-assigned) fd 3
+Python version: 2.7.12 (default, Jun 29 2016, 08:57:23)  [GCC 5.3.0]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x556dd6849200
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 101432 bytes (99 KB) for 1 cores
+*** Operational MODE: single process ***
+*** no app loaded. going in full dynamic mode ***
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI worker 1 (and the only) (pid: 1, cores: 1)
+spawned 8 offload threads for uWSGI worker 1
