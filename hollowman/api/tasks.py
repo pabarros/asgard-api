@@ -85,5 +85,7 @@ def task_files_download(task_id, user):
     if files_info.status_code == HTTPStatus.NOT_FOUND:
         return Response(response=json.dumps({}), status=404)
 
-    return Response(response=files_info.iter_content(chunk_size=4096), status=200, headers={"Content-Disposition":  f"attachment; filename={task_id}_stderr.log",
+    filename = f"{task_id}_{path.strip('/')}.log"
+
+    return Response(response=files_info.iter_content(chunk_size=4096), status=200, headers={"Content-Disposition":  f"attachment; filename={filename}",
                                                                              "Content-Type": "application/octet-stream"})

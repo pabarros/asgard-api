@@ -171,13 +171,14 @@ class TasksEndpointTest(BaseApiTests, unittest.TestCase):
                          body=json.dumps(slave_state_fixture),
                          status=200)
                 rsps.add(method="GET",
-                         url=f"http://127.0.0.1:5051/files/download?path={sandbox_directory}/stderr",
+                         url=f"http://127.0.0.1:5051/files/download?path={sandbox_directory}/stdout",
                          body=task_file_download_fixture,
                          status=200,
                          match_querystring=True)
-                resp = client.get(f"/tasks/{task_id}/files/download?path=/stderr&offset=0&length=42", headers=self.auth_header)
+                resp = client.get(f"/tasks/{task_id}/files/download?path=/stdout&offset=0&length=42", headers=self.auth_header)
                 self.assertEquals(200, resp.status_code)
                 self.assertEqual(bytes(task_file_download_fixture, "utf-8"), resp.data)
+                self.assertEqual(resp.headers.get("Content-Disposition"), f"attachment; filename={task_id}_stdout.log")
 
     @with_json_fixture("../fixtures/api/tasks/task_info_namespace_dev_task_id_infra_mongodb_mongodb1.2580925d-0129-11e8-9a03-6e85ded2ca1e.json")
     @with_json_fixture("../fixtures/api/tasks/one_slave_json_id_2084863b-12d1-4319-b515-992eab91a53d-S1.json")
