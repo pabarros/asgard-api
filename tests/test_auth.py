@@ -158,6 +158,24 @@ class TestAuthentication(TestCase):
             self.assertEqual("user@host.com.br", request.user.tx_email)
             self.assertEqual(5, request.user.current_account.id)
 
+    def test_jwt_auth_with_token_from_session_if_headers_not_present(self):
+        """
+        Se não encontrarmos o token JWT no header, olhamos na flask session procurando por ele.
+        """
+        test_client = application.test_client()
+
+        with application.app_context(), \
+             patch.object(routes, "check_authentication_successful",
+                          return_value={"email": self.user.tx_email}):
+            jwt_token = jwt_auth.jwt_encode_callback(jwt_generate_user_info(self.user, self.account_dev))
+
+            with test_client.session_transaction() as flask_session:
+                flask_session['jwt'] = jwt_token
+
+
+            response = test_client.get("/v2/apps")
+            self.assertEqual(200, response.status_code)
+
     @unittest.skip("Ainda nao temos usuarios validos/ativos/invalidos")
     def test_return_401_if_jwt_token_is_valid_but_user_is_invalid(self):
         """
