@@ -3,8 +3,6 @@ import requests
 import sys
 import os
 
-import ipdb
-ipdb.set_trace()
 proxies = {
     "http": os.getenv("http_proxy", "")
 }
