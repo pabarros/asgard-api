@@ -4,6 +4,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.63.0
+  - IN-2425 Implemntação da API de file read/download para podermos ver os logs de uma task pela API do Asgard
+  - Script que ajuda a fazer um tail -f nos logs de uma app
+
 * 0.62.0
   - IN-2451 Atualização do session-checker-plugin para 0.2.0 (para usar o request pipelines);
   - Essa versão da API só funciona com a versão da UI 0.12.0+. Pois a partir dessa versão já temos suporte a request pipeline.
