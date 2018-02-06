@@ -1,0 +1,96 @@
+{
+   "tasks" : [
+      {
+         "slave_id" : "31fcae61-51a9-4ad1-8054-538503eb53a9-S5",
+         "framework_id" : "27b52920-3899-4b90-a1d6-bf83a87f3612-0000",
+         "discovery" : {
+            "name" : "mongodb1.mongodb.infra.dev",
+            "visibility" : "FRAMEWORK",
+            "ports" : {
+               "ports" : [
+                  {
+                     "number" : 31948,
+                     "protocol" : "tcp"
+                  }
+               ]
+            }
+         },
+         "state" : "TASK_FAILED",
+         "name" : "mongodb1.mongodb.infra.dev",
+         "executor_id" : "",
+         "resources" : {
+            "ports" : "[31948-31948]",
+            "gpus" : 0,
+            "disk" : 0,
+            "mem" : 3096,
+            "cpus" : 1
+         },
+         "statuses" : [
+            {
+               "timestamp" : 1516813542.3423,
+               "state" : "TASK_RUNNING",
+               "container_status" : {
+                  "container_id" : {
+                     "value" : "1ec0d0bf-0f11-49ba-8a03-2cf954ad1cfe"
+                  },
+                  "network_infos" : [
+                     {
+                        "ip_addresses" : [
+                           {
+                              "protocol" : "IPv4",
+                              "ip_address" : "127.0.0.1"
+                           }
+                        ]
+                     }
+                  ]
+               }
+            },
+            {
+               "timestamp" : 1516813542.34416,
+               "container_status" : {
+                  "container_id" : {
+                     "value" : "1ec0d0bf-0f11-49ba-8a03-2cf954ad1cfe"
+                  },
+                  "network_infos" : [
+                     {
+                        "ip_addresses" : [
+                           {
+                              "ip_address" : "127.0.0.1",
+                              "protocol" : "IPv4"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               "state" : "TASK_FAILED"
+            }
+         ],
+         "id" : "dev_infra_mongodb_mongodb1.2580925d-0129-11e8-9a03-6e85ded2ca1e",
+         "container" : {
+            "type" : "DOCKER",
+            "docker" : {
+               "parameters" : [
+               ],
+               "image" : "mongodb34-hmg",
+               "privileged" : false,
+               "force_pull_image" : true,
+               "network" : "HOST"
+            },
+            "volumes" : [
+               {
+                  "host_path" : "/data/mongodb",
+                  "mode" : "RW",
+                  "container_path" : "/data/db"
+               }
+            ]
+         },
+         "labels" : [
+            {
+               "value" : "1",
+               "key" : "hollowman.default_scale"
+            }
+         ],
+         "role" : "*"
+      }
+   ]
+}

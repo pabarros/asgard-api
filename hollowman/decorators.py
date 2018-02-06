@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import jwt
 import json
-from flask import request, make_response
+from flask import request, make_response, session
 from alchemytools.context import managed
 
 from hollowman.conf import SECRET_KEY
@@ -50,14 +50,20 @@ AUTH_TYPES = defaultdict(lambda: not_authenticated)
 AUTH_TYPES[TokenTypes.USER_TOKEN] = check_auth_token
 AUTH_TYPES[TokenTypes.JWT] = check_jwt_token
 
-def auth_required():
+def auth_required(pass_user=False):
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
             try:
+                user = None
                 auth_header = request.headers.get("Authorization", "invalid-type invalid-token")
                 token_type, token = auth_header.strip().split(" ")
-                user = AUTH_TYPES[token_type](token)
+
+                if token_type == "invalid-type":
+                    user = check_jwt_token(session['jwt'])
+                else:
+                    user = AUTH_TYPES[token_type](token)
+
 
                 if not user:
                     return make_response(invalid_token_response_body, 401)
@@ -81,6 +87,8 @@ def auth_required():
             except Exception as e:
                 logger.exception({"exc": e, "step": "auth"})
                 return make_response(invalid_token_response_body, 401)
+            if pass_user:
+                kwargs['user'] = request.user
 
             return fn(*args, **kwargs)
         return decorator

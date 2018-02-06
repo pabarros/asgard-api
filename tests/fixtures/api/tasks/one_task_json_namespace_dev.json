@@ -1,0 +1,71 @@
+{
+   "tasks" : [
+      {
+         "name" : "mysql.infra.dev",
+         "container" : {
+            "docker" : {
+               "network" : "HOST",
+               "image" : "mysql:5.6.30",
+               "parameters" : [
+               ],
+               "privileged" : false,
+               "force_pull_image" : true
+            },
+            "type" : "DOCKER",
+            "volumes" : [
+               {
+                  "mode" : "RW",
+                  "container_path" : "/var/lib/mysql/",
+                  "host_path" : "/var/lib/mysql/5.6.30/"
+               }
+            ]
+         },
+         "executor_id" : "",
+         "state" : "TASK_RUNNING",
+         "slave_id" : "2084863b-12d1-4319-b515-992eab91a53d-S1",
+         "resources" : {
+            "gpus" : 0,
+            "disk" : 0,
+            "mem" : 12288,
+            "ports" : "[31461-31461]",
+            "cpus" : 3.5
+         },
+         "framework_id" : "27b52920-3899-4b90-a1d6-bf83a87f3612-0000",
+         "role" : "*",
+         "statuses" : [
+            {
+               "container_status" : {
+                  "container_id" : {
+                     "value" : "e14d7537-c1d0-4846-a076-25d623d6a70f"
+                  },
+                  "network_infos" : [
+                     {
+                        "ip_addresses" : [
+                           {
+                              "ip_address" : "10.168.200.97",
+                              "protocol" : "IPv4"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               "state" : "TASK_RUNNING",
+               "timestamp" : 1516194429.20948
+            }
+         ],
+         "discovery" : {
+            "ports" : {
+               "ports" : [
+                  {
+                     "protocol" : "tcp",
+                     "number" : 31461
+                  }
+               ]
+            },
+            "visibility" : "FRAMEWORK",
+            "name" : "mysql.infra.dev"
+         },
+         "id" : "dev_infra_mysql.b331f6c9-fb9e-11e7-ab4b-faf0633ea91f"
+      }
+   ]
+}
