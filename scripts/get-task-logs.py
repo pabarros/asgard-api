@@ -25,7 +25,8 @@ def get_json(url):
     return requests.get(url, proxies=proxies, headers={"Authorization": f"{ASGARD_AUTH}"}).json()
 
 
-offset = get_json(f"{ASGARD_API}/tasks/{task_id}/files/read?path={filelog}&offset=-1&account_id={ASGARD_ACCOUNT_ID}")['offset'] - 512
+offset = get_json(f"{ASGARD_API}/tasks/{task_id}/files/read?path={filelog}&offset=-1&account_id={ASGARD_ACCOUNT_ID}")['offset'] 
+offset -= min(512, offset)
 block_size = 4096
 while True:
     url = f"{ASGARD_API}/tasks/{task_id}/files/read?path={filelog}&offset={offset}&length={block_size}&account_id={ASGARD_ACCOUNT_ID}"
