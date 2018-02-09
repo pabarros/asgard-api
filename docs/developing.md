@@ -12,6 +12,18 @@ Rode em um terminal separado, o script `asgard-run.sh`. Esse script vai subir um
 Mesos + Marathon + PGSQL. O Script imprime os IPs de cada um dos componenetes para que
 possamos saber onde estão rodando.
 
+O PGSQL já está com a estrutura do banco pronta e já possui um usuário com o Token `<TOKEN-AQUI>`.
+
+Dessa forma você jaá consegue fazer o seguinte request:
+
+`curl -i -H "Authorization: Token <TOKEN-AQUI>" http://127.0.0.1:5000/v2/apps`
+
+E isso deve retornar:
+
+```
+{"apps": []}
+```
+
 ## Instalando as dependencias do asgard-api
 
 Instale as dependencias listadas em `requirements-dev.txt`.
@@ -24,7 +36,6 @@ Importante passar as envs
 
 `HOLLOWMAN_REDIRECT_AFTER_LOGIN=http://localhost/authenticated`
 `HOLLOWMAN_CORS_WHITELIST=http://localhost`
-
 
 ## Rodando a UI
 
