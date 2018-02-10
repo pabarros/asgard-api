@@ -4,6 +4,7 @@ from datetime import timedelta
 import json
 import traceback
 import sys
+import os
 
 import newrelic.agent
 
@@ -25,7 +26,7 @@ from hollowman.plugins import load_all_metrics_plugins
 if NEW_RELIC_LICENSE_KEY and NEW_RELIC_APP_NAME:
     newrelic.agent.initialize()
 
-application = HollowmanFlask(__name__)
+application = HollowmanFlask(__name__, static_url_path='/static', static_folder=os.path.normpath('../static'))
 application.url_map.strict_slashes = False
 application.secret_key = SECRET_KEY
 application.permanent_session_lifetime = timedelta(minutes=5)
