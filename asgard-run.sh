@@ -11,7 +11,18 @@ MESOS_MASTER_IP=172.18.0.11
 MESOS_SLAVE_IP=172.18.0.21
 MARATHON_IP=172.18.0.31
 
+POSTGRES_IP=172.18.0.41
+
 docker network create --subnet 172.18.0.0/16 asgard
+
+#Postgres
+
+echo -n "Postgres (${POSTGRES_IP}) "
+docker run -d --rm -it --ip ${POSTGRES_IP} \
+  --name asgard_pgsql \
+  --net ${NETWORK_NAME} \
+  -v ${PWD}/scripts/init-db-config.sql:/docker-entrypoint-initdb.d/init-db-config.sql \
+  postgres:9.4
 
 # ZK Cluster
 
@@ -108,7 +119,6 @@ echo MESOS_DOCKER_STOP_TIMEOUT=${MESOS_DOCKER_STOP_TIMEOUT}
 ) \
   -v /sys/fs/cgroup:/sys/fs/cgroup \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /etc/docker.tar.bz2:/etc/docker.tar.bz2 \
   daltonmatos/mesos:0.0.3
 
 ## MARATHON
@@ -131,7 +141,7 @@ MARATHON_HTTP_CREDENTIALS=marathon:pwd
 MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=http://localhost:4200
 
 echo -n "Marathon (${MARATHON_IP}) "
-docker run -d --rm -it --ip ${MARATHON_IP} \
+docker run -d -it --ip ${MARATHON_IP} \
   --name asgard_marathon \
   --net ${NETWORK_NAME} \
   --env-file <(
@@ -154,6 +164,9 @@ echo JAVA_OPTS=${JAVA_OPTS}
 echo MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=${MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN}
 ) \
   mesosphere/marathon:v1.3.13 --enable_features gpu_resources
+
+#CREATE INITIAL GROUP
+#curl -X POST -d '{"id": "/asgard"}' http://${MARATHON_IP}:8080/v2/groups
 
 echo "Pressione ENTER para desligar o ambiente"
 echo "ATENÇÃO: Todos os dados serão perdidos"
