@@ -7,7 +7,7 @@ from hollowman.marathonapp import AsgardMarathonApp
 
 from tests.utils import with_json_fixture
 
-class SieveMarathonAppTest(unittest.TestCase):
+class AsgardMarathonAppTest(unittest.TestCase):
 
     @with_json_fixture("single_full_app.json")
     def setUp(self, single_full_app_fixture):
