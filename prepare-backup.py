@@ -8,13 +8,13 @@
 import sys
 import json
 
-from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathon.group import AsgardAppGroup
 from marathon.models.group import MarathonGroup
 from marathon.util import MarathonJsonEncoder
 
 
 data = open(sys.argv[1]).read()
-_g = SieveAppGroup(MarathonGroup.from_json(json.loads(data)))
+_g = AsgardAppGroup(MarathonGroup.from_json(json.loads(data)))
 
 for group in _g.iterate_groups():
     del group.version

@@ -10,7 +10,7 @@ from marathon.models.group import MarathonGroup
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType
 from hollowman.marathonapp import SieveMarathonApp
-from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathon.group import AsgardAppGroup
 
 
 Apps = List[Tuple[SieveMarathonApp, MarathonApp]]
@@ -128,6 +128,6 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
                                                 (group_id or "/").strip("/"))
         try:
-            return SieveAppGroup(self.marathon_client.get_group(group_id_with_namespace))
+            return AsgardAppGroup(self.marathon_client.get_group(group_id_with_namespace))
         except NotFoundError as e:
-            return SieveAppGroup(MarathonGroup.from_json({"id": group_id_with_namespace}))
+            return AsgardAppGroup(MarathonGroup.from_json({"id": group_id_with_namespace}))
