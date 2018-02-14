@@ -1,5 +1,5 @@
 # Hollowman
-[![Build Status](https://travis-ci.org/diogommartins/simple_json_logger.svg?branch=master)](https://travis-ci.org/B2W-BIT/asgard-api)
+[![Build Status](https://travis-ci.org/B2W-BIT/asgard-api.svg?branch=master)](https://travis-ci.org/B2W-BIT/asgard-api)
 
 The thought of human invisibility has intrigued man for centuries. Highly gifted scientist Sebastian Caine develops a serum that induces complete invisibility. His remarkable transformation results in unimaginable power that seems to suffocate his sense of morality and leads to a furious and frightening conclusion.
 
