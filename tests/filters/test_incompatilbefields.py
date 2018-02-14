@@ -3,7 +3,7 @@
 import unittest
 
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 from hollowman.http_wrappers.request import Request
 
 from tests.utils import with_json_fixture
@@ -16,8 +16,8 @@ class IncompatibleFieldsFilterTest(unittest.TestCase):
         self.request = Request(None)
         self.single_full_app_fixture = single_full_app_fixture
         self.filter = IncompatibleFieldsFilter()
-        self.request_app = SieveMarathonApp.from_json(self.single_full_app_fixture)
-        self.original_app = SieveMarathonApp.from_json(self.single_full_app_fixture)
+        self.request_app = AsgardMarathonApp.from_json(self.single_full_app_fixture)
+        self.original_app = AsgardMarathonApp.from_json(self.single_full_app_fixture)
 
     def test_update_app_remove_ports_fields(self):
         self.original_app.ports = self.single_full_app_fixture['container']['docker']['portMappings'][0]['servicePort']

@@ -9,11 +9,11 @@ from marathon.models.group import MarathonGroup
 
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 from hollowman.marathon.group import SieveAppGroup
 
 
-Apps = List[Tuple[SieveMarathonApp, MarathonApp]]
+Apps = List[Tuple[AsgardMarathonApp, MarathonApp]]
 
 
 class RequestResource(Enum):

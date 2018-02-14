@@ -6,7 +6,7 @@ from hollowman.filters.basicconstraint import BasicConstraintFilter
 from marathon.models import MarathonDeployment, MarathonQueueItem
 from marathon.models.task import MarathonTask
 
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 
 from hollowman.filters.uri import AddURIFilter
 from hollowman.filters.trim import TrimRequestFilter

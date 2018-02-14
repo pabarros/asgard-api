@@ -1,7 +1,7 @@
 from marathon.models import MarathonDeployment
 from marathon.models.task import MarathonTask
 
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 
 
 class NameSpaceFilter:
@@ -44,7 +44,7 @@ class NameSpaceFilter:
             task.id = task.id.replace("{}_".format(namespace), "", 1)
             task.app_id = self._remove_namespace(task.app_id, namespace)
 
-    def response(self, user, response_app, original_app) -> SieveMarathonApp:
+    def response(self, user, response_app, original_app) -> AsgardMarathonApp:
         if not response_app.id.startswith("/{}/".format(user.current_account.namespace)):
              return None
 

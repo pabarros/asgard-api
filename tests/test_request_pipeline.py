@@ -17,7 +17,7 @@ from hollowman.dispatcher import dispatch
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType, FilterType
 from hollowman.models import User, Account
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 
 from tests.utils import with_json_fixture
 
@@ -117,8 +117,8 @@ class RequestPipelineTest(unittest.TestCase):
         }
 
         request_data = {"constraints": []}
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -127,7 +127,7 @@ class RequestPipelineTest(unittest.TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
-            filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+            filtered_app = AsgardMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(0, len(filtered_app.constraints))
             self._check_other_fields("constraints", filtered_app)
 
@@ -139,7 +139,7 @@ class RequestPipelineTest(unittest.TestCase):
         """
         class AddNewConstraintFilter:
             def write(self, user, request_app, original_app):
-                assert isinstance(request_app, SieveMarathonApp)
+                assert isinstance(request_app, AsgardMarathonApp)
                 return request_app
 
         pipeline = {
@@ -147,8 +147,8 @@ class RequestPipelineTest(unittest.TestCase):
         }
 
         request_data = {"constraints": []}
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -174,8 +174,8 @@ class RequestPipelineTest(unittest.TestCase):
         }
 
         request_data = {"constraints": [["hostname", "LIKE", "myhost"]]}
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -185,7 +185,7 @@ class RequestPipelineTest(unittest.TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
-            filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+            filtered_app = AsgardMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(1, len(filtered_app.constraints))
             self.assertEqual(["hostname", "LIKE", "myhost"], filtered_app.constraints[0].json_repr())
             self._check_other_fields("constraints", filtered_app)
@@ -205,8 +205,8 @@ class RequestPipelineTest(unittest.TestCase):
         }
 
         request_data = {"constraints": []}
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -216,7 +216,7 @@ class RequestPipelineTest(unittest.TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
-            filtered_request_app = SieveMarathonApp.from_json(filtered_request.get_json())
+            filtered_request_app = AsgardMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(1, len(filtered_request_app.constraints))
             self._check_other_fields("constraints", filtered_request_app)
 
@@ -238,8 +238,8 @@ class RequestPipelineTest(unittest.TestCase):
         }
         request_data = {"labels": {}}
 
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -249,7 +249,7 @@ class RequestPipelineTest(unittest.TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
-            filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+            filtered_app = AsgardMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(1, len(filtered_app.labels.keys()))
             self.assertEqual({"label1": "value1"}, filtered_app.labels)
             self._check_other_fields("labels", filtered_app)
@@ -270,8 +270,8 @@ class RequestPipelineTest(unittest.TestCase):
         # Simulando uma app que veio sem o campo "upgradeStrategy"
         request_data = {}
 
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -281,7 +281,7 @@ class RequestPipelineTest(unittest.TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
-            filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+            filtered_app = AsgardMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(1, filtered_app.upgrade_strategy.maximum_over_capacity)
             self.assertEqual(0.75, filtered_app.upgrade_strategy.minimum_health_capacity)
             self._check_other_fields("upgradeStrategy", filtered_app)
@@ -297,8 +297,8 @@ class RequestPipelineTest(unittest.TestCase):
         }
         request_data = {"env": []}
 
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -308,7 +308,7 @@ class RequestPipelineTest(unittest.TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
-            filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+            filtered_app = AsgardMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(1, len(filtered_app.env.keys()))
             self.assertEqual({"env1": "env-value1"}, filtered_app.env)
             self._check_other_fields("env", filtered_app)
@@ -338,8 +338,8 @@ class RequestPipelineTest(unittest.TestCase):
             ]
         }
 
-        request_app = SieveMarathonApp.from_json(request_data)
-        original_app = SieveMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
+        request_app = AsgardMarathonApp.from_json(request_data)
+        original_app = AsgardMarathonApp.from_json(deepcopy(self.single_full_app_fixture))
 
         with application.test_request_context("/v2/apps/foo",
                                               method="PUT",
@@ -349,7 +349,7 @@ class RequestPipelineTest(unittest.TestCase):
             ctx.request.user = self.user
             request = Request(ctx.request)
             filtered_request = dispatch(self.user, request, filters_pipeline=pipeline)
-            filtered_app = SieveMarathonApp.from_json(filtered_request.get_json())
+            filtered_app = AsgardMarathonApp.from_json(filtered_request.get_json())
             self.assertEqual(1, len(filtered_app.health_checks))
             self.assertEqual("/marathon/healthcheck", filtered_app.health_checks[0].json_repr()['path'])
             self._check_other_fields("healthChecks", filtered_app)

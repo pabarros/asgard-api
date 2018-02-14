@@ -4,7 +4,7 @@ from marathon.models.constraint import MarathonConstraint
 
 
 from hollowman.models import HollowmanSession, User, Account
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 from hollowman.filters.owner import AddOwnerConstraintFilter
 
 from tests.utils import with_json_fixture
@@ -24,13 +24,13 @@ class OwnerFilterTest(unittest.TestCase):
         self.session.add(self.account_dev)
         self.session.commit()
 
-        self.request_app = SieveMarathonApp.from_json(single_full_app_fixture)
-        self.original_app = SieveMarathonApp.from_json(single_full_app_fixture)
+        self.request_app = AsgardMarathonApp.from_json(single_full_app_fixture)
+        self.original_app = AsgardMarathonApp.from_json(single_full_app_fixture)
         self.user.current_account = self.account_dev
 
     def test_create_app_add_constraint_app_with_no_constraint(self):
         self.request_app.constraints = []
-        filtered_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
+        filtered_app = self.filter.write(self.user, self.request_app, AsgardMarathonApp())
 
         owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(1, len(filtered_app.constraints))
@@ -49,7 +49,7 @@ class OwnerFilterTest(unittest.TestCase):
 
     def test_create_app_constraint_exist_with_wrong_value(self):
         self.request_app.constraints.append(MarathonConstraint(field="owner", operator="LIKE", value="other-owner"))
-        filtered_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
+        filtered_app = self.filter.write(self.user, self.request_app, AsgardMarathonApp())
 
         owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(2, len(filtered_app.constraints))
@@ -66,7 +66,7 @@ class OwnerFilterTest(unittest.TestCase):
         self.assertEqual(self.account_dev.owner, owner_constraint[0].value)
 
     def test_create_app_add_constraint_app_with_other_constraints(self):
-        filtered_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
+        filtered_app = self.filter.write(self.user, self.request_app, AsgardMarathonApp())
 
         owner_constraint = filtered_app.get_constraints_by_name("owner")
         self.assertEqual(2, len(filtered_app.constraints))

@@ -9,7 +9,7 @@ from marathon.models.task import MarathonTask
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
 from hollowman.marathon.group import SieveAppGroup
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 
 
 # Keys que são multi-valor e que devem
@@ -54,7 +54,7 @@ class Request(HTTPWrapper):
             pass
         if isinstance(base_app, MarathonTask):
             return MarathonTask.from_json(merged)
-        return SieveMarathonApp.from_json(merged)
+        return AsgardMarathonApp.from_json(merged)
 
     def get_request_data(self) -> Iterable[Dict]:
         if not self.request.data:

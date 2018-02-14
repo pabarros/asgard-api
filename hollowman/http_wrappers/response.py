@@ -7,7 +7,7 @@ from marathon.models.deployment import MarathonDeployment
 from marathon.models.queue import MarathonQueueItem
 
 from hollowman.http_wrappers.base import HTTPWrapper, Apps
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardMarathonApp
 from hollowman.marathon.group import SieveAppGroup
 
 
@@ -29,7 +29,7 @@ class Response(HTTPWrapper):
             response_content = json.loads(self.response.data)
             if self.is_list_apps_request():
                 for app in response_content['apps']:
-                    response_app = SieveMarathonApp.from_json(app)
+                    response_app = AsgardMarathonApp.from_json(app)
                     app = self.marathon_client.get_app(self.object_id or response_app.id)
                     yield response_app, app
                 return
@@ -60,7 +60,7 @@ class Response(HTTPWrapper):
                     yield queued_app, queued_app
                 return
             else:
-                response_app = SieveMarathonApp.from_json(response_content.get('app') or response_content)
+                response_app = AsgardMarathonApp.from_json(response_content.get('app') or response_content)
                 app = self.marathon_client.get_app(self.object_id)
                 yield response_app, app
                 return
@@ -74,7 +74,7 @@ class Response(HTTPWrapper):
                 return
             return
 
-        yield SieveMarathonApp(), self.marathon_client.get_app(self.app_id)
+        yield AsgardMarathonApp(), self.marathon_client.get_app(self.app_id)
 
     def join(self, apps: Apps) -> FlaskResponse:
 
@@ -88,7 +88,7 @@ class Response(HTTPWrapper):
                 # No caso de ser um acesso a uma app específica, e ainda sim recebermos apps = [],
                 # deveríamos retornar 404. Chegar uma lista vazia qui significa que a app foi removida
                 # do response, ou seja, quem fez o request não pode visualizar esses dados, portanto, 404.
-                response_app = apps[0][0] if apps else SieveMarathonApp()
+                response_app = apps[0][0] if apps else AsgardMarathonApp()
                 body = {'app': response_app.json_repr(minimal=True)}
                 if 'versions/' in self.request.path:
                     body = body['app']
