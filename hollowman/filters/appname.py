@@ -1,4 +1,4 @@
-from hollowman.marathonapp import AsgardMarathonApp
+from hollowman.marathonapp import AsgardApp
 
 
 class AddAppNameFilter:

@@ -14,7 +14,7 @@ from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.request import Request
 from hollowman.models import User, Account
 from hollowman.marathon.group import SieveAppGroup
-from hollowman.marathonapp import AsgardMarathonApp
+from hollowman.marathonapp import AsgardApp
 
 from tests.utils import with_json_fixture, get_fixture
 
@@ -82,7 +82,7 @@ class SplitTests(TestCase):
             self.assertEqual(
                 apps,
                 [
-                    (AsgardMarathonApp.from_json(fixture), MarathonApp.from_json({"id": "/dev/foo"}))
+                    (AsgardApp.from_json(fixture), MarathonApp.from_json({"id": "/dev/foo"}))
                 ]
             )
 

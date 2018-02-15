@@ -14,7 +14,7 @@ from responses import RequestsMock
 from hollowman import conf
 from hollowman.app import application
 from hollowman.http_wrappers import Response
-from hollowman.marathonapp import AsgardMarathonApp
+from hollowman.marathonapp import AsgardApp
 from hollowman.marathon.group import SieveAppGroup
 from hollowman.models import User, Account
 
@@ -55,14 +55,14 @@ class SplitTests(unittest.TestCase):
             response = Response(ctx.request, flask_response)
 
             with patch.object(response, 'marathon_client') as client:
-                client.get_app.return_value = AsgardMarathonApp.from_json(fixture)
+                client.get_app.return_value = AsgardApp.from_json(fixture)
                 apps = list(response.split())
                 self.assertEqual([call("/foo")], client.get_app.call_args_list)
 
             self.assertEqual(
                 apps,
                 [
-                    (AsgardMarathonApp.from_json(fixture), client.get_app.return_value)
+                    (AsgardApp.from_json(fixture), client.get_app.return_value)
                 ])
 
     @with_json_fixture('single_full_app.json')
@@ -87,8 +87,8 @@ class SplitTests(unittest.TestCase):
         self.assertEqual(
             apps,
             [
-                (AsgardMarathonApp.from_json(fixture), original_apps[0]),
-                (AsgardMarathonApp.from_json(modified_app), original_apps[1])
+                (AsgardApp.from_json(fixture), original_apps[0]),
+                (AsgardApp.from_json(modified_app), original_apps[1])
             ]
         )
 
@@ -292,7 +292,7 @@ class JoinTests(unittest.TestCase):
             response = Response(ctx.request, response)
 
         with patch.object(response, 'marathon_client') as client:
-            client.get_app.return_value = AsgardMarathonApp.from_json(deepcopy(fixture))
+            client.get_app.return_value = AsgardApp.from_json(deepcopy(fixture))
             apps = list(response.split())
 
             joined_response = response.join(apps)
@@ -315,7 +315,7 @@ class JoinTests(unittest.TestCase):
             response = Response(ctx.request, response)
 
         with patch.object(response, 'marathon_client') as client:
-            original_apps = [AsgardMarathonApp.from_json(app) for app in fixtures]
+            original_apps = [AsgardApp.from_json(app) for app in fixtures]
             client.get_app.side_effect = original_apps
             apps = list(response.split())
 

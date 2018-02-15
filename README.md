@@ -89,7 +89,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
   - Atualização do plugin session-checker-plugin, com a Dialog de troca de conta
 
 * 0.0.40
-  - Refactoring no AsgardMarathonApp
+  - Refactoring no AsgardApp
 
 * 0.0.39
   - Suporte a request com lista no body;

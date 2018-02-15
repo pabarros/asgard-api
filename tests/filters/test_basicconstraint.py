@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from marathon import MarathonConstraint
 
 from hollowman.filters.basicconstraint import BasicConstraintFilter
-from hollowman.marathonapp import AsgardMarathonApp
+from hollowman.marathonapp import AsgardApp
 from tests.utils import get_fixture
 
 
@@ -13,7 +13,7 @@ class TestBasicConstraintFilter(unittest.TestCase):
     def setUp(self):
         self.single_full_app_fixture = get_fixture("single_full_app.json")
         self.filter = BasicConstraintFilter()
-        self.request_app = AsgardMarathonApp.from_json(self.single_full_app_fixture)
+        self.request_app = AsgardApp.from_json(self.single_full_app_fixture)
         self.original_app = Mock()
         self.user = Mock()
         self.constraints = (BasicConstraintFilter.mesos_constraint, BasicConstraintFilter.workload_constraint)
