@@ -4,6 +4,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.63.1
+  - Correção para apps que tinham o nome contento a string `*versions/`. 
+
 * 0.63.0
   - IN-2425 Implemntação da API de file read/download para podermos ver os logs de uma task pela API do Asgard
   - Script que ajuda a fazer um tail -f nos logs de uma app

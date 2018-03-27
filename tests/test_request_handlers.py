@@ -73,6 +73,26 @@ class RequestHandlersTests(TestCase):
                 self.assertEqual(200, response.status_code)
                 self.assertEqual("/foo", json.loads(response.data)['id'])
 
+    @with_json_fixture("../fixtures/single_full_app.json")
+    def test_apps_endpoint_accepts_app_with_versions_in_the_name(self, single_full_app_fixture):
+        """
+        Regressão: Commit 0068801288b33a407676a6aa9b521881854de2f7
+        Devemos aceitar uma app que possui a string "versions" em um lugar no nome, especialmente no fim
+        de uma parte do path, ex: "/workers/conversions/splitter"
+        """
+        auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
+        single_full_app_fixture['id'] = "/dev/workers/conversions/splitter"
+        with application.test_client() as client:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps/dev/workers/conversions/splitter',
+                         body=json.dumps({"app": single_full_app_fixture}), status=200)
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/workers/conversions/splitter',
+                         body=json.dumps({"app": single_full_app_fixture}), status=200)
+                response = client.get("/v2/apps/workers/conversions/splitter", headers=auth_header)
+                self.assertEqual(200, response.status_code)
+                self.assertTrue('app' in json.loads(response.data))
+                self.assertEqual("/workers/conversions/splitter", json.loads(response.data)['app']['id'])
+
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
     def test_groups_endpoint_returns_group_on_root_json(self, group_dev_namespace_fixture):
         auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}

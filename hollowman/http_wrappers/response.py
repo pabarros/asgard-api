@@ -90,7 +90,7 @@ class Response(HTTPWrapper):
                 # do response, ou seja, quem fez o request não pode visualizar esses dados, portanto, 404.
                 response_app = apps[0][0] if apps else SieveMarathonApp()
                 body = {'app': response_app.json_repr(minimal=True)}
-                if 'versions/' in self.request.path:
+                if '/versions/' in self.request.path:
                     body = body['app']
         elif self.is_read_request() and self.is_group_request():
             response_group = apps[0][0] if apps else MarathonGroup()
