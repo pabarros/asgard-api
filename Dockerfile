@@ -1,6 +1,6 @@
 FROM docker.sieve.com.br/infra/alpine/py36/uwsgi20:0.0.2
 
-#Version: 0.63.0
+#Version: 0.63.1
 #Tag: sieve/infra/asgard-api
 
 ARG _=""
