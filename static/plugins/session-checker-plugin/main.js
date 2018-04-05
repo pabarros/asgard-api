@@ -67,7 +67,7 @@
 	    PipelineStore = _window$marathonPlugi.PipelineStore;
 
 
-	var VERSION = "0.2.0";
+	var VERSION = "0.3.0-rc1";
 
 	PluginHelper.registerMe();
 	_SessionCheckerAction2.default.init();
@@ -646,13 +646,13 @@
 	var _window$marathonPlugi = window.marathonPluginInterface,
 	    PluginActions = _window$marathonPlugi.PluginActions,
 	    PluginHelper = _window$marathonPlugi.PluginHelper,
-	    config = _window$marathonPlugi.config,
-	    Sieve = _window$marathonPlugi.Sieve;
+	    Bridge = _window$marathonPlugi.Bridge,
+	    MarathonService = _window$marathonPlugi.MarathonService;
 
 
 	var acceptDialog = function acceptDialog(dialog) {
 	  if (dialog.myid === "session-expired") {
-	    Sieve.navigateTo("/login");
+	    Bridge.navigateTo("/login");
 	  }
 	};
 
@@ -667,13 +667,13 @@
 	  }
 	}
 
-	Sieve.DialogStore.on("DIALOG_EVENTS_ACCEPT_DIALOG", acceptDialog);
+	Bridge.DialogStore.on("DIALOG_EVENTS_ACCEPT_DIALOG", acceptDialog);
 
 	function checkSession() {
-	  Sieve.ajaxWrapper({
-	    url: config.apiURL + "v2/deployments",
+	  MarathonService.request({
+	    resource: "v2/deployments",
 	    concurrent: true
-	  }).error(function (error) {
+	  }).success(function (response) {}).error(function (error) {
 	    checkStatusCode(error.status);
 	  });
 	}
@@ -711,8 +711,8 @@
 	var _window$marathonPlugi = window.marathonPluginInterface,
 	    PluginActions = _window$marathonPlugi.PluginActions,
 	    PluginHelper = _window$marathonPlugi.PluginHelper,
-	    Sieve = _window$marathonPlugi.Sieve,
-	    config = _window$marathonPlugi.config;
+	    Bridge = _window$marathonPlugi.Bridge,
+	    MarathonService = _window$marathonPlugi.MarathonService;
 	/* eslint-disable camelcase */
 
 	function showErrorDialog(title, message) {
@@ -747,8 +747,8 @@
 	    var _this = this;
 
 	    if (dialog.myid === "session-account-change") {
-	      Sieve.ajaxWrapper({
-	        url: config.apiURL + "hollow/account/next",
+	      MarathonService.request({
+	        resource: "hollow/account/next",
 	        method: "POST"
 	      }).error(function (error) {
 	        showErrorDialog("Erro ao trocar de conta", error.body.msg);
@@ -759,7 +759,7 @@
 	        });
 	        localStorage.setItem("auth_token", response.body.jwt_token);
 	      });
-	      Sieve.navigateTo("/#/apps");
+	      Bridge.navigateTo("/#/apps");
 	    }
 	  },
 
@@ -771,7 +771,7 @@
 	    var _this2 = this;
 
 	    /* eslint-disable no-unused-vars */
-	    Sieve.ajaxWrapper({ url: config.apiURL + "hollow/account/me", method: "GET" }).error(function (error) {
+	    MarathonService.request({ resource: "hollow/account/me", method: "GET" }).error(function (error) {
 	      /* Não temos muito o que fazer aqui. Se retornar erro,
 	       * já estamos deslogados e isso já é tratado por outra
 	       * parte desse plugin. E se estamos deslogados,
@@ -787,7 +787,7 @@
 	  },
 
 	  componentWillMount: function componentWillMount() {
-	    Sieve.DialogStore.on("DIALOG_EVENTS_ACCEPT_DIALOG", this.acceptChangeAccountDialog);
+	    Bridge.DialogStore.on("DIALOG_EVENTS_ACCEPT_DIALOG", this.acceptChangeAccountDialog);
 	    this.whoAmI();
 	  },
 
