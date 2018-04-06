@@ -67,7 +67,7 @@
 	    PipelineStore = _window$marathonPlugi.PipelineStore;
 
 
-	var VERSION = "0.3.0-rc1";
+	var VERSION = "0.3.0";
 
 	PluginHelper.registerMe();
 	_SessionCheckerAction2.default.init();
