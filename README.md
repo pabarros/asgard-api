@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.64.0
+  - Atualização do plugin session-checker-plugin para não usar mais o objeto Sieve (e sim o objeto Bridge)
+
 * 0.63.1
   - Correção para apps que tinham o nome contento a string `*versions/`. 
 
