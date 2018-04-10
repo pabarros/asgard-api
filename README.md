@@ -5,7 +5,8 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* 0.65.0-rc4
+* 0.65.0
+  - Passamos um objeto logger para todos os plugins que são carregados no boot;
   - Ajustamos o loglevel de todos os loggers a partir de uma envvar: `ASGARD_LOGLEVEL`;
 
 * 0.64.0
