@@ -5,6 +5,10 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.66.6
+  - Atualizando asgard-api-sdk==0.2.0
+  - Atualizando mesos-metrics-api==0.5.0
+
 * 0.65.0
   - Passamos um objeto logger para todos os plugins que são carregados no boot;
   - Ajustamos o loglevel de todos os loggers a partir de uma envvar: `ASGARD_LOGLEVEL`;
