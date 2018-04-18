@@ -191,9 +191,3 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
-
-insert into "user" (tx_name, tx_email, tx_authkey, bl_system) values ('Rafael Amorim', 'rafael@admatic.com.br', 'cccccchcdhjrtrgbtndbedljrectjhv', false);
-
-insert into account (name, namespace, owner) values ('asgard', 'asgard', 'asgard');
-
-insert into user_has_account values (1,1);

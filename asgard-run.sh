@@ -21,7 +21,7 @@ echo -n "Postgres (${POSTGRES_IP}) "
 docker run -d --rm -it --ip ${POSTGRES_IP} \
   --name asgard_pgsql \
   --net ${NETWORK_NAME} \
-  -v ${PWD}/scripts/init-db-config.sql:/docker-entrypoint-initdb.d/init-db-config.sql \
+  -v ${PWD}/scripts/sql/:/docker-entrypoint-initdb.d/:ro \
   postgres:9.4
 
 # ZK Cluster
