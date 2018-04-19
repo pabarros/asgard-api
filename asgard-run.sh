@@ -9,6 +9,8 @@ ZK_CLUSTER_IPS=${ZK_1_IP}:2181,${ZK_2_IP}:2181,${ZK_3_IP}:2181
 
 MESOS_MASTER_IP=172.18.0.11
 MESOS_SLAVE_IP=172.18.0.21
+MESOS_SLAVE_IPS_ACCOUNT_ASGARD_INFRA="172.18.0.51 172.18.0.52 172.18.0.53 172.18.0.54 172.18.0.55"
+MESOS_SLAVE_IPS_ACCOUNT_ASGARD_DEV="172.18.0.61 172.18.0.62 172.18.0.63 172.18.0.64 172.18.0.65"
 MARATHON_IP=172.18.0.31
 
 POSTGRES_IP=172.18.0.41
@@ -60,67 +62,6 @@ echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
 ) docker.sieve.com.br/infra/zookeeper:0.0.1
 
 
-## MESOS
-
-
-MESOS_QUORUM=1
-MESOS_IP=${MESOS_MASTER_IP}
-MESOS_WORK_DIR=/var/lib/mesos
-MESOS_HOSTNAME_LOOKUP=false
-MESOS_ZK=zk://${ZK_CLUSTER_IPS}/mesos
-#  volumes:
-#    - /var/lib/mesos/:/var/lib/mesos/:rw
-
-echo -n "Mesos Master (${MESOS_MASTER_IP}) "
-docker run -d --rm -it --ip ${MESOS_MASTER_IP} \
-  --name asgard_mesosmaster \
-  --net ${NETWORK_NAME} \
-  --env-file <(
-echo MESOS_QUORUM=${MESOS_QUORUM}
-echo MESOS_IP=${MESOS_IP}
-echo MESOS_WORK_DIR=${MESOS_WORK_DIR}
-echo MESOS_HOSTNAME_LOOKUP=${MESOS_HOSTNAME_LOOKUP}
-echo MESOS_ZK=${MESOS_ZK}
-) daltonmatos/mesos:0.0.3 /usr/sbin/mesos-master
-
-
-## MESOS SLAVE
-MESOS_IP=${MESOS_SLAVE_IP}
-LIBPROCESS_ADVERTISE_IP=${MESOS_SLAVE_IP}
-MESOS_ATTRIBUTES=";owner:sieve;mesos:slave;workload:general"
-MESOS_MASTER=zk://${ZK_CLUSTER_IPS}/mesos
-MESOS_EXECUTOR_REGISTRATION_TIMEOUT=5mins
-MESOS_CONTAINERIZERS=docker
-MESOS_HOSTNAME_LOOKUP=false
-MESOS_GC_DELAY=60mins
-MESOS_SWITCH_USER=false
-MESOS_SYSTEMD_ENABLE_SUPPORT=false
-MESOS_DOCKER_REMOVE_DELAY=30mins
-MESOS_DOCKER_STOP_TIMEOUT=1mins
-
-
-echo -n "Mesos Slave (${MESOS_SLAVE_IP}) "
-docker run -d --rm -it --ip ${MESOS_SLAVE_IP} \
-  --name asgard_mesosslave \
-  --net ${NETWORK_NAME} \
-  --env-file <(
-echo MESOS_IP=${MESOS_IP}
-echo LIBPROCESS_ADVERTISE_IP=${LIBPROCESS_ADVERTISE_IP}
-echo MESOS_ATTRIBUTES=${MESOS_ATTRIBUTES}
-echo MESOS_MASTER=${MESOS_MASTER}
-echo MESOS_EXECUTOR_REGISTRATION_TIMEOUT=${MESOS_EXECUTOR_REGISTRATION_TIMEOUT}
-echo MESOS_CONTAINERIZERS=${MESOS_CONTAINERIZERS}
-echo MESOS_HOSTNAME_LOOKUP=${MESOS_HOSTNAME_LOOKUP}
-echo MESOS_GC_DELAY=${MESOS_GC_DELAY}
-echo MESOS_SWITCH_USER=${MESOS_SWITCH_USER}
-echo MESOS_SYSTEMD_ENABLE_SUPPORT=${MESOS_SYSTEMD_ENABLE_SUPPORT}
-echo MESOS_DOCKER_REMOVE_DELAY=${MESOS_DOCKER_REMOVE_DELAY}
-echo MESOS_DOCKER_STOP_TIMEOUT=${MESOS_DOCKER_STOP_TIMEOUT}
-) \
-  -v /sys/fs/cgroup:/sys/fs/cgroup \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  daltonmatos/mesos:0.0.3
-
 ## MARATHON
 MARATHON_HOSTNAME=${MARATHON_IP}
 MESOS_IP=${MARATHON_IP}
@@ -165,8 +106,88 @@ echo MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=${MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN
 ) \
   mesosphere/marathon:v1.3.13 --enable_features gpu_resources
 
+
+## MESOS
+MESOS_QUORUM=1
+MESOS_IP=${MESOS_MASTER_IP}
+MESOS_WORK_DIR=/var/lib/mesos
+MESOS_HOSTNAME_LOOKUP=false
+MESOS_ZK=zk://${ZK_CLUSTER_IPS}/mesos
+#  volumes:
+#    - /var/lib/mesos/:/var/lib/mesos/:rw
+
+echo -n "Mesos Master (${MESOS_MASTER_IP}) "
+docker run -d --rm -it --ip ${MESOS_MASTER_IP} \
+  --name asgard_mesosmaster \
+  --net ${NETWORK_NAME} \
+  --env-file <(
+echo MESOS_QUORUM=${MESOS_QUORUM}
+echo MESOS_IP=${MESOS_IP}
+echo MESOS_WORK_DIR=${MESOS_WORK_DIR}
+echo MESOS_HOSTNAME_LOOKUP=${MESOS_HOSTNAME_LOOKUP}
+echo MESOS_ZK=${MESOS_ZK}
+) daltonmatos/mesos:0.0.3 /usr/sbin/mesos-master
+
+
+## MESOS SLAVE
+MESOS_IP=${MESOS_SLAVE_IP}
+LIBPROCESS_ADVERTISE_IP=${MESOS_SLAVE_IP}
+MESOS_ATTRIBUTES=";mesos:slave;workload:general"
+MESOS_MASTER=zk://${ZK_CLUSTER_IPS}/mesos
+MESOS_EXECUTOR_REGISTRATION_TIMEOUT=5mins
+MESOS_CONTAINERIZERS=docker
+MESOS_HOSTNAME_LOOKUP=false
+MESOS_GC_DELAY=60mins
+MESOS_SWITCH_USER=false
+MESOS_SYSTEMD_ENABLE_SUPPORT=false
+MESOS_DOCKER_REMOVE_DELAY=30mins
+MESOS_DOCKER_STOP_TIMEOUT=1mins
+
+
+for SLAVE_IP in `echo ${MESOS_SLAVE_IPS_ACCOUNT_ASGARD_INFRA}`;
+do
+    echo -n "Mesos Slave (namespace=asgard-infra (${SLAVE_IP}) "
+    docker run -d --rm -it --ip ${SLAVE_IP} \
+      --name asgard_mesosslave_${RANDOM} \
+      --net ${NETWORK_NAME} \
+      --env-file <(
+    echo MESOS_IP=${SLAVE_IP}
+    echo LIBPROCESS_ADVERTISE_IP=${SLAVE_IP}
+    echo MESOS_ATTRIBUTES="${MESOS_ATTRIBUTES};owner:asgard-infra"
+    echo MESOS_MASTER=${MESOS_MASTER}
+    ) \
+      -v /sys/fs/cgroup:/sys/fs/cgroup \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(dirname $(readlink --canonicalize ${0}))/scripts/docker.tar.bz2:/etc/docker.tar.bz2 \
+      daltonmatos/mesos:0.0.3
+done
+
+for SLAVE_IP in `echo ${MESOS_SLAVE_IPS_ACCOUNT_ASGARD_DEV}`;
+do
+    echo -n "Mesos Slave (namespace=asgard-dev (${SLAVE_IP}) "
+    docker run -d --rm -it --ip ${SLAVE_IP} \
+      --name asgard_mesosslave_${RANDOM} \
+      --net ${NETWORK_NAME} \
+      --env-file <(
+    echo MESOS_IP=${SLAVE_IP}
+    echo LIBPROCESS_ADVERTISE_IP=${SLAVE_IP}
+    echo MESOS_ATTRIBUTES="${MESOS_ATTRIBUTES};owner:asgard-dev"
+    echo MESOS_MASTER=${MESOS_MASTER}
+    ) \
+      -v /sys/fs/cgroup:/sys/fs/cgroup \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(dirname $(readlink --canonicalize ${0}))/scripts/docker.tar.bz2:/etc/docker.tar.bz2 \
+      daltonmatos/mesos:0.0.3
+done
+
 #CREATE INITIAL GROUP
-#curl -X POST -d '{"id": "/asgard"}' http://${MARATHON_IP}:8080/v2/groups
+echo "Creating initial groups. Waiting for Marathon to come up..."
+while true; do
+  curl -s -X PUT -d '{"id": "/", "groups": [{"id": "/asgard-dev"}, {"id": "/asgard-infra"}]}' http://${MARATHON_IP}:8080/v2/groups
+  if [ $? -eq 0 ]; then
+    break;
+  fi
+done
 
 echo "Pressione ENTER para desligar o ambiente"
 echo "ATENÇÃO: Todos os dados serão perdidos"
