@@ -5,7 +5,11 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* 0.66.6
+* 0.67.0
+  - Uso do `get_option` da asgard-api-sdk;
+  - Melhoria no ambiente de dev. Agora temos toda a infra completa, com PgSQL com múltiplas contas.
+
+* 0.66.0
   - Atualizando asgard-api-sdk==0.2.0
   - Atualizando mesos-metrics-api==0.5.0
 
