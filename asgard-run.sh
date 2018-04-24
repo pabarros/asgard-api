@@ -15,7 +15,7 @@ MARATHON_IP=172.18.0.31
 
 POSTGRES_IP=172.18.0.41
 
-docker network create --subnet 172.18.0.0/16 asgard
+docker network create --subnet 172.18.0.0/16 ${NETWORK_NAME}
 
 #Postgres
 
@@ -104,7 +104,9 @@ echo JAVA_OPTS=${JAVA_OPTS}
 #echo #MARATHON_HTTP_CREDENTIALS=${MARATHON_HTTP_CREDENTIALS}
 echo MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=${MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN}
 ) \
-  mesosphere/marathon:v1.3.13 --enable_features gpu_resources
+  mesosphere/marathon:v1.3.13 --enable_features gpu_resources --mesos_role asgard
+
+#--default_accepted_resource_roles asgard
 
 
 ## MESOS
@@ -131,6 +133,7 @@ echo MESOS_ZK=${MESOS_ZK}
 
 ## MESOS SLAVE
 MESOS_ATTRIBUTES=";mesos:slave;workload:general"
+MESOS_RESOURCES="cpus(*):4;mem(*):4096;ports(*):[31000-31999];cpus(asgard):1;mem(asgard):1024;ports(asgard):[30000-30999]"
 MESOS_MASTER=zk://${ZK_CLUSTER_IPS}/mesos
 
 for SLAVE_IP in `echo ${MESOS_SLAVE_IPS_ACCOUNT_ASGARD_INFRA}`;
@@ -144,6 +147,7 @@ do
     echo LIBPROCESS_ADVERTISE_IP=${SLAVE_IP}
     echo MESOS_ATTRIBUTES="${MESOS_ATTRIBUTES};owner:asgard-infra"
     echo MESOS_MASTER=${MESOS_MASTER}
+    echo MESOS_RESOURCES=${MESOS_RESOURCES}
     ) \
       -v /sys/fs/cgroup:/sys/fs/cgroup \
       -v /var/run/docker.sock:/var/run/docker.sock \
@@ -162,6 +166,7 @@ do
     echo LIBPROCESS_ADVERTISE_IP=${SLAVE_IP}
     echo MESOS_ATTRIBUTES="${MESOS_ATTRIBUTES};owner:asgard-dev"
     echo MESOS_MASTER=${MESOS_MASTER}
+    echo MESOS_RESOURCES=${MESOS_RESOURCES}
     ) \
       -v /sys/fs/cgroup:/sys/fs/cgroup \
       -v /var/run/docker.sock:/var/run/docker.sock \
