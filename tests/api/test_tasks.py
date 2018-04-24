@@ -212,3 +212,24 @@ class TasksEndpointTest(BaseApiTests, unittest.TestCase):
                 resp_data = json.loads(resp.data)
                 self.assertEquals(404, resp.status_code)
 
+    def test_download_by_id_expired(self):
+        """
+        Se o ID não existir mais no cache, retornamos 404
+        """
+        self.fail()
+
+    def test_download_by_id_task_does_not_exist(self):
+        """
+        Se a task não existir mais, provavelmente o mesos não
+        vai retornar valores de path, sandbox e etc.
+
+        Validar isso e retornar 404 também.
+        """
+        self.fail()
+
+    def test_download_by_id_task_running(self):
+        """
+        Retornamos o arquivo desejado
+        """
+        self.fail()
+

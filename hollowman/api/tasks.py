@@ -89,3 +89,7 @@ def task_files_download(task_id, user):
 
     return Response(response=files_info.iter_content(chunk_size=4096), status=200, headers={"Content-Disposition":  f"attachment; filename={filename}",
                                                                              "Content-Type": "application/octet-stream"})
+
+@tasks_blueprint.route("/downloads/<string:download_id>")
+def download_by_id(download_id):
+    return Response()
