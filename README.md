@@ -7,6 +7,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 * -next
   - Criação de um cache client. Cache client não dá raise caso o redis esteja fora do ar. 
+  - Criação dos endpoints para download de arquivos de uma task
 
 * 0.67.0
   - Uso do `get_option` da asgard-api-sdk;
