@@ -5,7 +5,7 @@ marathon.models.base.ID_PATTERN = re.compile('.*')
 from marathon.models.group import MarathonGroup
 
 
-class SieveAppGroup():
+class AsgardAppGroup():
 
     def __init__(self, wrapped_group=MarathonGroup()):
         self._marathon_group = wrapped_group
@@ -38,4 +38,4 @@ class SieveAppGroup():
 
     @classmethod
     def from_json(cls, *args, **kwargs):
-        return SieveAppGroup(MarathonGroup.from_json(*args, **kwargs))
+        return AsgardAppGroup(MarathonGroup.from_json(*args, **kwargs))

@@ -2,7 +2,6 @@ import json
 import unittest
 from copy import deepcopy
 from http import HTTPStatus
-from unittest import TestCase
 from unittest.mock import patch, Mock, call
 
 from marathon import NotFoundError, MarathonApp
@@ -14,8 +13,8 @@ from responses import RequestsMock
 from hollowman import conf
 from hollowman.app import application
 from hollowman.http_wrappers import Response
-from hollowman.marathonapp import SieveMarathonApp
-from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathonapp import AsgardApp
+from hollowman.marathon.group import AsgardAppGroup
 from hollowman.models import User, Account
 
 from tests.utils import with_json_fixture, get_fixture
@@ -55,14 +54,14 @@ class SplitTests(unittest.TestCase):
             response = Response(ctx.request, flask_response)
 
             with patch.object(response, 'marathon_client') as client:
-                client.get_app.return_value = SieveMarathonApp.from_json(fixture)
+                client.get_app.return_value = AsgardApp.from_json(fixture)
                 apps = list(response.split())
                 self.assertEqual([call("/foo")], client.get_app.call_args_list)
 
             self.assertEqual(
                 apps,
                 [
-                    (SieveMarathonApp.from_json(fixture), client.get_app.return_value)
+                    (AsgardApp.from_json(fixture), client.get_app.return_value)
                 ])
 
     @with_json_fixture('single_full_app.json')
@@ -87,8 +86,8 @@ class SplitTests(unittest.TestCase):
         self.assertEqual(
             apps,
             [
-                (SieveMarathonApp.from_json(fixture), original_apps[0]),
-                (SieveMarathonApp.from_json(modified_app), original_apps[1])
+                (AsgardApp.from_json(fixture), original_apps[0]),
+                (AsgardApp.from_json(modified_app), original_apps[1])
             ]
         )
 
@@ -133,7 +132,7 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(5, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture)).iterate_groups()]
+                expected_groups = [AsgardAppGroup(g) for g in AsgardAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture)).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
@@ -153,8 +152,8 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(1, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g)
-                                   for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][2])).iterate_groups()]
+                expected_groups = [AsgardAppGroup(g)
+                                   for g in AsgardAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][2])).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
@@ -180,7 +179,7 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(2, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])).iterate_groups()]
+                expected_groups = [AsgardAppGroup(g) for g in AsgardAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
@@ -292,7 +291,7 @@ class JoinTests(unittest.TestCase):
             response = Response(ctx.request, response)
 
         with patch.object(response, 'marathon_client') as client:
-            client.get_app.return_value = SieveMarathonApp.from_json(deepcopy(fixture))
+            client.get_app.return_value = AsgardApp.from_json(deepcopy(fixture))
             apps = list(response.split())
 
             joined_response = response.join(apps)
@@ -315,7 +314,7 @@ class JoinTests(unittest.TestCase):
             response = Response(ctx.request, response)
 
         with patch.object(response, 'marathon_client') as client:
-            original_apps = [SieveMarathonApp.from_json(app) for app in fixtures]
+            original_apps = [AsgardApp.from_json(app) for app in fixtures]
             client.get_app.side_effect = original_apps
             apps = list(response.split())
 

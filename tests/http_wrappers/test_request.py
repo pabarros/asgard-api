@@ -13,8 +13,8 @@ from hollowman.app import application
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.request import Request
 from hollowman.models import User, Account
-from hollowman.marathon.group import SieveAppGroup
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathon.group import AsgardAppGroup
+from hollowman.marathonapp import AsgardApp
 
 from tests.utils import with_json_fixture, get_fixture
 
@@ -82,7 +82,7 @@ class SplitTests(TestCase):
             self.assertEqual(
                 apps,
                 [
-                    (SieveMarathonApp.from_json(fixture), MarathonApp.from_json({"id": "/dev/foo"}))
+                    (AsgardApp.from_json(fixture), MarathonApp.from_json({"id": "/dev/foo"}))
                 ]
             )
 
@@ -587,8 +587,8 @@ class GetOriginalGroupTest(TestCase):
                 request = Request(ctx.request)
 
                 group = request._get_original_group(self.user, "/foo")
-                self.assertTrue(isinstance(group, SieveAppGroup))
-                self.assertEqual(SieveAppGroup.from_json(found_group), group)
+                self.assertTrue(isinstance(group, AsgardAppGroup))
+                self.assertEqual(AsgardAppGroup.from_json(found_group), group)
 
     def test_get_original_group_not_found(self):
         """
@@ -602,7 +602,7 @@ class GetOriginalGroupTest(TestCase):
                 request = Request(ctx.request)
 
                 group = request._get_original_group(self.user, "/not-found")
-                self.assertEqual(SieveAppGroup(MarathonGroup.from_json({"id": "/dev/not-found"})), group)
+                self.assertEqual(AsgardAppGroup(MarathonGroup.from_json({"id": "/dev/not-found"})), group)
 
 class RequestWrapperTest(TestCase):
 

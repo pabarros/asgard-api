@@ -1,5 +1,5 @@
 
-from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathon.group import AsgardAppGroup
 from marathon.models.group import MarathonGroup
 from marathon.client import MarathonClient
 from marathon.util import MarathonJsonEncoder
@@ -17,7 +17,7 @@ def _patch_docker_params(params):
                 v = parts[0] + "=" + "/sieve" + parts[1]
                 p[k] = v
 
-_group = SieveAppGroup(MarathonGroup.from_json(json.loads(sys.stdin.read())))
+_group = AsgardAppGroup(MarathonGroup.from_json(json.loads(sys.stdin.read())))
 
 for group in _group.iterate_groups():
     group.id = "/sieve{}".format(group.id)

@@ -15,7 +15,7 @@ from http import HTTPStatus
 
 from hollowman.app import application
 from hollowman.models import Account, User
-from hollowman.marathonapp import SieveMarathonApp
+from hollowman.marathonapp import AsgardApp
 from hollowman.filters.namespace import NameSpaceFilter
 from hollowman.http_wrappers.response import Response
 from tests.utils import with_json_fixture
@@ -25,8 +25,8 @@ class TestNamespaceFilter(unittest.TestCase):
     @with_json_fixture("single_full_app.json")
     def setUp(self, single_full_app_fixture):
         self.filter = NameSpaceFilter()
-        self.request_app = SieveMarathonApp.from_json(single_full_app_fixture)
-        self.original_app = SieveMarathonApp.from_json(single_full_app_fixture)
+        self.request_app = AsgardApp.from_json(single_full_app_fixture)
+        self.original_app = AsgardApp.from_json(single_full_app_fixture)
         self.account = Account(name="Dev Account", namespace="dev", owner="company")
         self.user = User(tx_email="user@host.com.br")
         self.user.current_account = self.account
@@ -51,7 +51,7 @@ class TestNamespaceFilter(unittest.TestCase):
         """
         Para novas apps, sempre vamos adicionar o prefixo.
         """
-        modified_app = self.filter.write(self.user, self.request_app, SieveMarathonApp())
+        modified_app = self.filter.write(self.user, self.request_app, AsgardApp())
         self.assertEqual("/dev/foo", modified_app.id)
 
     @with_json_fixture("../fixtures/tasks/get.json")
@@ -82,7 +82,7 @@ class TestNamespaceFilter(unittest.TestCase):
         """
         Uma app com id = "/<namespace>/some/other/path/<namespace>/other/app" deve ter apenas a primeira ocorrência de "/<namespace>" removida.
         """
-        response_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        response_app = original_app = AsgardApp.from_json(single_full_app_with_tasks_fixture)
         response_app.id = "/dev/some/other/path/dev/other/app"
 
         modified_app = self.filter.response(self.user, response_app, original_app)
@@ -90,7 +90,7 @@ class TestNamespaceFilter(unittest.TestCase):
 
     @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
     def test_response_apps_remove_namespace_from_all_tasks(self, single_full_app_with_tasks_fixture):
-        request_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        request_app = original_app = AsgardApp.from_json(single_full_app_with_tasks_fixture)
 
         self.assertEqual(3, len(request_app.tasks))
         modified_app = self.filter.response(self.user, request_app, original_app)
@@ -105,7 +105,7 @@ class TestNamespaceFilter(unittest.TestCase):
 
     @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
     def test_response_apps_remove_namespace_from_all_tasks_empty_task_list(self, single_full_app_with_tasks_fixture):
-        request_app = original_app = SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        request_app = original_app = AsgardApp.from_json(single_full_app_with_tasks_fixture)
         request_app.id = "/dev/foo"
         request_app.tasks = []
         original_app.id = "/dev/foo"
@@ -117,7 +117,7 @@ class TestNamespaceFilter(unittest.TestCase):
 
     @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
     def test_response_apps_returns_none_if_outside_current_namespace(self, single_full_app_with_tasks_fixture):
-        request_app = original_app =SieveMarathonApp.from_json(single_full_app_with_tasks_fixture)
+        request_app = original_app =AsgardApp.from_json(single_full_app_with_tasks_fixture)
         request_app.id = original_app.id = "/othernamespace/foo"
 
         self.assertIsNone(self.filter.response(self.user, request_app, original_app))
