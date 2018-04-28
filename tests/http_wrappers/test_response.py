@@ -2,7 +2,6 @@ import json
 import unittest
 from copy import deepcopy
 from http import HTTPStatus
-from unittest import TestCase
 from unittest.mock import patch, Mock, call
 
 from marathon import NotFoundError, MarathonApp
@@ -15,7 +14,7 @@ from hollowman import conf
 from hollowman.app import application
 from hollowman.http_wrappers import Response
 from hollowman.marathonapp import AsgardApp
-from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathon.group import AsgardAppGroup
 from hollowman.models import User, Account
 
 from tests.utils import with_json_fixture, get_fixture
@@ -133,7 +132,7 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(5, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture)).iterate_groups()]
+                expected_groups = [AsgardAppGroup(g) for g in AsgardAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture)).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
@@ -153,8 +152,8 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(1, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g)
-                                   for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][2])).iterate_groups()]
+                expected_groups = [AsgardAppGroup(g)
+                                   for g in AsgardAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][2])).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
@@ -180,7 +179,7 @@ class SplitTests(unittest.TestCase):
                 response = Response(ctx.request, response)
                 groups_tuple = list(response.split())
                 self.assertEqual(2, len(groups_tuple))
-                expected_groups = [SieveAppGroup(g) for g in SieveAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])).iterate_groups()]
+                expected_groups = [AsgardAppGroup(g) for g in AsgardAppGroup(MarathonGroup.from_json(group_dev_namespace_fixture['groups'][1])).iterate_groups()]
                 # Compara com os groups originais
                 self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 

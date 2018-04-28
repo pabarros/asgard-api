@@ -8,7 +8,7 @@ from marathon.models.task import MarathonTask
 
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
-from hollowman.marathon.group import SieveAppGroup
+from hollowman.marathon.group import AsgardAppGroup
 from hollowman.marathonapp import AsgardApp
 
 
