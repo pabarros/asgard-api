@@ -5,7 +5,7 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-* -next
+* 0.68.0
   - Criação de um cache client. Cache client não dá raise caso o redis esteja fora do ar. 
   - Criação dos endpoints para download de arquivos de uma task
 
