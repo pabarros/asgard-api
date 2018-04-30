@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+* 0.68.1
+  - Gerando versão correta. A 0.68.0 foi gerada errado.
+
 * 0.68.0
   - Criação de um cache client. Cache client não dá raise caso o redis esteja fora do ar. 
   - Criação dos endpoints para download de arquivos de uma task
