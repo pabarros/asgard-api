@@ -2,10 +2,12 @@
 import json
 import requests
 from http import HTTPStatus
+from uuid import uuid4
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, redirect, request, url_for
 from hollowman.decorators import auth_required
 from hollowman.conf import MESOS_ADDRESSES
+from hollowman import cache
 
 tasks_blueprint = Blueprint(__name__, __name__)
 
@@ -80,12 +82,32 @@ def task_files_download(task_id, user):
     offset = request.args.get("offset", 0)
     length = request.args.get("length", 1024)
     path = request.args.get("path", "")
-    files_info = requests.get(f"http://{slave_ip}:5051/files/download?path={sandbox_directory}{path}", stream=True)
+    file_final_url = f"http://{slave_ip}:5051/files/download?path={sandbox_directory}{path}"
+    download_id = uuid4().hex
+    cache.set(f"downloads/{download_id}", {
+        'file_url': file_final_url,
+        'task_id': task_id,
+        'file_path': path
+    }, timeout=30) 
+    download_id_url = url_for('hollowman.api.tasks.download_by_id', download_id=download_id) 
+    return Response(response=json.dumps({'download_url': download_id_url.strip("/")}), status=HTTPStatus.OK)
 
-    if files_info.status_code == HTTPStatus.NOT_FOUND:
-        return Response(response=json.dumps({}), status=404)
+@tasks_blueprint.route("/downloads/<string:download_id>")
+def download_by_id(download_id):
+    file_data = cache.get(f"downloads/{download_id}")
+    if not file_data:
+        return Response(status=HTTPStatus.NOT_FOUND)
 
-    filename = f"{task_id}_{path.strip('/')}.log"
+    file_url = file_data['file_url']
+    task_id = file_data['task_id']
+    file_path = file_data['file_path']
 
-    return Response(response=files_info.iter_content(chunk_size=4096), status=200, headers={"Content-Disposition":  f"attachment; filename={filename}",
-                                                                             "Content-Type": "application/octet-stream"})
+    response = requests.get(file_url, stream=True)
+
+    if response.status_code == HTTPStatus.NOT_FOUND:
+        return Response(response=json.dumps({}), status=HTTPStatus.NOT_FOUND)
+
+    filename = f"{task_id}_{file_path.strip('/')}.log"
+
+    return Response(response=response.iter_content(chunk_size=4096), status=200, headers={"Content-Disposition":  f"attachment; filename={filename}",
+                                                                                            "Content-Type": "application/octet-stream"})
