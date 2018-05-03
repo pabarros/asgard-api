@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+# Porque não fizemos isso aqui com docker-commpose?
+# 1. Existem inúmeras variaveias compartilhadas, por exmeplo, o IP dos ZKs.
+# Fazendo isso com compose teríamos que repetir esses valores para todos os compose-files que precisassem deles,
+# 2. Existem variáveis compostas por valores de outras variáveis e não podemos fazer essa composição em um envfile; Por isso não usamos envfile.
+# 3. Não é possivel passar um envfile pro docker-compose, apenas dentro do compose-file. Se pudéssemos passar até seria pssível
+# criar um grande arquivo de env e passar para todas as chamadas do compose.
+
 # VARIAVEIS COMUNS A TODOS OS PROCESSOS
 NETWORK_NAME="asgard"
 ZK_1_IP=172.18.0.2
