@@ -23,7 +23,12 @@ MARATHON_IP=172.18.0.31
 
 POSTGRES_IP=172.18.0.41
 
+echo "Removing any old containers..."
+docker rm -f $(docker ps -aq -f name=asgard_)
+echo "Recreating network=${NETWORK_NAME}"
+docker network rm ${NETWORK_NAME}
 docker network create --subnet 172.18.0.0/16 ${NETWORK_NAME}
+sleep 2
 
 #Postgres
 
@@ -191,7 +196,3 @@ while true; do
   fi
 done
 
-echo "Pressione ENTER para desligar o ambiente"
-echo "ATENÇÃO: Todos os dados serão perdidos"
-read
-docker rm -f $(docker ps -aq -f name=asgard_)
