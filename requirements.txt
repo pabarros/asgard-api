@@ -16,4 +16,4 @@ sqlalchemy==1.1.13
 #Asgard API SDK
 asgard-api-sdk==0.2.0
 # Asgard API Plugins
-asgard-api-plugin-metrics-mesos==0.5.0
+asgard-api-plugin-metrics-mesos==0.6.0-rc2
