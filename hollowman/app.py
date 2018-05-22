@@ -60,6 +60,7 @@ def after_request(response):
             "user": (hasattr(request, "user") and request.user.tx_email) or None,
             "account_id": (hasattr(request, "user") and request.user.current_account.id) or None,
             "location": response.headers.get("Location"),
+            "user-agent": request.headers.get("User-Agent"),
             "qstring": request.args,
             "error": _get_current_exception_if_exists(request)
         }
