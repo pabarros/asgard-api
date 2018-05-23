@@ -1,4 +1,5 @@
 
+import os
 from hollowman.marathonapp import AsgardApp
 
 NET_BRIDGE = "BRIDGE"
@@ -7,12 +8,12 @@ class TransformJSONFilter:
     name = "transfomrjson"
 
     def write(self, user, request_app, original_app):
-        if self._is_new_format(request_app):
+        if self._is_new_format(request_app) and self._is_env_enabled():
             return self._transform_to_old_format(request_app)
         return request_app
 
     def response(self, user, response_app, original_app):
-        if self._is_old_format(response_app):
+        if self._is_old_format(response_app) and self._is_env_enabled():
             return self._transform_to_new_format(response_app)
         return response_app
 
@@ -42,3 +43,6 @@ class TransformJSONFilter:
         app.container.docker.port_mappings = app.container.port_mappings
         del app.container.port_mappings
         return app
+
+    def _is_env_enabled(self):
+        return os.getenv("ASGARD_FILTER_TRANSFORMJSON_ENABLED", "0") == "1"

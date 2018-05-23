@@ -1,4 +1,7 @@
+import os
+
 import unittest
+from unittest import mock
 
 from hollowman.filters.transformjson import TransformJSONFilter
 from hollowman.marathonapp import AsgardApp
@@ -9,6 +12,12 @@ class TransformJSONTest(unittest.TestCase):
 
     def setUp(self):
         self.filter = TransformJSONFilter()
+        self.env_patcher = mock.patch.dict(os.environ, ASGARD_FILTER_TRANSFORMJSON_ENABLED="1")
+        self.env_patcher.start()
+
+    def tearDown(self):
+        self.env_patcher.stop()
+
 
     @with_json_fixture("../fixtures/filters/app-json-new-format.json")
     def test_is_json_new_format_has_only_networks(self, app_json_new_format):
@@ -41,7 +50,7 @@ class TransformJSONTest(unittest.TestCase):
         request_app = AsgardApp.from_json(app_json_new_format)
         original_app = AsgardApp.from_json(app_json_new_format)
         filtered_app = self.filter.write(None, request_app, original_app)
-        
+
         self.assertEqual(filtered_app.container.docker.network, "BRIDGE")
         self.assertTrue(filtered_app.container.docker.port_mappings)
         self.assertEqual(app_json_new_format['container']['portMappings'][0], filtered_app.container.docker.port_mappings[0].json_repr())
@@ -58,7 +67,7 @@ class TransformJSONTest(unittest.TestCase):
         request_app = AsgardApp.from_json(app_json_new_format)
         original_app = AsgardApp.from_json(app_json_new_format)
         filtered_app = self.filter.write(None, request_app, original_app)
-        
+
         self.assertEqual(filtered_app.container.docker.network, "HOST")
         self.assertTrue(filtered_app.container.docker.port_mappings)
         self.assertEqual(app_json_new_format['container']['portMappings'][0], filtered_app.container.docker.port_mappings[0].json_repr())
@@ -128,4 +137,29 @@ class TransformJSONTest(unittest.TestCase):
         expected_port_mappings = full_app_old_format['container']['docker']['portMappings']
         self.assertEqual(len(expected_port_mappings), len(filtered_app.container.port_mappings))
         self.assertEqual(expected_port_mappings[0], filtered_app.container.port_mappings[0].json_repr())
+
+    @with_json_fixture("../fixtures/filters/app-json-new-format.json")
+    @with_json_fixture("../fixtures/single_full_app.json")
+    def test_noop_if_env_is_disabled(self, app_json_new_format, app_json_old_format):
+        """
+        O filtro nao deve rodar se a env ASGARD_FILTER_TRANSFORMJSON_ENABLED=0
+        """
+        with mock.patch.dict(os.environ, ASGARD_FILTER_TRANSFORMJSON_ENABLED="0"):
+            asgard_app_new_format = AsgardApp.from_json(app_json_new_format)
+            asgard_app_old_format = AsgardApp.from_json(app_json_old_format)
+
+            filterd_before_upstream_request = self.filter.write(None, asgard_app_new_format, asgard_app_new_format)
+            filterd_before_response_to_client = self.filter.response(None, asgard_app_old_format, asgard_app_old_format)
+
+            # Não convertemos a App para formato velho
+            self.assertEqual(filterd_before_upstream_request.networks, app_json_new_format['networks'])
+            self.assertEqual(filterd_before_upstream_request.container.port_mappings[0].json_repr(), app_json_new_format['container']['portMappings'][0])
+            self.assertFalse(hasattr(filterd_before_upstream_request.container.docker, "network"))
+            self.assertFalse(filterd_before_upstream_request.container.docker.port_mappings)
+
+            # Não convertemos a app para o formato novo
+            self.assertFalse(filterd_before_response_to_client.networks)
+            self.assertFalse(hasattr(filterd_before_response_to_client.container, "port_mappings"))
+            self.assertEqual(filterd_before_response_to_client.container.docker.network, app_json_old_format['container']['docker']['network'])
+            self.assertEqual(filterd_before_response_to_client.container.docker.port_mappings[0].json_repr(), app_json_old_format['container']['docker']['portMappings'][0])
 
