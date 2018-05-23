@@ -7,18 +7,38 @@ class TransformJSONFilter:
     name = "transfomrjson"
 
     def write(self, user, request_app, original_app):
-        return self._transform_to_new_format(request_app)
+        if self._is_new_format(request_app):
+            return self._transform_to_old_format(request_app)
+        return request_app
 
     def response(self, user, response_app, original_app):
-        return self._transform_to_new_format(response_app)
+        if self._is_old_format(response_app):
+            return self._transform_to_new_format(response_app)
+        return response_app
+
+    def _is_old_format(self, app: AsgardApp):
+        return not self._is_new_format(app)
 
     def _is_new_format(self, app: AsgardApp):
         return app.networks or hasattr(app.container, "port_mappings")
 
     def _transform_to_new_format(self, app: AsgardApp):
         if app.container.docker.network.lower() == NET_BRIDGE.lower():
-            app.networks = [{"name": "container/bridge"}]
-            del app.container.docker.network
+            app.networks = [{"mode": "container/bridge"}]
+        else:
+            app.networks = [{"mode": "host"}]
+
+        del app.container.docker.network
         app.container.port_mappings = app.container.docker.port_mappings
         return app
 
+    def _transform_to_old_format(self, app: AsgardApp):
+        if app.networks[0]['mode'] == "container/bridge":
+            app.container.docker.network = "BRIDGE"
+        else:
+            app.container.docker.network = "HOST"
+
+        del app.networks
+        app.container.docker.port_mappings = app.container.port_mappings
+        del app.container.port_mappings
+        return app
