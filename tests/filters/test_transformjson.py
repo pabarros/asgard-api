@@ -33,39 +33,59 @@ class TransformJSONTest(unittest.TestCase):
         asgard_app = AsgardApp.from_json(single_full_app_fixture)
         self.assertFalse(self.filter._is_new_format(asgard_app))
 
-    def test_transform_json_network_already_new_format_before_upstream_request(self):
+    def test_transform_json_network_already_new_format_before_upstream_request(self, app_json_new_format):
         """
-        Não fazemos nada se o JSON já estiver no formato novo, ou seja, com a chave `networks` (na raiz).
+        Não fazemos nada se o JSON a App já estiver no formato novo.
+        Especificamente nesse teste a App possui o `networks` mas não possui o `container.portMappings`
         """
         self.fail()
 
-    def test_transform_json_change_network_before_upstream_request(self):
-        """
-        Movemos o dict de `container.docker.network` para `netowks`
-        """
+    def test_transform_json_change_network_before_upstream_request(self, full_app_old_format):
         self.fail()
 
     def test_transform_json_change_port_mappings_already_new_format_before_upstream_request(self):
         """
-        Não fazemos nada se o JSON já possui a key `container.portMappings`
+        Não fazemos nada se o JSON a App já estiver no formato novo.
         """
         self.fail()
 
-    def test_transform_json_change_port_mappings_before_upstream_request(self):
-        """
-        Movemos `container.docker.portMappings` para `container.portMappings`
-        """
+    def test_transform_json_change_port_mappings_before_upstream_request(self, full_app_old_format):
         self.fail()
 
     def test_transform_json_change_network_already_new_format_before_response_to_client(self):
         self.fail()
 
-    def test_transform_json_change_network_before_response_to_client(self):
-        self.fail()
+    @with_json_fixture("../fixtures/single_full_app.json")
+    def test_transform_json_to_new_format_change_network_before_response_to_client(self, full_app_old_format):
+        """
+        Movemos o dict de `container.docker.network` para `netowks`
+        """
+        del full_app_old_format['container']['docker']['portMappings']
+        request_app = AsgardApp.from_json(full_app_old_format)
+        original_app = AsgardApp.from_json(full_app_old_format)
+
+        filtered_app = self.filter.write(None, request_app, original_app)
+        self.assertTrue(filtered_app.networks)
+        self.assertEqual(1, len(filtered_app.networks))
+        self.assertEqual("container/bridge", filtered_app.networks[0]['name'])
 
     def test_transform_json_change_port_mappings_already_new_format_before_response_to_client(self):
         self.fail()
 
-    def test_transform_json_change_port_mappings_before_response_to_client(self):
-        self.fail()
+    @with_json_fixture("../fixtures/single_full_app.json")
+    def test_transform_json_to_new_format_change_port_mappings_before_response_to_client(self, full_app_old_format):
+        """
+        Movemos `container.docker.portMappings` para `container.portMappings`
+        Especificamente nesse teste a App possui `container.portMappings`
+        """
+        request_app = AsgardApp.from_json(full_app_old_format)
+        original_app = AsgardApp.from_json(full_app_old_format)
+
+        self.assertFalse(hasattr(request_app.container, "port_mappings"))
+        filtered_app = self.filter.response(None, request_app, original_app)
+
+        self.assertTrue(filtered_app.container.port_mappings)
+        expected_port_mappings = full_app_old_format['container']['docker']['portMappings']
+        self.assertEqual(len(expected_port_mappings), len(filtered_app.container.port_mappings))
+        self.assertEqual(expected_port_mappings[0], filtered_app.container.port_mappings[0].json_repr())
 
