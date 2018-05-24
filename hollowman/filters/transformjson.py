@@ -40,8 +40,13 @@ class TransformJSONFilter:
             app.container.docker.network = "HOST"
 
         del app.networks
-        app.container.docker.port_mappings = app.container.port_mappings
-        del app.container.port_mappings
+
+        app.container.docker.port_mappings = getattr(app.container, "port_mappings", None)
+        try:
+            del app.container.port_mappings
+        except Exception as e:
+            pass
+
         return app
 
     def _is_env_enabled(self):

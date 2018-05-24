@@ -75,6 +75,18 @@ class TransformJSONTest(unittest.TestCase):
         self.assertFalse(hasattr(filtered_app.container, "port_mappings"))
         self.assertFalse(hasattr(filtered_app, "networks"))
 
+    @with_json_fixture("../fixtures/filters/app-json-new-format.json")
+    def test_transform_json_before_upstream_absent_port_mappings(self, app_json_new_format):
+        del app_json_new_format['container']['portMappings']
+        request_app = AsgardApp.from_json(app_json_new_format)
+        original_app = AsgardApp.from_json(app_json_new_format)
+        filtered_app = self.filter.write(None, request_app, original_app)
+
+        self.assertIsNone(filtered_app.container.docker.port_mappings)
+
+        self.assertFalse(hasattr(filtered_app.container, "port_mappings"))
+        self.assertFalse(hasattr(filtered_app, "networks"))
+
     @with_json_fixture("../fixtures/single_full_app.json")
     def test_transform_json_to_new_format_change_network_before_response_to_client(self, full_app_old_format):
         """
