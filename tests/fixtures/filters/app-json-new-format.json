@@ -1,0 +1,90 @@
+{
+      "tasks" : [],
+      "backoffSeconds" : 1,
+      "gpus" : 0,
+      "labels" : {},
+      "requirePorts" : false,
+      "tasksHealthy" : 0,
+      "disk" : 0,
+      "cmd" : "sleep 1000",
+      "id" : "/asgard-dev/alpine",
+      "deployments" : [],
+      "tasksUnhealthy" : 0,
+      "executor" : "",
+      "networks" : [
+         {
+            "mode" : "container/bridge"
+         }
+      ],
+      "tasksRunning" : 0,
+      "version" : "2018-05-23T14:55:57.260Z",
+      "versionInfo" : {
+         "lastScalingAt" : "2018-05-23T14:55:57.260Z",
+         "lastConfigChangeAt" : "2018-05-23T14:55:57.260Z"
+      },
+      "maxLaunchDelaySeconds" : 3600,
+      "instances" : 0,
+      "container" : {
+         "portMappings" : [
+            {
+               "containerPort" : 0,
+               "servicePort" : 10000,
+               "name" : "default",
+               "labels" : {},
+               "hostPort" : 0,
+               "protocol" : "tcp"
+            }
+         ],
+         "type" : "DOCKER",
+         "volumes" : [],
+         "docker" : {
+            "image" : "alpine",
+            "forcePullImage" : true,
+            "parameters" : [
+               {
+                  "key" : "label",
+                  "value" : "hollowman.appname=/asgard-dev/alpine"
+               }
+            ],
+            "privileged" : false
+         }
+      },
+      "killSelection" : "YOUNGEST_FIRST",
+      "constraints" : [
+         [
+            "mesos",
+            "LIKE",
+            "slave"
+         ],
+         [
+            "workload",
+            "LIKE",
+            "general"
+         ],
+         [
+            "owner",
+            "LIKE",
+            "asgard-dev"
+         ]
+      ],
+      "backoffFactor" : 1.15,
+      "fetch" : [
+         {
+            "extract" : true,
+            "cache" : false,
+            "uri" : "file:///etc/docker.tar.bz2",
+            "executable" : false
+         }
+      ],
+      "upgradeStrategy" : {
+         "minimumHealthCapacity" : 1,
+         "maximumOverCapacity" : 1
+      },
+      "tasksStaged" : 0,
+      "mem" : 128,
+      "cpus" : 1,
+      "unreachableStrategy" : {
+         "inactiveAfterSeconds" : 0,
+         "expungeAfterSeconds" : 0
+      }
+   }
