@@ -5,6 +5,7 @@ from unittest import mock
 
 from hollowman.filters.transformjson import TransformJSONFilter
 from hollowman.marathonapp import AsgardApp
+from hollowman.app import application
 from tests.utils import with_json_fixture
 
 
@@ -14,9 +15,12 @@ class TransformJSONTest(unittest.TestCase):
         self.filter = TransformJSONFilter()
         self.env_patcher = mock.patch.dict(os.environ, ASGARD_FILTER_TRANSFORMJSON_ENABLED="1")
         self.env_patcher.start()
+        self.flask_req_ctx = application.test_request_context("/v2/apps/dev/foo", headers={"X-UI-Version": "new"})
+        self.flask_req_ctx.push()
 
     def tearDown(self):
         self.env_patcher.stop()
+        self.flask_req_ctx.pop()
 
 
     @with_json_fixture("../fixtures/filters/app-json-new-format.json")
@@ -154,9 +158,11 @@ class TransformJSONTest(unittest.TestCase):
     @with_json_fixture("../fixtures/single_full_app.json")
     def test_noop_if_env_is_disabled(self, app_json_new_format, app_json_old_format):
         """
-        O filtro nao deve rodar se a env ASGARD_FILTER_TRANSFORMJSON_ENABLED=0
+        O filtro nao deve rodar se a não houver indicações de que a UI já é a versão nova.
+        Essa indicação é feita através de um header `X-UI-Version` que é passado em todos os requests (apenas pela UI nova)
         """
-        with mock.patch.dict(os.environ, ASGARD_FILTER_TRANSFORMJSON_ENABLED="0"):
+        with mock.patch.dict(os.environ, ASGARD_FILTER_TRANSFORMJSON_ENABLED="0"), \
+                application.test_request_context("/v2/apps/dev/foo", headers={}):
             asgard_app_new_format = AsgardApp.from_json(app_json_new_format)
             asgard_app_old_format = AsgardApp.from_json(app_json_old_format)
 
