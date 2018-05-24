@@ -45,4 +45,5 @@ def _make_request(path, method, params=None, headers=None, data=None):
 def _remove_keys(data):
     data.pop("version", None)
     data.pop("fetch", None)
+    data.pop("secrets", None)
 
