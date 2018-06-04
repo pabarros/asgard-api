@@ -5,8 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
-### -next
+### 0.70.0
  * Adição do filtro de compatibilidade entre UI 1.30 e Backend <= 1.4.x;
+ * Remoção da key `secrets` de todos os JSONs
 
 ### 0.69.0
  * Atualizando asgard-api-plugin-mesos-metrics para 0.6.0
