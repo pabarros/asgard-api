@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+### -next
+ * Adição do filtro de compatibilidade entre UI 1.30 e Backend <= 1.4.x;
+
 ### 0.69.0
  * Atualizando asgard-api-plugin-mesos-metrics para 0.6.0
 
@@ -186,11 +189,11 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Env vars
 * ASGARD_CACHE_URL [required]: Enredeço do cache (Redis). No formato: `redis://<host>:<port>/<db>`
-* ASGARD_CACHE_KEY_PREFIX: default `asgard-api/` Prefixo que será usado em todas as operações com o cache
-* ASGARD_CACHE_DEFAULT_TIMEOUT default 60s; Tempo de expiração padrão das chaves de cache
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
 * HOLLOWMAN_MARATHON_ADDRESS_INDEX [required] Where to connect to find Marathon api. List of Marathon IPs. <INDEX> starts at 0.
 * HOLLOWMAN_MESOS_ADDRESS_INDEX [required] Where to connect to find Mesos API. List of Mesos IPs. <INDEX> starts at 0.
+* ASGARD_CACHE_KEY_PREFIX: default `asgard-api/` Prefixo que será usado em todas as operações com o cache
+* ASGARD_CACHE_DEFAULT_TIMEOUT default 60s; Tempo de expiração padrão das chaves de cache
 * HOLLOWMAN_REDIRECT_ROOTPATH_TO: Env que diz para onde o usuario será redirecionado se acessar a raiz onde o hollowman está deployado. Defaults to `/v2/apps`
 * HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_ID: ID da app Oauth2, registrado no console do Google
 * HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_SECRET: Secret dessa app.

@@ -20,7 +20,7 @@ from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
 from hollowman.filters.labels import LabelsFilter
 from hollowman.http_wrappers.response import Response
 from hollowman.http_wrappers.base import RequestResource
-
+from hollowman.filters.transformjson import TransformJSONFilter
 
 FILTERS_METHOD_NAMES = {
     RequestResource.APPS: "response",
@@ -37,6 +37,7 @@ FILTERS_PIPELINE = {
 
         OperationType.WRITE: (
             NameSpaceFilter(),
+            TransformJSONFilter(),
             AddURIFilter(),
             DefaultScaleFilter(),
             ForcePullFilter(),
@@ -51,9 +52,11 @@ FILTERS_PIPELINE = {
     FilterType.RESPONSE: {
         OperationType.READ: (
             NameSpaceFilter(),
+            TransformJSONFilter(),
         ),
         OperationType.WRITE: (
             NameSpaceFilter(),
+            TransformJSONFilter(),
         )
     }
 }
