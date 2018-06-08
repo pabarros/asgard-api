@@ -16,6 +16,8 @@ from hollowman.marathonapp import AsgardApp
 # ser mergeados de forma especial quando
 # juntamos a request_app com a original_app
 REMOVABLE_KEYS = {"constraints", "labels", "env", "healthChecks", "upgradeStrategy"}
+
+
 class Request(HTTPWrapper):
     json_encoder = MarathonMinimalJsonEncoder
 
@@ -138,6 +140,8 @@ class Request(HTTPWrapper):
             OperationType.READ derived request filters are
             readonly and dont manipulate the request
             """
+            if not apps:
+                return request
             request_app, original_app = apps[0]
             self._adjust_request_path_if_needed(self.request, original_app)
             return self.request
