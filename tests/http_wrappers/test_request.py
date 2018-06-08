@@ -695,7 +695,7 @@ class RequestWrapperTest(TestCase):
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/apps/dev/my-app/restart", request_wrapper.request.path)
 
-    def test_adjust_apps_request_path_keep_aaditional_paths_multiple_paths(self):
+    def test_adjust_apps_request_path_keep_additional_paths_multiple_paths(self):
         with application.test_request_context('/v2/apps/my-app/versions/2017-10-31T13:01:07.768Z',
                                               method='GET') as ctx:
             request_wrapper = Request(ctx.request)
