@@ -655,15 +655,13 @@ class RequestWrapperTest(TestCase):
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/groups/dev/versions", request_wrapper.request.path)
 
-
-    def test_adjust_groups_versions_request_path(self):
+    def test_adjust_group_versions_request_path(self):
         with application.test_request_context('/v2/groups/my-group/versions',
                                               method='GET') as ctx:
             request_wrapper = Request(ctx.request)
             original_app = MarathonGroup(id="/dev/my-group")
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/groups/dev/my-group/versions", request_wrapper.request.path)
-
 
     def test_adjust_apps_tasks_request_path(self):
         with application.test_request_context('/v2/apps/my-app/tasks',
