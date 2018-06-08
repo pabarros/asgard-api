@@ -425,6 +425,17 @@ class JoinTests(TestCase):
                 self.assertEqual("/v2/groups/dev", joined_request.path)
                 self.assertEqual(b"", joined_request.data)
 
+    def test_join_apps_read_empty_list(self):
+        with application.test_request_context('/v2/apps', method='GET') as ctx:
+            ctx.request.user = self.user
+            request = Request(ctx.request)
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps', status=200, body='''{"apps":[]}''')
+                apps = list(request.split())
+                joined_request = request.join(apps)
+                self.assertEqual("/v2/groups/dev", joined_request.path)
+                self.assertEqual(b"", joined_request.data)
+
     @with_json_fixture("../fixtures/group-b_dev_namespace_with_apps.json")
     def test_join_group_read_non_root_group(self, group_b_fixture):
         with application.test_request_context('/v2/groups/group-b', method='GET') as ctx:
