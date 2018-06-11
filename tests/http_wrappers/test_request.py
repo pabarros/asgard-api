@@ -433,7 +433,7 @@ class JoinTests(TestCase):
                 rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps', status=200, body='''{"apps":[]}''')
                 apps = list(request.split())
                 joined_request = request.join(apps)
-                self.assertEqual("/v2/groups/dev", joined_request.path)
+                self.assertEqual("/v2/apps", joined_request.path)
                 self.assertEqual(b"", joined_request.data)
 
     @with_json_fixture("../fixtures/group-b_dev_namespace_with_apps.json")

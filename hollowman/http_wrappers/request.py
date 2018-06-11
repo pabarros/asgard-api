@@ -141,7 +141,8 @@ class Request(HTTPWrapper):
             readonly and dont manipulate the request
             """
             if not apps:
-                return request
+                request.data = json.dumps([])
+                return self.request
             request_app, original_app = apps[0]
             self._adjust_request_path_if_needed(self.request, original_app)
             return self.request
