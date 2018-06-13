@@ -1,7 +1,6 @@
 from tracemalloc import BaseFilter
 from typing import Iterable, Dict
 
-import http_wrappers
 from hollowman.filters.basicconstraint import BasicConstraintFilter
 from marathon.models import MarathonDeployment, MarathonQueueItem
 from marathon.models.task import MarathonTask
@@ -21,6 +20,7 @@ from hollowman.filters.labels import LabelsFilter
 from hollowman.http_wrappers.response import Response
 from hollowman.http_wrappers.base import RequestResource
 from hollowman.filters.transformjson import TransformJSONFilter
+from hollowman.http_wrappers import Request
 
 FILTERS_METHOD_NAMES = {
     RequestResource.APPS: "response",
@@ -72,7 +72,7 @@ def _get_filter_callable_name(request, operation):
 
 
 def dispatch(user,
-             request: http_wrappers.Request,
+             request: Request,
              filters_pipeline: Dict[OperationType, Iterable[BaseFilter]] = FILTERS_PIPELINE[FilterType.REQUEST],
              filter_method_name_callback=_get_filter_callable_name) -> HollowmanRequest:
     # TODO: (user, request_app, original_app) podem ser refatorados em uma classe de domínio
