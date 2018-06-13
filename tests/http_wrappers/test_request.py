@@ -662,7 +662,7 @@ class RequestWrapperTest(TestCase):
         with application.test_request_context('/v2/groups/versions',
                                               method='GET') as ctx:
             request_wrapper = Request(ctx.request)
-            original_app = MarathonGroup(id="/dev")
+            original_app = MarathonGroup(id="/dev/versions")
             request_wrapper._adjust_request_path_if_needed(request_wrapper.request, original_app)
             self.assertEqual("/v2/groups/dev/versions", request_wrapper.request.path)
 
