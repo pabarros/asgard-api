@@ -5,6 +5,9 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+### 0.71.0
+ * Corrigido bug que afetava um GET em /v2/apps/ para uma conta vazia
+
 ### 0.70.0
  * Adição do filtro de compatibilidade entre UI 1.30 e Backend <= 1.4.x;
  * Remoção da key `secrets` de todos os JSONs
