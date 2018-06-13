@@ -1,6 +1,5 @@
-from typing import Iterable
-from flask import Response as FlaskResponse, request
-import json
+from tracemalloc import BaseFilter
+from typing import Iterable, Dict
 
 from hollowman.filters.basicconstraint import BasicConstraintFilter
 from marathon.models import MarathonDeployment, MarathonQueueItem
@@ -21,6 +20,7 @@ from hollowman.filters.labels import LabelsFilter
 from hollowman.http_wrappers.response import Response
 from hollowman.http_wrappers.base import RequestResource
 from hollowman.filters.transformjson import TransformJSONFilter
+from hollowman.http_wrappers import Request
 
 FILTERS_METHOD_NAMES = {
     RequestResource.APPS: "response",
@@ -61,6 +61,7 @@ FILTERS_PIPELINE = {
     }
 }
 
+
 def _get_filter_callable_name(request, operation):
     if request.is_tasks_request():
         method_name = f"{operation.value}_task"
@@ -69,30 +70,30 @@ def _get_filter_callable_name(request, operation):
 
     return method_name
 
-def dispatch(user, request, filters_pipeline=FILTERS_PIPELINE[FilterType.REQUEST], filter_method_name_callback=_get_filter_callable_name) -> HollowmanRequest:
-    """
-    :type user: User
-    :type request: http_wrappers.Request
-    :type filters_pipeline: Dict[OperationType, Iterable[BaseFilter]]
 
-    todo: (user, request_app, original_app) podem ser refatorados em uma classe de domínio
-    """
+def dispatch(user,
+             request: Request,
+             filters_pipeline: Dict[OperationType, Iterable[BaseFilter]] = FILTERS_PIPELINE[FilterType.REQUEST],
+             filter_method_name_callback=_get_filter_callable_name) -> HollowmanRequest:
+    # TODO: (user, request_app, original_app) podem ser refatorados em uma classe de domínio
 
     filtered_apps = []
 
     for operation in request.request.operations:
         for request_app, original_app in request.split():
             if _dispatch(request,
-                      filters_pipeline[operation],
-                      filter_method_name_callback(request, operation),
-                      request_app, original_app):
+                         filters_pipeline[operation],
+                         filter_method_name_callback(request, operation),
+                         request_app, original_app):
                 filtered_apps.append((request_app, original_app))
 
     return request.join(filtered_apps)
 
+
 def _get_callable_if_exist(filter_, method_name):
     if hasattr(filter_, method_name):
         return getattr(filter_, method_name)
+
 
 def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter_args):
     for filter_ in filters_pipeline:
@@ -101,4 +102,3 @@ def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter
             continue
         return False
     return True
-

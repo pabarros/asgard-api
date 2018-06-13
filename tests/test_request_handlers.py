@@ -16,11 +16,11 @@ from hollowman import conf
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
 
+
 class RequestHandlersTests(TestCase):
 
     @with_json_fixture("single_full_app.json")
     def setUp(self, single_full_app_fixture):
-
         self.request_apps = [
             (MarathonApp(id='/xablau'), MarathonApp(id='/xena')),
             (MarathonApp(id='/foo'), MarathonApp(id='/bar')),
@@ -41,7 +41,7 @@ class RequestHandlersTests(TestCase):
         """
         with application.test_request_context('/v2/apps/foo', method='GET') as ctx:
             with patch('hollowman.request_handlers.upstream_request'), \
-                patch('hollowman.request_handlers.dispatch') as dispatch_mock:
+                 patch('hollowman.request_handlers.dispatch') as dispatch_mock:
                 user = MagicMock()
                 ctx.request.user = user
                 request_parser = Request(ctx.request)
@@ -65,7 +65,8 @@ class RequestHandlersTests(TestCase):
         single_full_app_fixture['id'] = "/dev/foo"
         with application.test_client() as client:
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps/dev/foo/versions/2017-10-31T13:01:07.768Z',
+                rsps.add(method='GET',
+                         url=conf.MARATHON_ADDRESSES[0] + '/v2/apps/dev/foo/versions/2017-10-31T13:01:07.768Z',
                          body=json.dumps(single_full_app_fixture), status=200)
                 rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//dev/foo',
                          body=json.dumps({"app": single_full_app_fixture}), status=200)
@@ -129,6 +130,18 @@ class RequestHandlersTests(TestCase):
                 self.assertEqual(1, len(response_data['queue']))
                 self.assertEqual("/waiting", response_data['queue'][0]['app']['id'])
 
+    def test_get_empty_apps_listing(self):
+        auth_header = {"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
+        with application.test_client() as client:
+            with RequestsMock() as rsps:
+                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps',
+                         body=json.dumps({"apps": []}), status=200)
+                response = client.get("/v2/apps", headers=auth_header)
+                self.assertEqual(200, response.status_code)
+                response_body = json.loads(response.data)
+                self.assertEqual({"apps": []}, response_body)
+
+
 class DispatchResponse404Test(TestCase):
 
     @with_json_fixture("single_full_app.json")
@@ -152,4 +165,3 @@ class DispatchResponse404Test(TestCase):
                          body=json.dumps({'message': "App /foo not found"}), status=404)
                 response = client.get("/v2/apps/foo", headers=auth_header)
                 self.assertEqual(404, response.status_code)
-
