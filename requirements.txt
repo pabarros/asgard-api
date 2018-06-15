@@ -12,7 +12,6 @@ psycopg2==2.7.3
 redis==2.10.6
 requests==2.18.3
 simple-json-logger==0.2.2
-sqlalchemy==1.1.13
 
 #Asgard API SDK
 asgard-api-sdk==0.2.0
