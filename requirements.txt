@@ -16,5 +16,5 @@ simple-json-logger==0.2.2
 #Asgard API SDK
 asgard-api-sdk==0.2.0
 # Asgard API Plugins
-asgard-api-plugin-metrics-mesos==0.7.0-rc1
+asgard-api-plugin-metrics-mesos==0.7.0
 asgard-api-plugin-metrics-fluentd==0.1.0
