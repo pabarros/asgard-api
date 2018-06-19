@@ -14,40 +14,7 @@ source "dev/network.sh"
 source "dev/pgsql.sh"
 
 # ZK Cluster
-
-ZOO_SERVERS="server.1=${ZK_1_IP}:2888:3888 server.2=${ZK_2_IP}:2888:3888 server.3=${ZK_3_IP}:2888:3888"
-ZOO_PURGE_INTERVAL=10
-echo -n "ZK (${ZK_1_IP}) "
-docker run -d \
-  --name asgard_zk_1 \
-  --rm -it --ip ${ZK_1_IP} \
-  -e ZOO_MY_ID=1 \
-  --net ${NETWORK_NAME} \
-  --env-file <(
-echo ZOO_SERVERS=${ZOO_SERVERS}
-echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
-) docker.sieve.com.br/infra/zookeeper:0.0.1
-
-echo -n "ZK (${ZK_2_IP}) "
-docker run -d --rm -it --ip ${ZK_2_IP} \
-  --name asgard_zk_2 \
-  -e ZOO_MY_ID=2 \
-  --net ${NETWORK_NAME} \
-  --env-file <(
-echo ZOO_SERVERS=${ZOO_SERVERS}
-echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
-) docker.sieve.com.br/infra/zookeeper:0.0.1
-
-echo -n "ZK (${ZK_3_IP}) "
-docker run -d --rm -it --ip ${ZK_3_IP} \
-  --name asgard_zk_3 \
-  -e ZOO_MY_ID=3 \
-  --net ${NETWORK_NAME} \
-  --env-file <(
-echo ZOO_SERVERS=${ZOO_SERVERS}
-echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
-) docker.sieve.com.br/infra/zookeeper:0.0.1
-
+source "dev/zk.sh"
 
 source "dev/marathon.sh"
 source "dev/mesosmaster.sh"
