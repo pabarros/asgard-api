@@ -7,18 +7,12 @@
 # 3. Não é possivel passar um envfile pro docker-compose, apenas dentro do compose-file. Se pudéssemos passar até seria pssível
 # criar um grande arquivo de env e passar para todas as chamadas do compose.
 
-HERE=$(dirname $(readlink -f $0))
-
 source "dev/vars.sh"
 source "dev/network.sh"
 source "dev/pgsql.sh"
-
-# ZK Cluster
 source "dev/zk.sh"
-
 source "dev/marathon.sh"
 source "dev/mesosmaster.sh"
-
 source "dev/mesosslave.sh"
 
 #CREATE INITIAL GROUP
