@@ -21,6 +21,7 @@ for group in _g.iterate_groups():
     for app in group.apps:
         del app.version
         del app.fetch
+        del app.ports
 
 data_output = json.dumps(_g._marathon_group, cls=MarathonJsonEncoder)
 print (data_output)
