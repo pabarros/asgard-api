@@ -36,6 +36,11 @@ class TransformJSONTest(unittest.TestCase):
         self.assertTrue(self.filter._is_new_format(asgard_app))
 
     @with_json_fixture("../fixtures/filters/app-json-new-format.json")
+    def test_transform_to_new_does_not_have_old_network(self, app_json_new_format):
+        asgard_app = AsgardApp.from_json(app_json_new_format)
+        self.assertTrue(self.filter._transform_to_new_format(asgard_app))
+
+    @with_json_fixture("../fixtures/filters/app-json-new-format.json")
     def test_is_json_new_format_has_only_port_mappings(self, app_json_new_format):
         del app_json_new_format['networks']
         asgard_app = AsgardApp.from_json(app_json_new_format)
