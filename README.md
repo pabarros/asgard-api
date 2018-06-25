@@ -5,6 +5,11 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 
 ## Changelog
 
+### 0.73.0-rc1
+ * Refactoring dos scripts que ligam o ambiente de dev local
+ * Atualização da asgard SDK para 0.3.0-rc1
+ * Atualização da asgard-api-plugin-metrics-mesos 0.8.0-rc1
+
 ### 0.71.0
  * Corrigido bug que afetava um GET em /v2/apps/ para uma conta vazia
 
