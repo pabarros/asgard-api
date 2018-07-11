@@ -55,11 +55,11 @@ orquestrador em questão consiga entender.
 - https://github.com/B2W-BIT/asgard-api-plugin-metrics-fluentd
   - Fornece métricas sobre os buffers do Fluentd, caso seja essa a solução escolhida para fazer a coleta dos logs das aplicações;
 - https://github.com/B2W-BIT/asgard-log-ingestor
- - Ingestor genérico de logs que lê as linhas de log de um RabbitMQ e indexa em vários destinos possíveis (elasticsearch, cloudwatch logs, etc)
+  - Ingestor genérico de logs que lê as linhas de log de um RabbitMQ e indexa em vários destinos possíveis (elasticsearch, cloudwatch logs, etc)
 - https://github.com/B2W-BIT/asgard-counts-ingestor
- - Ingestor de metadados de logs, contendo apenas as contagens (de linhas de logs e de byes de logs) de cada aplicação. Esses dados são também lidos de um RabbitMQ e indexados em um elasticsearch.
+  - Ingestor de metadados de logs, contendo apenas as contagens (de linhas de logs e de byes de logs) de cada aplicação. Esses dados são também lidos de um RabbitMQ e indexados em um elasticsearch.
 - https://github.com/B2W-BIT/asgard-app-stats-collector
- - Coletor genérico de estatísticas de uso de CPU/RAM de todas as tarefas do cluster, indexa no elasticsearch já adicionando o nome da App original. Esse coletor será o responsável por falar com outros orquestradores, à medida que suporte a eles for sendo adicionado ao projeto.
+  - Coletor genérico de estatísticas de uso de CPU/RAM de todas as tarefas do cluster, indexa no elasticsearch já adicionando o nome da App original. Esse coletor será o responsável por falar com outros orquestradores, à medida que suporte a eles for sendo adicionado ao projeto.
 
 ## Orquestradores atualmente suportados
 
