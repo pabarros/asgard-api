@@ -1,203 +1,281 @@
-# Hollowman
-[![Build Status](https://travis-ci.org/B2W-BIT/asgard-api.svg?branch=master)](https://travis-ci.org/B2W-BIT/asgard-api)
-[![codecov](https://codecov.io/gh/B2W-BIT/asgard-api/branch/master/graph/badge.svg)](https://codecov.io/gh/B2W-BIT/asgard-api)
+# Asgard API [![Build Status](https://travis-ci.org/B2W-BIT/asgard-api.svg?branch=master)](https://travis-ci.org/B2W-BIT/asgard-api) [![codecov](https://codecov.io/gh/B2W-BIT/asgard-api/branch/master/graph/badge.svg)](https://codecov.io/gh/B2W-BIT/asgard-api)
 
-The thought of human invisibility has intrigued man for centuries. Highly gifted scientist Sebastian Caine develops a serum that induces complete invisibility. His remarkable transformation results in unimaginable power that seems to suffocate his sense of morality and leads to a furious and frightening conclusion.
+API principal do Projeto Asgard.
 
-## Changelog
+## Projeto Asgard
 
-### 0.73.0-rc1
- * Refactoring dos scripts que ligam o ambiente de dev local
- * Atualização da asgard SDK para 0.3.0-rc1
- * Atualização da asgard-api-plugin-metrics-mesos 0.8.0-rc1
+O Projeto Asgard existe com dois propósitos principais:
 
-### 0.71.0
- * Corrigido bug que afetava um GET em /v2/apps/ para uma conta vazia
+ - Facilitar a vida de quem desenvolve aplicações (de todo tipo);
+ - Facilitar a vida de quem mantém uma infra-estrutura onde rodam centenas/milhares de aplicações
 
-### 0.70.0
- * Adição do filtro de compatibilidade entre UI 1.30 e Backend <= 1.4.x;
- * Remoção da key `secrets` de todos os JSONs
+O primeiro ponto é alcançado provendo uma Interface WEB (em uma API) universal onde a pessoa 
+responsável por um conjunto de aplicações possa ver, em um único lugar, todas as informações 
+sobre essas aplicações, como por exemplo: Quantiade de CPU/RAM alocada, Logs recentes gerados por
+cada instâncias dessas aplicações, lista das instâncias de cada aplicação, etc.
 
-### 0.69.0
- * Atualizando asgard-api-plugin-mesos-metrics para 0.6.0
+O segundo ponto é alcançado tendo um úniclo cluster onde rodam tasks de múltiplos times. Tendo uma
+API que provê números referentes a esses times, como por exemplo: Total de tarefas, Total de servidores
+conectados no cluster, ocupação (em termos de CPU/RAM) do pool de máquinas de cada time (e também ocupação
+global, sem considerar times separados), etc.
 
-### 0.68.1
-  - Gerando versão correta. A 0.68.0 foi gerada errado.
+## Features principais
 
-### 0.68.0
-  - Criação de um cache client. Cache client não dá raise caso o redis esteja fora do ar. 
-  - Criação dos endpoints para download de arquivos de uma task
+ * Separação de múltiplos times usando a mesma interface mas vendo apenas suas próprias aplicações;
+ * API plugável para geração de números e métricas sobre o cluster;
+ * Visualização de Logs de cada tarefa dentro da própria interface.
 
-### 0.67.0
-  - Uso do `get_option` da asgard-api-sdk;
-  - Melhoria no ambiente de dev. Agora temos toda a infra completa, com PgSQL com múltiplas contas.
+## Ideia geral de implementação
 
-### 0.66.0
-  - Atualizando asgard-api-sdk==0.2.0
-  - Atualizando mesos-metrics-api==0.5.0
+A ideia da Asgard API é ser o único ponto com o qual qualquer código (ou pessoa) deve falar. Essa API
+é quem vai abstrair todos os orquestradores suportados pelo projeto. A ideia do projeto é definir seus
+próprios Endpoints e Resources genéricos o suficiente para poderem ser transformados/traduzidos em 
+Endpoints e Resources específicos do orquestrador escolhido.
 
-### 0.65.0
-  - Passamos um objeto logger para todos os plugins que são carregados no boot;
-  - Ajustamos o loglevel de todos os loggers a partir de uma envvar: `ASGARD_LOGLEVEL`;
+É a asgard API quem fala com os múltiplos orquestradores, é papel dela receber uma requisição da UI (ou
+de um client HTTP qualquer), decidir para qual backend aquele request deve ser encaminhado e então ela
+faz todas as transformações necessárias para mudar o request sendo recebido para um formato em que o
+orquestrador em questão consiga entender.
 
-### 0.64.0
-  - Atualização do plugin session-checker-plugin para não usar mais o objeto Sieve (e sim o objeto Bridge)
 
-### 0.63.1
-  - Correção para apps que tinham o nome contento a string `*versions/`. 
+## Componentes principais do Projeto Asgard
 
-### 0.63.0
-  - IN-2425 Implemntação da API de file read/download para podermos ver os logs de uma task pela API do Asgard
-  - Script que ajuda a fazer um tail -f nos logs de uma app
+### Componentes essenciais
 
-### 0.62.0
-  - IN-2451 Atualização do session-checker-plugin para 0.2.0 (para usar o request pipelines);
-  - Essa versão da API só funciona com a versão da UI 0.12.0+. Pois a partir dessa versão já temos suporte a request pipeline.
+- Asgard API (esse repositório)
+- Asgard UI, que é a UI oficial do projeto Asgard. (https://github.com/B2W-BIT/asgard-ui)
+  - Essa é a UI original do Marathon, com algumas poucas modificações. Modificações não triviais foram submetidas com PRs ao projeto orginal e já foram mergeadas.
+- https://github.com/B2W-BIT/asgard-ui-session-checker-plugin
+  - Plugin para a UI do Asgard que adiciona o token JWT em todas as requisições feitas à API.
 
-### 0.61.0
-  - IN-2434 Implementação da uma estrutura simples para plugins no backend
-      > Adição do um primeiro plugin:  asgard-api-plugin-metrics-mesos==0.1.0
+### Componentes opcionais
 
-### 0.60.0
-  - Mudança do versionamento para SemVer. Estávamos incrementando o `.patch` e não o `.minor`.
-  - IN-2422 Fix no scale após edição da app e que todas as apps eram renovadas
+- https://github.com/B2W-BIT/asgard-api-plugin-metrics-mesos
+  - Fornece métrica sobre o cluster de Mesos, caso seja esse o seu orquestrador escolhido;
+- https://github.com/B2W-BIT/asgard-api-plugin-metrics-fluentd
+  - Fornece métricas sobre os buffers do Fluentd, caso seja essa a solução escolhida para fazer a coleta dos logs das aplicações;
+- https://github.com/B2W-BIT/asgard-log-ingestor
+ - Ingestor genérico de logs que lê as linhas de log de um RabbitMQ e indexa em vários destinos possíveis (elasticsearch, cloudwatch logs, etc)
+- https://github.com/B2W-BIT/asgard-counts-ingestor
+ - Ingestor de metadados de logs, contendo apenas as contagens (de linhas de logs e de byes de logs) de cada aplicação. Esses dados são também lidos de um RabbitMQ e indexados em um elasticsearch.
+- https://github.com/B2W-BIT/asgard-app-stats-collector
+ - Coletor genérico de estatísticas de uso de CPU/RAM de todas as tarefas do cluster, indexa no elasticsearch já adicionando o nome da App original. Esse coletor será o responsável por falar com outros orquestradores, à medida que suporte a eles for sendo adicionado ao projeto.
 
-### 0.0.59
-  - Ativando suporte ao newrelic APM
+## Orquestradores atualmente suportados
 
-### 0.0.58
-  - IN-2407 Bugfix apps que continham em seu nome o valor de seu próprio namespace
+Atualmente a Asgard API suporta:
 
-### 0.0.57
-  - Adicionando dump do schema do banco
-  - Silenciando os logs do marathon-python
+* Mesosphere Marathon (https://mesosphere.github.io/marathon/)
+  - Confirmamos que funciona até a versão 1.4.12. Ainda não testamos com versões posteriores (`1.5.x`, `.1.6.x`) mas pretendemos fazer isso em algum momento.
 
-### 0.0.56
-  - IN-2104/IN-2408 Suporte a múltiplos Marathons
+## Arquitetura geral da API
 
-### 0.0.55
-  - IN-2362 Movendo o `merge_apps()` pra dentro do `.split()`
-  - IN-2379 Major refacroting no pipeline de request/response. Agora os dois fluxos são atendidos pelo mesmo dispatch()
+A Asgard API, internamente, possui 4 "pipelines" principais:
 
-### 0.0.54
-  - Atualizando session-checker-plugin para usar o ajaxWrapper de dentro do objeto Sieve.
+  - Request WRITE pipeline;
+  - Request READ pipeline;
+  - Response WRITE pipeline;
+  - Response READ pipeline.
 
-### 0.0.53
-  - Mudança no nome da imagem para `/sieve/infra/asgard-api`
-  - IN-2404 Remove label traefik.backend para que não exista a possibilidade de duas apps terem o mesmo backend
+Cada pipeline é composta por uma lista de "Filtros", um filtro pode fazer parte de mais de uma pipeline (até de todas se quiser). 
+Um exemplo de filtro que está registrado em múltiplas pipelines é o [`namespace` filter](hollowman/filters/namespace.py).
 
-### 0.0.52
-  - IN-2354 Removendo deployments de outros namespaces
-  - IN-2365 Filto que remove campos que o marathon nao aceita quando fazemos POST/PUT
+Cada pieline possui um "contrato" que o filtro deve obedecer para que possa fazer parte dessa pipeline, que é o que veremos a seguir.
 
-### 0.0.51
-  - IN-2344 Suporte ao endpoint /v2/tasks
-  - IN-2355 Usando passgem por referencia nos filtros
-  - IN-2356 Não passamos `original_*` para os métodos de response filters
-  - IN-2357 Adiçao do AddURIFilter que adiciona a autenticação do docker registry
-  - IN-2361 Mudando todas as chamdas de `().from_json()` para `.from_json()`
+### Request READ pipeline
 
-### 0.0.50
-  - Implementção da possibilidade de remover campos que são multi-valor (constraints, labels, env, etc)
+Essa pipeline roda sempre que a Asgard API recebe um request de leitura, ou seja, `GET`.
 
-### 0.0.48/0.0.49
-  - Suporte ao endpoint /v2/queue
-  - Refactoring interno para generalizar o forma como pegamos o ID do resource sendo acessado
+Essa pipeline não tem uma interface definida, já que o que faz mais sentido é implementar um filtro na pipeline `Response.READ`.
 
-### 0.0.47
-  - Removendo do response apps que não pertencem ao namespace atual (/v2/apps)
-  - Separando erros de autenticação em HTTP 401 e erros não tratados em HTTP 500. O Stacktrace é retornado no response JSON.
 
-### 0.0.46
-  - BUGFIX: Apps que tinham a ultima parte do path repetidos retornavam 404
+### Request WRITE pipeline
 
-### 0.0.45
-  - Implementação parcial do endpoint /v2/deployments. As apps do seu namespace já aparecem certo (sem o prefixo), mas ainda aparecem apps de outros namespaces.
-  - Implementação do filtro que preenche a label de defaultscale.
+Essa pipeline roda sempre que a Asgard API recebe um request de escrita, ou seja, `POST, PUT, PATCH, DELETE`.
 
-### 0.0.44
-  - Filtro que adiciona constrains mesos:LIKE:slave e workload:LIKE:general, caso não existam.
+Interface de um filtro de escrita:
 
-### 0.0.43
-  - Atualizando plugin session-checker-plugin
+```python
+class Filter:
+  
+    def write_task(self, user, request_task, original_task):
+        """
+        Método chamado para cada task (instância de App) que está sendo
+        modificada pelo request atual.
+        Esse método é chamad individualmente para cada task.
 
-### 0.0.42
-  - Implementado response pipeline. Agora é possível modificar os responses devolvidos pelo marathon usando filtros
-  - Immplementado suporte a GET/DELETE em /v2/groups/
-  - Removido código que lidava com requests não autenticados. Agora a autenticção é sempre requerida;
+        request_task: Representação da task que está no request atual
+        original_task: Representação da task que está atualmente em vigor.
+        """
+        ...
+        return request_task
 
-### 0.0.41
-  - Implementado lógica de troca de conta
-  - Atualização do plugin session-checker-plugin, com a Dialog de troca de conta
+    def write(self, user, request_app, original_app):
+        """
+        Método chamado para cada App sendo modificada no request atual.
 
-### 0.0.40
-  - Refactoring no AsgardApp
+        request_app: Representação da App que está no request atual;
+        original_app: Representação da app que está atualmente em vigor
+        """
+        ...
+        return request_app
+```
 
-### 0.0.39
-  - Suporte a request com lista no body;
-  - Implementação do filtro que adiciona namespace
-  - Desligando filtro de namespace, por enquanto.
-  - Implementado um teste para ajudar a garantir que nenhum filtro ativo terá problemas com requests não-autenticados
+O filtro deve sempre retornar o objeto que está no request (modificado ou não). É essa representação
+que será enviada ao orquestrador.
 
-### 0.0.38
-  - BUGFIX: User do request sendo corretamente repassado para o dispatch
-  - Filter para adicionar a costraint `owner:LIKE:<account.owner>`
+### Response READ pipeline
 
-### 0.0.37
-  - Início do suporte a `account_id` nos requests
-  - Necessidade de estar vinculado a pelo menos uma conta para que o request seja válido
-  - Adicionando primeiro endpoint de métricas. ZK. Já feito com flask Blueprints.
-  - Atualizando marathon-python para 0.9.2
+Essa pipeline roda sempre que a Asgard API recebe um request de escrita, ou seja, `GET`. Essa pipeline roda imediatamente
+antes de devolvermos o response para o cliente original.
 
-### 0.0.36
-  - Remoção do Fluxo velho de request
-  - Remoção dos filtros: dns, constraint, defaultscale. Serão re-implementados eventualmente.
-  - Criação do wrapper para o MarathonApp
+Interface do filtro:
 
-### 0.0.35
-  - Fitlro forcepull
-  - Filtro trim
+```python
+class Filter:
 
-### 0.0.34
-  - Major Refactoring do pipeline de filtros. Agora cada filtro recebe apenas uma app por vez, independente do request estar sendo feito em múltiplas apps
-  - Mudança na interface dos filtros. Essa mudança é incompatível com os filtros velhos
+    def response(self, user, response_app, original_app) -> AsgardApp:
+      return response_app
+      
+    def response_group(self, user, response_group, original_group):
+      return response_group
 
-### 0.0.33
-  - Implementação do roteamento para o fluxo novo e fluxo velho. Isso depois será removido, quando tudo for fluxo novo.
+    def response_deployment(self, user, deployment: MarathonDeployment, original_deployment) -> MarathonDeployment:
+      return deployment
+    
+    def response_task(self, user, response_task, original_task):
+      return response_task
 
-### 0.0.32
-  - Separando o mapeamento de todas as rotas da API. Isso vai permitir que possamos mexer nas rotas de forma individual
+    def response_queue(self, user, response_queue, original_queue):
+      return response_queue
 
-### 0.0.31
-  - Removendo header Content-Encoding. Marathon 1.3.13 retorna os responses em formato gzip, mas o hollowman ainda nao trata isso.
+```
 
-### 0.0.30
-  - Adicionando session-checker-plugin
+Cada método é chamado para cada um dos tipos de Resources que existem. Assim como nos filtros de escrita, os métodos
+são chamados individualmente para cada Resource envolvido nessa response, ex: Se estamos respondedo com uma lista de Apps,
+cada app será passada individualmente para o filtro, no método `response()`. 
 
-### 0.0.29
-  - Migração para python 3.6
+Se o método retornar o próprio objeto ele será incluído no response final. Se for retornado `None`, esse Resource será **removido** do
+response final. Dessa forma um filtro consegue ocultar certos dados antes do response ser enviado ao cliente final.
 
-### 0.0.28
-  - Atualizando example-plugin. Corrigindo chamada à Dialog API.
+### Response WRITE pipeline
 
-### 0.0.27
-  - Atualizando immage base para uwsgi/py27:0.0.12 (Log "JSON")
+Essa pipeline ainda não é usada (e talvez até seja rmeovida no furuto). Para mexer no response, implemente um filtro na pipeline `Response.READ`.
 
-### 0.0.26
-  - Adicionado lógica para dupla autenticação: Token JWT (com oauth2) e Token de usuário
-  - Adicionadas novas configurações: HOLLOWMAN_DB_ECHO, HOLLOWMAN_ENFORCE_AUTH, HOLLOWMAN_DB_URL
+### Filtros
 
-### 0.0.25
-  - Adicionadas rotas pra servir o código dos plugins para a UI
-  - Atualização para imagem base alpine/py27/uwsgi20:0.0.11, por causa do `UWSGI_EXTRA_ARGS`
-  - Necessidade de passar `UWSGI_EXTRA_ARGS="--static-map2 /static=/opt/app/"`
-  - Adição de um plugin de exemplo
-### 0.0.24
-  - Migrando para Flask-OAuthlib
-### 0.0.23
-  - Adicionado todo o fluxo para autenticação oauth2, mas ainda não é obrigatório.
+Um filtro é a forma que encontramos de modificar tanto o request quanto o response que a Asgard API recebe.
 
-## Env vars
+Para adicionar um novo filtro a uma pipeline, mexemos no dicionário `FILTERS_PIPELINE`, que está em [dispatcher.py](hollowman/dispatcher.py)
+
+### Filtros - Trabalho futuro
+
+Atualimente os filtros ficam sempre dentro do código do projeto principal e são adicionados/removidos manualmente. Existe uma ideia
+de criar uma interface de plugins para que filtros externos (instalados com `pip install ...`) possam ser adicionados ao código de forma
+mais dinâmica.
+
+# Contribuindo com o Projeto Asgard
+
+Para rodar um ambiente de desenvolvimento local, podemos usar o script [asgard-run.sh](asgard-run.sh) que está na raiz do projeto. Esse script vai
+subir um cluster de Mesos + Marathon automaticamente. O output do script te diz quais os IPs de cada um dos componentes.
+
+Depois de ter o cluster rodando é hora de configurar as env vars para o seu projeto local. A lista de envs necessárias está no final desse documento.
+
+Essa é lista de env já com os valores para o ambiente de desenvolvimento:
+
+```
+ASGARD_FILTER_TRANSFORMJSON_ENABLED=1
+ASGARD_LOGLEVEL=DEBUG
+HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_ID=""
+HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_SECRET=""
+HOLLOWMAN_SECRET_KEY=secret__
+
+HOLLOWMAN_CORS_WHITELIST=http://localhost:4200,http://localhost
+UWSGI_EXTRA_ARGS=--static-map2 /static=/opt/app --honour-stdin
+HOLLOWMAN_REDIRECT_AFTER_LOGIN=http://localhost:4200/authenticated/
+MARATHON_CREDENTIALS=marathon:secret
+
+ASGARD_CACHE_KEY_PREFIX=asgard-api-dev/
+
+HOLLOWMAN_MARATHON_ADDRESS_0=http://172.18.0.31:8080
+HOLLOWMAN_METRICS_ZK_ID_0=172.18.0.2
+HOLLOWMAN_METRICS_ZK_ID_1=172.18.0.3
+HOLLOWMAN_METRICS_ZK_ID_2=172.18.0.4
+
+HOLLOWMAN_DB_URL=postgresql://postgres:@172.18.0.41/asgard
+
+HOLLOWMAN_MARATHON_ADDRESS_0=http://172.18.0.31:8080
+HOLLOWMAN_MARATHON_ADDRESS_1=http://172.18.0.31:8080
+HOLLOWMAN_MARATHON_ADDRESS_2=http://172.18.0.31:8080
+
+HOLLOWMAN_MESOS_ADDRESS_0=http://172.18.0.11:5050
+HOLLOWMAN_MESOS_ADDRESS_1=http://172.18.0.12:5050
+HOLLOWMAN_MESOS_ADDRESS_2=http://172.18.0.13:5050
+
+```
+Você precisa passar todas as envs para ser posspivel rodar o código da API. Essa passagem de valores via env pode ser feito da forma que você achar melhor.
+
+Para rodar a API, chame o arquivo [hollowman/main.py](hollowman/main.py) usando seu interpretador python.
+
+Quando tiver a API rodando, você pode fazer um request para validar:
+
+```
+$ curl -i http://127.0.0.1:5000/v2/apps/
+{"msg": "Authorization token is invalid"}% 
+```
+
+Isso significa que você não está autenticado, o que é verdade, já que nem criamos seu novo usuário.
+
+## Criando um novo usuário para desenvolvimento
+
+Para criar um novo usuário, você pode editar o arquivo [user.sql](scripts/sql/user.sql) a adicionar ali um trecho de SQL que vincula seu user a uma das contas
+de dev que existem no banco. Usando um exemplo: Novo usuário tem email "mail@server.com", faríamos o seguinte:
+
+```
+
+INSERT INTO "user" (tx_name, tx_email, tx_authkey, bl_system) VALUES ('Novo User', 'mail@server.com', 'a648638d589740879f25bf55648ccc21', false);
+
+INSERT INTO user_has_account (account_id, user_id) VALUES (
+  (SELECT id from account where name = 'Asgard/DEV'),
+  (SELECT id from "user" where tx_email='mail@server.com')
+);
+
+INSERT INTO user_has_account (account_id, user_id) VALUES (
+  (SELECT id from account where name = 'Asgard/INFRA'),
+  (SELECT id from "user" where tx_email='mail@server.com')
+);
+```
+
+Agora rode novamente o script que sobe o ambiente de desenvolvimento. Isso vai recriar todos os componentes, incluindo o baco de dados.
+
+Dessa forma, agora podemos fazer a seguinte requisição:
+
+```
+curl -H "Authorization: Token a648638d589740879f25bf55648ccc21" http://127.0.0.1:5000/v2/apps
+{"apps": []}% 
+```
+
+Agora sim você está vendo sua lista de apps, que obviamente é vazia. Nesse momento você está pronto
+para começar a desenvolver novos códigos para a Asgard API.
+
+
+## Evoluindo o banco de dados
+
+Sempre que fizermos uma mudança no banco, vamos guardar o SQL na pasta `sql/` . Os arquivos têm nome prefixado por um número (`date +"%s"`),
+pois isso indica a ordem em que deve ser rodados. Por enquanto vamos assim até migrar para um projeto que gerencie essas migrações.
+
+Para pegar o SQL que o Alchemy gera para um model:
+Abra o ipython (também passando as mesmas envs que você passou para rodar a API)
+
+```python
+>>> from sqlalchemy.schema import CreateTable
+>>> from hollowman.models import <Model>
+>>> from hollowman.models import engine
+>>> print (CreateTable(Account.__table__).compile(engine))
+```
+
+
+## Env vars necessárias para o projeto
 * ASGARD_CACHE_URL [required]: Enredeço do cache (Redis). No formato: `redis://<host>:<port>/<db>`
 * MARATHON_CREDENTIALS [required] user:pass for the basic auth
 * HOLLOWMAN_MARATHON_ADDRESS_INDEX [required] Where to connect to find Marathon api. List of Marathon IPs. <INDEX> starts at 0.
@@ -214,59 +292,5 @@ The thought of human invisibility has intrigued man for centuries. Highly gifted
 * ASGARD_LOGLEVEL: String indicando o loglevel a ser usado. Pode ser INFO, ERROR, DEBUG, WARNING, etc.
 
 
-
-## Evoluindo o banco de dados
-
-Sempr que fizermos uma mudança no banco, vamos guardar o SQL na pasta `sql/`. Os arquivos têm nome prefixado por um número (`date +"%s"`),
-pois isso indica a ordem em que deve ser rodados. Por enquanto vamos assim até migrar para um projeto que gerencie essas migrações.
-
-Para pegar o SQL que o Alchemy gera para um model:
-Abra o ipython com a env
->>> from sqlalchemy.schema import CreateTable
->>> from hollowman.models import <Model>
->>> from hollowman.models import engine
->>> print (CreateTable(Account.__table__).compile(engine))
-
-## Opções específicas de filtros
-
-Qualquer filtro pode ser desliagdo por app caso a app possua a label `hollowman.filter.<name>.disable=<anyvalue>`. Onde `<name>` é o
-valor do atributo `name` da classe que implementa o filtro em questão.
-
-
-Um filtro qualquer pode ser desabilitado **globalmente** usando a envvar: HOLLOWMAN_FILTER_<NAME>_DISABLE: "qualquer-valor".
-
-
-A ausência da env ou da label significa que o filtro está ligado.
-
-### Passando parametros adcionais para um filtro
-
-É possível passar parametros abritrários para um filtro qualquer via envvar. O nome da env deve ser:
-
-`HOLLOWMAN_FILTER_<FILTER>_PARAM_<OPTIONNAME>_<INDEX>` onde:
-
-`<FILTER>` é o nome do filtro
-`<OPTIONNAME>` e o nome do parametro
-`<INDEX>` é um indice para quando precisamos passar uma lista
-
-
-
-## Parametros por Filtro
-
-### Constraint
-
-O Filtro DNS recebe o parametro `BASECONSTRAINT`. Esse parametro diz quais constraints serão adicionadas a uma pp caso ela não tenha nenhuma. Isso significa que o nome da env é: `HOLLOWMAN_FILTER_CONSTRAINT_PARAM_BASECONSTRAINT_{0,1,2}`
-
-
-## Como adicionar novos plugins para a UI
-
-
-Para adicionar novos plugins o `main.js` do plugin deve ser comitado em `/static/plugins/<plugin-id>/main.js`
-Alteramos o arquivo `app.py` e adicionamos uma nova chamada a `register_plugin(<plugin-id>)`
-
-Isso é o mínimo neceessário para que esse novo plugin esteja disponível para a UI.
-
-
-
-
-## Running tests
-`py.test --cov=hollowman --cov-report term-missing -v -s`
+# Rodando os testes do projeto
+`PYTHONPATH=. py.test --cov=./ --cov-report term-missing -v -s`
