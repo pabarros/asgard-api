@@ -62,7 +62,7 @@ def after_request(response):
             "location": response.headers.get("Location"),
             "user-agent": request.headers.get("User-Agent"),
             "qstring": request.args,
-            "error": _get_current_exception_if_exists(request)
+            "current_exception": _get_current_exception_if_exists(request)
         }
     )
     return response
