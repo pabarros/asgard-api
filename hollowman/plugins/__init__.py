@@ -33,6 +33,9 @@ class API_PLUGIN_TYPES(Enum):
 PLUGIN_REGISTRY = {
 }
 
+PLUGINS_LOAD_STATUS = { 'plugins': {}
+}
+
 def register_plugin(plugin_id):
     plugin_data = {
         "id": plugin_id,
@@ -44,6 +47,9 @@ def register_plugin(plugin_id):
 
 def get_plugin_registry_data():
     return {'plugins': list(PLUGIN_REGISTRY.values())}
+
+def get_pulgin_load_status_data():
+    return PLUGINS_LOAD_STATUS
 
 def load_entrypoint_group(groupname):
     return list(pkg_resources.iter_entry_points(group=groupname))
@@ -70,6 +76,10 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
                 "plugin_id": package_name,
                 "mountpoint URI": url_prefix,
             })
+            PLUGINS_LOAD_STATUS['plugins'][package_name] = {
+                "status": "Plugin sucessfully loaded",
+                "plugin_id": package_name
+            }
         except Exception as e:
             logger.error({
                 "msg": "Failed to load plugin",
@@ -78,4 +88,7 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
                 "traceback": traceback.format_exc(),
                 "type": sys.exc_info()[0].__name__,
             })
-
+            PLUGINS_LOAD_STATUS['plugins'][package_name] = {
+                "status": "Failed to load plugin",
+                "plugin_id": package_name
+            }
