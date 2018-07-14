@@ -4,6 +4,6 @@ python:
 install:
   - pip install pipenv
   - pipenv install --system --deploy --ignore-pipfile --dev
-script: py.test -v --cov=hollowman --cov-report term-missing -v
+script: pipenv run py.test -v --cov=hollowman --cov-report term-missing -v
 after_success:
   - codecov
