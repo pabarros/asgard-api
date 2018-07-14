@@ -293,4 +293,4 @@ Abra o ipython (também passando as mesmas envs que você passou para rodar a AP
 
 
 # Rodando os testes do projeto
-`PYTHONPATH=. py.test --cov=./ --cov-report term-missing -v -s`
+`PIPENV_DONT_LOAD_ENV=1 pipenv run py.test --cov=./ --cov-report term-missing -v -s`
