@@ -33,7 +33,14 @@ class API_PLUGIN_TYPES(Enum):
 PLUGIN_REGISTRY = {
 }
 
-PLUGINS_LOAD_STATUS = { 'plugins': {}
+PLUGINS_LOAD_STATUS = {
+    'plugins': {
+    },
+    "stats": {
+        "load_ok": 0,
+        "load_failed": 0,
+        "load_total": 0,
+    }
 }
 
 def register_plugin(plugin_id):
@@ -87,6 +94,8 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
                     "function_name": entrypoint.attrs[0],
                 }
             })
+            PLUGINS_LOAD_STATUS["stats"]["load_ok"] += 1
+            PLUGINS_LOAD_STATUS["stats"]["load_total"] += 1
         except Exception as e:
             formatted_traceback = traceback.format_exc()
             exception_type = sys.exc_info()[0].__name__
@@ -107,3 +116,4 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
                     "function_name": entrypoint.attrs[0],
                 }
             })
+            PLUGINS_LOAD_STATUS["stats"]["load_failed"] += 1
