@@ -64,6 +64,9 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
     for entrypoint in all_metric_plugins:
         try:
             package_name = entrypoint.dist.project_name
+            if package_name not in PLUGINS_LOAD_STATUS['plugins']:
+                PLUGINS_LOAD_STATUS['plugins'][package_name] = []
+
             entrypoint_function = entrypoint.load()
             plugin_logger_instance = get_plugin_logger_instance(plugin_id=package_name)
             plugin_logger_instance.setLevel(getattr(logging, conf.LOGLEVEL, logging.INFO))
@@ -76,19 +79,31 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
                 "plugin_id": package_name,
                 "mountpoint URI": url_prefix,
             })
-            PLUGINS_LOAD_STATUS['plugins'][package_name] = {
-                "status": "Plugin sucessfully loaded",
-                "plugin_id": package_name
-            }
+            PLUGINS_LOAD_STATUS['plugins'][package_name].append({
+                "status": "OK",
+                "plugin_id": package_name,
+                "entrypoint": {
+                    "module_name": entrypoint.module_name,
+                    "function_name": entrypoint.attrs[0],
+                }
+            })
         except Exception as e:
+            formatted_traceback = traceback.format_exc()
+            exception_type = sys.exc_info()[0].__name__
             logger.error({
                 "msg": "Failed to load plugin",
                 "plugin_entrypoint": entrypoint,
                 "plugin_id": package_name,
-                "traceback": traceback.format_exc(),
-                "type": sys.exc_info()[0].__name__,
+                "traceback": formatted_traceback,
+                "type": exception_type,
             })
-            PLUGINS_LOAD_STATUS['plugins'][package_name] = {
-                "status": "Failed to load plugin",
-                "plugin_id": package_name
-            }
+            PLUGINS_LOAD_STATUS['plugins'][package_name].append({
+                "status": "FAIL",
+                "exception": exception_type,
+                "traceback": formatted_traceback,
+                "plugin_id": package_name,
+                "entrypoint": {
+                    "module_name": entrypoint.module_name,
+                    "function_name": entrypoint.attrs[0],
+                }
+            })
