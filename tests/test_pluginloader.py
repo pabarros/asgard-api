@@ -39,7 +39,6 @@ class PluginLoaderTest(unittest.TestCase):
         Certifica que populamos o registro interno contento o status de load de cada
         plugin
         """
-        self.maxDiff = None
         logger_mock = mock.MagicMock()
         with mock.patch.multiple(conf, LOGLEVEL="DEBUG"):
             plugins.PLUGINS_LOAD_STATUS['plugins'] = {}
