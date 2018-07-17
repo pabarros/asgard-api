@@ -49,12 +49,6 @@ class PluginLoaderTest(unittest.TestCase):
             data_sorted = sorted(plugin_status_data, key=lambda item: item['entrypoint']['function_name'])
             self.assertEqual(4, len(data_sorted))
 
-            # Os plugins estão sendo carfregados 2x (por causa da forma como os imports estão.
-            # Quando isso for resolvido, teremos que ajustar esses numeros.
-            self.assertEqual(4, plugins.PLUGINS_LOAD_STATUS['stats']['load_ok'])
-            self.assertEqual(8, plugins.PLUGINS_LOAD_STATUS['stats']['load_failed'])
-            self.assertEqual(4, plugins.PLUGINS_LOAD_STATUS['stats']['load_total'])
-
             expected_load_data = [{
                 "status": "FAIL",
                 "exception": "ImportError",
