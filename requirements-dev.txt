@@ -1,4 +1,0 @@
-ipdb==0.10.1
-./tests/fixtures/plugins/metrics/metric-plugin-example-1
--r requirements.txt
--r requirements-tests.txt

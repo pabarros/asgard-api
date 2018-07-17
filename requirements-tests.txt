@@ -1,7 +1,0 @@
--r requirements.txt
-pytest-cov==2.4.0
-coverage==4.2
-mock==2.0.0
-pytest==3.0.1
-responses==0.7.0
-codecov
