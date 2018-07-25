@@ -16,7 +16,7 @@ function zk_node_start() {
       --env-file <(
     echo ZOO_SERVERS=${ZOO_SERVERS}
     echo ZOO_PURGE_INTERVAL=${ZOO_PURGE_INTERVAL}
-    ) docker.sieve.com.br/infra/zookeeper:0.0.1
+    ) zookeeper:3.4.10
 }
 
 
