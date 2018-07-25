@@ -213,9 +213,23 @@ HOLLOWMAN_MESOS_ADDRESS_1=http://172.18.0.12:5050
 HOLLOWMAN_MESOS_ADDRESS_2=http://172.18.0.13:5050
 
 ```
-Você precisa passar todas as envs para ser posspivel rodar o código da API. Essa passagem de valores via env pode ser feito da forma que você achar melhor.
+Você precisa passar todas as envs para ser posspivel rodar o código da API. O jeito mais simples de fazer isso é criar um arquivo chamado `.env`
+na raiz do projeto. Esse arquivo já está no `.gitignore`, por isso não será comitado.
 
-Para rodar a API, chame o arquivo [hollowman/main.py](hollowman/main.py) usando seu interpretador python.
+## Rodando a Asgard API localmente
+
+O projeto Asgard API usa o `pipenv` e precisa do python 3.6. Antes de instalar as dependências, certifique que o python 3.6 esteja instalado em funcionando.
+Para instalar as dependências rode:
+
+```
+pipenv install --dev
+```
+
+Para rodar, use:
+
+```
+pipenv run python hollowman/main.py
+```
 
 Quando tiver a API rodando, você pode fazer um request para validar:
 
@@ -224,7 +238,7 @@ $ curl -i http://127.0.0.1:5000/v2/apps/
 {"msg": "Authorization token is invalid"}% 
 ```
 
-Isso significa que você não está autenticado, o que é verdade, já que nem criamos seu novo usuário.
+Isso significa que você não está autenticado, o que é verdade, já que nem criamos seu novo usuário. Faremos isso agora.
 
 ## Criando um novo usuário para desenvolvimento
 
