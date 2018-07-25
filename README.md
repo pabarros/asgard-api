@@ -214,7 +214,7 @@ HOLLOWMAN_MESOS_ADDRESS_2=http://172.18.0.13:5050
 
 ```
 Você precisa passar todas as envs para ser posspivel rodar o código da API. O jeito mais simples de fazer isso é criar um arquivo chamado `.env`
-na raiz do projeto. Esse arquivo já está no `.gitignore`, por isso não será comitado.
+na raiz do projeto, contento todas as envs mostradas acima, exatamente com esses valores. Esse arquivo já está no `.gitignore`, por isso não será comitado.
 
 ## Rodando a Asgard API localmente
 
