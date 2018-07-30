@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.74.0
+ * Adição do endpoint `/plugins` que mostra o status final de load dos plugins da API
+ * Mudança na chave onde a exception de um request é logada
+ * Fix no build da imagem docker para usar pipenv
+
 ### 0.73.0-rc1
  * Refactoring dos scripts que ligam o ambiente de dev local
  * Atualização da asgard SDK para 0.3.0-rc1
