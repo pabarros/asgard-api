@@ -33,6 +33,16 @@ class API_PLUGIN_TYPES(Enum):
 PLUGIN_REGISTRY = {
 }
 
+PLUGINS_LOAD_STATUS = {
+    'plugins': {
+    },
+    "stats": {
+        "load_ok": 0,
+        "load_failed": 0,
+        "load_total": 0,
+    }
+}
+
 def register_plugin(plugin_id):
     plugin_data = {
         "id": plugin_id,
@@ -44,6 +54,9 @@ def register_plugin(plugin_id):
 
 def get_plugin_registry_data():
     return {'plugins': list(PLUGIN_REGISTRY.values())}
+
+def get_pulgin_load_status_data():
+    return PLUGINS_LOAD_STATUS
 
 def load_entrypoint_group(groupname):
     return list(pkg_resources.iter_entry_points(group=groupname))
@@ -58,6 +71,9 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
     for entrypoint in all_metric_plugins:
         try:
             package_name = entrypoint.dist.project_name
+            if package_name not in PLUGINS_LOAD_STATUS['plugins']:
+                PLUGINS_LOAD_STATUS['plugins'][package_name] = []
+
             entrypoint_function = entrypoint.load()
             plugin_logger_instance = get_plugin_logger_instance(plugin_id=package_name)
             plugin_logger_instance.setLevel(getattr(logging, conf.LOGLEVEL, logging.INFO))
@@ -70,12 +86,34 @@ def load_all_metrics_plugins(flask_application, get_plugin_logger_instance=get_p
                 "plugin_id": package_name,
                 "mountpoint URI": url_prefix,
             })
+            PLUGINS_LOAD_STATUS['plugins'][package_name].append({
+                "status": "OK",
+                "plugin_id": package_name,
+                "entrypoint": {
+                    "module_name": entrypoint.module_name,
+                    "function_name": entrypoint.attrs[0],
+                }
+            })
+            PLUGINS_LOAD_STATUS["stats"]["load_ok"] += 1
+            PLUGINS_LOAD_STATUS["stats"]["load_total"] += 1
         except Exception as e:
+            formatted_traceback = traceback.format_exc()
+            exception_type = sys.exc_info()[0].__name__
             logger.error({
                 "msg": "Failed to load plugin",
                 "plugin_entrypoint": entrypoint,
                 "plugin_id": package_name,
-                "traceback": traceback.format_exc(),
-                "type": sys.exc_info()[0].__name__,
+                "traceback": formatted_traceback,
+                "type": exception_type,
             })
-
+            PLUGINS_LOAD_STATUS['plugins'][package_name].append({
+                "status": "FAIL",
+                "exception": exception_type,
+                "traceback": formatted_traceback,
+                "plugin_id": package_name,
+                "entrypoint": {
+                    "module_name": entrypoint.module_name,
+                    "function_name": entrypoint.attrs[0],
+                }
+            })
+            PLUGINS_LOAD_STATUS["stats"]["load_failed"] += 1

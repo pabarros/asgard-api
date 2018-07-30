@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "44b2f215655efa5bb856710c5e71a12a8a037abea1418193811c64c4ff785505"
+            "sha256": "b1671bb9fbbf5d3c271ef41b9ee263208d3a5fedd57b269e800a781c2a87d1cb"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,10 +22,6 @@
             ],
             "index": "pypi",
             "version": "==0.5.2"
-        },
-        "asgard-api-plugin-metrics-example-1": {
-            "editable": true,
-            "path": "./tests/fixtures/plugins/metrics/metric-plugin-example-1"
         },
         "asgard-api-plugin-metrics-fluentd": {
             "hashes": [
@@ -310,6 +306,10 @@
         "asgard-api": {
             "editable": true,
             "path": "."
+        },
+        "asgard-api-plugin-metrics-example-1": {
+            "editable": true,
+            "path": "./tests/fixtures/plugins/metrics/metric-plugin-example-1"
         },
         "atomicwrites": {
             "hashes": [

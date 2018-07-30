@@ -11,6 +11,7 @@ from hollowman.decorators import auth_required
 from hollowman.log import logger
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from hollowman.plugins import get_plugin_registry_data
+from hollowman.plugins import get_pulgin_load_status_data
 from hollowman import conf, request_handlers, upstream, http_wrappers
 
 
@@ -148,3 +149,8 @@ def plugins():
 def main_js(plugin_id):
     return redirect("static/plugins/{}/main.js".format(plugin_id))
 
+@application.route("/plugins")
+def plugins_status():
+    resp = make_response(json.dumps(get_pulgin_load_status_data()), 200)
+    resp.headers["Content-Type"] = "application/json; charset=utf-8"
+    return resp
