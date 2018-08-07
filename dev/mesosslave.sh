@@ -24,17 +24,13 @@ function start_mesos_slave() {
       -v /sys/fs/cgroup:/sys/fs/cgroup \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v $(dirname $(readlink --canonicalize ${0}))/../scripts/docker.tar.bz2:/etc/docker.tar.bz2 \
-      daltonmatos/mesos:0.0.3
+      b2wasgard/mesos:0.0.3
 }
 
-start_mesos_slave 172.18.0.51 "asgard-infra"
-start_mesos_slave 172.18.0.52 "asgard-infra"
-start_mesos_slave 172.18.0.53 "asgard-infra"
-start_mesos_slave 172.18.0.54 "asgard-infra"
-start_mesos_slave 172.18.0.55 "asgard-infra"
-start_mesos_slave 172.18.0.61 "asgard-dev"
-start_mesos_slave 172.18.0.62 "asgard-dev"
-start_mesos_slave 172.18.0.63 "asgard-dev"
-start_mesos_slave 172.18.0.64 "asgard-dev"
-start_mesos_slave 172.18.0.65 "asgard-dev"
+for IP in ${MESOS_SLAVE_IPS_ACCOUNT_ASGARD_INFRA}; do
+  start_mesos_slave ${IP} "asgard-infra"
+done
 
+for IP in ${MESOS_SLAVE_IPS_ACCOUNT_ASGARD_DEV}; do
+  start_mesos_slave ${IP} "asgard-dev"
+done
