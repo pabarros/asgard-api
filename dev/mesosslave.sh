@@ -24,7 +24,7 @@ function start_mesos_slave() {
       -v /sys/fs/cgroup:/sys/fs/cgroup \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -v $(dirname $(readlink --canonicalize ${0}))/../scripts/docker.tar.bz2:/etc/docker.tar.bz2 \
-      daltonmatos/mesos:0.0.3
+      b2wasgard/mesos:0.0.3
 }
 
 start_mesos_slave 172.18.0.51 "asgard-infra"
