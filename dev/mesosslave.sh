@@ -24,7 +24,7 @@ function start_mesos_slave() {
     ) \
       -v /sys/fs/cgroup:/sys/fs/cgroup \
       -v /var/run/docker.sock:/var/run/docker.sock \
-      -v $(dirname $(readlink --canonicalize ${0}))/../scripts/docker.tar.bz2:/etc/docker.tar.bz2 \
+      -v $(dirname $(readlink --canonicalize ${0}))/scripts/docker.tar.bz2:/etc/docker.tar.bz2 \
       b2wasgard/mesos:0.0.3)
 
     echo "Mesos Slave conatiner_id=${container_id:0:7} ns=${namespace} addr=${ip} attrs=${all_attrs}"
