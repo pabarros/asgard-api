@@ -6,4 +6,4 @@ container_id=$(docker run --rm -d \
                 --name asgard_ui \
                 b2wasgard/asgard-ui:0.18.0)
 
-echo "ASGARD UI (http://localhost) container_id=${container_id:0:8}"
+echo "ASGARD UI (http://localhost:4200) container_id=${container_id:0:8}"
