@@ -14,6 +14,7 @@ source "dev/zk.sh"
 source "dev/marathon.sh"
 source "dev/mesosmaster.sh"
 source "dev/mesosslave.sh"
+source "dev/asgard-ui.sh"
 
 #CREATE INITIAL GROUP
 echo "Creating initial groups. Waiting for Marathon to come up..."
