@@ -42,8 +42,7 @@ function marathon_start(){
       echo MARATHON_ZK_MAX_VERSIONS=${MARATHON_ZK_MAX_VERSIONS}
       echo JAVA_OPTS=${JAVA_OPTS}
       ) \
-        mesosphere/marathon:v1.3.13 --enable_features gpu_resources --mesos_role asgard
-              #--default_accepted_resource_roles asgard
+        mesosphere/marathon:v1.4.12 --enable_features gpu_resources --mesos_role asgard
 }
 
 marathon_start ${MARATHON_IP}
