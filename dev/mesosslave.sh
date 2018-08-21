@@ -41,3 +41,8 @@ start_mesos_slave "172.18.2.10" "asgard-dev" "extra_attrs=workload:general;dc:gc
 start_mesos_slave "172.18.2.11" "asgard-dev" "extra_attrs=workload:general;dc:gcp"
 start_mesos_slave "172.18.3.20" "asgard-dev" "extra_attrs=workload:general;dc:aws"
 start_mesos_slave "172.18.3.30" "asgard-dev" "extra_attrs=workload:general;dc:aws"
+
+
+# Slaves do Core do Asgard
+start_mesos_slave "172.18.0.20" "asgard" "extra_attrs=workload:asgard-cache;dc:aws"
+
