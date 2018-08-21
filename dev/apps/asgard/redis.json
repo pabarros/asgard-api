@@ -1,0 +1,61 @@
+[{
+  "id": "/asgard/cache/redis",
+  "cmd": null,
+  "cpus": 0.5,
+  "mem": 950,
+  "disk": 0,
+  "instances": 1,
+  "constraints": [
+    [
+      "dc",
+      "LIKE",
+      "aws"
+    ],
+    [
+      "mesos",
+      "LIKE",
+      "slave"
+    ],
+    [
+      "workload",
+      "LIKE",
+      "asgard-cache"
+    ],
+    [
+      "owner",
+      "LIKE",
+      "asgard"
+    ]
+  ],
+  "acceptedResourceRoles": [
+    "*"
+  ],
+  "container": {
+    "type": "DOCKER",
+    "volumes": [],
+    "docker": {
+      "image": "b2wasgard/redis:0.0.2",
+      "network": "HOST",
+      "portMappings": [],
+      "privileged": true,
+      "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/infra/asgard/cache/redis"
+        }
+      ],
+      "forcePullImage": true
+    }
+  },
+  "labels": {
+    "hollowman.default_scale": "1"
+  },
+  "portDefinitions": [],
+  "uris": [
+    "file:///etc/docker.tar.bz2"
+  ],
+  "upgradeStrategy": {
+    "minimumHealthCapacity": 0,
+    "maximumOverCapacity": 0
+  }
+}]

@@ -25,3 +25,5 @@ while true; do
   fi
 done
 
+source "dev/create-apps.sh"
+
