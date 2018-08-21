@@ -19,7 +19,7 @@ source "dev/asgard-ui.sh"
 #CREATE INITIAL GROUP
 echo "Creating initial groups. Waiting for Marathon to come up..."
 while true; do
-  curl -s -X PUT -d '{"id": "/", "groups": [{"id": "/asgard-dev"}, {"id": "/asgard-infra"}]}' http://${MARATHON_IP}:8080/v2/groups
+  curl -s -X PUT -d '{"id": "/", "groups": [{"id": "/asgard-dev"}, {"id": "/asgard-infra"}, {"id": "/asgard"}]}' http://${MARATHON_IP}:8080/v2/groups
   if [ $? -eq 0 ]; then
     break;
   fi
