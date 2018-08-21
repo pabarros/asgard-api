@@ -1,0 +1,65 @@
+{
+  "id": "/mysql",
+  "cmd": null,
+  "cpus": 0.2,
+  "mem": 128,
+  "disk": 0,
+  "instances": 1,
+  "constraints": [
+    [
+      "mesos",
+      "LIKE",
+      "slave"
+    ],
+    [
+      "workload",
+      "LIKE",
+      "general"
+    ],
+    [
+      "owner",
+      "LIKE",
+      "asgard-dev"
+    ]
+  ],
+  "acceptedResourceRoles": [],
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "mysql:5.7",
+      "portMappings": [],
+      "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard-dev/mysql"
+        }
+      ],
+      "privileged": false,
+      "forcePullImage": true
+    },
+    "volumes": [],
+    "portMappings": []
+  },
+  "env": {
+    "MYSQL_ROOT_PASSWORD": "secret"
+  },
+  "portDefinitions": [
+    {
+      "port": 10000,
+      "protocol": "tcp",
+      "name": null,
+      "labels": {}
+    }
+  ],
+  "fetch": [
+    {
+      "uri": "file:///etc/docker.tar.bz2",
+      "extract": true,
+      "executable": false,
+      "cache": false
+    }
+  ],
+  "uris": [
+    "file:///etc/docker.tar.bz2"
+  ]
+}
