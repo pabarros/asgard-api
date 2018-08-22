@@ -12,3 +12,6 @@ curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/phpmyadmin.json http://${MARATHON_IP}:8080/v2/apps
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/wordpress.json http://${MARATHON_IP}:8080/v2/apps
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/httpbin.json http://${MARATHON_IP}:8080/v2/apps
+
+
+curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/rabbitmq.json http://${MARATHON_IP}:8080/v2/apps

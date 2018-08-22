@@ -12,7 +12,7 @@ function start_mesos_slave() {
     aditional_attrs=$(echo ${3} | cut -f 2 -d '=')
 
     all_attrs="${MESOS_ATTRIBUTES};${aditional_attrs};owner:${namespace}"
-    container_id=$(docker run -d --rm -it --ip ${ip} \
+    container_id=$(docker run -d -it --ip ${ip} \
       --name asgard_mesosslave_${RANDOM} \
       --net ${NETWORK_NAME} \
       --env-file <(
@@ -48,4 +48,5 @@ start_mesos_slave "172.18.5.1" "asgard-dev" "extra_attrs=workload:mysql-wordpres
 
 # Slaves do Core do Asgard
 start_mesos_slave "172.18.0.20" "asgard" "extra_attrs=workload:asgard-cache;dc:aws"
+start_mesos_slave "172.18.0.21" "asgard" "extra_attrs=workload:asgard-log-ingest-rabbitmq;dc:aws"
 
