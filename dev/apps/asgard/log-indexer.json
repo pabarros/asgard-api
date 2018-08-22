@@ -1,0 +1,125 @@
+[{
+  "id": "/asgard/logs/app-log-ingestor",
+    "cmd": null,
+    "cpus": 0.5,
+    "mem": 512,
+    "disk": 0,
+    "instances": 0,
+    "constraints": [
+      [
+        "dc",
+    "LIKE",
+    "aws"
+      ],
+      [
+        "mesos",
+      "LIKE",
+      "slave"
+      ],
+      [
+        "workload",
+      "LIKE",
+      "general"
+      ],
+      [
+        "owner",
+      "LIKE",
+      "asgard"
+      ]
+      ],
+      "acceptedResourceRoles": [
+        "*"
+      ],
+      "container": {
+        "type": "DOCKER",
+        "docker": {
+          "image": "b2wasgard/log-indexer:0.4.0",
+          "network": "BRIDGE",
+          "portMappings": [
+          {
+            "name": null,
+            "containerPort": 0,
+            "hostPort": 0,
+            "servicePort": 10004,
+            "protocol": "tcp",
+            "labels": {}
+          }
+          ],
+          "parameters": [
+          {
+            "key": "label",
+            "value": "hollowman.appname=/asgard/logs/app-log-ingestor"
+          },
+          {
+            "key": "log-opt",
+            "value": "fluentd-address=172.18.70.2:24224"
+          },
+          {
+            "key": "log-opt",
+            "value": "tag=asgard.app.asgard.logs.app-log-ingestor"
+          },
+          {
+            "key": "log-opt",
+            "value": "fluentd-async-connect=1"
+          },
+          {
+            "key": "log-driver",
+            "value": "fluentd"
+          },
+          {
+            "key": "network",
+            "value": "asgard"
+          }
+          ],
+          "privileged": false,
+          "forcePullImage": true
+        },
+        "volumes": [],
+        "portMappings": [
+        {
+          "name": null,
+          "containerPort": 0,
+          "hostPort": 0,
+          "servicePort": 10004,
+          "protocol": "tcp",
+          "labels": {}
+        }
+        ]
+      },
+      "env": {
+        "LOGS_QUEUE_NAMES": "asgard/app/infra/asgard/logs/counts, asgard/errors/*, asgard-unrouted, asgard/app/infra/asgard/logs/app-log-ingestor",
+        "LOGS_RABBITMQ_USER": "guest",
+        "INDEXER_BULK_INSERT_TIMEOUT": "50",
+        "LOGS_RABBITMQ_VHOST": "fluentd",
+        "LOGS_RABBITMQ_PREFETCH": "128",
+        "LOGS_RABBITMQ_HOST": "172.18.80.1",
+        "ASGARD_LOGINGESTOR_LOGLEVEL": "DEBUG",
+        "LOGS_RABBITMQ_PWD": "guest",
+        "HOLLOWMAN_ELASTICSEARCH_ADDRESS_0": "172.18.70.1:9200",
+        "LOGS_BULK_SIZE": "128",
+        "ASYNCWORKER_LOGLEVEL": "ERROR"
+      },
+      "labels": {
+        "hollowman.default_scale": "4"
+      },
+      "networks": [
+      {
+        "mode": "container/bridge"
+      }
+      ],
+      "portDefinitions": [
+      {
+        "port": 10004,
+        "protocol": "tcp",
+        "name": null,
+        "labels": {}
+      }
+      ],
+      "upgradeStrategy": {
+        "maximumOverCapacity": 0,
+        "minimumHealthCapacity": 0
+      },
+      "uris": [
+        "file:///etc/docker.tar.bz2"
+      ]
+}]

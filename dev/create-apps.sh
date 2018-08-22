@@ -22,6 +22,7 @@ curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard
 # 172.18.70.2
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/fluentd.json http://${MARATHON_IP}:8080/v2/apps
 
+curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/log-indexer.json http://${MARATHON_IP}:8080/v2/apps
 
 
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/echo.json http://${MARATHON_IP}:8080/v2/apps
