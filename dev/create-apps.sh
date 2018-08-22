@@ -18,11 +18,13 @@ curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard
 
 # 172.18.70.1
 #curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/elasticsearch.json http://${MARATHON_IP}:8080/v2/apps
+docker run --rm --net=asgard --ip 172.18.70.1 --name "asgard_elasticsearch_$$" -d elasticsearch:5.5-alpine
 
 # 172.18.70.2
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/fluentd.json http://${MARATHON_IP}:8080/v2/apps
 
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/log-indexer.json http://${MARATHON_IP}:8080/v2/apps
+curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/kibana.json http://${MARATHON_IP}:8080/v2/apps
 
 
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/echo.json http://${MARATHON_IP}:8080/v2/apps
