@@ -1,0 +1,66 @@
+[{
+  "id": "/asgard-dev/echo",
+    "cmd": "while true; do echo {\\\"bla\\\": \\\"value\\\"} ; sleep 1; done",
+    "cpus": 1,
+    "mem": 128,
+    "disk": 0,
+    "instances": 1,
+    "constraints": [
+      [
+        "mesos",
+    "LIKE",
+    "slave"
+      ],
+      [
+        "workload",
+      "LIKE",
+      "general"
+      ],
+      [
+        "owner",
+      "LIKE",
+      "asgard-dev"
+      ]
+    ],
+    "acceptedResourceRoles": [
+      "*"
+    ],
+    "container": {
+      "type": "DOCKER",
+      "docker": {
+        "image": "alpine",
+        "network": "BRIDGE",
+        "portMappings": [],
+        "parameters": [
+        {
+          "key": "log-opt",
+          "value": "fluentd-address=172.18.70.2:24224"
+        },
+        {
+          "key": "log-opt",
+          "value": "tag=asgard.app.asgard-dev.echo"
+        },
+        {
+          "key": "log-opt",
+          "value": "fluentd-async-connect=1"
+        },
+        {
+          "key": "log-driver",
+          "value": "fluentd"
+        },
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard/generate-log"
+        }
+        ],
+        "privileged": false,
+        "forcePullImage": true
+      },
+      "volumes": [],
+      "portMappings": []
+    },
+    "portDefinitions": [],
+    "uris": [
+      "file:///etc/docker.tar.bz2"
+    ]
+}]

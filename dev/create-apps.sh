@@ -24,3 +24,5 @@ curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard
 
 
 
+curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/echo.json http://${MARATHON_IP}:8080/v2/apps
+
