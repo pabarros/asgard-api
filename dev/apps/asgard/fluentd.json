@@ -1,0 +1,79 @@
+[{
+  "id": "/asgard/logs/fluentd",
+    "cmd": null,
+    "cpus": 1,
+    "mem": 1024,
+    "disk": 0,
+    "instances": 1,
+    "acceptedResourceRoles": [
+      "*"
+    ],
+    "container": {
+      "type": "DOCKER",
+      "docker": {
+        "image": "b2wasgard/fluentd:0.5.0",
+        "network": "BRIDGE",
+        "portMappings": [
+        {
+          "containerPort": 24224,
+          "hostPort": 0,
+          "servicePort": 10005,
+          "protocol": "tcp",
+          "labels": {}
+        }
+        ],
+        "privileged": true,
+        "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard/logs/fluentd"
+        },
+        {
+          "key": "network",
+          "value": "asgard"
+        },
+        {
+          "key": "ip",
+          "value": "172.18.70.2"
+        }
+        ],
+        "forcePullImage": true
+      }
+    },
+    "env": {
+      "TARGET_RABBITMQ_PASSWORD": "guest",
+      "TARGET_RABBITMQ_PORT": "5672",
+      "TARGET_RABBITMQ_USER": "guest",
+      "FLUENTD_FLUSH_THREAD_COUNT": "4",
+      "FLUENTD_SOURCE_PORT": "24224",
+      "FILTER_PARSER_JSON_RESERVE_DATA": "false",
+      "TARGET_RABBITMQ_EXCHANGE_DURABLE": "true",
+      "FLUENTD_BACKOFF_BASE": "1.6",
+      "TARGET_RABBITMQ_HOST": "172.18.80.1",
+      "TARGET_RABBITMQ_EXCHANGE": "fluentd-logs",
+      "FLUENTD_SOURCE_MONITORING_PORT": "24220",
+      "FLUENTD_CONF": "export_log_to_rabbitmq.conf",
+      "FLUENTD_SYSTEM_LOG_LEVEL": "fatal",
+      "TARGET_RABBITMQ_VHOST": "fluentd",
+      "TARGET_RABBITMQ_TAG_KEY": "true",
+      "TARGET_RABBITMQ_PERSISTENT": "true"
+    },
+    "labels": {
+      "hollowman.default_scale": "1"
+    },
+    "portDefinitions": [
+    {
+      "port": 10005,
+      "protocol": "tcp",
+      "name": "default",
+      "labels": {}
+    }
+    ],
+    "uris": [
+      "file:///etc/docker.tar.bz2"
+    ],
+    "upgradeStrategy": {
+      "minimumHealthCapacity": 0,
+      "maximumOverCapacity": 0
+    }
+}]

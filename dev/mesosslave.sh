@@ -47,6 +47,7 @@ start_mesos_slave "172.18.5.1" "asgard-dev" "extra_attrs=workload:mysql-wordpres
 
 
 # Slaves do Core do Asgard
+start_mesos_slave "172.18.0.19" "asgard" "extra_attrs=workload:general;dc:aws"
 start_mesos_slave "172.18.0.20" "asgard" "extra_attrs=workload:asgard-cache;dc:aws"
 start_mesos_slave "172.18.0.21" "asgard" "extra_attrs=workload:asgard-log-ingest-rabbitmq;dc:aws"
 

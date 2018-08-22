@@ -34,6 +34,7 @@
     "type": "DOCKER",
     "docker": {
       "image": "rabbitmq:3.6-management",
+      "network": "BRIDGE",
       "portMappings": [
         {
           "name": "web",
