@@ -27,3 +27,4 @@ done
 
 source "dev/create-apps.sh"
 
+#pipenv run python hollowman/main.py

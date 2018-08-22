@@ -1,0 +1,90 @@
+[{
+  "id": "/asgard-dev/phpmyadmin",
+    "cmd": null,
+    "cpus": 0.5,
+    "mem": 128,
+    "disk": 0,
+    "instances": 0,
+    "constraints": [
+      [
+        "mesos",
+    "LIKE",
+    "slave"
+      ],
+      [
+        "workload",
+      "LIKE",
+      "general"
+      ],
+      [
+        "owner",
+      "LIKE",
+      "asgard-dev"
+      ]
+    ],
+    "acceptedResourceRoles": [
+      "*"
+    ],
+    "container": {
+      "type": "DOCKER",
+      "docker": {
+        "image": "phpmyadmin/phpmyadmin",
+        "network": "HOST",
+        "portMappings": [
+        {
+          "name": "http",
+          "containerPort": 80,
+          "hostPort": 0,
+          "servicePort": 10001,
+          "protocol": "tcp",
+          "labels": {}
+        }
+        ],
+        "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard-dev/phpmyadmin"
+        },
+        {
+          "key": "network",
+          "value": "asgard"
+        }
+        ],
+        "privileged": false,
+        "forcePullImage": true
+      },
+      "volumes": [],
+      "portMappings": [
+      {
+        "name": "http",
+        "containerPort": 80,
+        "hostPort": 0,
+        "servicePort": 10001,
+        "protocol": "tcp",
+        "labels": {}
+      }
+      ]
+    },
+    "env": {
+      "PMA_HOST": "172.18.0.5",
+      "PMA_PORT": "3306",
+      "PMA_USER": "root",
+      "PMA_PASSWORD": "secret"
+    },
+    "networks": [
+    {
+      "mode": "container/bridge"
+    }
+    ],
+    "portDefinitions": [
+    {
+      "port": 10001,
+      "protocol": "tcp",
+      "name": null,
+      "labels": {}
+    }
+    ],
+    "uris": [
+      "file:///etc/docker.tar.bz2"
+    ]
+}]
