@@ -15,6 +15,7 @@ function start_mesos_slave() {
     container_id=$(docker run -d -it --ip ${ip} \
       --name asgard_mesosslave_${RANDOM} \
       --net ${NETWORK_NAME} \
+      --restart always \
       --env-file <(
     echo MESOS_IP=${ip}
     echo LIBPROCESS_ADVERTISE_IP=${ip}
