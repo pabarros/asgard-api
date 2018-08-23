@@ -21,6 +21,8 @@ function start_mesos_slave() {
     echo MESOS_ATTRIBUTES="${MESOS_ATTRIBUTES};${aditional_attrs};owner:${namespace}"
     echo MESOS_MASTER=${MESOS_MASTER}
     echo MESOS_RESOURCES=${MESOS_RESOURCES}
+    echo MESOS_CGROUPS_ENABLE_CFS=1
+    echo MESOS_CGROUPS_CPU_ENABLE_PIDS_AND_TIDS_COUNT=1
     ) \
       -v /sys/fs/cgroup:/sys/fs/cgroup \
       -v /var/run/docker.sock:/var/run/docker.sock \
@@ -47,6 +49,7 @@ start_mesos_slave "172.18.5.1" "asgard-dev" "extra_attrs=workload:mysql-wordpres
 
 
 # Slaves do Core do Asgard
+start_mesos_slave "172.18.0.18" "asgard" "extra_attrs=workload:general;dc:aws"
 start_mesos_slave "172.18.0.19" "asgard" "extra_attrs=workload:general;dc:aws"
 start_mesos_slave "172.18.0.20" "asgard" "extra_attrs=workload:asgard-cache;dc:aws"
 start_mesos_slave "172.18.0.21" "asgard" "extra_attrs=workload:asgard-log-ingest-rabbitmq;dc:aws"
