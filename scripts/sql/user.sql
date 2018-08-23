@@ -1,7 +1,7 @@
 \c asgard;
 
-insert into account (name, namespace, owner) values ('Asgard/DEV', 'asgard-dev', 'asgard-dev');
 insert into account (name, namespace, owner) values ('Asgard/INFRA', 'asgard-infra', 'asgard-infra');
+insert into account (name, namespace, owner) values ('Asgard/DEV', 'asgard-dev', 'asgard-dev');
 insert into account (name, namespace, owner) values ('Asgard/Core', 'asgard', 'asgard');
 
 INSERT INTO "user" (tx_name, tx_email, tx_authkey, bl_system) VALUES ('Dalton Barreto', 'daltonmatos@gmail.com', '15ce068d5d2942b18a7f8ae76933f53', false);
