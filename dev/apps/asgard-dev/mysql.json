@@ -32,13 +32,17 @@
       "portMappings": [],
       "network": "HOST",
       "parameters": [
-        {
+       {
           "key": "label",
           "value": "hollowman.appname=/asgard-dev/mysql"
         },
         {
           "key": "network",
           "value": "asgard"
+        },
+        {
+          "key": "ip",
+          "value": "172.18.70.10"
         }
       ],
       "privileged": false,
@@ -46,6 +50,10 @@
     },
     "volumes": [],
     "portMappings": []
+  },
+  "upgradeStrategy": {
+    "maximumOverCapacity": 0,
+    "minimumHealthCapacity": 0
   },
   "env": {
     "MYSQL_ROOT_PASSWORD": "secret"

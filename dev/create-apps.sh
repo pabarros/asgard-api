@@ -8,6 +8,7 @@ echo ""
 echo "Creating initial apps...${BASEDIR}"
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard/redis.json http://${MARATHON_IP}:8080/v2/apps
 
+# MySQL 172.18.70.10
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/mysql.json http://${MARATHON_IP}:8080/v2/apps
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/phpmyadmin.json http://${MARATHON_IP}:8080/v2/apps
 curl -s -H "Content-type: application/json" -X PUT -d@${BASEDIR}/dev/apps/asgard-dev/wordpress.json http://${MARATHON_IP}:8080/v2/apps

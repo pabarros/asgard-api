@@ -66,7 +66,7 @@
       ]
     },
     "env": {
-      "PMA_HOST": "172.18.0.5",
+      "PMA_HOST": "172.18.70.10",
       "PMA_PORT": "3306",
       "PMA_USER": "root",
       "PMA_PASSWORD": "secret"
