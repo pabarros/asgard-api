@@ -32,6 +32,22 @@
       "portMappings": [],
       "network": "HOST",
       "parameters": [
+          {
+          "key": "log-opt",
+          "value": "fluentd-address=172.18.70.2:24224"
+        },
+        {
+          "key": "log-opt",
+          "value": "tag=asgard.app.asgard-dev.mysql"
+        },
+        {
+          "key": "log-opt",
+          "value": "fluentd-async-connect=1"
+        },
+        {
+          "key": "log-driver",
+          "value": "fluentd"
+        },
        {
           "key": "label",
           "value": "hollowman.appname=/asgard-dev/mysql"
