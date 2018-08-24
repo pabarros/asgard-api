@@ -34,3 +34,14 @@ put_json "${BASEDIR}/dev/apps/asgard/kibana.json"
 put_json "${BASEDIR}/dev/apps/asgard/stats-collector.json"
 
 put_json "${BASEDIR}/dev/apps/asgard-dev/echo.json"
+
+
+
+echo "Creating initial queues/users/vhosts. Waiting for RabbitMQ to come up..."
+while true; do
+  curl -sF "file=@${BASEDIR}/dev/rabbit_0e9901f475ce_2018-8-24.json" "http://172.18.80.1:15672/api/definitions?auth=Z3Vlc3Q6Z3Vlc3Q="
+  if [ $? -eq 0 ]; then
+    break;
+  fi
+  sleep 5
+done
