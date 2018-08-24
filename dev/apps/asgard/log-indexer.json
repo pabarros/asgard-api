@@ -4,7 +4,7 @@
     "cpus": 0.5,
     "mem": 512,
     "disk": 0,
-    "instances": 0,
+    "instances": 1,
     "constraints": [
       [
         "dc",
@@ -87,16 +87,16 @@
         ]
       },
       "env": {
-        "LOGS_QUEUE_NAMES": "asgard/app/infra/asgard/logs/counts, asgard/errors/*, asgard-unrouted, asgard/app/infra/asgard/logs/app-log-ingestor",
+        "LOGS_QUEUE_NAMES": "asgard/errors/*, asgard-unrouted",
         "LOGS_RABBITMQ_USER": "guest",
         "INDEXER_BULK_INSERT_TIMEOUT": "50",
         "LOGS_RABBITMQ_VHOST": "fluentd",
-        "LOGS_RABBITMQ_PREFETCH": "128",
+        "LOGS_RABBITMQ_PREFETCH": "32",
         "LOGS_RABBITMQ_HOST": "172.18.80.1",
         "ASGARD_LOGINGESTOR_LOGLEVEL": "DEBUG",
         "LOGS_RABBITMQ_PWD": "guest",
         "HOLLOWMAN_ELASTICSEARCH_ADDRESS_0": "172.18.70.1:9200",
-        "LOGS_BULK_SIZE": "128",
+        "LOGS_BULK_SIZE": "8",
         "ASYNCWORKER_LOGLEVEL": "ERROR"
       },
       "labels": {
