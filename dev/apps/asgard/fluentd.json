@@ -4,7 +4,7 @@
     "cpus": 1,
     "mem": 1024,
     "disk": 0,
-    "instances": 0,
+    "instances": 1,
     "acceptedResourceRoles": [
       "*"
     ],
@@ -48,7 +48,7 @@
       "FLUENTD_SOURCE_PORT": "24224",
       "FILTER_PARSER_JSON_RESERVE_DATA": "false",
       "TARGET_RABBITMQ_EXCHANGE_DURABLE": "true",
-      "FLUENTD_BACKOFF_BASE": "1.6",
+      "FLUENTD_BACKOFF_BASE": "1",
       "TARGET_RABBITMQ_HOST": "172.18.80.1",
       "TARGET_RABBITMQ_EXCHANGE": "fluentd-logs",
       "FLUENTD_SOURCE_MONITORING_PORT": "24220",
