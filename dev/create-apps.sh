@@ -45,3 +45,8 @@ while true; do
   fi
   sleep 5
 done
+
+
+echo "Restaurando configs do Kibana..."
+curl --data-binary @${BASEDIR}/dev/kibana-indices.json -X POST  http://172.18.70.1:9200/.kibana/_bulk
+
