@@ -1,0 +1,85 @@
+[{
+  "id": "/asgard/logs/elasticsearch/kibana",
+    "cmd": null,
+    "cpus": 0.3,
+    "mem": 512,
+    "disk": 0,
+    "instances": 1,
+    "constraints": [
+      [
+        "mesos",
+    "LIKE",
+    "slave"
+      ],
+      [
+        "workload",
+      "LIKE",
+      "general"
+      ],
+      [
+        "owner",
+      "LIKE",
+      "asgard"
+      ]
+    ],
+    "acceptedResourceRoles": [
+      "*"
+    ],
+    "container": {
+      "type": "DOCKER",
+      "docker": {
+        "image": "kibana:5.2.2",
+        "network": "BRIDGE",
+        "portMappings": [
+        {
+          "name": "web",
+          "containerPort": 5601,
+          "hostPort": 0,
+          "servicePort": 10092,
+          "protocol": "tcp",
+          "labels": {}
+        }
+        ],
+        "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard/logs/elasticsearch/kibana"
+        },
+        {
+          "key": "network",
+          "value": "asgard"
+        },
+        {
+          "key": "ip",
+          "value": "172.18.70.5"
+        }
+        ],
+        "privileged": false,
+        "forcePullImage": true
+      },
+      "volumes": [],
+      "portMappings": [
+      {
+        "name": "web",
+        "containerPort": 5601,
+        "hostPort": 0,
+        "servicePort": 10092,
+        "protocol": "tcp",
+        "labels": {}
+      }
+      ]
+    },
+    "env": {
+      "ELASTICSEARCH_URL": "http://172.18.70.1:9200"
+    },
+    "labels": {
+    },
+    "networks": [
+    {
+      "mode": "container/bridge"
+    }
+    ],
+    "uris": [
+      "file:///etc/docker.tar.bz2"
+    ]
+}]

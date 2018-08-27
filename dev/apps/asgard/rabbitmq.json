@@ -1,0 +1,100 @@
+[{
+  "id": "/asgard/logs/rabbitmq/nodes",
+  "cmd": null,
+  "cpus": 1,
+  "mem": 1024,
+  "disk": 0,
+  "instances": 1,
+  "constraints": [
+    [
+      "dc",
+      "LIKE",
+      "aws"
+    ],
+    [
+      "mesos",
+      "LIKE",
+      "slave"
+    ],
+    [
+      "workload",
+      "LIKE",
+      "asgard-log-ingest-rabbitmq"
+    ],
+    [
+      "owner",
+      "LIKE",
+      "asgard"
+    ]
+  ],
+  "acceptedResourceRoles": [
+    "*"
+  ],
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "rabbitmq:3.6-management",
+      "network": "BRIDGE",
+      "portMappings": [
+        {
+          "name": "web",
+          "containerPort": 15672,
+          "hostPort": 0,
+          "servicePort": 10003,
+          "protocol": "tcp",
+          "labels": {}
+        }
+      ],
+      "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard/logs/rabbitmq/nodes"
+        },
+        {
+          "key": "network",
+          "value": "asgard"
+        },
+        {
+          "key": "ip",
+          "value": "172.18.80.1"
+        }
+      ],
+      "privileged": true,
+      "forcePullImage": true
+    },
+    "volumes": [],
+    "portMappings": [
+      {
+        "name": "web",
+        "containerPort": 15672,
+        "hostPort": 0,
+        "servicePort": 10003,
+        "protocol": "tcp",
+        "labels": {}
+      }
+    ]
+  },
+  "env": {
+    "RABBITMQ_VM_MEMORY_HIGH_WATERMARK": "1024MiB"
+  },
+  "networks": [
+    {
+      "mode": "container/bridge"
+    }
+  ],
+  "portDefinitions": [
+    {
+      "port": 10003,
+      "protocol": "tcp",
+      "name": null,
+      "labels": {}
+    }
+  ],
+  "upgradeStrategy": {
+    "maximumOverCapacity": 0,
+    "minimumHealthCapacity": 0
+  },
+  "uris": [
+    "file:///etc/docker.tar.bz2"
+  ]
+}]

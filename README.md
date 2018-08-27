@@ -218,14 +218,14 @@ na raiz do projeto, contento todas as envs mostradas acima, exatamente com esses
 
 ## Rodando a Asgard API localmente
 
-O projeto Asgard API usa o `pipenv` e precisa do python 3.6. Antes de instalar as dependências, certifique que o python 3.6 esteja instalado em funcionando.
+O projeto Asgard API usa o `pipenv` e precisa do python 3.6. Antes de instalar as dependências, certifique que o python 3.6 esteja instalado e funcionando.
 Para instalar as dependências rode:
 
 ```
 pipenv install --dev
 ```
 
-Para rodar, use:
+Para rodar a API, use:
 
 ```
 pipenv run python hollowman/main.py
@@ -271,6 +271,15 @@ curl -H "Authorization: Token a648638d589740879f25bf55648ccc21" http://127.0.0.1
 
 Agora sim você está vendo sua lista de apps, que obviamente é vazia. Nesse momento você está pronto
 para começar a desenvolver novos códigos para a Asgard API.
+
+
+## Rodando um ambiente Asgard completo
+
+Para rodar um ambiente completo, use o script `asgard-run.sh`. Esse script vai ligar um container para cada componente do Asgard.
+Depois que tiver com todos os containers rodando mais a API (que rodamos com o comando acima), basta acessar `http://localhost:4200`
+e fazer login usando o usuário que acabamos e criar.
+
+**Atenção**: Para o processo de login funcionar você precisa criar uma Oauth2 app no console do Google. Mais detalhes aqui: https://developers.google.com/identity/protocols/OAuth2
 
 
 ## Evoluindo o banco de dados

@@ -1,0 +1,82 @@
+[{
+  "id": "/asgard-dev/httpbin",
+    "cmd": null,
+    "cpus": 0.1,
+    "mem": 128,
+    "disk": 0,
+    "instances": 0,
+    "constraints": [
+      [
+        "mesos",
+    "LIKE",
+    "slave"
+      ],
+      [
+        "workload",
+      "LIKE",
+      "general"
+      ],
+      [
+        "owner",
+      "LIKE",
+      "asgard-dev"
+      ]
+    ],
+    "acceptedResourceRoles": ["*"],
+    "container": {
+      "type": "DOCKER",
+      "docker": {
+        "image": "kennethreitz/httpbin",
+        "network": "BRIDGE",
+        "portMappings": [
+        {
+          "name": "http",
+          "containerPort": 80,
+          "hostPort": 0,
+          "servicePort": 10000,
+          "protocol": "tcp",
+          "labels": {}
+        }
+        ],
+        "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard-dev/httpbin"
+        },
+        {
+          "key": "network",
+          "value": "asgard"
+        }
+        ],
+        "privileged": false,
+        "forcePullImage": true
+      },
+      "volumes": [],
+      "portMappings": [
+      {
+        "name": "http",
+        "containerPort": 80,
+        "hostPort": 0,
+        "servicePort": 10000,
+        "protocol": "tcp",
+        "labels": {}
+      }
+      ]
+    },
+    "networks": [
+    {
+      "mode": "container/bridge"
+    }
+    ],
+    "portDefinitions": [
+    {
+      "port": 10000,
+      "protocol": "tcp",
+      "name": "default",
+      "labels": {}
+    }
+    ],
+    "uris": [
+      "file:///etc/docker.tar.bz2"
+    ]
+}]

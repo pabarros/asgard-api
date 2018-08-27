@@ -1,0 +1,89 @@
+[{
+  "id": "/asgard-dev/wordpress",
+    "cmd": null,
+    "cpus": 0.3,
+    "mem": 256,
+    "disk": 0,
+    "instances": 0,
+    "constraints": [
+      [
+        "mesos",
+    "LIKE",
+    "slave"
+      ],
+      [
+        "workload",
+      "LIKE",
+      "general"
+      ],
+      [
+        "owner",
+      "LIKE",
+      "asgard-dev"
+      ]
+    ],
+    "acceptedResourceRoles": [
+      "*"
+    ],
+    "container": {
+      "type": "DOCKER",
+      "docker": {
+        "image": "wordpress:4.9.8-php5.6-apache",
+        "network": "BRIDGE",
+        "portMappings": [
+        {
+          "name": "http",
+          "containerPort": 80,
+          "hostPort": 0,
+          "servicePort": 10002,
+          "protocol": "tcp",
+          "labels": {}
+        }
+        ],
+        "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard-dev/wordpress"
+        },
+        {
+          "key": "network",
+          "value": "asgard"
+        }
+        ],
+        "privileged": false,
+        "forcePullImage": true
+      },
+      "volumes": [],
+      "portMappings": [
+      {
+        "name": "http",
+        "containerPort": 80,
+        "hostPort": 0,
+        "servicePort": 10002,
+        "protocol": "tcp",
+        "labels": {}
+      }
+      ]
+    },
+    "env": {
+      "WORDPRESS_DB_HOST": "172.18.70.10",
+      "WORDPRESS_DB_USER": "root",
+      "WORDPRESS_DB_PASSWORD": "secret"
+    },
+    "networks": [
+    {
+      "mode": "container/bridge"
+    }
+    ],
+    "portDefinitions": [
+    {
+      "port": 10002,
+      "protocol": "tcp",
+      "name": null,
+      "labels": {}
+    }
+    ],
+    "uris": [
+      "file:///etc/docker.tar.bz2"
+    ]
+}]

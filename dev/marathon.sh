@@ -15,7 +15,7 @@ MARATHON_ZK_SESSION_TIMEOUT=10000
 MARATHON_ZK_MAX_VERSIONS=25
 JAVA_OPTS=-Xms2g
 MARATHON_HTTP_CREDENTIALS=marathon:pwd
-MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=http://localhost:4200
+MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=http://localhost:4200,http://localhost
 
 function marathon_start(){
   ip=${1}
@@ -41,11 +41,8 @@ function marathon_start(){
       echo MARATHON_ZK_SESSION_TIMEOUT=${MARATHON_ZK_SESSION_TIMEOUT}
       echo MARATHON_ZK_MAX_VERSIONS=${MARATHON_ZK_MAX_VERSIONS}
       echo JAVA_OPTS=${JAVA_OPTS}
-      #echo #MARATHON_HTTP_CREDENTIALS=${MARATHON_HTTP_CREDENTIALS}
-      echo MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=${MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN}
       ) \
-        mesosphere/marathon:v1.3.13 --enable_features gpu_resources --mesos_role asgard
-              #--default_accepted_resource_roles asgard
+        mesosphere/marathon:v1.4.12 --enable_features gpu_resources --mesos_role asgard
 }
 
 marathon_start ${MARATHON_IP}

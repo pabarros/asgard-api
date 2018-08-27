@@ -1,0 +1,82 @@
+[{
+  "id": "/asgard/asgard-app-stats-collector",
+    "cmd": null,
+    "cpus": 0.1,
+    "cmd": "while true; do python -m status_collector; sleep 1; done",
+    "mem": 64,
+    "disk": 0,
+    "instances": 1,
+    "constraints": [
+      [
+        "mesos",
+    "LIKE",
+    "slave"
+      ],
+      [
+        "workload",
+      "LIKE",
+      "general"
+      ],
+      [
+        "owner",
+      "LIKE",
+      "asgard"
+      ]
+    ],
+    "acceptedResourceRoles": [
+      "*"
+    ],
+    "container": {
+      "type": "DOCKER",
+      "docker": {
+        "image": "b2wasgard/stats-collector:0.1.0",
+        "network": "BRIDGE",
+        "portMappings": [],
+        "parameters": [
+        {
+          "key": "label",
+          "value": "hollowman.appname=/asgard/asgard-app-stats-collector"
+        },
+        {
+          "key": "log-opt",
+          "value": "fluentd-address=172.18.70.2:24224"
+        },
+        {
+          "key": "log-opt",
+          "value": "tag=asgard.app.asgard.asgard-app-stats-collector"
+        },
+        {
+          "key": "log-opt",
+          "value": "fluentd-async-connect=1"
+        },
+        {
+          "key": "log-driver",
+          "value": "fluentd"
+        },
+        {
+          "key": "network",
+          "value": "asgard"
+        }
+        ],
+        "privileged": false,
+        "forcePullImage": true
+      },
+      "volumes": [],
+      "portMappings": []
+    },
+    "env": {
+      "STATUS_COLLECTOR_RABBITMQ_VHOST": "asgard-stats",
+      "STATUS_COLLECTOR_RABBITMQ_PWD": "guest",
+      "STATUS_COLLECTOR_RABBITMQ_RK": "asgard/app/stats",
+      "STATUS_COLLECTOR_RABBITMQ_USER": "guest",
+      "STATUS_COLLECTOR_RABBITMQ_HOST": "172.18.80.1",
+      "STATUS_COLLECTOR_MESOS_MASTER_IP": "172.18.0.11"
+    },
+    "labels": {
+      "hollowman.default_scale": "1"
+    },
+    "portDefinitions": [],
+    "uris": [
+      "file:///etc/docker.tar.bz2"
+    ]
+}]
