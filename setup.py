@@ -6,7 +6,7 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='asgard-api',
-    version='0.73.0',
+    version='0.75.0',
 
     description='API for the Asgard Project',
     long_description="",
