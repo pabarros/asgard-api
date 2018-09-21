@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d65fa0d788988c4966850b788d485254fe85c47aac55d3380258e17a955db6d9"
+            "sha256": "3d603536acb46ee55c4f3a041bcec34b38b27aff89165ce2c220809be614a1e9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,10 +32,10 @@
         },
         "asgard-api-plugin-metrics-mesos": {
             "hashes": [
-                "sha256:1ed06d8c7e7cc872d346259292819cb07f0757203c0a17823873ae4375c97f07"
+                "sha256:149aac34a61f93356e06d63f91b38bc845830999aa4cc63789e1447c4447b3b9"
             ],
             "index": "pypi",
-            "version": "==0.8.0"
+            "version": "==0.9.0rc1"
         },
         "asgard-api-sdk": {
             "hashes": [
