@@ -3,10 +3,10 @@ from codecs import open  # To use a consistent encoding
 from os import path
 
 here = path.abspath(path.dirname(__file__))
-?!?jedi=0, ?!?     (*_***attrs*_*) ?!?jedi?!?
+
 setup(
     name='asgard-api',
-    version='0.76.1',
+    version='0.76.2',
 
     description='API for the Asgard Project',
     long_description="",

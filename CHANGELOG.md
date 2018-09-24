@@ -1,5 +1,7 @@
 # Changelog
 
+### 0.76.2
+ * Ajustando erros de sintaxe no setup.py
 
 ### 0.76.1
  * Ajustando versão no setup.py
