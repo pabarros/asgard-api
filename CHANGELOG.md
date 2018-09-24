@@ -1,5 +1,9 @@
 # Changelog
 
+
+### 0.76.1
+ * Ajustando versão no setup.py
+
 ### 0.76.0
  * Atualizando asgard-api-plugin-mesos-metrics==0.9.0
 
