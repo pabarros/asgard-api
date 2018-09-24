@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.76.0
+ * Atualizando asgard-api-plugin-mesos-metrics==0.9.0
+
 ### 0.75.0
  * Atualização do flask para `0.12.4`, https://nvd.nist.gov/vuln/detail/CVE-2018-1000656
 
