@@ -41,7 +41,9 @@ class TransformJSONFilter:
 
         if hasattr(app.container.docker, 'network'):
             del app.container.docker.network
-        app.container.port_mappings = app.container.docker.port_mappings
+
+        if hasattr(app.container.docker, 'port_mappings') and app.container.docker.port_mappings:
+            app.container.port_mappings = app.container.docker.port_mappings
         return app
 
     def _transform_to_old_format(self, app: AsgardApp):
