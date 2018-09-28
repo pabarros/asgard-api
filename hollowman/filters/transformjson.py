@@ -33,13 +33,17 @@ class TransformJSONFilter:
         return app.networks or hasattr(app.container, "port_mappings")
 
     def _transform_to_new_format(self, app: AsgardApp):
-        if app.container.docker.network.lower() == NET_BRIDGE.lower():
+        network_attr = getattr(app.container.docker, 'network', NET_BRIDGE.lower())
+        if network_attr.lower() == NET_BRIDGE.lower():
             app.networks = [{"mode": "container/bridge"}]
         else:
             app.networks = [{"mode": "host"}]
 
-        del app.container.docker.network
-        app.container.port_mappings = app.container.docker.port_mappings
+        if hasattr(app.container.docker, 'network'):
+            del app.container.docker.network
+
+        if hasattr(app.container.docker, 'port_mappings') and app.container.docker.port_mappings:
+            app.container.port_mappings = app.container.docker.port_mappings
         return app
 
     def _transform_to_old_format(self, app: AsgardApp):
