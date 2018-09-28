@@ -1,6 +1,6 @@
 # Changelog
 
-### 0.77.0-rc1
+### 0.77.0
  * Correção de um bug quando uma App era enviada ao backend sem ter informações sobre network.
 
 ### 0.76.2
