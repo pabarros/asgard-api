@@ -35,3 +35,6 @@ asgard-api = {editable = true, path = "."}
 
 [requires]
 python_version = "3.6"
+
+[scripts]
+api = 'python hollowman/main.py'

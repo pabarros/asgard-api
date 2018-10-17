@@ -228,7 +228,7 @@ pipenv install --dev
 Para rodar a API, use:
 
 ```
-pipenv run python hollowman/main.py
+pipenv run api
 ```
 
 Quando tiver a API rodando, você pode fazer um request para validar:
