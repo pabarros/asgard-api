@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.78.0
+ * Filtro que remove informação de namespace do campo lastTaskFailure de uma app;
+
 ### 0.77.0
  * Correção de um bug quando uma App era enviada ao backend sem ter informações sobre network.
 
