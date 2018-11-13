@@ -103,6 +103,18 @@ class TestNamespaceFilter(unittest.TestCase):
         self.assertEqual("foo.a31dfafb-be63-11e7-8ef1-0242a8c1e33e", modified_app.tasks[2].id)
         self.assertEqual("/foo", modified_app.tasks[2].app_id)
 
+        self.assertEqual("foo.bb1f57d0-e755-11e8-9eac-0242eb39892d", modified_app.last_task_failure.task_id)
+        self.assertEqual("/foo", modified_app.last_task_failure.app_id)
+
+    @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
+    def test_response_apps_remove_namespace_without_last_task_failure(self, single_full_app_with_tasks_fixture):
+        del single_full_app_with_tasks_fixture['lastTaskFailure']
+        request_app = original_app = AsgardApp.from_json(single_full_app_with_tasks_fixture)
+
+        modified_app = self.filter.response(self.user, request_app, original_app)
+
+        self.assertIsNone(modified_app.last_task_failure)
+
     @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
     def test_response_apps_remove_namespace_from_all_tasks_empty_task_list(self, single_full_app_with_tasks_fixture):
         request_app = original_app = AsgardApp.from_json(single_full_app_with_tasks_fixture)
