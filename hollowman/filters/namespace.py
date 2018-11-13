@@ -13,6 +13,9 @@ class NameSpaceFilter:
             id_without_ns = "/"
         return id_without_ns
 
+    def _remove_namespace_from_task_id(self, task_id, namespace):
+        return task_id.replace("{}_".format(namespace), "", 1)
+
     def write_task(self, user, request_task, original_task):
         try:
             request_task.app_id = self._add_namespace(
@@ -41,8 +44,13 @@ class NameSpaceFilter:
 
     def _remove_namespace_from_tasks(self, task_list, namespace):
         for task in task_list:
-            task.id = task.id.replace("{}_".format(namespace), "", 1)
+            task.id = self._remove_namespace_from_task_id(task.id, namespace)
             task.app_id = self._remove_namespace(task.app_id, namespace)
+
+    def _remove_namespace_from_last_failure(self, last_failure, namespace):
+        if last_failure:
+            last_failure.app_id = self._remove_namespace(last_failure.app_id, namespace)
+            last_failure.task_id = self._remove_namespace_from_task_id(last_failure.task_id, namespace)
 
     def response(self, user, response_app, original_app) -> AsgardApp:
         if not response_app.id.startswith("/{}/".format(user.current_account.namespace)):
@@ -50,6 +58,7 @@ class NameSpaceFilter:
 
         response_app.id = self._remove_namespace(response_app.id, user.current_account.namespace)
         self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
+        self._remove_namespace_from_last_failure(response_app.last_task_failure, user.current_account.namespace)
 
         return response_app
 
