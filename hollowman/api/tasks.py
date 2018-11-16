@@ -88,8 +88,8 @@ def task_files_download(task_id, user):
         'file_url': file_final_url,
         'task_id': task_id,
         'file_path': path
-    }, timeout=30) 
-    download_id_url = url_for('hollowman.api.tasks.download_by_id', download_id=download_id) 
+    }, timeout=30)
+    download_id_url = url_for('hollowman.api.tasks.download_by_id', download_id=download_id)
     return Response(response=json.dumps({'download_url': download_id_url.strip("/")}), status=HTTPStatus.OK)
 
 @tasks_blueprint.route("/downloads/<string:download_id>")

@@ -16,6 +16,17 @@
             "srv2.*"
         ]
     ],
+   "lastTaskFailure": {
+            "appId": "/dev/foo",
+            "host": "10.168.200.97",
+            "message": "Container exited with status 127",
+            "taskId": "dev_foo.bb1f57d0-e755-11e8-9eac-0242eb39892d",
+            "instanceId": null,
+            "slaveId": "39e1a8e3-0fd1-4ba6-981d-e01318944957-S4",
+            "state": "TASK_FAILED",
+            "timestamp": "2018-11-13T15:06:48.445000Z",
+            "version": "2018-11-13T14:45:48.207Z"
+        },
     "container": {
         "docker": {
             "forcePullImage": false,
