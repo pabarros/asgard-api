@@ -1,5 +1,5 @@
 from asyncworker import RouteTypes
-from asgardapi.app import app
+from asgard.app import app
 from aiohttp import web
 
 
