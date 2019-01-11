@@ -4,5 +4,5 @@ from hollowman.conf import HOLLOWMAN_DB_URL, HOLLOWMAN_DB_ECHO
 
 from .session import _SessionMaker
 
-#AsgardDBSession = Session(HOLLOWMAN_DB_URL, echo=HOLLOWMAN_DB_ECHO, minsize=1, maxsize=2)
+AsgardDBSession = _SessionMaker(HOLLOWMAN_DB_URL, echo=HOLLOWMAN_DB_ECHO, minsize=1)
 
