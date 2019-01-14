@@ -8,8 +8,8 @@ from itests.util import PgDataMocker
 from tests.conf import TEST_PGSQL_DSN
 import sqlalchemy
 
-class ManagedAsContextManagerTest(asynctest.TestCase):
 
+class ManagedAsContextManagerTest(asynctest.TestCase):
     async def setUp(self):
         self.session = _SessionMaker(TEST_PGSQL_DSN)
         self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
@@ -17,15 +17,21 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
             [10, "Novo User", "email@host.com"],
             [20, "John Doe", "john@host.com"],
         ]
-        self.pg_data_mocker.add_data(User, ["id", "tx_name", "tx_email"], self.users_fixture)
+        self.pg_data_mocker.add_data(
+            User, ["id", "tx_name", "tx_email"], self.users_fixture
+        )
 
-        self.pg_data_mocker.add_data(Account, ["id", "name", "namespace", "owner"], [
-            [10, "dev", "dev", "dev"]
-        ])
+        self.pg_data_mocker.add_data(
+            Account,
+            ["id", "name", "namespace", "owner"],
+            [[10, "dev", "dev", "dev"]],
+        )
 
-        self.pg_data_mocker.add_data(UserHasAccount, ["id", "user_id", "account_id"], [
-            [10, 20, 10], # John Doe
-        ])
+        self.pg_data_mocker.add_data(
+            UserHasAccount,
+            ["id", "user_id", "account_id"],
+            [[10, 20, 10]],  # John Doe
+        )
         await self.pg_data_mocker.create()
 
     async def tearDown(self):
@@ -38,8 +44,9 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         try:
             async with self.session() as conn:
                 async with conn.begin():
-                    insert_query = User.__table__.insert().values(tx_name="Mais um user",
-                                                   tx_email="mais-um-user@host.com")
+                    insert_query = User.__table__.insert().values(
+                        tx_name="Mais um user", tx_email="mais-um-user@host.com"
+                    )
                     await conn.execute(insert_query)
                     raise RollBackException()
         except RollBackException as ex:
@@ -49,13 +56,16 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         else:
             async with self.session() as conn:
                 result = list(await conn.query(User).all())
-                self.assertEqual(1, len(result), "Transaction should not be confirmed")
+                self.assertEqual(
+                    1, len(result), "Transaction should not be confirmed"
+                )
             self.fail("RollBackException not raised")
 
     async def test_commit_on_success(self):
         async with self.session() as conn:
-            insert_query = User.__table__.insert().values(tx_name="Outro User",
-                                           tx_email="outro-user@host.com")
+            insert_query = User.__table__.insert().values(
+                tx_name="Outro User", tx_email="outro-user@host.com"
+            )
             await conn.execute(insert_query)
 
         async with self.session() as conn:
@@ -95,25 +105,29 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
 
     async def test_with_model_with_filter(self):
         async with self.session() as conn:
-            result = await conn.query(User).filter(User.tx_name == "John Doe").all()
+            result = (
+                await conn.query(User).filter(User.tx_name == "John Doe").all()
+            )
 
             self.assertEqual(1, len(result))
             self.assertEqual("john@host.com", result[0].tx_email)
 
     async def test_with_model_with_join(self):
         import sqlalchemy as sa
-        async with self.session() as conn:
-            #asgard=# select * from enqstwstis."user" as u, enqstwstis.account as a, enqstwstis.user_has_account as ua where u.id = ua.user_id and a.id = ua.account_id;
-            # id | tx_name  |   tx_email    | tx_authkey | bl_system | id | name | namespace | owner | id | user_id | account_id
-            #----+----------+---------------+------------+-----------+----+------+-----------+-------+----+---------+------------
-            #  2 | John Doe | john@host.com |            | f         |  1 | dev  | dev       | dev   |  1 |       2 |          1
-            join = User.__table__.join(UserHasAccount, User.id == UserHasAccount.c.user_id) \
-                    .join(Account.__table__, Account.id == UserHasAccount.c.account_id)
-            #select = sa.select([User.__table__]).select_from(join)
 
-            #result_raw = list(await conn.execute(select))
-            #self.assertEqual(1, len(result_raw))
-            #self.assertEqual("John Doe", result_raw[0].tx_name)
+        async with self.session() as conn:
+            # asgard=# select * from enqstwstis."user" as u, enqstwstis.account as a, enqstwstis.user_has_account as ua where u.id = ua.user_id and a.id = ua.account_id;
+            # id | tx_name  |   tx_email    | tx_authkey | bl_system | id | name | namespace | owner | id | user_id | account_id
+            # ----+----------+---------------+------------+-----------+----+------+-----------+-------+----+---------+------------
+            #  2 | John Doe | john@host.com |            | f         |  1 | dev  | dev       | dev   |  1 |       2 |          1
+            join = User.__table__.join(
+                UserHasAccount, User.id == UserHasAccount.c.user_id
+            ).join(Account.__table__, Account.id == UserHasAccount.c.account_id)
+            # select = sa.select([User.__table__]).select_from(join)
+
+            # result_raw = list(await conn.execute(select))
+            # self.assertEqual(1, len(result_raw))
+            # self.assertEqual("John Doe", result_raw[0].tx_name)
 
             result = await conn.query(User).join(join).all()
             self.assertEqual(1, len(result))
@@ -132,6 +146,7 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
             async with SessionClass() as conn1:
                 async with SessionClass() as conn2:
                     pass
+
         with self.assertRaises(asyncio.TimeoutError):
             await asyncio.wait_for(coro(), 0.5)
 
@@ -154,5 +169,6 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         """
         with self.assertRaises(sqlalchemy.orm.exc.MultipleResultsFound):
             async with self.session() as conn:
-                await conn.query(User).filter(User.tx_email == "not-found").one()
-
+                await conn.query(User).filter(
+                    User.tx_email == "not-found"
+                ).one()

@@ -1,19 +1,19 @@
-from flask import Flask,Request
+from flask import Flask, Request
 from json import loads
 
 from enum import Enum, auto
 
 
 class OperationType(Enum):
-    READ = 'read'
-    WRITE = 'write'
+    READ = "read"
+    WRITE = "write"
 
-    SCALE_UP = 'scale_up'
-    SCALE_DOWN = 'scale_down'
-    RESTART = 'restart'
-    DESTROY = 'destroy'
-    SUSPEND = 'suspend'
-    CREATE = 'create'
+    SCALE_UP = "scale_up"
+    SCALE_DOWN = "scale_down"
+    RESTART = "restart"
+    DESTROY = "destroy"
+    SUSPEND = "suspend"
+    CREATE = "create"
 
 
 class FilterType(Enum):
@@ -22,7 +22,6 @@ class FilterType(Enum):
 
 
 class HollowmanRequest(Request):
-
     def get_json(self, cache=False, **kwargs):
         """
         Changed cache to False to ease filter implementations
@@ -37,9 +36,9 @@ class HollowmanRequest(Request):
     def operations(self):
         operations = []
 
-        if self.method == 'GET':
+        if self.method == "GET":
             operations.append(OperationType.READ)
-        elif self.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        elif self.method in ("POST", "PUT", "PATCH", "DELETE"):
             operations.append(OperationType.WRITE)
 
         return operations

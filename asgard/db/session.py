@@ -1,4 +1,3 @@
-
 from aiopg.sa import create_engine
 import sqlalchemy
 
@@ -46,8 +45,8 @@ class _SessionMaker:
     async def engine(self):
         return await self._engine_wrapper.engine()
 
-class AsgardDBConnection:
 
+class AsgardDBConnection:
     def __init__(self, engine, conn, session):
         self.engine = engine
         self.conn = conn

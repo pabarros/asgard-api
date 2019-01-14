@@ -3,7 +3,7 @@ from hollowman.marathonapp import AsgardApp
 
 class AddAppNameFilter:
 
-    name = 'appname'
+    name = "appname"
 
     def write(self, user, request_app, original_app):
         if not hasattr(request_app.container, "docker"):
@@ -13,15 +13,12 @@ class AddAppNameFilter:
         params = request_app.container.docker.parameters
 
         for p in params:
-            if p['key'] == "label" and p['value'].startswith("hollowman.appname"):
-                p['value'] = appname
+            if p["key"] == "label" and p["value"].startswith(
+                "hollowman.appname"
+            ):
+                p["value"] = appname
                 break
         else:
-            params.append({
-                "key": "label",
-                "value": appname
-            })
-
+            params.append({"key": "label", "value": appname})
 
         return request_app
-

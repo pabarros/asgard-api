@@ -1,4 +1,3 @@
-
 from hollowman.marathon.group import AsgardAppGroup
 from marathon.models.group import MarathonGroup
 from marathon.client import MarathonClient
@@ -17,6 +16,7 @@ def _patch_docker_params(params):
                 v = parts[0] + "=" + "/sieve" + parts[1]
                 p[k] = v
 
+
 _group = AsgardAppGroup(MarathonGroup.from_json(json.loads(sys.stdin.read())))
 
 for group in _group.iterate_groups():
@@ -27,9 +27,13 @@ for group in _group.iterate_groups():
         app.id = "/sieve{}".format(app.id)
         app.fetch = []
         del app.version
-        _patch_docker_params([p for p in app.container.docker.parameters if p['value'].startswith("hollowman.appname")])
+        _patch_docker_params(
+            [
+                p
+                for p in app.container.docker.parameters
+                if p["value"].startswith("hollowman.appname")
+            ]
+        )
         print(" >", app.id, app.container.docker.parameters, file=sys.stderr)
 
 print(json.dumps(_group._marathon_group, cls=MarathonJsonEncoder))
-
-

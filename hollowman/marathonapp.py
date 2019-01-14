@@ -1,10 +1,7 @@
-
-
 from marathon.models.app import MarathonApp
 
 
 class AsgardApp(MarathonApp):
-
     def get_constraints_by_name(self, consraint_name):
         result = []
         for c in self.constraints:

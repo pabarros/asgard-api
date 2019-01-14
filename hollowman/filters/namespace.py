@@ -20,18 +20,19 @@ class NameSpaceFilter:
         try:
             request_task.app_id = self._add_namespace(
                 app_id=request_task.app_id,
-                namespace=user.current_account.namespace
+                namespace=user.current_account.namespace,
             )
         except AttributeError as e:
             pass
-        request_task.id = "{namespace}_{task_id}".format(namespace=user.current_account.namespace, task_id=request_task.id)
+        request_task.id = "{namespace}_{task_id}".format(
+            namespace=user.current_account.namespace, task_id=request_task.id
+        )
         return request_task
 
     def write(self, user, request_app, original_app):
 
         request_app.id = self._add_namespace(
-            app_id=request_app.id,
-            namespace=user.current_account.namespace
+            app_id=request_app.id, namespace=user.current_account.namespace
         )
 
         return request_app
@@ -49,28 +50,48 @@ class NameSpaceFilter:
 
     def _remove_namespace_from_last_failure(self, last_failure, namespace):
         if last_failure:
-            last_failure.app_id = self._remove_namespace(last_failure.app_id, namespace)
-            last_failure.task_id = self._remove_namespace_from_task_id(last_failure.task_id, namespace)
+            last_failure.app_id = self._remove_namespace(
+                last_failure.app_id, namespace
+            )
+            last_failure.task_id = self._remove_namespace_from_task_id(
+                last_failure.task_id, namespace
+            )
 
     def response(self, user, response_app, original_app) -> AsgardApp:
-        if not response_app.id.startswith("/{}/".format(user.current_account.namespace)):
-             return None
+        if not response_app.id.startswith(
+            "/{}/".format(user.current_account.namespace)
+        ):
+            return None
 
-        response_app.id = self._remove_namespace(response_app.id, user.current_account.namespace)
-        self._remove_namespace_from_tasks(response_app.tasks, user.current_account.namespace)
-        self._remove_namespace_from_last_failure(response_app.last_task_failure, user.current_account.namespace)
+        response_app.id = self._remove_namespace(
+            response_app.id, user.current_account.namespace
+        )
+        self._remove_namespace_from_tasks(
+            response_app.tasks, user.current_account.namespace
+        )
+        self._remove_namespace_from_last_failure(
+            response_app.last_task_failure, user.current_account.namespace
+        )
 
         return response_app
 
     def response_group(self, user, response_group, original_group):
-        response_group.id = self._remove_namespace(response_group.id, user.current_account.namespace)
+        response_group.id = self._remove_namespace(
+            response_group.id, user.current_account.namespace
+        )
         for app in response_group.apps:
-            app.id = self._remove_namespace(app.id, user.current_account.namespace)
-            self._remove_namespace_from_tasks(app.tasks, user.current_account.namespace)
+            app.id = self._remove_namespace(
+                app.id, user.current_account.namespace
+            )
+            self._remove_namespace_from_tasks(
+                app.tasks, user.current_account.namespace
+            )
 
         return response_group
 
-    def response_deployment(self, user, deployment: MarathonDeployment, original_deployment) -> MarathonDeployment:
+    def response_deployment(
+        self, user, deployment: MarathonDeployment, original_deployment
+    ) -> MarathonDeployment:
         # Não teremos deployments que afetam apps de múltiplos namespaces,
         # por isos podemos olhar apenas umas das apps.
         original_affected_apps_id = deployment.affected_apps[0]
@@ -80,20 +101,28 @@ class NameSpaceFilter:
         ]
 
         for action in deployment.current_actions:
-            action.app = self._remove_namespace(action.app, user.current_account.namespace)
+            action.app = self._remove_namespace(
+                action.app, user.current_account.namespace
+            )
 
         for step in deployment.steps:
             for action in step.actions:
-                action.app = self._remove_namespace(action.app, user.current_account.namespace)
+                action.app = self._remove_namespace(
+                    action.app, user.current_account.namespace
+                )
 
-        if original_affected_apps_id.startswith(f"/{user.current_account.namespace}/"):
+        if original_affected_apps_id.startswith(
+            f"/{user.current_account.namespace}/"
+        ):
             return deployment
         return None
 
     def response_queue(self, user, response_queue, original_queue):
         current_namespace = user.current_account.namespace
         if response_queue.app.id.startswith("/{}/".format(current_namespace)):
-            response_queue.app.id = self._remove_namespace(response_queue.app.id, user.current_account.namespace)
+            response_queue.app.id = self._remove_namespace(
+                response_queue.app.id, user.current_account.namespace
+            )
             return response_queue
         return None
 
@@ -108,7 +137,8 @@ class NameSpaceFilter:
 
         """
         if response_task.id.startswith(f"{user.current_account.namespace}_"):
-            self._remove_namespace_from_tasks([response_task], user.current_account.namespace)
+            self._remove_namespace_from_tasks(
+                [response_task], user.current_account.namespace
+            )
             return response_task
         return None
-

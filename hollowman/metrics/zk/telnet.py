@@ -1,4 +1,3 @@
-
 from telnetlib import Telnet
 
 

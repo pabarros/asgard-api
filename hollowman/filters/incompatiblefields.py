@@ -1,5 +1,3 @@
-
-
 class IncompatibleFieldsFilter:
     """
     Esse filtro serve para corrigir alguns comportamentos do Marathon.
@@ -23,4 +21,3 @@ class IncompatibleFieldsFilter:
         request_app.ports = []
         request_app.port_definitions = []
         return request_app
-
