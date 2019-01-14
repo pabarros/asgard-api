@@ -6,6 +6,7 @@ from hollowman.models import User, Account, UserHasAccount
 from aiopg.sa import create_engine
 from itests.util import PgDataMocker
 from tests.conf import TEST_PGSQL_DSN
+import sqlalchemy
 
 class ManagedAsContextManagerTest(asynctest.TestCase):
 
@@ -107,7 +108,7 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
             #----+----------+---------------+------------+-----------+----+------+-----------+-------+----+---------+------------
             #  2 | John Doe | john@host.com |            | f         |  1 | dev  | dev       | dev   |  1 |       2 |          1
             join = User.__table__.join(UserHasAccount, User.id == UserHasAccount.c.user_id) \
-            #        .join(Account.__table__, Account.id == UserHasAccount.c.account_id)
+                    .join(Account.__table__, Account.id == UserHasAccount.c.account_id)
             #select = sa.select([User.__table__]).select_from(join)
 
             #result_raw = list(await conn.execute(select))
@@ -133,3 +134,25 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
                     pass
         with self.assertRaises(asyncio.TimeoutError):
             await asyncio.wait_for(coro(), 0.5)
+
+    async def test_get_one_OK(self):
+        async with self.session() as conn:
+            result = await conn.query(User).filter(User.id == 20).one()
+            self.assertEqual(20, result.id)
+
+    async def test_get_one_more_than_one_result(self):
+        """
+        Raises sqlalchemy.orm.exc.MultipleResultsFound
+        """
+        with self.assertRaises(sqlalchemy.orm.exc.MultipleResultsFound):
+            async with self.session() as conn:
+                await conn.query(User).one()
+
+    async def test_get_one_no_result_found(self):
+        """
+        Raises sqlalchemy.orm.exc.NoResultFound
+        """
+        with self.assertRaises(sqlalchemy.orm.exc.MultipleResultsFound):
+            async with self.session() as conn:
+                await conn.query(User).filter(User.tx_email == "not-found").one()
+

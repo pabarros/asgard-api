@@ -91,3 +91,12 @@ class AsgardDBConnection:
         result = await self.execute(self._query)
         return await result.fetchall()
 
+    async def one(self):
+        self._query.limit(2)
+        result = await self.execute(self._query)
+        result_list = list(await result.fetchall())
+        if len(result_list) > 1:
+            raise sqlalchemy.orm.exc.MultipleResultsFound
+        if not len(result_list):
+            raise sqlalchemy.orm.exc.MultipleResultsFound
+        return result_list[0]
