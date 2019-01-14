@@ -42,7 +42,7 @@ python_version = "3.6"
 
 [scripts]
 api = 'python hollowman/main.py'
-test = "py.test -sv --cov=asyncworker --cov-report term-missing -v"
-lint = "mypy asyncworker --ignore-missing-imports"
+test = "py.test -sv --cov=asgard --cov-report term-missing -v tests/"
+lint = "mypy asgard --ignore-missing-imports"
 fmt = "black --py36 -v --line-length 80 ."
 fmt-check = "black --py36 -v --line-length 80 --check ."
