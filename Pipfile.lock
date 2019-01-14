@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ab70ab83fcd3d30d8e5f55198f53ab4ebed4d23c4bfa3af8e9095e2bee19e231"
+            "sha256": "696ce39bb49d4a8f6b38bd8d88912ca7a9940aa88325f4020ec6fed766d1f6c8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -55,6 +55,14 @@
                 "sha256:9de6a87f01ea7b143304af270b8f2dab81a193ea2a0a661a98b2ea0c9a19f1a7"
             ],
             "version": "==0.3.0"
+        },
+        "aiopg": {
+            "hashes": [
+                "sha256:2fa57bee0b7b8422408a79de085c3423e0b0633be3a0046b66a53594bf69a837",
+                "sha256:509d4a1ad9fa1af5dca6d547b759a8cbcfd70d6cedd0737cb3ff4ccfec812ea2"
+            ],
+            "index": "pypi",
+            "version": "==0.15.0"
         },
         "alchemytools": {
             "hashes": [
@@ -495,6 +503,14 @@
         "asgard-api-plugin-metrics-example-1": {
             "editable": true,
             "path": "./tests/fixtures/plugins/metrics/metric-plugin-example-1"
+        },
+        "asynctest": {
+            "hashes": [
+                "sha256:56bd75b03df55956d57437db26700503d1013616314db5d1ea1a73be1186fd71",
+                "sha256:77520850ae21620ec31738f4a7b467acaa44de6d3752d8ac7a9f4dcf55d77853"
+            ],
+            "index": "pypi",
+            "version": "==0.12.2"
         },
         "backcall": {
             "hashes": [
