@@ -5,14 +5,18 @@ from asgard.http.client import _HttpClientMaker, _HttpClient
 
 class HttpClientTest(asynctest.TestCase):
     async def setUp(self):
-        self.http_client = _HttpClientMaker()
-        self._session_mock = CoroutineMock(get=CoroutineMock(), close=CoroutineMock())
-        self.http_client._session = CoroutineMock()
+        self._session_mock = CoroutineMock(
+            post=CoroutineMock(),
+            put=CoroutineMock(),
+            delete=CoroutineMock(),
+            get=CoroutineMock(),
+            close=CoroutineMock(),
+        )
+        self.session_class_mock = Mock(return_value=self._session_mock)
 
     async def test_pass_args_to_shared_client_session(self):
-        session_class_mock = Mock(return_value=self._session_mock)
         client = _HttpClient(
-            session_class_mock,
+            self.session_class_mock,
             "https://httpbin.org/ip",
             "GET",
             44,
@@ -20,19 +24,76 @@ class HttpClientTest(asynctest.TestCase):
             data={"key": "OK"},
         )
         async with client:
-            session_class_mock.assert_called_with(44, timeout=10, data={"key": "OK"})
+            self.session_class_mock.assert_called_with(
+                44, timeout=10, data={"key": "OK"}
+            )
 
-    async def test_use_correct_http_method_when_entering_context_get(self):
-        self.fail()
-
-    async def test_use_correct_http_method_when_entering_context_post(self):
-        self.fail()
-
-    async def test_use_correct_http_method_when_entering_context_put(self):
-        self.fail()
-
-    async def test_use_correct_http_method_when_entering_context_delete(self):
-        self.fail()
+    async def test_calls_apropriate_method_on_shared_session(self):
+        client = _HttpClient(self.session_class_mock, "https://httpbin.org/ip", "POST")
+        async with client:
+            self.session_class_mock.assert_called_with()
+            client._session.post.assert_awaited_with("https://httpbin.org/ip")
 
     async def test_close_shared_session_on_context_exit(self):
-        self.fail()
+        client = _HttpClient(self.session_class_mock, "https://httpbin.org/ip", "POST")
+        async with client:
+            self.session_class_mock.assert_called_with()
+            client._session.close.assert_not_awaited()
+        client._session.close.assert_awaited_with()
+
+
+class HttpClientMkakerTest(asynctest.TestCase):
+    async def setUp(self):
+        self._session_mock = CoroutineMock(
+            post=CoroutineMock(),
+            put=CoroutineMock(),
+            delete=CoroutineMock(),
+            get=CoroutineMock(),
+            close=CoroutineMock(),
+        )
+
+    async def test_passes_args_and_kwargs_to_http_client_instance(self):
+        url = "https://httpbin.org/ip"
+        client_maker = _HttpClientMaker()
+
+        client_get = client_maker.get(url, 40, 50, timeout=5)
+        client_get._session = self._session_mock
+        async with client_get:
+            self.assertEqual((40, 50), client_get._args)
+            self.assertEqual({"timeout": 5}, client_get._kwargs)
+
+    async def test_use_correct_http_method_when_entering_context_get(self):
+        url = "https://httpbin.org/ip"
+        client_maker = _HttpClientMaker()
+
+        client_get = client_maker.get(url)
+        client_get._session = self._session_mock
+        async with client_get:
+            client_get._session.get.assert_awaited_with("https://httpbin.org/ip")
+
+    async def test_use_correct_http_method_when_entering_context_post(self):
+        url = "https://httpbin.org/ip"
+        client_maker = _HttpClientMaker()
+
+        client_get = client_maker.post(url)
+        client_get._session = self._session_mock
+        async with client_get:
+            client_get._session.post.assert_awaited_with("https://httpbin.org/ip")
+
+    async def test_use_correct_http_method_when_entering_context_put(self):
+        url = "https://httpbin.org/ip"
+        client_maker = _HttpClientMaker()
+
+        client_get = client_maker.put(url)
+        client_get._session = self._session_mock
+        async with client_get:
+            client_get._session.put.assert_awaited_with("https://httpbin.org/ip")
+
+    async def test_use_correct_http_method_when_entering_context_delete(self):
+        url = "https://httpbin.org/ip"
+        client_maker = _HttpClientMaker()
+
+        client_get = client_maker.delete(url)
+        client_get._session = self._session_mock
+        async with client_get:
+            client_get._session.delete.assert_awaited_with("https://httpbin.org/ip")
