@@ -1,6 +1,12 @@
+from importlib import reload
 import asynctest
 from asynctest.mock import CoroutineMock, call, Mock
-from asgard.http.client import _HttpClientMaker, _HttpClient
+from asynctest import mock
+from asgard.http.client import (
+    _HttpClientMaker,
+    _HttpClient,
+    default_http_client_timeout,
+)
 
 
 class HttpClientTest(asynctest.TestCase):
@@ -28,16 +34,33 @@ class HttpClientTest(asynctest.TestCase):
                 44, timeout=10, data={"key": "OK"}
             )
 
-    async def test_calls_apropriate_method_on_shared_session(self):
-        client = _HttpClient(self.session_class_mock, "https://httpbin.org/ip", "POST")
+    async def test_shared_session_receives_default_timeout_config(self):
+        client = _HttpClient(
+            self.session_class_mock,
+            "https://httpbin.org/ip",
+            "GET",
+            44,
+            data={"key": "OK"},
+        )
         async with client:
-            self.session_class_mock.assert_called_with()
+            self.session_class_mock.assert_called_with(
+                44, timeout=default_http_client_timeout, data={"key": "OK"}
+            )
+
+    async def test_calls_apropriate_method_on_shared_session(self):
+        client = _HttpClient(
+            self.session_class_mock, "https://httpbin.org/ip", "POST"
+        )
+        async with client:
+            self.session_class_mock.assert_called_with(timeout=mock.ANY)
             client._session.post.assert_awaited_with("https://httpbin.org/ip")
 
     async def test_close_shared_session_on_context_exit(self):
-        client = _HttpClient(self.session_class_mock, "https://httpbin.org/ip", "POST")
+        client = _HttpClient(
+            self.session_class_mock, "https://httpbin.org/ip", "POST"
+        )
         async with client:
-            self.session_class_mock.assert_called_with()
+            self.session_class_mock.assert_called_with(timeout=mock.ANY)
             client._session.close.assert_not_awaited()
         client._session.close.assert_awaited_with()
 
@@ -69,7 +92,9 @@ class HttpClientMkakerTest(asynctest.TestCase):
         client_get = client_maker.get(url)
         client_get._session = self._session_mock
         async with client_get:
-            client_get._session.get.assert_awaited_with("https://httpbin.org/ip")
+            client_get._session.get.assert_awaited_with(
+                "https://httpbin.org/ip"
+            )
 
     async def test_use_correct_http_method_when_entering_context_post(self):
         url = "https://httpbin.org/ip"
@@ -78,7 +103,9 @@ class HttpClientMkakerTest(asynctest.TestCase):
         client_get = client_maker.post(url)
         client_get._session = self._session_mock
         async with client_get:
-            client_get._session.post.assert_awaited_with("https://httpbin.org/ip")
+            client_get._session.post.assert_awaited_with(
+                "https://httpbin.org/ip"
+            )
 
     async def test_use_correct_http_method_when_entering_context_put(self):
         url = "https://httpbin.org/ip"
@@ -87,7 +114,9 @@ class HttpClientMkakerTest(asynctest.TestCase):
         client_get = client_maker.put(url)
         client_get._session = self._session_mock
         async with client_get:
-            client_get._session.put.assert_awaited_with("https://httpbin.org/ip")
+            client_get._session.put.assert_awaited_with(
+                "https://httpbin.org/ip"
+            )
 
     async def test_use_correct_http_method_when_entering_context_delete(self):
         url = "https://httpbin.org/ip"
@@ -96,4 +125,10 @@ class HttpClientMkakerTest(asynctest.TestCase):
         client_get = client_maker.delete(url)
         client_get._session = self._session_mock
         async with client_get:
-            client_get._session.delete.assert_awaited_with("https://httpbin.org/ip")
+            client_get._session.delete.assert_awaited_with(
+                "https://httpbin.org/ip"
+            )
+
+    async def test_uses_default_timeout_configs(self):
+        self.assertEqual(default_http_client_timeout.connect, 5)
+        self.assertEqual(default_http_client_timeout.total, 30)
