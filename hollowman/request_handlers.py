@@ -23,11 +23,14 @@ FILTERS_METHOD_NAMES = {
     RequestResource.QUEUE: "response_queue",
 }
 
+
 def upstream_request(request: HollowmanRequest) -> Response:
     resp = upstream.replay_request(request)
-    return Response(response=resp.content,
-                    status=resp.status_code,
-                    headers=dict(resp.headers))
+    return Response(
+        response=resp.content,
+        status=resp.status_code,
+        headers=dict(resp.headers),
+    )
 
 
 class RequestHandler(metaclass=abc.ABCMeta):
@@ -47,12 +50,16 @@ class Deployments(RequestHandler):
         return self.wrapped_request.is_read_request()
 
     def _apply_response_filters(self, response) -> Response:
-        response = http_wrappers.Response(self.wrapped_request.request, response)
+        response = http_wrappers.Response(
+            self.wrapped_request.request, response
+        )
         return dispatch(
             self.user,
             response,
             filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
-            filter_method_name_callback=lambda response, *args: FILTERS_METHOD_NAMES[response.request_resource]
+            filter_method_name_callback=lambda response, *args: FILTERS_METHOD_NAMES[
+                response.request_resource
+            ],
         )
 
     def handle(self) -> Response:
@@ -76,8 +83,9 @@ def new(request: http_wrappers.Request) -> Response:
             request.request.user,
             response,
             filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
-            filter_method_name_callback=lambda response, *args: FILTERS_METHOD_NAMES[response.request_resource]
+            filter_method_name_callback=lambda response, *args: FILTERS_METHOD_NAMES[
+                response.request_resource
+            ],
         )
 
     return upstream_response
-

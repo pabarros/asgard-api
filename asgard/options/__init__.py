@@ -31,8 +31,11 @@ def get_option(namespace, option_name):
 
     return final_value
 
+
 def _get_env_value(namespace, option_name, idx=None):
-    base_envname = ENV_NAME_PATTERN.format(namespace=namespace.upper(), option_name=option_name.upper())
+    base_envname = ENV_NAME_PATTERN.format(
+        namespace=namespace.upper(), option_name=option_name.upper()
+    )
     if idx is None:
         return os.getenv(base_envname)
     return os.getenv("{}_{}".format(base_envname, idx))

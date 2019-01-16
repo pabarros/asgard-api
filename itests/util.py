@@ -13,10 +13,12 @@ class PgDataMocker:
     def __init__(self, pool: Engine):
         self.data: Dict[Table, List[Dict]] = defaultdict(list)
         self.pool = pool
-        self.schema = ''.join(random.choices(string.ascii_lowercase, k=10))
+        self.schema = "".join(random.choices(string.ascii_lowercase, k=10))
         self._used_tables = []
 
-    def add_data(self, model: Type, field_names: List[str], data: List[List[Any]]):
+    def add_data(
+        self, model: Type, field_names: List[str], data: List[List[Any]]
+    ):
         if not data:
             return
         assert all(len(field_names) == len(row) for row in data)
@@ -40,7 +42,10 @@ class PgDataMocker:
 
     async def create(self):
         await self._create_schema()
-        commands = (table.insert().values(self.data[table]) for table in self._used_tables)
+        commands = (
+            table.insert().values(self.data[table])
+            for table in self._used_tables
+        )
         async with self.pool.acquire() as conn:
             for command in commands:
                 await conn.execute(command)

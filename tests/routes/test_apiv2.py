@@ -28,12 +28,16 @@ class TestAuthentication(TestCase):
         self.new_dispatcher_user = User(
             tx_email="xablau@host.com.br",
             tx_name="Xablau",
-            tx_authkey="69ed620926be4067a36402c3f7e9ddf0")
+            tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
+        )
         self.normal_user = User(
             tx_email="user@host.com.br",
             tx_name="John Doe",
-            tx_authkey="70ed620926be4067a36402c3f7e9ddf0")
-        self.account = Account(name="New Account", namespace="acc", owner="company")
+            tx_authkey="70ed620926be4067a36402c3f7e9ddf0",
+        )
+        self.account = Account(
+            name="New Account", namespace="acc", owner="company"
+        )
         self.normal_user.accounts = [self.account]
         self.session.add_all([self.new_dispatcher_user, self.normal_user])
         self.session.commit()
@@ -44,10 +48,10 @@ class TestAuthentication(TestCase):
         patch.stopall()
 
     def make_auth_header(self, user, account) -> Dict[str, str]:
-        jwt_token = jwt_auth.jwt_encode_callback(jwt_generate_user_info(user, account))
-        return {
-            "Authorization": "JWT {}".format(jwt_token.decode('utf-8'))
-        }
+        jwt_token = jwt_auth.jwt_encode_callback(
+            jwt_generate_user_info(user, account)
+        )
+        return {"Authorization": "JWT {}".format(jwt_token.decode("utf-8"))}
 
     @with_json_fixture("single_full_app.json")
     def test_it_creates_a_response_using_a_dict_of_headers(self, fixture):
@@ -59,11 +63,21 @@ class TestAuthentication(TestCase):
         """
         test_client = application.test_client()
         with application.app_context():
-            auth_header = self.make_auth_header(self.normal_user, self.normal_user.accounts[0])
+            auth_header = self.make_auth_header(
+                self.normal_user, self.normal_user.accounts[0]
+            )
             with RequestsMock() as rsps:
-                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps',
-                         body=json.dumps({'apps': [fixture]}), status=200)
-                rsps.add(method='GET', url=conf.MARATHON_ADDRESSES[0] + '/v2/apps//foo',
-                         body=json.dumps({'app': fixture}), status=200)
+                rsps.add(
+                    method="GET",
+                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps",
+                    body=json.dumps({"apps": [fixture]}),
+                    status=200,
+                )
+                rsps.add(
+                    method="GET",
+                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//foo",
+                    body=json.dumps({"app": fixture}),
+                    status=200,
+                )
                 r = test_client.get("/v2/apps", headers=auth_header)
                 self.assertEqual(200, r.status_code)

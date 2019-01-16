@@ -1,11 +1,10 @@
-
 import unittest
 from marathon.models.group import MarathonGroup
 
 from hollowman.marathon.group import AsgardAppGroup
 
-class GroupWrapperTest(unittest.TestCase):
 
+class GroupWrapperTest(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -15,11 +14,7 @@ class GroupWrapperTest(unittest.TestCase):
         self.assertEqual(root_a, root_b)
 
     def test_from_json(self):
-        data = {
-            "id": "/",
-            "apps": [],
-            "groups": [],
-        }
+        data = {"id": "/", "apps": [], "groups": []}
         group = AsgardAppGroup.from_json(data)
         self.assertEqual("/", group.id)
 
@@ -31,11 +26,8 @@ class GroupWrapperTest(unittest.TestCase):
     def test_iterate_sub_groups_one_level(self):
         data = {
             "id": "/",
-            "groups": [
-                {"id": "/foo", "apps": []},
-                {"id": "/bla", "apps": []},
-            ],
-            "apps": []
+            "groups": [{"id": "/foo", "apps": []}, {"id": "/bla", "apps": []}],
+            "apps": [],
         }
         group = AsgardAppGroup(MarathonGroup.from_json(data))
         self.assertEqual(group.id, "/")
@@ -55,21 +47,18 @@ class GroupWrapperTest(unittest.TestCase):
                 {
                     "id": "/foo",
                     "apps": [],
-                    "groups": [
-                        {
-                            "id": "/foo/bar",
-                            "apps": []
-                        },
-                    ]
-                },
+                    "groups": [{"id": "/foo/bar", "apps": []}],
+                }
             ],
-            "apps": []
+            "apps": [],
         }
         group = AsgardAppGroup(MarathonGroup.from_json(data))
         self.assertEqual(group.id, "/")
         expected_all_group_ids = ["/", "/foo", "/foo/bar"]
         returned_groups = list(group.iterate_groups())
-        self.assertEqual(expected_all_group_ids, [g.id for g in returned_groups])
+        self.assertEqual(
+            expected_all_group_ids, [g.id for g in returned_groups]
+        )
 
     def test_iterate_sub_groups_three_levels(self):
         """
@@ -89,19 +78,21 @@ class GroupWrapperTest(unittest.TestCase):
                         {
                             "id": "/foo/bar",
                             "apps": [],
-                            "groups": [{"id": "/foo/bar/baz"}]
-                        },
-                    ]
-                },
+                            "groups": [{"id": "/foo/bar/baz"}],
+                        }
+                    ],
+                }
             ],
-            "apps": []
+            "apps": [],
         }
 
         group = AsgardAppGroup(MarathonGroup.from_json(data))
         self.assertEqual(group.id, "/")
         expected_all_group_ids = ["/", "/foo", "/foo/bar", "/foo/bar/baz"]
         returned_groups = list(group.iterate_groups())
-        self.assertEqual(expected_all_group_ids, [g.id for g in returned_groups])
+        self.assertEqual(
+            expected_all_group_ids, [g.id for g in returned_groups]
+        )
 
     def test_iterate_subgroups_three_levels_with_siblings(self):
         """
@@ -122,24 +113,27 @@ class GroupWrapperTest(unittest.TestCase):
                         {
                             "id": "/foo/bar",
                             "apps": [],
-                            "groups": [{"id": "/foo/bar/baz"}]
-                        },
-                    ]
+                            "groups": [{"id": "/foo/bar/baz"}],
+                        }
+                    ],
                 },
-                {
-                    "id": "/foo2",
-                    "apps": [],
-                    "groups": [],
-
-                },
+                {"id": "/foo2", "apps": [], "groups": []},
             ],
-            "apps": []
+            "apps": [],
         }
         group = AsgardAppGroup(MarathonGroup.from_json(data))
         self.assertEqual(group.id, "/")
-        expected_all_group_ids = ["/", "/foo", "/foo/bar", "/foo/bar/baz", "/foo2"]
+        expected_all_group_ids = [
+            "/",
+            "/foo",
+            "/foo/bar",
+            "/foo/bar/baz",
+            "/foo2",
+        ]
         returned_groups = list(group.iterate_groups())
-        self.assertEqual(expected_all_group_ids, [g.id for g in returned_groups])
+        self.assertEqual(
+            expected_all_group_ids, [g.id for g in returned_groups]
+        )
 
     def test_iterate_group_apps(self):
         data = {
@@ -147,10 +141,7 @@ class GroupWrapperTest(unittest.TestCase):
             "groups": [
                 {
                     "id": "/foo",
-                    "apps": [
-                        {"id": "/foo/app0"},
-                        {"id": "/foo/app1"},
-                    ],
+                    "apps": [{"id": "/foo/app0"}, {"id": "/foo/app1"}],
                     "groups": [
                         {
                             "id": "/foo/bar",
@@ -161,32 +152,30 @@ class GroupWrapperTest(unittest.TestCase):
                                     "apps": [
                                         {"id": "/foo/bar/baz/app0"},
                                         {"id": "/foo/bar/baz/app1"},
-                                    ]
+                                    ],
                                 }
-                            ]
-                        },
-                    ]
-                },
+                            ],
+                        }
+                    ],
+                }
             ],
-            "apps": [
-                {"id": "/app0"},
-                {"id": "/app1"}
-            ]
+            "apps": [{"id": "/app0"}, {"id": "/app1"}],
         }
         group = AsgardAppGroup(MarathonGroup.from_json(data))
         self.assertEqual(group.id, "/")
-        expected_all_apps_ids = ["/app0", "/app1", "/foo/app0", "/foo/app1", "/foo/bar/baz/app0", "/foo/bar/baz/app1"]
+        expected_all_apps_ids = [
+            "/app0",
+            "/app1",
+            "/foo/app0",
+            "/foo/app1",
+            "/foo/bar/baz/app0",
+            "/foo/bar/baz/app1",
+        ]
         returned_apps = list(group.iterate_apps())
         self.assertEqual(expected_all_apps_ids, [g.id for g in returned_apps])
 
     def test_modify_some_apps(self):
-        data = {
-            "id": "/",
-            "apps": [
-                {"id": "/foo"},
-                {"id": "/bla"},
-            ],
-        }
+        data = {"id": "/", "apps": [{"id": "/foo"}, {"id": "/bla"}]}
         group = AsgardAppGroup(MarathonGroup.from_json(data))
         apps = list(group.iterate_apps())
         apps[0].id = "/foo0"
@@ -194,4 +183,3 @@ class GroupWrapperTest(unittest.TestCase):
 
         apps_modified = list(group.iterate_apps())
         self.assertEqual(["/foo0", "/bla0"], [app.id for app in apps_modified])
-

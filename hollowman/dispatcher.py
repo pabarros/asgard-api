@@ -12,7 +12,11 @@ from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
 from hollowman.filters.namespace import NameSpaceFilter
-from hollowman.hollowman_flask import OperationType, FilterType, HollowmanRequest
+from hollowman.hollowman_flask import (
+    OperationType,
+    FilterType,
+    HollowmanRequest,
+)
 from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
@@ -32,9 +36,7 @@ FILTERS_METHOD_NAMES = {
 
 FILTERS_PIPELINE = {
     FilterType.REQUEST: {
-        OperationType.READ: (
-        ),
-
+        OperationType.READ: (),
         OperationType.WRITE: (
             NameSpaceFilter(),
             TransformJSONFilter(),
@@ -47,18 +49,12 @@ FILTERS_PIPELINE = {
             AddOwnerConstraintFilter(),
             IncompatibleFieldsFilter(),
             LabelsFilter(),
-        )
+        ),
     },
     FilterType.RESPONSE: {
-        OperationType.READ: (
-            NameSpaceFilter(),
-            TransformJSONFilter(),
-        ),
-        OperationType.WRITE: (
-            NameSpaceFilter(),
-            TransformJSONFilter(),
-        )
-    }
+        OperationType.READ: (NameSpaceFilter(), TransformJSONFilter()),
+        OperationType.WRITE: (NameSpaceFilter(), TransformJSONFilter()),
+    },
 }
 
 
@@ -71,20 +67,27 @@ def _get_filter_callable_name(request, operation):
     return method_name
 
 
-def dispatch(user,
-             request: Request,
-             filters_pipeline: Dict[OperationType, Iterable[BaseFilter]] = FILTERS_PIPELINE[FilterType.REQUEST],
-             filter_method_name_callback=_get_filter_callable_name) -> HollowmanRequest:
+def dispatch(
+    user,
+    request: Request,
+    filters_pipeline: Dict[
+        OperationType, Iterable[BaseFilter]
+    ] = FILTERS_PIPELINE[FilterType.REQUEST],
+    filter_method_name_callback=_get_filter_callable_name,
+) -> HollowmanRequest:
     # TODO: (user, request_app, original_app) podem ser refatorados em uma classe de domínio
 
     filtered_apps = []
 
     for operation in request.request.operations:
         for request_app, original_app in request.split():
-            if _dispatch(request,
-                         filters_pipeline[operation],
-                         filter_method_name_callback(request, operation),
-                         request_app, original_app):
+            if _dispatch(
+                request,
+                filters_pipeline[operation],
+                filter_method_name_callback(request, operation),
+                request_app,
+                original_app,
+            ):
                 filtered_apps.append((request_app, original_app))
 
     return request.join(filtered_apps)
@@ -95,7 +98,9 @@ def _get_callable_if_exist(filter_, method_name):
         return getattr(filter_, method_name)
 
 
-def _dispatch(request_or_response, filters_pipeline, filter_method_name, *filter_args):
+def _dispatch(
+    request_or_response, filters_pipeline, filter_method_name, *filter_args
+):
     for filter_ in filters_pipeline:
         func = _get_callable_if_exist(filter_, filter_method_name)
         if not func or func(request_or_response.request.user, *filter_args):

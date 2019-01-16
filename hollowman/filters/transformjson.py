@@ -1,10 +1,10 @@
-
 from flask import request
 
 import os
 from hollowman.marathonapp import AsgardApp
 
 NET_BRIDGE = "BRIDGE"
+
 
 class TransformJSONFilter:
     """
@@ -14,6 +14,7 @@ class TransformJSONFilter:
     Esse filtro faz a camada de compatibilidade entre a UI nova e o backend velho.
     Se eventualmente voltarmos a usar UI velha, esse filtro detecta isso e não faz nada.
     """
+
     name = "transfomrjson"
 
     def write(self, user, request_app, original_app):
@@ -33,28 +34,35 @@ class TransformJSONFilter:
         return app.networks or hasattr(app.container, "port_mappings")
 
     def _transform_to_new_format(self, app: AsgardApp):
-        network_attr = getattr(app.container.docker, 'network', NET_BRIDGE.lower())
+        network_attr = getattr(
+            app.container.docker, "network", NET_BRIDGE.lower()
+        )
         if network_attr.lower() == NET_BRIDGE.lower():
             app.networks = [{"mode": "container/bridge"}]
         else:
             app.networks = [{"mode": "host"}]
 
-        if hasattr(app.container.docker, 'network'):
+        if hasattr(app.container.docker, "network"):
             del app.container.docker.network
 
-        if hasattr(app.container.docker, 'port_mappings') and app.container.docker.port_mappings:
+        if (
+            hasattr(app.container.docker, "port_mappings")
+            and app.container.docker.port_mappings
+        ):
             app.container.port_mappings = app.container.docker.port_mappings
         return app
 
     def _transform_to_old_format(self, app: AsgardApp):
-        if app.networks[0]['mode'] == "container/bridge":
+        if app.networks[0]["mode"] == "container/bridge":
             app.container.docker.network = "BRIDGE"
         else:
             app.container.docker.network = "HOST"
 
         del app.networks
 
-        app.container.docker.port_mappings = getattr(app.container, "port_mappings", None)
+        app.container.docker.port_mappings = getattr(
+            app.container, "port_mappings", None
+        )
         try:
             del app.container.port_mappings
         except Exception as e:

@@ -1,4 +1,4 @@
-#encoding: utf-8
+# encoding: utf-8
 
 import unittest
 import mock
@@ -9,63 +9,54 @@ from hollowman.plugins import register_plugin
 from hollowman.app import application
 from hollowman import routes, decorators
 
+
 class PluginEndpointTest(unittest.TestCase):
-
-
     def test_return_only_registered_plugins_empty(self):
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY={}):
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual({"plugins": []}, json.loads(response.data))
 
     def test_return_only_registered_plugins_not_empty(self):
         plugin_data = {
-            u"plugins": [
-                {
-                        u"id": u"some-example-plugin",
-                        u"info":{
-                            u"modules": [u"ui"]
-                        }
-                }
+            "plugins": [
+                {"id": "some-example-plugin", "info": {"modules": ["ui"]}}
             ]
         }
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY={}):
             register_plugin("some-example-plugin")
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual({}, json.loads(response.data))
 
     def test_return_only_registered_plugins_not_empty(self):
         plugin_registry = {
-            "some-example-plugin":{
+            "some-example-plugin": {
                 "id": "some-example-plugin",
-                "info":{
-                    "modules": ["ui"]
-                }
+                "info": {"modules": ["ui"]},
             }
         }
-        plugin_data = {
-            "plugins": [
-                plugin_registry["some-example-plugin"]
-            ]
-        }
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = plugin_registry):
+        plugin_data = {"plugins": [plugin_registry["some-example-plugin"]]}
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY=plugin_registry):
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual(plugin_data, json.loads(response.data))
 
     def test_redirect_to_right_main_js(self):
-        response = application.test_client().get("/v2/plugins/some-plugin/main.js")
+        response = application.test_client().get(
+            "/v2/plugins/some-plugin/main.js"
+        )
         self.assertEqual(302, response.status_code)
-        self.assertEqual("http://localhost/static/plugins/some-plugin/main.js", response.headers["Location"])
+        self.assertEqual(
+            "http://localhost/static/plugins/some-plugin/main.js",
+            response.headers["Location"],
+        )
 
     def test_register_one_plugin(self):
         plugin_registry = {
             "check-expired-session-plugin": {
                 "id": "check-expired-session-plugin",
-                "info": {
-                    "modules": ["ui"]
-                }
+                "info": {"modules": ["ui"]},
             }
         }
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY={}):
             register_plugin("check-expired-session-plugin")
             self.assertDictEqual(plugin_registry, plugins.PLUGIN_REGISTRY)
 
@@ -73,18 +64,14 @@ class PluginEndpointTest(unittest.TestCase):
         plugin_registry = {
             "check-expired-session-plugin": {
                 "id": "check-expired-session-plugin",
-                "info": {
-                    "modules": ["ui"]
-                }
+                "info": {"modules": ["ui"]},
             },
             "colapse-sidebar-plugin": {
                 "id": "colapse-sidebar-plugin",
-                "info": {
-                    "modules": ["ui"]
-                }
-            }
+                "info": {"modules": ["ui"]},
+            },
         }
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY = {}):
+        with mock.patch.multiple(plugins, PLUGIN_REGISTRY={}):
             register_plugin("check-expired-session-plugin")
             register_plugin("colapse-sidebar-plugin")
             self.assertDictEqual(plugin_registry, plugins.PLUGIN_REGISTRY)

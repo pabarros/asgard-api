@@ -34,9 +34,16 @@ codecov = "*"
 asgard-api = {editable = true, path = "."}
 "asgard-api-plugin-metrics-example-1" = {editable = true, path = "./tests/fixtures/plugins/metrics/metric-plugin-example-1"}
 asynctest = "==0.12.2"
+mypy = "==0.630"
+black = "==18.9b0"
 
 [requires]
 python_version = "3.6"
 
 [scripts]
 api = 'python hollowman/main.py'
+test = "py.test -sv --cov=asgard --cov-report term-missing -v tests/"
+itest = "py.test -sv --cov=asgard --cov-report term-missing -v itests/"
+lint = "mypy asgard --ignore-missing-imports"
+fmt = "black --py36 -v --line-length 80 ."
+fmt-check = "black --py36 -v --line-length 80 --check ."
