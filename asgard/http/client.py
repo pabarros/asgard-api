@@ -12,9 +12,7 @@ default_http_client_timeout = ClientTimeout(
 class _HttpClient:
     _session: Optional[ClientSession]
 
-    def __init__(
-        self, session_class, url: str, method: str, *args, **kwargs
-    ) -> None:
+    def __init__(self, session_class, url: str, method: str, *args, **kwargs) -> None:
         self._session = None
         self._session_class = session_class
         self._url = url
@@ -27,9 +25,7 @@ class _HttpClient:
             if "timeout" not in self._kwargs:
                 self._kwargs["timeout"] = default_http_client_timeout
             self._session = self._session_class(*self._args, **self._kwargs)
-        return await self._return_session_method(self._session, self._method)(
-            self._url
-        )
+        return await self._return_session_method(self._session, self._method)(self._url)
 
     def _return_session_method(self, session, method_name):
         return getattr(session, method_name.lower())
@@ -39,6 +35,10 @@ class _HttpClient:
 
 
 class _HttpClientMaker:
+    def __init__(self, session_class):
+        self._session_class = session_class
+        self.session = None
+
     def get(self, url: str, *args, **kwargs):
         return _HttpClient(ClientSession, url, "GET", *args, **kwargs)
 
@@ -51,5 +51,13 @@ class _HttpClientMaker:
     def delete(self, url: str, *args, **kwargs):
         return _HttpClient(ClientSession, url, "DELETE", *args, **kwargs)
 
+    async def __aenter__(self):
+        if not self.session:
+            self.session = self._session_class(timeout=default_http_client_timeout)
+        return self.session
 
-http_client = _HttpClientMaker()
+    async def __aexit__(self, exc_type, exc_value, exc_tb):
+        await self.session.close()
+
+
+http_client = _HttpClientMaker(ClientSession)
