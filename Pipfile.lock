@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b372db115d91100487d58867dad4603fdf20ca43dfb5fa76d7ea51ef1c7a402b"
+            "sha256": "c42d22ba7f7696f34ed316478c5a8117078c606517825142282c298b1008d9f1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -73,23 +73,17 @@
         },
         "asgard-api-plugin-metrics-fluentd": {
             "hashes": [
-                "sha256:9ec015cbc80c4a325cf1c6da3bd912856ae947d0d506e85fa7dc6059f2d420cd"
+                "sha256:6986147ebaa6f6b5696425c182198bdfe70373efeb2387b3e8ffa53969469c11"
             ],
             "index": "pypi",
-            "version": "==0.1.1"
+            "version": "==0.2.0"
         },
         "asgard-api-plugin-metrics-mesos": {
             "hashes": [
-                "sha256:b33c078abef2483755365c43ce9595248be79a662102aff27ac0ce9c61c9b882"
+                "sha256:50ac40fe23e920e09820f97a8e95b3b73888a5b065f15134834cabe32fad63b3"
             ],
             "index": "pypi",
-            "version": "==0.9.0"
-        },
-        "asgard-api-sdk": {
-            "hashes": [
-                "sha256:40319f01b325c784a8100b24117e88255730dbd0699e01c3437e70e0537cec70"
-            ],
-            "version": "==0.3.0"
+            "version": "==0.10.0"
         },
         "async-timeout": {
             "hashes": [
@@ -199,13 +193,6 @@
             ],
             "index": "pypi",
             "version": "==0.9.5"
-        },
-        "freezegun": {
-            "hashes": [
-                "sha256:703caac155dcaad61f78de4cb0666dca778d854dfb90b3699930adee0559a622",
-                "sha256:94c59d69bb99c9ec3ca5a3adb41930d3ea09d2a9756c23a02d89fa75646e78dd"
-            ],
-            "version": "==0.3.10"
         },
         "hiredis": {
             "hashes": [
@@ -391,20 +378,6 @@
                 "sha256:99fe612dbe5f41e07124d9002c118c14f3ee703574ffa9779fee78135b8b94b6"
             ],
             "version": "==1.4.2"
-        },
-        "python-dateutil": {
-            "hashes": [
-                "sha256:1adb80e7a782c12e52ef9a8182bebeb73f1d7e24e374397af06fb4956c8dc5c0",
-                "sha256:e27001de32f627c22380a688bcc43ce83504a7bc5da472209b4c70f02829f0b8"
-            ],
-            "version": "==2.7.3"
-        },
-        "pytz": {
-            "hashes": [
-                "sha256:65ae0c8101309c45772196b21b74c46b2e5d11b6275c45d251b150d5da334555",
-                "sha256:c06425302f2cf668f1bba7a0a03f3c1d34d4ebeef2c72003da308b3947c7f749"
-            ],
-            "version": "==2018.4"
         },
         "redis": {
             "hashes": [
