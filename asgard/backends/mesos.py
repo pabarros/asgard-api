@@ -5,9 +5,6 @@ from asgard.http.client import http_client
 
 
 class MesosBackend(Backend):
-    def __init__(self):
-        super(MesosBackend, self).__init__()
-
     async def get_agents(self, namespace: str):
         agents_url = f"{get_mesos_leader_address()}/slaves"
         async with http_client.get(agents_url) as response:
