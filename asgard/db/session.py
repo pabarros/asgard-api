@@ -97,5 +97,5 @@ class AsgardDBConnection:
         if len(result_list) > 1:
             raise sqlalchemy.orm.exc.MultipleResultsFound
         if not len(result_list):
-            raise sqlalchemy.orm.exc.MultipleResultsFound
+            raise sqlalchemy.orm.exc.NoResultFound
         return result_list[0]

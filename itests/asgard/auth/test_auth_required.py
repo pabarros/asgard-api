@@ -51,7 +51,13 @@ class AuthRequiredTest(TestCase):
         self.session = _SessionMaker(TEST_PGSQL_DSN)
         self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
         self.users_fixture = [
-            [20, "John Doe", "john@host.com", "69ed620926be4067a36402c3f7e9ddf0"]
+            [20, "John Doe", "john@host.com", "69ed620926be4067a36402c3f7e9ddf0"],
+            [
+                21,
+                "User with no acounts",
+                "user-no-accounts@host.com",
+                "7b4184bfe7d2349eb56bcfb9dc246cf8",
+            ],
         ]
         self.pg_data_mocker.add_data(
             User, ["id", "tx_name", "tx_email", "tx_authkey"], self.users_fixture
@@ -60,58 +66,32 @@ class AuthRequiredTest(TestCase):
         self.pg_data_mocker.add_data(
             Account,
             ["id", "name", "namespace", "owner"],
-            [[10, "Dev Team", "dev", "company"]],
+            [
+                [10, "Dev Team", "dev", "company"],
+                [11, "Infra Team", "infra", "company"],
+                [12, "Other Team", "other", "company"],
+            ],
         )
 
-        # self.pg_data_mocker.add_data(
-        #    UserHasAccount, ["id", "user_id", "account_id"], [[10, 20, 10]]  # John Doe
-        # )
+        self.pg_data_mocker.add_data(
+            UserHasAccount,
+            ["id", "user_id", "account_id"],
+            [[10, 20, 10], [11, 20, 11]],  # John Doe, accounts: Dev Team, Infra Team
+        )
         await self.pg_data_mocker.create()
-        # self.session = HollowmanSession()
-        # self.user = User(
-        #    tx_email="user@host.com.br",
-        #    tx_name="John Doe",
-        #    tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
-        # )
-        # self.account_dev = Account(
-        #    id=4, name="Dev Team", namespace="dev", owner="company"
-        # )
-        # self.account_infra = Account(
-        #    name="Infra Team", namespace="infra", owner="company"
-        # )
-        # self.account_sup = Account(
-        #    name="Support Team", namespace="sup", owner="company"
-        # )
-        # self.user.accounts = [self.account_dev, self.account_infra]
-        # self.session.add(self.user)
-        # self.session.add(self.account_dev)
-        # self.session.add(self.account_infra)
-        # self.session.add(self.account_sup)
-        # self.user_with_no_accounts = User(
-        #    tx_email="user-no-accounts@host.com.br",
-        #    tx_name="No Accounts",
-        #    tx_authkey="7b4184bfe7d2349eb56bcfb9dc246cf8",
-        # )
-        # self.session.add(self.user_with_no_accounts)
-        # self.account_with_no_user = Account(
-        #    name="Team Nobody", namespace="nobody", owner="nobody"
-        # )
-        # self.session.add(self.account_with_no_user)
-        # self.session.commit()
-        # self.response_http_200 = MagicMock(status_code=200)
-        # responses.add(
-        #    method="GET",
-        #    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps",
-        #    body=json.dumps({"apps": [fixture]}),
-        #    status=200,
-        # )
-        # responses.add(
-        #    method="GET",
-        #    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//foo",
-        #    body=json.dumps({"app": fixture}),
-        #    status=200,
-        # )
-        # responses.start()
+
+        @self.app.route(["/"], methods=["GET"], type=RouteTypes.HTTP)
+        @auth_required
+        async def handler(r):
+            data = {
+                "user": r.user.tx_email,
+                "current_account": {
+                    "id": r.user.current_account.id,
+                    "namespace": r.user.current_account.namespace,
+                    "name": r.user.current_account.name,
+                },
+            }
+            return web.json_response(data)
 
     async def tearDown(self):
         mock.patch.stopall()
@@ -121,11 +101,6 @@ class AuthRequiredTest(TestCase):
         """
         Populates request.user if authentication is successful
         """
-
-        @self.app.route(["/"], methods=["GET"], type=RouteTypes.HTTP)
-        @auth_required
-        async def handler(r):
-            return web.json_response({"user": r.user.tx_email})
 
         await self.signal_handler.startup(self.app)
 
@@ -137,13 +112,9 @@ class AuthRequiredTest(TestCase):
             )
             data = await resp.json()
             self.assertEqual(200, resp.status)
-            self.assertEqual({"user": "john@host.com"}, data)
+            self.assertEqual("john@host.com", data["user"])
 
     async def test_auth_auth_fails_if_header_is_not_present(self):
-        @self.app.route(["/"], methods=["GET"], type=RouteTypes.HTTP)
-        @auth_required
-        async def handler(r):
-            return web.json_response({"user": r.user.tx_email})
 
         await self.signal_handler.startup(self.app)
 
@@ -155,19 +126,96 @@ class AuthRequiredTest(TestCase):
             self.assertEqual(401, resp.status)
             self.assertEqual({"msg": "Authorization token is invalid"}, data)
 
-    # def test_token_populate_default_account_if_request_account_is_empty(self):
-    #    with application.test_client() as client:
-    #        r = client.get(
-    #            "/v2/apps",
-    #            headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"},
-    #        )
-    #        self.assertEqual(200, r.status_code)
-    #        self.assertEqual("user@host.com.br", request.user.tx_email)
-    #        self.assertEqual(self.account_dev.id, request.user.current_account.id)
-    #        self.assertEqual(
-    #            self.account_dev.namespace, request.user.current_account.namespace
-    #        )
-    #        self.assertEqual(self.account_dev.owner, request.user.current_account.owner)
+    async def test_auth_auth_failts_if_key_not_found(self):
+        await self.signal_handler.startup(self.app)
+        async with TestClient(
+            TestServer(self.app[RouteTypes.HTTP]["app"]), loop=asyncio.get_event_loop()
+        ) as client:
+            resp = await client.get(
+                "/", headers={"Authorization": "Token token-not-found"}
+            )
+            data = await resp.json()
+            self.assertEqual(401, resp.status)
+            self.assertEqual({"msg": "Authorization token is invalid"}, data)
+
+    async def test_auth_auth_fails_if_user_has_no_associated_account(self):
+        await self.signal_handler.startup(self.app)
+        async with TestClient(
+            TestServer(self.app[RouteTypes.HTTP]["app"]), loop=asyncio.get_event_loop()
+        ) as client:
+            resp = await client.get(
+                "/", headers={"Authorization": "Token 7b4184bfe7d2349eb56bcfb9dc246cf8"}
+            )
+            data = await resp.json()
+            self.assertEqual(401, resp.status)
+            self.assertEqual({"msg": "No associated account"}, data)
+
+    async def test_auth_auth_fails_if_desired_account_does_not_exist(self):
+        await self.signal_handler.startup(self.app)
+        async with TestClient(
+            TestServer(self.app[RouteTypes.HTTP]["app"]), loop=asyncio.get_event_loop()
+        ) as client:
+            resp = await client.get(
+                "/",
+                params={"account_id": 42},
+                headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"},
+            )
+            data = await resp.json()
+            self.assertEqual(401, resp.status)
+            self.assertEqual({"msg": "Account does not exist"}, data)
+
+    async def test_auth_populate_default_account_if_request_account_is_empty(self):
+        await self.signal_handler.startup(self.app)
+        async with TestClient(
+            TestServer(self.app[RouteTypes.HTTP]["app"]), loop=asyncio.get_event_loop()
+        ) as client:
+            resp = await client.get(
+                "/", headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"}
+            )
+            data = await resp.json()
+            self.assertEqual(200, resp.status)
+            self.assertEqual(
+                {
+                    "user": "john@host.com",
+                    "current_account": {
+                        "name": "Dev Team",
+                        "id": 10,
+                        "namespace": "dev",
+                    },
+                },
+                data,
+            )
+
+    async def test_auth_auth_fails_if_user_is_not_associated_to_desired_account(self):
+        """
+        Qualquer request com `?account_id` que o usuário nao esteja vinculado, retorna 401
+        """
+        await self.signal_handler.startup(self.app)
+        async with TestClient(
+            TestServer(self.app[RouteTypes.HTTP]["app"]), loop=asyncio.get_event_loop()
+        ) as client:
+            resp = await client.get(
+                "/",
+                params={"account_id": 12},  # Other Account
+                headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"},
+            )
+            data = await resp.json()
+            self.assertEqual(401, resp.status)
+            self.assertEqual({"msg": "Permission Denied to access this account"}, data)
+
+    @skip("Ainda nao temos usuarios validos/ativos/invalidos")
+    def test_auth_auth_failts_if_token_is_valid_but_user_is_invalid(self):
+        """
+        User could be inactive or does not exist
+        """
+        self.fail()
+
+    @skip("Ainda nao temos usuarios validos/ativos/invalidos")
+    def test_jwt_auth_failts_if_token_is_valid_but_user_is_invalid(self):
+        """
+        User could be inactive or does not exist
+        """
+        self.fail()
 
     # @unittest.skip("Pode não fazer sentido...")
     # def test_jwt_populate_default_account_if_request_account_is_empty(self):
@@ -199,24 +247,6 @@ class AuthRequiredTest(TestCase):
     #            "Permission Denied to access this account", json.loads(r.data)["msg"]
     #        )
 
-    # def test_return_401_if_key_not_found(self):
-    #    with application.test_client() as client:
-    #        r = client.get(
-    #            "/v2/apps", headers={"Authorization": "Token token-not-found"}
-    #        )
-    #        self.assertEqual(401, r.status_code)
-    #        self.assertEqual(
-    #            "Authorization token is invalid", json.loads(r.data)["msg"]
-    #        )
-
-    # def test_return_401_if_no_token_present(self):
-    #    with application.test_client() as client:
-    #        r = client.get("/v2/apps")
-    #        self.assertEqual(401, r.status_code)
-    #        self.assertEqual(
-    #            "Authorization token is invalid", json.loads(r.data)["msg"]
-    #        )
-
     # def test_jwt_do_not_trigger_token_auth_if_jwt_token_is_present(self):
     #    """
     #    Both auth uses the same header: Authorization. Token Auth should *not* be called if current token is JWT
@@ -226,18 +256,6 @@ class AuthRequiredTest(TestCase):
     #    ) as session_mock:
     #        r = test_client.get("/v2/apps", headers={"Authorization": "JWT Token"})
     #        self.assertEqual(0, session_mock.call_count)
-
-    # def test_token_return_401_if_user_is_not_associated_to_desired_account(self):
-    #    """
-    #    Qualquer request com `?account_id` que o usuário nao esteja vinculado, retorna 401
-    #    """
-    #    account_id = self.account_with_no_user.id
-    #    with application.test_client() as client:
-    #        r = client.get(
-    #            "/v2/apps?account_id={}".format(account_id),
-    #            headers={"Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"},
-    #        )
-    #        self.assertEqual(401, r.status_code)
 
     # def test_return_200_if_jwt_token_valid(self):
     #    test_client = application.test_client()
@@ -259,13 +277,6 @@ class AuthRequiredTest(TestCase):
     #        self.assertEqual(200, r.status_code)
     #        self.assertEqual("user@host.com.br", request.user.tx_email)
     #        self.assertEqual(5, request.user.current_account.id)
-
-    # @unittest.skip("Ainda nao temos usuarios validos/ativos/invalidos")
-    # def test_return_401_if_jwt_token_is_valid_but_user_is_invalid(self):
-    #    """
-    #    User could be inactive or does not exist
-    #    """
-    #    self.fail()
 
     # def test_return_401_if_jwt_token_is_invalid(self):
     #    with application.app_context(), application.test_client() as test_client:
@@ -332,7 +343,7 @@ class AuthRequiredTest(TestCase):
     #            "login-failed.html", reason="User not found"
     #        )
 
-    # def test_login_failed_user_does_not_have_any_account(self):
+    # def test_oauth2_login_failed_user_does_not_have_any_account(self):
     #    test_client = application.test_client()
 
     #    with application.app_context(), patch.object(
@@ -345,15 +356,6 @@ class AuthRequiredTest(TestCase):
     #        render_mock.assert_called_once_with(
     #            "login-failed.html", reason="No associated accounts"
     #        )
-
-    # def test_return_401_user_has_no_associated_account(self):
-    #    with application.test_client() as client:
-    #        r = client.get(
-    #            "/v2/apps",
-    #            headers={"Authorization": "Token 7b4184bfe7d2349eb56bcfb9dc246cf8"},
-    #        )
-    #        self.assertEqual(401, r.status_code)
-    #        self.assertEqual("No associated account", json.loads(r.data)["msg"])
 
     # def test_jwt_add_redirect_with_account_id_on_token_after_login(self):
     #    """
