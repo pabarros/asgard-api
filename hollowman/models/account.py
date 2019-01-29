@@ -7,7 +7,7 @@ from hollowman.models import BaseModel
 from hollowman.models.user_has_account import UserHasAccount
 
 
-class Account(BaseModel):
+class Account(BaseModel):  # type: ignore
     __tablename__ = "account"
 
     id = Column(Integer, primary_key=True)

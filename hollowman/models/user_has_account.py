@@ -16,7 +16,7 @@ from hollowman.models import BaseModel
 
 UserHasAccount = Table(
     "user_has_account",
-    BaseModel.metadata,
+    BaseModel.metadata,  # type: ignore
     Column("id", Integer, primary_key=True),
     Column("user_id", Integer, ForeignKey("user.id")),
     Column("account_id", Integer, ForeignKey("account.id")),
