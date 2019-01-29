@@ -4,6 +4,7 @@ from typing import Dict, Callable
 
 from aiohttp import web
 from sqlalchemy.orm.exc import NoResultFound
+import sqlalchemy
 
 import jwt
 import json
@@ -13,7 +14,6 @@ from asgard import db
 from hollowman.conf import SECRET_KEY
 from hollowman.models import HollowmanSession, User, Account, UserHasAccount
 from hollowman.log import logger
-from hollowman.auth import _get_user_by_email
 
 
 invalid_token_response_body = {"msg": "Authorization token is invalid"}
@@ -34,59 +34,75 @@ class TokenTypes(object):
 
 
 async def _get_account_by_id(account_id):
-    async with db.AsgardDBSession() as s:
-        if account_id:
+    if account_id:
+        async with db.AsgardDBSession() as s:
             try:
-                acc = await s.query(Account).filter(Account.id == account_id).one()
-                return acc
+                return await s.query(Account).filter(Account.id == account_id).one()
             except NoResultFound:
                 return None
-    return None
+
+
+def _build_base_query(session: db.session.AsgardDBConnection):
+    _join = User.__table__.join(
+        UserHasAccount, User.id == UserHasAccount.c.user_id, isouter=True
+    ).join(Account.__table__, Account.id == UserHasAccount.c.account_id, isouter=True)
+    session.query(User, Account.id.label("account_id")).join(_join)
+
+
+async def _build_user_instance(
+    session: db.session.AsgardDBConnection,
+    query_additional_criteria: sqlalchemy.sql.elements.BinaryExpression,
+    auth_failed_log_data: dict,
+):
+    _build_base_query(session)
+    rows = await session.filter(query_additional_criteria).all()
+    if not rows:
+        logger.warning(auth_failed_log_data)
+        return None
+    account_ids = [row.account_id for row in rows if row.account_id]
+    user = User(tx_name=rows[0].tx_name, tx_email=rows[0].tx_email)
+    user.account_ids = account_ids
+    return user
 
 
 async def check_auth_token(token):
     async with db.AsgardDBSession() as session:
-        _join = User.__table__.join(
-            UserHasAccount, User.id == UserHasAccount.c.user_id, isouter=True
-        ).join(
-            Account.__table__, Account.id == UserHasAccount.c.account_id, isouter=True
+        return await _build_user_instance(
+            session,
+            User.tx_authkey == token,
+            {
+                "event": "auth-failed",
+                "token-type": "apikey",
+                "error": "Key not found",
+                "token": token,
+            },
         )
-        rows = (
-            await session.query(User, Account.id.label("account_id"))
-            .join(_join)
-            .filter(User.tx_authkey == token)
-            .all()
-        )
-        if not rows:
-            logger.info(
-                {
-                    "event": "auth-failed",
-                    "token-type": "apikey",
-                    "error": "Key not found",
-                    "token": token,
-                }
-            )
-            return None
-        account_ids = [row.account_id for row in rows if row.account_id]
-        user = User(tx_name=rows[0].tx_name, tx_email=rows[0].tx_email)
-        user.account_ids = account_ids
-        return user
 
 
-def check_jwt_token(jwt_token):
+async def check_jwt_token(jwt_token):
     try:
         payload = jwt.decode(jwt_token, key=SECRET_KEY)
-        return _get_user_by_email(payload["user"]["email"])
     except Exception as e:
-        logger.info(
+        logger.warning(
             {
-                "auth": "failed",
+                "event": "invalid-token",
                 "token-type": "jwt",
                 "error": str(e),
-                "jwt_token": jwt_token,
+                "token": jwt_token,
             }
         )
         return None
+    async with db.AsgardDBSession() as session:
+        return await _build_user_instance(
+            session,
+            User.tx_email == payload["user"]["email"],
+            {
+                "event": "auth-failed",
+                "token-type": "JWT",
+                "error": "user not found",
+                "email": payload["user"]["email"],
+            },
+        )
 
 
 def _extract_account_id_from_jwt(jwt_token):
@@ -139,7 +155,7 @@ def auth_required(fn):
                 return make_response(permission_denied_on_account_response_body, 401)
 
             request.user = user
-            request.user.current_account = request_account_on_db
+            request.user.current_account = request_account_on_db  # type: ignore
 
         except Exception as e:
             logger.exception({"exc": e, "step": "auth"})

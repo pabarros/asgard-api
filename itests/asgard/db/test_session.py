@@ -22,11 +22,15 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         )
 
         self.pg_data_mocker.add_data(
-            Account, ["id", "name", "namespace", "owner"], [[10, "dev", "dev", "dev"]]
+            Account,
+            ["id", "name", "namespace", "owner"],
+            [[10, "dev", "dev", "dev"]],
         )
 
         self.pg_data_mocker.add_data(
-            UserHasAccount, ["id", "user_id", "account_id"], [[10, 20, 10]]  # John Doe
+            UserHasAccount,
+            ["id", "user_id", "account_id"],
+            [[10, 20, 10]],  # John Doe
         )
         await self.pg_data_mocker.create()
 
@@ -52,7 +56,9 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         else:
             async with self.session() as conn:
                 result = list(await conn.query(User).all())
-                self.assertEqual(1, len(result), "Transaction should not be confirmed")
+                self.assertEqual(
+                    1, len(result), "Transaction should not be confirmed"
+                )
             self.fail("RollBackException not raised")
 
     async def test_commit_on_success(self):
@@ -99,7 +105,9 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
 
     async def test_with_model_with_filter(self):
         async with self.session() as conn:
-            result = await conn.query(User).filter(User.tx_name == "John Doe").all()
+            result = (
+                await conn.query(User).filter(User.tx_name == "John Doe").all()
+            )
 
             self.assertEqual(1, len(result))
             self.assertEqual("john@host.com", result[0].tx_email)
@@ -161,4 +169,6 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         """
         with self.assertRaises(sqlalchemy.orm.exc.NoResultFound):
             async with self.session() as conn:
-                await conn.query(User).filter(User.tx_email == "not-found").one()
+                await conn.query(User).filter(
+                    User.tx_email == "not-found"
+                ).one()
