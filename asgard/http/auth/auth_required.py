@@ -164,8 +164,8 @@ def auth_required(fn):
                     permission_denied_on_account_response_body, 401
                 )
 
-            request.user = user
-            request.user.current_account = request_account_on_db  # type: ignore
+            request["user"] = user
+            request["user"].current_account = request_account_on_db
 
         except Exception as e:
             logger.exception({"exc": e, "step": "auth"})
