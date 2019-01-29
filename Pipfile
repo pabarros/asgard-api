@@ -32,11 +32,12 @@ mock = "==2.0.0"
 pytest = "==3.0.1"
 responses = "==0.7.0"
 codecov = "*"
-asgard-api = {editable = true, path = "."}
-"asgard-api-plugin-metrics-example-1" = {editable = true, path = "./tests/fixtures/plugins/metrics/metric-plugin-example-1"}
+asgard-api = {editable = true,path = "."}
+asgard-api-plugin-metrics-example-1 = {editable = true,path = "./tests/fixtures/plugins/metrics/metric-plugin-example-1"}
 asynctest = "==0.12.2"
 mypy = "==0.630"
 black = "==18.9b0"
+aioresponses = "==0.6.0"
 
 [requires]
 python_version = "3.6"
