@@ -37,7 +37,11 @@ async def _get_account_by_id(account_id):
     if account_id:
         async with db.AsgardDBSession() as s:
             try:
-                return await s.query(Account).filter(Account.id == account_id).one()
+                return (
+                    await s.query(Account)
+                    .filter(Account.id == account_id)
+                    .one()
+                )
             except NoResultFound:
                 return None
 
@@ -45,7 +49,11 @@ async def _get_account_by_id(account_id):
 def _build_base_query(session: db.session.AsgardDBConnection):
     _join = User.__table__.join(
         UserHasAccount, User.id == UserHasAccount.c.user_id, isouter=True
-    ).join(Account.__table__, Account.id == UserHasAccount.c.account_id, isouter=True)
+    ).join(
+        Account.__table__,
+        Account.id == UserHasAccount.c.account_id,
+        isouter=True,
+    )
     session.query(User, Account.id.label("account_id")).join(_join)
 
 
@@ -152,7 +160,9 @@ def auth_required(fn):
                 request_account_on_db.id
                 and request_account_on_db.id not in user.account_ids
             ):
-                return make_response(permission_denied_on_account_response_body, 401)
+                return make_response(
+                    permission_denied_on_account_response_body, 401
+                )
 
             request.user = user
             request.user.current_account = request_account_on_db  # type: ignore
