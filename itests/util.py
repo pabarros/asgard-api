@@ -15,6 +15,7 @@ class PgDataMocker:
         self.pool = pool
         self.schema = "".join(random.choices(string.ascii_lowercase, k=10))
         self._used_tables = []
+        self._original_table_schemas = {}
 
     def add_data(
         self, model: Type, field_names: List[str], data: List[List[Any]]
@@ -29,6 +30,7 @@ class PgDataMocker:
             table = model
 
         # ensure schema
+        self._original_table_schemas[table] = table.schema
         table.schema = self.schema
 
         self._used_tables.append(table)
@@ -53,3 +55,5 @@ class PgDataMocker:
     async def drop(self):
         async with self.pool.acquire() as conn:
             await conn.execute(DropSchema(self.schema, cascade=True))
+        for table, original_schema in self._original_table_schemas.items():
+            table.schema = original_schema

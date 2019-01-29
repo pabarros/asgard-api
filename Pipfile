@@ -46,6 +46,7 @@ api = 'python hollowman/main.py'
 async-api = 'python -m asgard.api'
 test = "py.test -sv --cov=hollowman --cov-report term-missing -v tests/"
 itest = "py.test -sv --cov=asgard --cov-report term-missing -v itests/"
+all-tests = "py.test -sv --cov=hollowman --cov=asgard --cov-report term-missing -v tests/ itests"
 lint = "mypy asgard --ignore-missing-imports"
 fmt = "black --py36 -v --line-length 80 ."
 fmt-check = "black --py36 -v --line-length 80 --check ."
