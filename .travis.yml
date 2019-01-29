@@ -12,7 +12,6 @@ install:
 script:
   - pipenv run lint
   - pipenv run fmt-check
-  - pipenv run py.test -v --cov=hollowman --cov=asgard --cov-report term-missing -v itests/
-  - pipenv run py.test -v --cov=hollowman --cov=asgard --cov-report term-missing -v tests/
+  - pipenv run all-tests
 after_success:
   - codecov

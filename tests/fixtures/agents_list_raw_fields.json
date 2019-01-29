@@ -1,0 +1,150 @@
+{
+   "slaves" : [
+      {
+         "pid" : "slave(1)@10.168.200.94:5051",
+         "used_resources" : {
+            "cpus" : 2.7,
+            "gpus" : 0,
+            "ports" : "[31187-31187, 31217-31217, 31250-31251, 31320-31320, 31480-31480]",
+            "mem" : 4128,
+            "disk" : 0
+         },
+         "hostname" : "10.168.200.94",
+         "active" : true,
+         "version" : "1.4.1",
+         "port" : 5051,
+         "reserved_resources_full" : {},
+         "registered_time" : 1546863598.0782,
+         "used_resources_full" : [
+            {
+               "type" : "SCALAR",
+               "scalar" : {
+                  "value" : 2.7
+               },
+               "role" : "*",
+               "name" : "cpus",
+               "allocation_info" : {
+                  "role" : "*"
+               }
+            },
+            {
+               "allocation_info" : {
+                  "role" : "*"
+               },
+               "role" : "*",
+               "name" : "mem",
+               "scalar" : {
+                  "value" : 4128
+               },
+               "type" : "SCALAR"
+            },
+            {
+               "allocation_info" : {
+                  "role" : "*"
+               },
+               "name" : "ports",
+               "role" : "*",
+               "ranges" : {
+                  "range" : [
+                     {
+                        "end" : 31187,
+                        "begin" : 31187
+                     },
+                     {
+                        "begin" : 31217,
+                        "end" : 31217
+                     },
+                     {
+                        "end" : 31251,
+                        "begin" : 31250
+                     },
+                     {
+                        "begin" : 31320,
+                        "end" : 31320
+                     },
+                     {
+                        "begin" : 31480,
+                        "end" : 31480
+                     }
+                  ]
+               },
+               "type" : "RANGES"
+            }
+         ],
+         "attributes" : {
+            "mesos" : "slave",
+            "owner" : "asgard",
+            "dc" : "bit",
+            "workload" : "general"
+         },
+         "id" : "fa8dd968-40c9-4179-9b1f-38b56341a2a4-S0",
+         "reserved_resources" : {},
+         "offered_resources" : {
+            "gpus" : 0,
+            "cpus" : 0,
+            "disk" : 0,
+            "mem" : 0
+         },
+         "unreserved_resources" : {
+            "cpus" : 4,
+            "gpus" : 0,
+            "ports" : "[31000-32000]",
+            "disk" : 456229,
+            "mem" : 8000
+         },
+         "offered_resources_full" : [],
+         "resources" : {
+            "gpus" : 0,
+            "cpus" : 4,
+            "ports" : "[31000-32000]",
+            "mem" : 8000,
+            "disk" : 456229
+         },
+         "reregistered_time" : 1547823685.33856,
+         "capabilities" : [
+            "MULTI_ROLE",
+            "HIERARCHICAL_ROLE",
+            "RESERVATION_REFINEMENT"
+         ],
+         "unreserved_resources_full" : [
+            {
+               "scalar" : {
+                  "value" : 4
+               },
+               "role" : "*",
+               "name" : "cpus",
+               "type" : "SCALAR"
+            },
+            {
+               "type" : "SCALAR",
+               "role" : "*",
+               "name" : "mem",
+               "scalar" : {
+                  "value" : 8000
+               }
+            },
+            {
+               "name" : "disk",
+               "role" : "*",
+               "scalar" : {
+                  "value" : 456229
+               },
+               "type" : "SCALAR"
+            },
+            {
+               "type" : "RANGES",
+               "ranges" : {
+                  "range" : [
+                     {
+                        "end" : 32000,
+                        "begin" : 31000
+                     }
+                  ]
+               },
+               "role" : "*",
+               "name" : "ports"
+            }
+         ]
+      }
+   ]
+}

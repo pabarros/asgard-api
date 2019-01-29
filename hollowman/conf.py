@@ -68,7 +68,6 @@ GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv(
     "HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_SECRET", "client_secret"
 )
 
-SECRET_KEY = os.getenv("HOLLOWMAN_SECRET_KEY", "secret")
 REDIRECT_AFTER_LOGIN = os.getenv("HOLLOWMAN_REDIRECT_AFTER_LOGIN")
 
 HOLLOWMAN_DB_URL = os.getenv("HOLLOWMAN_DB_URL", "sqlite://")
@@ -82,3 +81,7 @@ LOGLEVEL = os.getenv("ASGARD_LOGLEVEL", "INFO")
 ASGARD_CACHE_KEY_PREFIX = os.getenv("ASGARD_CACHE_KEY_PREFIX", "asgard/")
 ASGARD_CACHE_DEFAULT_TIMEOUT = os.getenv("ASGARD_CACHE_DEFAULT_TIMEOUT", 60)
 ASGARD_CACHE_URL = os.getenv("ASGARD_CACHE_URL", "redis://127.0.0.1:6379/0")
+
+
+# As configs estão, aos poucos, sendo migradas para o pacote `asgard.conf`
+from asgard.conf import SECRET_KEY

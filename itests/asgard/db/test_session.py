@@ -167,7 +167,7 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         """
         Raises sqlalchemy.orm.exc.NoResultFound
         """
-        with self.assertRaises(sqlalchemy.orm.exc.MultipleResultsFound):
+        with self.assertRaises(sqlalchemy.orm.exc.NoResultFound):
             async with self.session() as conn:
                 await conn.query(User).filter(
                     User.tx_email == "not-found"
