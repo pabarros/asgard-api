@@ -23,9 +23,7 @@ def _build_cors_whitelist(env_value):
 
 
 def _build_addresses(namespace, option_name, default_address):
-    addresses = {
-        addr.rstrip("/") for addr in get_option(namespace, option_name)
-    }
+    addresses = {addr.rstrip("/") for addr in get_option(namespace, option_name)}
     final_addresses = sorted(list(addresses))
     if not final_addresses:
         final_addresses = [default_address]
@@ -54,21 +52,16 @@ MARATHON_LEADER = MARATHON_ADDRESSES[0]
 MESOS_ADDRESSES = _build_mesos_addresses()
 
 user, passw = MARATHON_CREDENTIALS.split(":")
-marathon_client = MarathonClient(
-    MARATHON_ADDRESSES, username=user, password=passw
-)
+marathon_client = MarathonClient(MARATHON_ADDRESSES, username=user, password=passw)
 
 CORS_WHITELIST = _build_cors_whitelist(os.getenv("HOLLOWMAN_CORS_WHITELIST"))
 
 REDIRECT_ROOTPATH_TO = os.getenv("HOLLOWMAN_REDIRECT_ROOTPATH_TO", "/v2/apps")
-GOOGLE_OAUTH2_CLIENT_ID = os.getenv(
-    "HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_ID", "client_id"
-)
+GOOGLE_OAUTH2_CLIENT_ID = os.getenv("HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_ID", "client_id")
 GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv(
     "HOLLOWMAN_GOOGLE_OAUTH2_CLIENT_SECRET", "client_secret"
 )
 
-SECRET_KEY = os.getenv("HOLLOWMAN_SECRET_KEY", "secret")
 REDIRECT_AFTER_LOGIN = os.getenv("HOLLOWMAN_REDIRECT_AFTER_LOGIN")
 
 HOLLOWMAN_DB_URL = os.getenv("HOLLOWMAN_DB_URL", "sqlite://")
@@ -82,3 +75,7 @@ LOGLEVEL = os.getenv("ASGARD_LOGLEVEL", "INFO")
 ASGARD_CACHE_KEY_PREFIX = os.getenv("ASGARD_CACHE_KEY_PREFIX", "asgard/")
 ASGARD_CACHE_DEFAULT_TIMEOUT = os.getenv("ASGARD_CACHE_DEFAULT_TIMEOUT", 60)
 ASGARD_CACHE_URL = os.getenv("ASGARD_CACHE_URL", "redis://127.0.0.1:6379/0")
+
+
+# As configs estão, aos poucos, sendo migradas para o pacote `asgard.conf`
+from asgard.conf import SECRET_KEY

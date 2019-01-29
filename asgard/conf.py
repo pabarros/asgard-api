@@ -11,3 +11,7 @@ ASGARD_HTTP_CLIENT_CONNECT_TIMEOUT = int(
 ASGARD_HTTP_CLIENT_TOTAL_TIMEOUT = int(
     os.getenv("ASGARD_HTTP_CLIENT_TOTAL_TIMEOUT", 30)
 )
+
+# Configs que foram migradas do pacote `hollowman.conf`.
+# Depois vamos midar o prefixo de `HOLLOWMAN_` para `ASGARD_`
+SECRET_KEY = os.getenv("HOLLOWMAN_SECRET_KEY", "secret")
