@@ -8,6 +8,11 @@
 # criar um grande arquivo de env e passar para todas as chamadas do compose.
 
 source "dev/vars.sh"
+source "dev/cleanup.sh"
+
+echo "Sleeping for 3s, ^C to cancel now."
+sleep 3
+
 source "dev/network.sh"
 source "dev/pgsql.sh"
 source "dev/zk.sh"
