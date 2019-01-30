@@ -1,24 +1,14 @@
-from collections import namedtuple
 import jwt
-import json
 import asyncio
 
 from aiohttp import web
-
-from mock import patch, MagicMock
 from asynctest import skip, mock
-from hollowman.models import User, Account, UserHasAccount
 
 from asyncworker import App
 from asyncworker.options import RouteTypes
-from asyncworker.conf import Settings
 
-from asgard.db import _SessionMaker
 from asgard.http.auth import auth_required
 from asgard.http.auth.jwt import jwt_encode
-
-from itests.util import PgDataMocker
-from tests.conf import TEST_PGSQL_DSN
 
 from tests.utils import with_json_fixture
 from itests.util import BaseTestCase
@@ -28,48 +18,6 @@ class AuthRequiredTest(BaseTestCase):
     async def setUp(self):
         await super(AuthRequiredTest, self).setUp()
         self.app = App("", "", "", 1)
-
-        self.session = _SessionMaker(TEST_PGSQL_DSN)
-        self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
-        self.users_fixture = [
-            [
-                20,
-                "John Doe",
-                "john@host.com",
-                "69ed620926be4067a36402c3f7e9ddf0",
-            ],
-            [
-                21,
-                "User with no acounts",
-                "user-no-accounts@host.com",
-                "7b4184bfe7d2349eb56bcfb9dc246cf8",
-            ],
-        ]
-        self.pg_data_mocker.add_data(
-            User,
-            ["id", "tx_name", "tx_email", "tx_authkey"],
-            self.users_fixture,
-        )
-
-        self.pg_data_mocker.add_data(
-            Account,
-            ["id", "name", "namespace", "owner"],
-            [
-                [10, "Dev Team", "dev", "company"],
-                [11, "Infra Team", "infra", "company"],
-                [12, "Other Team", "other", "company"],
-            ],
-        )
-
-        self.pg_data_mocker.add_data(
-            UserHasAccount,
-            ["id", "user_id", "account_id"],
-            [
-                [10, 20, 10],
-                [11, 20, 11],
-            ],  # John Doe, accounts: Dev Team, Infra Team
-        )
-        await self.pg_data_mocker.create()
 
         @self.app.route(["/"], methods=["GET"], type=RouteTypes.HTTP)
         @auth_required

@@ -66,6 +66,8 @@ from asyncworker import RouteTypes
 import asyncio
 from aiohttp.test_utils import TestClient, TestServer
 from aiohttp import web
+from asgard.db import _SessionMaker
+from hollowman.models import User, Account, UserHasAccount
 
 from importlib import reload
 from asynctest import mock
@@ -81,8 +83,50 @@ class BaseTestCase(TestCase):
         ):
             reload(asgard.db)
 
+        self.session = _SessionMaker(TEST_PGSQL_DSN)
+        self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
+        self.users_fixture = [
+            [
+                20,
+                "John Doe",
+                "john@host.com",
+                "69ed620926be4067a36402c3f7e9ddf0",
+            ],
+            [
+                21,
+                "User with no acounts",
+                "user-no-accounts@host.com",
+                "7b4184bfe7d2349eb56bcfb9dc246cf8",
+            ],
+        ]
+        self.pg_data_mocker.add_data(
+            User,
+            ["id", "tx_name", "tx_email", "tx_authkey"],
+            self.users_fixture,
+        )
+
+        self.pg_data_mocker.add_data(
+            Account,
+            ["id", "name", "namespace", "owner"],
+            [
+                [10, "Dev Team", "dev", "company"],
+                [11, "Infra Team", "infra", "company"],
+                [12, "Other Team", "other", "company"],
+            ],
+        )
+
+        self.pg_data_mocker.add_data(
+            UserHasAccount,
+            ["id", "user_id", "account_id"],
+            [
+                [10, 20, 10],
+                [11, 20, 11],
+            ],  # John Doe, accounts: Dev Team, Infra Team
+        )
+        await self.pg_data_mocker.create()
+
     async def tearDown(self):
-        pass
+        await self.pg_data_mocker.drop()
 
     async def aiohttp_client(self, app: asyncworker.App):
         routes = app.routes_registry.http_routes
