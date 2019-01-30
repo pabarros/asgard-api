@@ -1,26 +1,17 @@
 from collections import namedtuple
-from importlib import reload
-
-import asgard.db
-
 import jwt
 import json
 import asyncio
 
-from aiohttp.test_utils import TestClient, TestServer
 from aiohttp import web
 
 from mock import patch, MagicMock
-from asynctest import TestCase, skip, mock
-import os
-from hollowman.models import HollowmanSession, User, Account, UserHasAccount
-import hollowman.conf
-from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
+from asynctest import skip, mock
+from hollowman.models import User, Account, UserHasAccount
 
 from asyncworker import App
 from asyncworker.options import RouteTypes
 from asyncworker.conf import Settings
-from asyncworker.signals.handlers.http import HTTPServer
 
 from asgard.db import _SessionMaker
 from asgard.http.auth import auth_required
@@ -29,7 +20,6 @@ from asgard.http.auth.jwt import jwt_encode
 from itests.util import PgDataMocker
 from tests.conf import TEST_PGSQL_DSN
 
-from tests import rebuild_schema
 from tests.utils import with_json_fixture
 from itests.util import BaseTestCase
 
@@ -38,11 +28,6 @@ class AuthRequiredTest(BaseTestCase):
     async def setUp(self):
         await super(AuthRequiredTest, self).setUp()
         self.app = App("", "", "", 1)
-
-        with mock.patch.object(
-            hollowman.conf, "HOLLOWMAN_DB_URL", TEST_PGSQL_DSN
-        ):
-            reload(asgard.db)
 
         self.session = _SessionMaker(TEST_PGSQL_DSN)
         self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())

@@ -67,10 +67,19 @@ import asyncio
 from aiohttp.test_utils import TestClient, TestServer
 from aiohttp import web
 
+from importlib import reload
+from asynctest import mock
+from tests.conf import TEST_PGSQL_DSN
+import hollowman.conf
+import asgard.db
+
 
 class BaseTestCase(TestCase):
     async def setUp(self):
-        pass
+        with mock.patch.object(
+            hollowman.conf, "HOLLOWMAN_DB_URL", TEST_PGSQL_DSN
+        ):
+            reload(asgard.db)
 
     async def tearDown(self):
         pass
