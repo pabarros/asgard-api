@@ -3,6 +3,8 @@ import random
 import string
 from collections import defaultdict
 from typing import Dict, List, Type, Any, Iterable
+from asynctest import TestCase
+import asyncworker
 
 from aiopg.sa import Engine
 from sqlalchemy import Table
@@ -57,3 +59,29 @@ class PgDataMocker:
             await conn.execute(DropSchema(self.schema, cascade=True))
         for table, original_schema in self._original_table_schemas.items():
             table.schema = original_schema
+
+
+from asyncworker.signals.handlers.http import HTTPServer
+from asyncworker import RouteTypes
+import asyncio
+from aiohttp.test_utils import TestClient, TestServer
+from aiohttp import web
+
+
+class BaseTestCase(TestCase):
+    async def setUp(self):
+        pass
+
+    async def tearDown(self):
+        pass
+
+    async def aiohttp_client(self, app: asyncworker.App):
+        routes = app.routes_registry.http_routes
+        http_app = web.Application()
+        for route in routes:
+            http_app.router.add_route(**route)
+        server = TestServer(http_app)
+        client = TestClient(server)
+        await server.start_server()
+
+        return client
