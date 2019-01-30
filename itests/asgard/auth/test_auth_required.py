@@ -134,6 +134,21 @@ class AuthRequiredTest(TestCase):
             self.assertEqual(200, resp.status)
             self.assertEqual("john@host.com", data["user"])
 
+    async def test_auth_auth_fails_if_token_type_is_invalid(self):
+
+        await self.signal_handler.startup(self.app)
+
+        async with TestClient(
+            TestServer(self.app[RouteTypes.HTTP]["app"]),
+            loop=asyncio.get_event_loop(),
+        ) as client:
+            resp = await client.get(
+                "/", headers={"Authorization": "Invalid-Type invalidToken"}
+            )
+            data = await resp.json()
+            self.assertEqual(401, resp.status)
+            self.assertEqual({"msg": "Authorization token is invalid"}, data)
+
     async def test_auth_auth_fails_if_header_is_not_present(self):
 
         await self.signal_handler.startup(self.app)

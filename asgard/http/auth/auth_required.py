@@ -16,6 +16,7 @@ from hollowman.models import HollowmanSession, User, Account, UserHasAccount
 from hollowman.log import logger
 
 
+unhandled_auth_error = {"msg": "Authorization failed. Unexpected error"}
 invalid_token_response_body = {"msg": "Authorization token is invalid"}
 permission_denied_on_account_response_body = {
     "msg": "Permission Denied to access this account"
@@ -120,7 +121,7 @@ def _extract_account_id_from_jwt(jwt_token):
         return None
 
 
-def not_authenticated(_):
+async def not_authenticated(_):
     return None
 
 
@@ -168,8 +169,8 @@ def auth_required(fn):
             request["user"].current_account = request_account_on_db
 
         except Exception as e:
-            logger.exception({"exc": e, "step": "auth"})
-            return make_response(invalid_token_response_body, 401)
+            logger.exception({"exc": e, "event": "auth-unhandled-error"})
+            return make_response(unhandled_auth_error, 401)
 
         user.current_account = request_account_on_db
         request.user = user
