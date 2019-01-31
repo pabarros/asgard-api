@@ -341,6 +341,33 @@
       },
       "active": true,
       "version": "1.4.1"
+    },
+    {
+      "id": "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
+      "hostname": "172.18.0.18",
+      "port": 5051,
+      "attributes": {
+        "mesos": "slave",
+        "workload": "general",
+        "dc": "aws",
+        "owner": "dev"
+      },
+      "resources": {
+        "disk": 26877,
+        "mem": 2560,
+        "gpus": 0,
+        "cpus": 2.5,
+        "ports": "[30000-31999]"
+      },
+      "used_resources": {
+        "disk": 0,
+        "mem": 512,
+        "gpus": 0,
+        "cpus": 0.5,
+        "ports": "[31858-31858]"
+      },
+      "active": true,
+      "version": "1.4.1"
     }
   ]
 }
