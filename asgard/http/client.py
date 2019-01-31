@@ -13,7 +13,14 @@ class _HttpClient:
     _session: Optional[ClientSession]
 
     def __init__(
-        self, session_class, url: str, method: str, *args, **kwargs
+        self,
+        session_class,
+        url: str,
+        method: str,
+        session_class_args=[],
+        session_class_kwargs={},
+        *args,
+        **kwargs,
     ) -> None:
         self._session = None
         self._session_class = session_class
@@ -21,14 +28,16 @@ class _HttpClient:
         self._args = args
         self._kwargs = kwargs
         self._method = method
+        self._session_class_args = session_class_args
+        self._session_class_kwargs = session_class_kwargs
 
     async def __aenter__(self):
         if not self._session:
-            if "timeout" not in self._kwargs:
-                self._kwargs["timeout"] = default_http_client_timeout
-            self._session = self._session_class(*self._args, **self._kwargs)
+            self._session = self._session_class(
+                *self._session_class_args, **self._session_class_kwargs
+            )
         return await self._return_session_method(self._session, self._method)(
-            self._url
+            self._url, *self._args, **self._kwargs
         )
 
     def _return_session_method(self, session, method_name):
@@ -39,21 +48,55 @@ class _HttpClient:
 
 
 class _HttpClientMaker:
-    def __init__(self, session_class):
+    def __init__(self, session_class, *args, **kwargs):
         self._session_class = session_class
         self.session = None
+        self._session_class_args = args
+        self._session_class_kwargs = kwargs
 
     def get(self, url: str, *args, **kwargs):
-        return _HttpClient(ClientSession, url, "GET", *args, **kwargs)
+        return _HttpClient(
+            self._session_class,
+            url,
+            "GET",
+            self._session_class_args,
+            self._session_class_kwargs,
+            *args,
+            **kwargs,
+        )
 
     def post(self, url: str, *args, **kwargs):
-        return _HttpClient(ClientSession, url, "POST", *args, **kwargs)
+        return _HttpClient(
+            self._session_class,
+            url,
+            "POST",
+            self._session_class_args,
+            self._session_class_kwargs,
+            *args,
+            **kwargs,
+        )
 
     def put(self, url: str, *args, **kwargs):
-        return _HttpClient(ClientSession, url, "PUT", *args, **kwargs)
+        return _HttpClient(
+            self._session_class,
+            url,
+            "PUT",
+            self._session_class_args,
+            self._session_class_kwargs,
+            *args,
+            **kwargs,
+        )
 
     def delete(self, url: str, *args, **kwargs):
-        return _HttpClient(ClientSession, url, "DELETE", *args, **kwargs)
+        return _HttpClient(
+            self._session_class,
+            url,
+            "DELETE",
+            self._session_class_args,
+            self._session_class_kwargs,
+            *args,
+            **kwargs,
+        )
 
     async def __aenter__(self):
         if not self.session:
@@ -66,4 +109,6 @@ class _HttpClientMaker:
         await self.session.close()
 
 
-http_client = _HttpClientMaker(ClientSession)
+http_client = _HttpClientMaker(
+    ClientSession, timeout=default_http_client_timeout
+)
