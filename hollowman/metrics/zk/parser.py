@@ -9,10 +9,7 @@ def _parse_latency_line(data):
 
 def _parse_mode_line(data):
     value = data.strip()
-    return {
-        "mode": value,
-        "is_leader": 1 if (value == "leader") else 0
-    }
+    return {"mode": value, "is_leader": 1 if (value == "leader") else 0}
 
 
 def _parse_connections(data):
@@ -26,12 +23,13 @@ def _parse_oustanting(data):
 def _parse_node_count(data):
     return {"node_count": int(data)}
 
+
 STAT_LINE_PARSER_CALLBACK = {
-    'latency min/avg/max': _parse_latency_line,
-    'connections': _parse_connections,
-    'outstanding': _parse_oustanting,
-    'mode': _parse_mode_line,
-    'node count': _parse_node_count,
+    "latency min/avg/max": _parse_latency_line,
+    "connections": _parse_connections,
+    "outstanding": _parse_oustanting,
+    "mode": _parse_mode_line,
+    "node count": _parse_node_count,
 }
 
 

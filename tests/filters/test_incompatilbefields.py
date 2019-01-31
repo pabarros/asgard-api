@@ -1,5 +1,3 @@
-
-
 import unittest
 
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
@@ -10,7 +8,6 @@ from tests.utils import with_json_fixture
 
 
 class IncompatibleFieldsFilterTest(unittest.TestCase):
-
     @with_json_fixture("../fixtures/single_full_app.json")
     def setUp(self, single_full_app_fixture):
         self.request = Request(None)
@@ -20,8 +17,12 @@ class IncompatibleFieldsFilterTest(unittest.TestCase):
         self.original_app = AsgardApp.from_json(self.single_full_app_fixture)
 
     def test_update_app_remove_ports_fields(self):
-        self.original_app.ports = self.single_full_app_fixture['container']['docker']['portMappings'][0]['servicePort']
-        merged_app = self.request.merge_marathon_apps(self.original_app, self.request_app)
+        self.original_app.ports = self.single_full_app_fixture["container"][
+            "docker"
+        ]["portMappings"][0]["servicePort"]
+        merged_app = self.request.merge_marathon_apps(
+            self.original_app, self.request_app
+        )
         filtered_app = self.filter.write(None, merged_app, self.original_app)
         self.assertEqual([], filtered_app.ports)
 
@@ -31,12 +32,12 @@ class IncompatibleFieldsFilterTest(unittest.TestCase):
                 "port": 10019,
                 "protocol": "tcp",
                 "name": "http",
-                "labels": {
-                    "vip": "192.168.0.1:80"
-                }
+                "labels": {"vip": "192.168.0.1:80"},
             }
         ]
         self.original_app.port_definitions = port_definitions
-        merged_app = self.request.merge_marathon_apps(self.original_app, self.request_app)
+        merged_app = self.request.merge_marathon_apps(
+            self.original_app, self.request_app
+        )
         filtered_app = self.filter.write(None, merged_app, self.original_app)
         self.assertEqual([], filtered_app.port_definitions)

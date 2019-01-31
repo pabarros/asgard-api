@@ -1,4 +1,3 @@
-
 import json
 import os
 from http import HTTPStatus
@@ -8,7 +7,7 @@ from flask import Blueprint, make_response
 from .telnet import send_command
 from .parser import parse_stat_output
 
-from asgard.sdk.options import get_option
+from asgard.options import get_option
 
 zk_metrics_blueprint = Blueprint(__name__, __name__)
 
@@ -21,7 +20,7 @@ def zk_metrics(myid):
 
     res = parse_stat_output(send_command(ZK_IP, 2181, "stat").decode("utf8"))
     response = make_response(json.dumps(res), HTTPStatus.OK)
-    response.headers['Content-type'] = "application/json"
+    response.headers["Content-type"] = "application/json"
     return response
 
 
@@ -30,7 +29,9 @@ def zk_leader():
     zk_ips = get_option("metrics", "zk_id")
     data = []
     for ip in zk_ips:
-        metrics = parse_stat_output(send_command(ip, 2181, "stat").decode("utf8"))
+        metrics = parse_stat_output(
+            send_command(ip, 2181, "stat").decode("utf8")
+        )
         data.append(metrics)
 
     all_modes = [metric.get("mode") == "leader" for metric in data]

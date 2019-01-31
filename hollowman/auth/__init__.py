@@ -1,4 +1,3 @@
-
 from alchemytools.context import managed
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -21,6 +20,7 @@ def _get_user_by_email(email):
         except NoResultFound:
             return None
 
+
 def _get_user_by_authkey(key):
     with managed(HollowmanSession) as s:
         try:
@@ -29,6 +29,7 @@ def _get_user_by_authkey(key):
             return user
         except NoResultFound:
             return None
+
 
 def _get_account_by_id(account_id):
     acc = None

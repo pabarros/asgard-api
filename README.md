@@ -316,4 +316,28 @@ Abra o ipython (também passando as mesmas envs que você passou para rodar a AP
 
 
 # Rodando os testes do projeto
-`PIPENV_DONT_LOAD_ENV=1 pipenv run py.test --cov=./ --cov-report term-missing -v -s`
+
+Os testes estão divididos em dois: Unitários (`teste/`) e de Integração (`itests/`).
+
+O comando base para rodar os testes é essencialmente o mesmo, que é esse:
+`PIPENV_DONT_LOAD_ENV=1 pipenv run py.test --cov=hollowman --cov=asgard --cov-report term-missing -v -s`
+
+## Rodando os testes unitários
+`PIPENV_DONT_LOAD_ENV=1 pipenv run py.test --cov=hollowman --cov=asgard --cov-report term-missing -v -s tests/`
+
+## Rodando os testes de integração
+
+Para rodar os testes de integração você precisa de alguns serviços rodando, por enquanto apenas o postgres.
+Para ligar um postgres localmente rode, na raiz do projeto:
+
+```
+source dev/vars.sh
+source dev/network.sh
+source dev/pgsql.sh 
+```
+
+depois rode os testes:
+
+`PIPENV_DONT_LOAD_ENV=1 PYTHONPATH=. pipenv run py.test --cov=hollowman --cov=asgard --cov-report term-missing -v -s itests/`
+
+

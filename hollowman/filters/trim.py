@@ -4,9 +4,9 @@ from typing import Dict
 from hollowman.marathonapp import AsgardApp
 
 
-class TrimRequestFilter():
-    name = 'trim'
-    app_attrs_to_trim = ('labels', 'env')
+class TrimRequestFilter:
+    name = "trim"
+    app_attrs_to_trim = ("labels", "env")
 
     def _trim_dict_items(self, d: Dict[str, str]) -> Dict[str, str]:
         new = {}

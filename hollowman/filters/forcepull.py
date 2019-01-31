@@ -1,13 +1,13 @@
-#encoding: utf-8
+# encoding: utf-8
 
 import json
 
 from hollowman.log import logger
 
 
-class ForcePullFilter():
+class ForcePullFilter:
 
-    name = 'pull'
+    name = "pull"
 
     def write(sef, user, request_app, app):
         try:
@@ -16,4 +16,3 @@ class ForcePullFilter():
         except AttributeError as e:
             pass
         return request_app
-

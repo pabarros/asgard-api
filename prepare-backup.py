@@ -24,4 +24,4 @@ for group in _g.iterate_groups():
         del app.ports
 
 data_output = json.dumps(_g._marathon_group, cls=MarathonJsonEncoder)
-print (data_output)
+print(data_output)

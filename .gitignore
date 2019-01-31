@@ -69,3 +69,4 @@ debug.log
 
 # Chef environements
 /compose/*.env
+.mypy_cache/

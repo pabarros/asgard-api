@@ -1,12 +1,11 @@
-
 import re
 import marathon.models.base
-marathon.models.base.ID_PATTERN = re.compile('.*')
+
+marathon.models.base.ID_PATTERN = re.compile(".*")
 from marathon.models.group import MarathonGroup
 
 
-class AsgardAppGroup():
-
+class AsgardAppGroup:
     def __init__(self, wrapped_group=MarathonGroup()):
         self._marathon_group = wrapped_group
 

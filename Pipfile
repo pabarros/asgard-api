@@ -20,6 +20,8 @@ requests = "==2.18.3"
 simple-json-logger = "==0.2.2"
 asgard-api-plugin-metrics-mesos = "==0.10.0"
 asgard-api-plugin-metrics-fluentd = "==0.2.0"
+async-worker = "==0.7.0"
+aiopg = "==0.15.0"
 requests-oauthlib = "==1.1.0"
 
 [dev-packages]
@@ -30,11 +32,22 @@ mock = "==2.0.0"
 pytest = "==3.0.1"
 responses = "==0.7.0"
 codecov = "*"
-asgard-api = {editable = true, path = "."}
-"asgard-api-plugin-metrics-example-1" = {editable = true, path = "./tests/fixtures/plugins/metrics/metric-plugin-example-1"}
+asgard-api = {editable = true,path = "."}
+asgard-api-plugin-metrics-example-1 = {editable = true,path = "./tests/fixtures/plugins/metrics/metric-plugin-example-1"}
+asynctest = "==0.12.2"
+mypy = "==0.630"
+black = "==18.9b0"
+aioresponses = "==0.6.0"
 
 [requires]
 python_version = "3.6"
 
 [scripts]
 api = 'python hollowman/main.py'
+async-api = 'python -m asgard.api'
+test = "py.test -sv --cov=hollowman --cov-report term-missing -v tests/"
+itest = "py.test -sv --cov=asgard --cov-report term-missing -v itests/"
+all-tests = "py.test -sv --cov=hollowman --cov=asgard --cov-report term-missing -v tests/ itests"
+lint = "mypy asgard --ignore-missing-imports"
+fmt = "black --py36 -v --line-length 80 ."
+fmt-check = "black --py36 --line-length 80 --check ."

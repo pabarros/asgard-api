@@ -1,9 +1,17 @@
 language: python
+dist: xenial
 python:
   - "3.6"
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database asgard;' -U postgres
 install:
   - pip install pipenv
   - pipenv install --system --deploy --ignore-pipfile --dev
-script: pipenv run py.test -v --cov=hollowman --cov-report term-missing -v
+script:
+  - pipenv run lint
+  - pipenv run fmt-check
+  - pipenv run all-tests
 after_success:
   - codecov

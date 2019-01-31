@@ -23,18 +23,19 @@ class RequestResource(Enum):
     TASKS = auto()
     QUEUE = auto()
 
+
 class HTTPWrapper(metaclass=abc.ABCMeta):
     json_encoder = MarathonJsonEncoder
     marathon_client = conf.marathon_client
 
-    app_path_prefix = '/v2/apps'
-    group_path_prefix = '/v2/groups'
-    deployment_prefix = '/v2/deployments'
-    tasks_prefix = '/v2/tasks'
-    queue_prefix = '/v2/queue'
+    app_path_prefix = "/v2/apps"
+    group_path_prefix = "/v2/groups"
+    deployment_prefix = "/v2/deployments"
+    tasks_prefix = "/v2/tasks"
+    queue_prefix = "/v2/queue"
 
     API_RESERVED_PATHS_PER_ENDPOINT = {
-        "apps": ['restart', 'tasks', 'versions'],
+        "apps": ["restart", "tasks", "versions"],
         "groups": ["versions"],
         "deployments": [],
         "tasks": [],
@@ -84,7 +85,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
         return self.request.path.startswith(self.queue_prefix)
 
     def _get_object_id(self, reserved_paths, endpoint_prefix):
-        split_ = self.request.path.split('/')
+        split_ = self.request.path.split("/")
         api_paths = reserved_paths
         locations = [split_.index(path) for path in api_paths if path in split_]
         cut_limit = min(locations or [len(split_)])
@@ -93,7 +94,7 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
 
         # Removes evey empty path
         split_ = [part for part in split_ if part]
-        return '/'.join(split_).replace(endpoint_prefix, '') or None
+        return "/".join(split_).replace(endpoint_prefix, "") or None
 
     @cached_property
     def object_id(self) -> str:
@@ -101,7 +102,10 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             return None
         base_path = [p for p in self.request.path.split("/") if p][:2]
         endpoint_name = base_path[1]
-        return self._get_object_id(self.API_RESERVED_PATHS_PER_ENDPOINT.get(endpoint_name, []), "/".join(base_path))
+        return self._get_object_id(
+            self.API_RESERVED_PATHS_PER_ENDPOINT.get(endpoint_name, []),
+            "/".join(base_path),
+        )
 
     @cached_property
     def request_resource(self) -> RequestResource:
@@ -117,17 +121,23 @@ class HTTPWrapper(metaclass=abc.ABCMeta):
             return RequestResource.QUEUE
 
     def _get_original_app(self, user, app_id):
-        app_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
-                                                app_id.strip("/"))
+        app_id_with_namespace = "/{}/{}".format(
+            user.current_account.namespace, app_id.strip("/")
+        )
         try:
             return self.marathon_client.get_app(app_id_with_namespace)
         except NotFoundError as e:
             return MarathonApp.from_json({"id": app_id_with_namespace})
 
     def _get_original_group(self, user, group_id):
-        group_id_with_namespace = "/{}/{}".format(user.current_account.namespace,
-                                                (group_id or "/").strip("/"))
+        group_id_with_namespace = "/{}/{}".format(
+            user.current_account.namespace, (group_id or "/").strip("/")
+        )
         try:
-            return AsgardAppGroup(self.marathon_client.get_group(group_id_with_namespace))
+            return AsgardAppGroup(
+                self.marathon_client.get_group(group_id_with_namespace)
+            )
         except NotFoundError as e:
-            return AsgardAppGroup(MarathonGroup.from_json({"id": group_id_with_namespace}))
+            return AsgardAppGroup(
+                MarathonGroup.from_json({"id": group_id_with_namespace})
+            )
