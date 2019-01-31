@@ -130,7 +130,7 @@ class HttpClientMkakerTest(asynctest.TestCase):
             )
 
     async def test_uses_default_timeout_configs(self):
-        self.assertEqual(default_http_client_timeout.connect, 5)
+        self.assertEqual(default_http_client_timeout.connect, 1)
         self.assertEqual(default_http_client_timeout.total, 30)
 
     async def test_with_block_on_client_return_session(self):

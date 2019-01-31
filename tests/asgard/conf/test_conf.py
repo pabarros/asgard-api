@@ -20,5 +20,5 @@ class AsgardConfTest(asynctest.TestCase):
 
     async def test_default_http_load_timeout_values(self):
         reload(conf)
-        self.assertEqual(conf.ASGARD_HTTP_CLIENT_CONNECT_TIMEOUT, 5)
+        self.assertEqual(conf.ASGARD_HTTP_CLIENT_CONNECT_TIMEOUT, 1)
         self.assertEqual(conf.ASGARD_HTTP_CLIENT_TOTAL_TIMEOUT, 30)
