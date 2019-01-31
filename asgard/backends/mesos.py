@@ -23,7 +23,8 @@ class MesosAgent:
 
 class MesosBackend(Backend):
     async def get_agents(self, namespace: str):
-        agents_url = f"{mesos.get_mesos_leader_address()}/slaves"
+        mesos_leader_address = await mesos.leader_address()
+        agents_url = f"{mesos_leader_address}/slaves"
         async with http_client.get(agents_url) as response:
             filtered_agents = []
             data = await response.json()

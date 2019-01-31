@@ -1,3 +1,4 @@
+import os
 from importlib import reload
 from asynctest import TestCase, mock
 from aioresponses import aioresponses
@@ -10,9 +11,10 @@ import asgard.backends
 
 class MesosBackendTest(TestCase):
     async def setUp(self):
+        self.mesos_address = "http://10.0.0.1:5050"
         self.mesos_leader_ip_pactcher = mock.patch(
             "asgard.sdk.mesos.get_mesos_leader_address",
-            mock.MagicMock(return_value="http://10.0.0.1:5050"),
+            mock.MagicMock(return_value=self.mesos_address),
         )
         self.mesos_leader_ip_pactcher.start()
 
@@ -22,9 +24,16 @@ class MesosBackendTest(TestCase):
         mock.patch.stopall()
 
     async def test_get_agents_filtered_by_namespace(self):
-        with aioresponses() as rsps:
+        with mock.patch.dict(
+            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
+        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             rsps.get(
-                "http://10.0.0.1:5050/slaves",
+                f"{self.mesos_address}/redirect",
+                status=301,
+                headers={"Location": self.mesos_address},
+            )
+            rsps.get(
+                f"{self.mesos_address}/slaves",
                 payload=get_fixture("agents_multi_owner.json"),
                 status=200,
             )
@@ -43,7 +52,14 @@ class MesosBackendTest(TestCase):
             )
 
     async def test_get_agents_remove_unused_fields(self):
-        with aioresponses() as rsps:
+        with mock.patch.dict(
+            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
+        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            rsps.get(
+                f"{self.mesos_address}/redirect",
+                status=301,
+                headers={"Location": self.mesos_address},
+            )
             rsps.get(
                 "http://10.0.0.1:5050/slaves",
                 payload=get_fixture("agents_list_raw_fields.json"),
