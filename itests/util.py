@@ -17,6 +17,7 @@ class PgDataMocker:
         self.pool = pool
         self.schema = "".join(random.choices(string.ascii_lowercase, k=10))
         self._used_tables = []
+        self._table_names = set()
         self._original_table_schemas = {}
 
     def add_data(
@@ -31,16 +32,19 @@ class PgDataMocker:
         else:
             table = model
 
-        # ensure schema
-        self._original_table_schemas[table] = table.schema
-        table.schema = self.schema
+        if table.name not in self._table_names:
+            # ensure schema
+            self._original_table_schemas[table] = table.schema
+            table.schema = self.schema
+            self._used_tables.append(table)
 
-        self._used_tables.append(table)
         self.data[table].extend((dict(zip(field_names, row)) for row in data))
+        self._table_names.add(table.name)
 
     async def _create_schema(self):
+        await self._drop_schema_only()
         async with self.pool.acquire() as conn:
-            await conn.execute(CreateSchema(self.schema))
+            await conn.execute(f"CREATE SCHEMA IF NOT EXISTS {self.schema}")
             for table in self._used_tables:
                 await conn.execute(CreateTable(table))
 
@@ -54,9 +58,12 @@ class PgDataMocker:
             for command in commands:
                 await conn.execute(command)
 
-    async def drop(self):
+    async def _drop_schema_only(self):
         async with self.pool.acquire() as conn:
-            await conn.execute(DropSchema(self.schema, cascade=True))
+            await conn.execute(f"DROP SCHEMA IF EXISTS {self.schema} CASCADE")
+
+    async def drop(self):
+        await self._drop_schema_only()
         for table, original_schema in self._original_table_schemas.items():
             table.schema = original_schema
 
