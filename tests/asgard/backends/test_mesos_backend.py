@@ -37,18 +37,11 @@ class MesosBackendTest(TestCase):
                 payload=get_fixture("agents_multi_owner.json"),
                 status=200,
             )
-            agents_data = await self.mesos_backend.get_agents(
-                namespace="asgard"
-            )
-            self.assertEqual(4, len(agents_data["agents"]))
+            agents = await self.mesos_backend.get_agents(namespace="asgard")
+            self.assertEqual(4, len(agents))
             self.assertEqual(
                 set(["asgard"]),
-                set(
-                    [
-                        agent["attributes"]["owner"]
-                        for agent in agents_data["agents"]
-                    ]
-                ),
+                set([agent.attributes["owner"] for agent in agents]),
             )
 
     async def test_get_agents_remove_unused_fields(self):
@@ -65,26 +58,6 @@ class MesosBackendTest(TestCase):
                 payload=get_fixture("agents_list_raw_fields.json"),
                 status=200,
             )
-            agents_data = await self.mesos_backend.get_agents(
-                namespace="asgard"
-            )
-            self.assertEqual(1, len(agents_data["agents"]))
-            self.assertEqual(
-                "asgard", agents_data["agents"][0]["attributes"]["owner"]
-            )
-            self.assertEqual(
-                set(
-                    [
-                        "reregistered_time",
-                        "active",
-                        "version",
-                        "id",
-                        "used_resources",
-                        "hostname",
-                        "attributes",
-                        "resources",
-                        "port",
-                    ]
-                ),
-                set(agents_data["agents"][0].keys()),
-            )
+            agents = await self.mesos_backend.get_agents(namespace="asgard")
+            self.assertEqual(1, len(agents))
+            self.assertEqual("asgard", agents[0].attributes["owner"])

@@ -23,6 +23,7 @@ asgard-api-plugin-metrics-fluentd = "==0.2.0"
 async-worker = "==0.7.0"
 aiopg = "==0.15.0"
 requests-oauthlib = "==1.1.0"
+pydantic = "==0.14"
 
 [dev-packages]
 ipdb = "==0.11"
