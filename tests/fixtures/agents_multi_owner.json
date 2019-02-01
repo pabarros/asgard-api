@@ -32,7 +32,7 @@
       "port": 5051,
       "attributes": {
         "mesos": "slave",
-        "workload": "general",
+        "workload": "tasks",
         "dc": "gcp",
         "owner": "asgard-infra"
       },
@@ -58,7 +58,7 @@
       "port": 5051,
       "attributes": {
         "mesos": "slave",
-        "workload": "general",
+        "workload": "tasks",
         "dc": "aws",
         "owner": "asgard-infra"
       },
