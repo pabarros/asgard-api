@@ -9,7 +9,7 @@ from asgard.services.models.agent import Agent
 
 
 class MesosAgent(Agent):
-    type: str = "MESOS"
+    _type: str = "MESOS"
     id: str
     hostname: str
     active: bool

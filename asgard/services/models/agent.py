@@ -1,11 +1,9 @@
-from typing import Dict, List, Union
+import abc
 from asgard.services.models import Model
-from abc import ABC, abstractmethod
-from pydantic.validators import dict_validator
 
 
-class Agent(Model):
-    type: str
+class Agent(Model, abc.ABC):
+    _type: str = NotImplementedError
 
     def has_attribute(self, attr_name):
         return attr_name in self.attributes
@@ -21,3 +19,13 @@ class Agent(Model):
 
     def filter_by_attrs(self):
         raise NotImplementedError
+
+
+class AgentFactory(Model):
+    def __new__(cls, *args, **kwargs) -> Agent:
+        type_ = kwargs.pop("type")
+        for subclass in Agent.__subclasses__():
+            if subclass._type == type_:
+                agent = subclass(*args, **kwargs)
+                return agent
+        raise ValueError(f"'{type_}' is an invalid agent type. ")
