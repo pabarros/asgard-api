@@ -27,6 +27,28 @@ class AgentsTests(unittest.TestCase):
         for agent in resource.agents:
             self.assertIsInstance(agent, MesosAgent)
 
+    def test_it_instantiates_a_agentsresource_using_agents_instances(self):
+        agents = [
+            MesosAgent(
+                **dict(
+                    type="MESOS",
+                    id="id",
+                    hostname="hostname",
+                    active="active",
+                    version="version",
+                    port=8080,
+                    used_resources={"bla": "used_resources"},
+                    attributes={"data": "attributes"},
+                    resources={"data": "resources"},
+                )
+            )
+        ]
+        resource = AgentsResource(agents=agents)
+
+        self.assertIsInstance(resource, AgentsResource)
+        for agent in resource.agents:
+            self.assertIsInstance(agent, MesosAgent)
+
     def test_it_raises_a_validation_error_if_type_is_invalid(self):
         agents = [
             dict(
