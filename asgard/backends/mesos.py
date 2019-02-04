@@ -1,4 +1,4 @@
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Any
 from asgard.backends.base import Backend
 
 from asgard.sdk import mesos
@@ -23,7 +23,7 @@ class MesosAgent(Agent):
 
 class MesosBackend(Backend):
     async def get_agents(
-        self, namespace: str, attr_filters: Dict[str, str] = {}
+        self, namespace: str, attr_filters: Dict[str, Any] = {}
     ) -> List[MesosAgent]:
         mesos_leader_address = await mesos.leader_address()
         agents_url = f"{mesos_leader_address}/slaves"

@@ -1,4 +1,4 @@
-from typing import List, Type, Dict
+from typing import List, Type, Dict, Any
 from asgard.app import app
 from asyncworker import RouteTypes
 from aiohttp import web
@@ -22,18 +22,12 @@ async def agents_handler(request: web.Request):
     return web.json_response(AgentsResource(agents=agents).dict())
 
 
-def check_attr_value(attr_name, attr_value, agent_attrs):
-    return attr_name in agent_attrs and agent_attrs[attr_name] == attr_value
-
-
-def apply_attr_filter(filters_dict: Dict, agents: List[Agent]) -> List[Agent]:
+def apply_attr_filter(filters_dict: Dict[str, Any], agents: List[Agent]) -> List[Agent]:
 
     filtered_agents = []
     for agent in agents:
         all_filters = [
-            check_attr_value(
-                attr_name, filters_dict[attr_name], agent.attributes
-            )
+            agent.attr_has_value(attr_name, filters_dict[attr_name])
             for attr_name in filters_dict
         ]
         if all(all_filters):
