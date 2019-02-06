@@ -6,7 +6,7 @@ from asgard.api.resources.agents import AgentsResource
 from asgard.backends.mesos import MesosAgent
 
 
-class AgentsTests(unittest.TestCase):
+class AgentsResourcesTests(unittest.TestCase):
     def test_it_instantiates_a_agentsresource_if_type_is_valid(self):
         agents = [
             dict(
@@ -31,7 +31,6 @@ class AgentsTests(unittest.TestCase):
         agents = [
             MesosAgent(
                 **dict(
-                    type="MESOS",
                     id="id",
                     hostname="hostname",
                     active="active",

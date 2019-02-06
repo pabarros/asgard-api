@@ -1,9 +1,12 @@
+from typing import List
 import abc
 from asgard.services.models import Model
 
+from asgard.services.models.app import App
+
 
 class Agent(Model, abc.ABC):
-    _type: str = NotImplementedError
+    _type: str
 
     def has_attribute(self, attr_name):
         return attr_name in self.attributes
@@ -17,7 +20,12 @@ class Agent(Model, abc.ABC):
             and self._get_attribute_value(attr_name) == attr_value
         )
 
-    def filter_by_attrs(self):
+    @abc.abstractmethod
+    def filter_by_attrs(self, attrs_kv):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def apps(self) -> List[App]:
         raise NotImplementedError
 
 

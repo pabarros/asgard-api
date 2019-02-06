@@ -143,3 +143,72 @@ class AgentsApiEndpointTest(BaseTestCase):
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
                 data["agents"][0]["id"],
             )
+
+    async def test_agent_app_list_zero_apps_running(self):
+        self._prepare_additional_fixture_data()
+        await self.pg_data_mocker.create()
+
+        slave_fixture = get_fixture("agents_multi_owner.json")
+        slave = slave_fixture["slaves"][0]
+        slave_id = slave["id"]
+        slave_address = f"http://{slave['hostname']}:{slave['port']}"
+
+        with mock.patch.dict(
+            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
+        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            self._mock_mesos_return_data(rsps)
+            rsps.get(
+                f"{self.mesos_address}/slaves?slave_id={slave_id}",
+                payload=slave_fixture,
+                status=200,
+            )
+            rsps.get(f"{slave_address}/containers", payload=[], status=200)
+            resp = await self.client.get(
+                "/agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S0/apps",
+                headers={"Authorization": f"Token {self.user_auth_key}"},
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(0, len(data["apps"]))
+
+    async def test_agent_appp_list_apps_running(self):
+        self._prepare_additional_fixture_data()
+        await self.pg_data_mocker.create()
+
+        slave_fixture = get_fixture("agents_multi_owner.json")
+        slave = slave_fixture["slaves"][0]
+        slave_id = slave["id"]
+        slave_address = f"http://{slave['hostname']}:{slave['port']}"
+
+        with mock.patch.dict(
+            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
+        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            self._mock_mesos_return_data(rsps)
+            rsps.get(
+                f"{self.mesos_address}/slaves?slave_id={slave_id}",
+                payload=slave_fixture,
+                status=200,
+            )
+            rsps.get(
+                f"{slave_address}/containers",
+                payload=get_fixture("agents_containers.json"),
+                status=200,
+            )
+            resp = await self.client.get(
+                "/agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S0/apps",
+                headers={"Authorization": f"Token {self.user_auth_key}"},
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(6, len(data["apps"]))
+            expected_app_ids = [
+                "infra/asgard/async-api",
+                "captura/wetl/visitcentral",
+                "portal/api",
+                "captura/kirby/feeder",
+                "infra/asgard/api",
+                "infra/rabbitmq",
+            ]
+            self.assertEqual(
+                expected_app_ids, [app["id"] for app in data["apps"]]
+            )

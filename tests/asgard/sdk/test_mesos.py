@@ -17,8 +17,6 @@ class TestMesos(TestCase):
             HOLLOWMAN_MESOS_ADDRESS_0=mesos_addresses[0],
             HOLLOWMAN_MESOS_ADDRESS_1=mesos_addresses[1],
             HOLLOWMAN_MESOS_ADDRESS_2=mesos_addresses[2],
-            ASGARD_HTTP_CLIENT_TOTAL_TIMEOUT="1",
-            ASGARD_HTTP_CLIENT_CONNECT_TIMEOUT="1",
         ), aioresponses(
             passthrough=["http://127.0.0.1", "http://10.0.2.1:5050"]
         ) as rsps:

@@ -12,6 +12,7 @@ from asgard.services.models import Model
 from asgard.services.models.agent import Agent
 
 from asgard.api.resources.agents import AgentsResource
+from asgard.api.resources.apps import AppsResource
 
 
 @app.route(["/agents"], type=RouteTypes.HTTP, methods=["GET"])
@@ -22,7 +23,9 @@ async def agents_handler(request: web.Request):
     return web.json_response(AgentsResource(agents=agents).dict())
 
 
-def apply_attr_filter(filters_dict: Dict[str, Any], agents: List[Agent]) -> List[Agent]:
+def apply_attr_filter(
+    filters_dict: Dict[str, Any], agents: List[Agent]
+) -> List[Agent]:
 
     filtered_agents = []
     for agent in agents:
@@ -44,3 +47,14 @@ async def agents_with_attrs(request: web.Request):
     filtered_agents = apply_attr_filter(filters, agents)
 
     return web.json_response(AgentsResource(agents=filtered_agents).dict())
+
+
+@app.route(["/agents/{agent_id}/apps"], type=RouteTypes.HTTP, methods=["GET"])
+@auth_required
+async def agent_apps(request: web.Request):
+    namespace = request["user"].current_account.namespace
+    agent_id = request.match_info["agent_id"]
+    apps = await agents_service.get_apps(
+        namespace=namespace, agent_id=agent_id, backend=mesos
+    )
+    return web.json_response(AppsResource(apps=apps).dict())
