@@ -13,7 +13,7 @@ MARATHON_RECONCILIATION_INTERVAL=600000
 MARATHON_ZK_TIMEOUT=10000
 MARATHON_ZK_SESSION_TIMEOUT=10000
 MARATHON_ZK_MAX_VERSIONS=25
-JAVA_OPTS=-Xms2g
+JAVA_OPTS="-Xms2g -XX:+PrintGCApplicationStoppedTime -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseParNewGC -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=80 -XX:MaxGCPauseMillis=200 -XX:MaxTenuringThreshold=1 -XX:SurvivorRatio=90 -XX:TargetSurvivorRatio=9 -XX:ParallelGCThreads=4 -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCCause -XX:+PrintTenuringDistribution -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=5M"
 MARATHON_HTTP_CREDENTIALS=marathon:pwd
 MARATHON_ACCESS_CONTROL_ALLOW_ORIGIN=http://localhost:4200,http://localhost
 
