@@ -190,3 +190,21 @@ class MesosBackendTest(TestCase):
                 "infra/rabbitmq",
             ]
             self.assertEqual(expected_app_ids, [app.id for app in apps])
+
+    async def test_get_tasks_from_app_zero_running_tasks(self):
+        self.fail()
+
+    async def test_get_tasks_from_app_not_in_same_namespace(self):
+        self.fail()
+
+    async def test_tasks_from_app_agent_not_found(self):
+        """
+        API do mesos retornoru {"slaves": []} quando buscamos pelo slave_id
+        """
+        self.fail()
+
+    async def test_tasks_from_app_agent_connection_error(self):
+        self.fail()
+
+    async def test_get_tasks_from_app_some_tasks_running(self):
+        self.fail()

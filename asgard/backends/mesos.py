@@ -101,3 +101,8 @@ class MesosBackend(Backend):
         if agent:
             return await agent.apps()
         return []
+
+    async def get_tasks(
+        self, namespace: str, agent_id: str, app_id: str
+    ) -> List[Task]:
+        pass

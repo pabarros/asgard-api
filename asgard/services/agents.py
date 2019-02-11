@@ -4,6 +4,7 @@ from typing import List
 from asgard.backends.base import Backend
 from asgard.services.models.agent import Agent
 from asgard.services.models.app import App
+from asgard.services.models.task import Task
 
 
 class AgentsService:
@@ -14,3 +15,12 @@ class AgentsService:
         self, namespace: str, agent_id: str, backend: Backend
     ) -> List[App]:
         return await backend.get_apps(namespace, agent_id)
+
+    async def get_tasks(
+        self,
+        namespace: str,
+        agent_id: str,
+        app_id: str,
+        backend: "asgard.backends.base.Backend",
+    ) -> List[Task]:
+        return await backend.get_tasks(namespace, agent_id, app_id)
