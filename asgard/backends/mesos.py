@@ -1,4 +1,5 @@
-from typing import Dict, Union, List, Any, Optional
+from typing import Dict, Union, List, Any, Optional, Set
+from collections import defaultdict
 from asgard.backends.base import Backend
 
 from asgard.sdk import mesos
@@ -43,7 +44,8 @@ class MesosAgent(Agent):
     def filter_by_attrs(self, kv):
         pass
 
-    def _transform_to_asgard_app_id(self, executor_id: str) -> str:
+    @classmethod
+    def _transform_to_asgard_app_id(cls, executor_id: str) -> str:
         task_name_part = executor_id.split(".")[0]
         return "/".join(task_name_part.split("_")[1:])
 
@@ -53,17 +55,36 @@ class MesosAgent(Agent):
         apps = []
         async with http_client.get(containers_url) as response:
             data = await response.json()
+            all_apps: Set[str] = set()
             for container_info in data:
-                apps.append(
-                    MesosApp(
+                app_id = MesosAgent._transform_to_asgard_app_id(
+                    container_info["executor_id"]
+                )
+                if app_id not in all_apps:
+                    apps.append(MesosApp(**{"id": app_id}))
+                    all_apps.add(app_id)
+            return apps
+
+    async def tasks(self, app_id: str) -> List[Task]:
+        self_address = f"http://{self.hostname}:{self.port}"
+        containers_url = f"{self_address}/containers"
+        async with http_client.get(containers_url) as response:
+            data = await response.json()
+            tasks_per_app: Dict[str, List[MesosTask]] = defaultdict(list)
+            for container_info in data:
+                app_id_ = MesosAgent._transform_to_asgard_app_id(
+                    container_info["executor_id"]
+                )
+                tasks_per_app[app_id_].append(
+                    MesosTask(
                         **{
-                            "id": self._transform_to_asgard_app_id(
+                            "name": MesosTask._transform_to_asgard_task_name(
                                 container_info["executor_id"]
                             )
                         }
                     )
                 )
-            return apps
+            return tasks_per_app[app_id]
 
 
 class MesosBackend(Backend):
@@ -82,9 +103,7 @@ class MesosBackend(Backend):
                 filtered_agents.append(mesos_agent)
         return filtered_agents
 
-    async def get_agent_by_id(
-        self, namespace: str, agent_id: str
-    ) -> Optional[Agent]:
+    async def get_agent_by_id(self, namespace: str, agent_id: str) -> Optional[Agent]:
         mesos_leader_address = await mesos.leader_address()
         agent_url = f"{mesos_leader_address}/slaves?slave_id={agent_id}"
         async with http_client.get(agent_url) as response:
@@ -102,7 +121,16 @@ class MesosBackend(Backend):
             return await agent.apps()
         return []
 
-    async def get_tasks(
-        self, namespace: str, agent_id: str, app_id: str
-    ) -> List[Task]:
-        pass
+    async def get_tasks(self, namespace: str, agent_id: str, app_id: str) -> List[Task]:
+        mesos_leader_address = await mesos.leader_address()
+        agent_url = f"{mesos_leader_address}/slaves?slave_id={agent_id}"
+        agent = None
+        async with http_client.get(agent_url) as response:
+            data = await response.json()
+            if len(data["slaves"]):
+                agent_ = MesosAgent(**data["slaves"][0])
+                if agent_.attr_has_value("owner", namespace):
+                    agent = agent_
+        if agent:
+            tasks = agent.tasks(app_id=app_id)
+            return tasks

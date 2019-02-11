@@ -39,8 +39,7 @@ class MesosBackendTest(TestCase):
             agents = await self.mesos_backend.get_agents(namespace="asgard")
             self.assertEqual(4, len(agents))
             self.assertEqual(
-                set(["asgard"]),
-                set([agent.attributes["owner"] for agent in agents]),
+                set(["asgard"]), set([agent.attributes["owner"] for agent in agents])
             )
 
     async def test_get_agents_remove_unused_fields(self):
@@ -61,9 +60,7 @@ class MesosBackendTest(TestCase):
             self.assertEqual(1, len(agents))
             self.assertEqual("asgard", agents[0].attributes["owner"])
 
-    async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(
-        self
-    ):
+    async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(self):
         slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
@@ -79,8 +76,7 @@ class MesosBackendTest(TestCase):
                 status=200,
             )
             agent = await self.mesos_backend.get_agent_by_id(
-                namespace="dev",
-                agent_id=slave_id,  # Agent from asgard-infra namespace
+                namespace="dev", agent_id=slave_id  # Agent from asgard-infra namespace
             )
             self.assertIsNone(agent)
 
@@ -100,8 +96,7 @@ class MesosBackendTest(TestCase):
                 status=200,
             )
             agent = await self.mesos_backend.get_agent_by_id(
-                namespace="dev",
-                agent_id=slave_id,  # Agent from asgard-infra namespace
+                namespace="dev", agent_id=slave_id  # Agent from asgard-infra namespace
             )
             self.assertIsNone(agent)
 
@@ -120,14 +115,10 @@ class MesosBackendTest(TestCase):
                 payload={"slaves": []},
                 status=200,
             )
-            apps = await self.mesos_backend.get_apps(
-                namespace="dev", agent_id=slave_id
-            )
+            apps = await self.mesos_backend.get_apps(namespace="dev", agent_id=slave_id)
             self.assertEqual(0, len(apps))
 
-    async def test_get_apps_returns_empty_list_if_no_apps_running_on_agent(
-        self
-    ):
+    async def test_get_apps_returns_empty_list_if_no_apps_running_on_agent(self):
         slave_fixture = get_fixture("agents_multi_owner.json")
         slave = slave_fixture["slaves"][0]
         slave_id = slave["id"]
@@ -179,17 +170,18 @@ class MesosBackendTest(TestCase):
             apps = await self.mesos_backend.get_apps(
                 namespace=slave_namespace, agent_id=slave_id
             )
-            self.assertEqual(6, len(apps))
+            self.assertEqual(5, len(apps))
 
-            expected_app_ids = [
-                "infra/asgard/async-api",
-                "captura/wetl/visitcentral",
-                "portal/api",
-                "captura/kirby/feeder",
-                "infra/asgard/api",
-                "infra/rabbitmq",
-            ]
-            self.assertEqual(expected_app_ids, [app.id for app in apps])
+            expected_app_ids = sorted(
+                [
+                    "captura/wetl/visitcentral",
+                    "portal/api",
+                    "captura/kirby/feeder",
+                    "infra/asgard/api",
+                    "infra/rabbitmq",
+                ]
+            )
+            self.assertEqual(expected_app_ids, sorted([app.id for app in apps]))
 
     async def test_get_tasks_from_app_zero_running_tasks(self):
         self.fail()
