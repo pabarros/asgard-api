@@ -7,6 +7,19 @@ from asgard.http.client import http_client
 
 from asgard.services.models.agent import Agent
 from asgard.services.models.app import App
+from asgard.services.models.task import Task
+
+
+class MesosTask(Task):
+    _type: str = "MESOS"
+    typer: str = "MESOS"
+
+    name: str
+
+    @classmethod
+    def _transform_to_asgard_task_name(cls, executor_id: str) -> str:
+        task_name_part = executor_id.split("_")[1:]
+        return "_".join(task_name_part)
 
 
 class MesosApp(App):
