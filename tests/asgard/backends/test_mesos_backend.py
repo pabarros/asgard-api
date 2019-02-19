@@ -1,7 +1,8 @@
 import os
 from asynctest import TestCase, mock, skip
 from aioresponses import aioresponses
-from tests.utils import get_fixture
+from tests.utils import get_fixture, add_agent_running_tasks, build_mesos_cluster
+from tests.conf import TEST_MESOS_ADDRESS
 
 import asgard.sdk.mesos
 from asgard.backends.mesos import MesosBackend
@@ -13,7 +14,7 @@ class MesosBackendTest(TestCase):
         self.mesos_address = "http://10.0.0.1:5050"
         self.mesos_leader_ip_pactcher = mock.patch(
             "asgard.sdk.mesos.leader_address",
-            mock.CoroutineMock(return_value=self.mesos_address),
+            mock.CoroutineMock(return_value=TEST_MESOS_ADDRESS),
         )
         self.mesos_leader_ip_pactcher.start()
 
@@ -22,41 +23,9 @@ class MesosBackendTest(TestCase):
     async def tearDown(self):
         mock.patch.stopall()
 
-    def _add_agent_running_tasks(self, rsps, agent_id):
-        agent_info = get_fixture(f"agents/{agent_id}/info.json")
-        agent_containers = get_fixture(f"agents/{agent_id}/containers.json")
-        rsps.get(
-            f"http://{agent_info['hostname']}:{agent_info['port']}/containers",
-            payload=agent_containers,
-            status=200,
-        )
-
-    def _build_mesos_cluster(self, rsps, *agent_ids):
-        all_agents_info = []
-        rsps.get(
-            f"{self.mesos_address}/redirect",
-            status=301,
-            headers={"Location": self.mesos_address},
-        )
-        for agent_id in agent_ids:
-            agent_info = get_fixture(f"agents/{agent_id}/info.json")
-            all_agents_info.append(agent_info)
-            self._add_agent_running_tasks(rsps, agent_id)
-            rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={agent_id}",
-                payload={"slaves": [agent_info]},
-                status=200,
-            )
-
-        rsps.get(
-            f"{self.mesos_address}/slaves",
-            payload={"slaves": all_agents_info},
-            status=200,
-        )
-
     async def test_get_agents_filtered_by_namespace(self):
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._build_mesos_cluster(
+            build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S10",
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S11",
@@ -83,7 +52,7 @@ class MesosBackendTest(TestCase):
 
     async def test_get_agents_remove_unused_fields(self):
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._build_mesos_cluster(rsps, "ead07ffb-5a61-42c9-9386-21b680597e6c-S9")
+            build_mesos_cluster(rsps, "ead07ffb-5a61-42c9-9386-21b680597e6c-S9")
             agents = await self.mesos_backend.get_agents(namespace="asgard")
             self.assertEqual(1, len(agents))
             self.assertEqual("asgard", agents[0].attributes["owner"])
@@ -91,7 +60,7 @@ class MesosBackendTest(TestCase):
     async def test_get_agent_by_id_includes_app_count(self):
         agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._build_mesos_cluster(rsps, agent_id)
+            build_mesos_cluster(rsps, agent_id)
             agent = await self.mesos_backend.get_agent_by_id(
                 namespace="asgard", agent_id=agent_id
             )
@@ -180,7 +149,7 @@ class MesosBackendTest(TestCase):
         slave_address = f"http://{slave['hostname']}:{slave['port']}"
         slave_namespace = slave["attributes"]["owner"]
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._build_mesos_cluster(rsps, agent_id)
+            build_mesos_cluster(rsps, agent_id)
             apps = await self.mesos_backend.get_apps(
                 namespace=slave_namespace, agent_id=slave_id
             )
