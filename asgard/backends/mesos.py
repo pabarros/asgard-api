@@ -40,6 +40,8 @@ class MesosAgent(Agent):
     used_resources: Dict[str, Union[str, int]]
     attributes: Dict[str, str]
     resources: Dict[str, Union[str, int]]
+    total_apps: int = 0
+    applications: List[MesosApp] = []
 
     def filter_by_attrs(self, kv):
         pass
@@ -100,6 +102,7 @@ class MesosBackend(Backend):
                 mesos_agent = MesosAgent(**agent_dict)
                 if not mesos_agent.attr_has_value("owner", namespace):
                     continue
+                mesos_agent.total_apps = len(await mesos_agent.apps())
                 filtered_agents.append(mesos_agent)
         return filtered_agents
 
@@ -112,25 +115,17 @@ class MesosBackend(Backend):
                 agent = MesosAgent(**data["slaves"][0])
                 if not agent.attr_has_value("owner", namespace):
                     return None
+
+                agent.applications = await agent.apps()
+                agent.total_apps = len(agent.applications)
                 return agent
             return None
 
     async def get_apps(self, namespace: str, agent_id: str) -> List[App]:
         agent = await self.get_agent_by_id(namespace, agent_id)
         if agent:
-            return await agent.apps()
+            return agent.applications
         return []
 
     async def get_tasks(self, namespace: str, agent_id: str, app_id: str) -> List[Task]:
-        mesos_leader_address = await mesos.leader_address()
-        agent_url = f"{mesos_leader_address}/slaves?slave_id={agent_id}"
-        agent = None
-        async with http_client.get(agent_url) as response:
-            data = await response.json()
-            if len(data["slaves"]):
-                agent_ = MesosAgent(**data["slaves"][0])
-                if agent_.attr_has_value("owner", namespace):
-                    agent = agent_
-        if agent:
-            tasks = agent.tasks(app_id=app_id)
-            return tasks
+        pass

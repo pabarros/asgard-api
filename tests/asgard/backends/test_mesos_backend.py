@@ -22,43 +22,87 @@ class MesosBackendTest(TestCase):
     async def tearDown(self):
         mock.patch.stopall()
 
+    def _add_agent_running_tasks(self, rsps, agent_id):
+        agent_info = get_fixture(f"agents/{agent_id}/info.json")
+        agent_containers = get_fixture(f"agents/{agent_id}/containers.json")
+        rsps.get(
+            f"http://{agent_info['hostname']}:{agent_info['port']}/containers",
+            payload=agent_containers,
+            status=200,
+        )
+
+    def _build_mesos_cluster(self, rsps, *agent_ids):
+        all_agents_info = []
+        rsps.get(
+            f"{self.mesos_address}/redirect",
+            status=301,
+            headers={"Location": self.mesos_address},
+        )
+        for agent_id in agent_ids:
+            agent_info = get_fixture(f"agents/{agent_id}/info.json")
+            all_agents_info.append(agent_info)
+            self._add_agent_running_tasks(rsps, agent_id)
+            rsps.get(
+                f"{self.mesos_address}/slaves?slave_id={agent_id}",
+                payload={"slaves": [agent_info]},
+                status=200,
+            )
+
+        rsps.get(
+            f"{self.mesos_address}/slaves",
+            payload={"slaves": all_agents_info},
+            status=200,
+        )
+
     async def test_get_agents_filtered_by_namespace(self):
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            rsps.get(
-                f"{self.mesos_address}/redirect",
-                status=301,
-                headers={"Location": self.mesos_address},
+            self._build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S10",
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S11",
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S12",
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S9",
             )
-            rsps.get(
-                f"{self.mesos_address}/slaves",
-                payload=get_fixture("agents_multi_owner.json"),
-                status=200,
-            )
+
             agents = await self.mesos_backend.get_agents(namespace="asgard")
             self.assertEqual(4, len(agents))
             self.assertEqual(
                 set(["asgard"]), set([agent.attributes["owner"] for agent in agents])
             )
+            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S10", agents[0].id)
+            self.assertEqual(2, agents[0].total_apps)
+
+            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S11", agents[1].id)
+            self.assertEqual(0, agents[1].total_apps)
+
+            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S12", agents[2].id)
+            self.assertEqual(1, agents[2].total_apps)
+
+            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S9", agents[3].id)
+            self.assertEqual(1, agents[3].total_apps)
 
     async def test_get_agents_remove_unused_fields(self):
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            rsps.get(
-                f"{self.mesos_address}/redirect",
-                status=301,
-                headers={"Location": self.mesos_address},
-            )
-            rsps.get(
-                f"{self.mesos_address}/slaves",
-                payload=get_fixture("agents_list_raw_fields.json"),
-                status=200,
-            )
+            self._build_mesos_cluster(rsps, "ead07ffb-5a61-42c9-9386-21b680597e6c-S9")
             agents = await self.mesos_backend.get_agents(namespace="asgard")
             self.assertEqual(1, len(agents))
             self.assertEqual("asgard", agents[0].attributes["owner"])
+
+    async def test_get_agent_by_id_includes_app_count(self):
+        agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
+        with mock.patch.dict(
+            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
+        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            self._build_mesos_cluster(rsps, agent_id)
+            agent = await self.mesos_backend.get_agent_by_id(
+                namespace="asgard", agent_id=agent_id
+            )
+            self.assertEqual(agent_id, agent.id)
+            self.assertEqual(2, agent.total_apps)
 
     async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(self):
         slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
@@ -144,29 +188,15 @@ class MesosBackendTest(TestCase):
             self.assertEqual(0, len(apps))
 
     async def test_get_apps_returns_apps_running_on_agent(self):
-        slave_fixture = get_fixture("agents_multi_owner.json")
-        slave = slave_fixture["slaves"][0]
+        agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
+        slave = get_fixture(f"agents/{agent_id}/info.json")
         slave_id = slave["id"]
         slave_address = f"http://{slave['hostname']}:{slave['port']}"
         slave_namespace = slave["attributes"]["owner"]
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            rsps.get(
-                f"{self.mesos_address}/redirect",
-                status=301,
-                headers={"Location": self.mesos_address},
-            )
-            rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={slave_id}",
-                payload=slave_fixture,
-                status=200,
-            )
-            rsps.get(
-                f"{slave_address}/containers",
-                payload=get_fixture("agents_containers.json"),
-                status=200,
-            )
+            self._build_mesos_cluster(rsps, agent_id)
             apps = await self.mesos_backend.get_apps(
                 namespace=slave_namespace, agent_id=slave_id
             )
@@ -182,21 +212,3 @@ class MesosBackendTest(TestCase):
                 ]
             )
             self.assertEqual(expected_app_ids, sorted([app.id for app in apps]))
-
-    async def test_get_tasks_from_app_zero_running_tasks(self):
-        self.fail()
-
-    async def test_get_tasks_from_app_not_in_same_namespace(self):
-        self.fail()
-
-    async def test_tasks_from_app_agent_not_found(self):
-        """
-        API do mesos retornoru {"slaves": []} quando buscamos pelo slave_id
-        """
-        self.fail()
-
-    async def test_tasks_from_app_agent_connection_error(self):
-        self.fail()
-
-    async def test_get_tasks_from_app_some_tasks_running(self):
-        self.fail()
