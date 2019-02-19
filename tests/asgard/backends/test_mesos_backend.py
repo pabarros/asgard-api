@@ -11,7 +11,6 @@ import asgard.backends
 
 class MesosBackendTest(TestCase):
     async def setUp(self):
-        self.mesos_address = "http://10.0.0.1:5050"
         self.mesos_leader_ip_pactcher = mock.patch(
             "asgard.sdk.mesos.leader_address",
             mock.CoroutineMock(return_value=TEST_MESOS_ADDRESS),
@@ -70,16 +69,7 @@ class MesosBackendTest(TestCase):
     async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(self):
         slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            rsps.get(
-                f"{self.mesos_address}/redirect",
-                status=301,
-                headers={"Location": self.mesos_address},
-            )
-            rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={slave_id}",
-                payload=get_fixture("agents_multi_owner.json"),
-                status=200,
-            )
+            build_mesos_cluster(rsps, slave_id)
             agent = await self.mesos_backend.get_agent_by_id(
                 namespace="dev", agent_id=slave_id  # Agent from asgard-infra namespace
             )
@@ -89,12 +79,12 @@ class MesosBackendTest(TestCase):
         slave_id = "39e1a8e3-0fd1-4ba6-981d-e01318944957-S2"
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             rsps.get(
-                f"{self.mesos_address}/redirect",
+                f"{TEST_MESOS_ADDRESS}/redirect",
                 status=301,
-                headers={"Location": self.mesos_address},
+                headers={"Location": TEST_MESOS_ADDRESS},
             )
             rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={slave_id}",
+                f"{TEST_MESOS_ADDRESS}/slaves?slave_id={slave_id}",
                 payload={"slaves": []},
                 status=200,
             )
@@ -107,12 +97,12 @@ class MesosBackendTest(TestCase):
         slave_id = "39e1a8e3-0fd1-4ba6-981d-e01318944957-S2"
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             rsps.get(
-                f"{self.mesos_address}/redirect",
+                f"{TEST_MESOS_ADDRESS}/redirect",
                 status=301,
-                headers={"Location": self.mesos_address},
+                headers={"Location": TEST_MESOS_ADDRESS},
             )
             rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={slave_id}",
+                f"{TEST_MESOS_ADDRESS}/slaves?slave_id={slave_id}",
                 payload={"slaves": []},
                 status=200,
             )
@@ -120,23 +110,12 @@ class MesosBackendTest(TestCase):
             self.assertEqual(0, len(apps))
 
     async def test_get_apps_returns_empty_list_if_no_apps_running_on_agent(self):
-        slave_fixture = get_fixture("agents_multi_owner.json")
-        slave = slave_fixture["slaves"][0]
+        agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S4"
+        slave = get_fixture(f"agents/{agent_id}/info.json")
         slave_id = slave["id"]
-        slave_address = f"http://{slave['hostname']}:{slave['port']}"
         slave_namespace = slave["attributes"]["owner"]
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            rsps.get(
-                f"{self.mesos_address}/redirect",
-                status=301,
-                headers={"Location": self.mesos_address},
-            )
-            rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={slave_id}",
-                payload=slave_fixture,
-                status=200,
-            )
-            rsps.get(f"{slave_address}/containers", payload=[], status=200)
+            build_mesos_cluster(rsps, agent_id)
             apps = await self.mesos_backend.get_apps(
                 namespace=slave_namespace, agent_id=slave_id
             )
@@ -146,7 +125,6 @@ class MesosBackendTest(TestCase):
         agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
         slave = get_fixture(f"agents/{agent_id}/info.json")
         slave_id = slave["id"]
-        slave_address = f"http://{slave['hostname']}:{slave['port']}"
         slave_namespace = slave["attributes"]["owner"]
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(rsps, agent_id)
