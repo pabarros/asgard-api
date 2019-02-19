@@ -167,11 +167,6 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        slave_fixture = get_fixture("agents_multi_owner.json")
-        slave = slave_fixture["slaves"][0]
-        slave_id = slave["id"]
-        slave_address = f"http://{slave['hostname']}:{slave['port']}"
-
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
