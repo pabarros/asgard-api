@@ -57,5 +57,7 @@ def build_mesos_cluster(rsps, *agent_ids):
         )
 
     rsps.get(
-        f"{TEST_MESOS_ADDRESS}/slaves", payload={"slaves": all_agents_info}, status=200
+        f"{TEST_MESOS_ADDRESS}/slaves",
+        payload={"slaves": all_agents_info},
+        status=200,
     )

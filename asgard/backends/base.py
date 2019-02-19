@@ -17,9 +17,13 @@ class Backend(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get_agent_by_id(self, namespace: str, agent_id: str) -> Optional[Agent]:
+    async def get_agent_by_id(
+        self, namespace: str, agent_id: str
+    ) -> Optional[Agent]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get_tasks(self, namespace: str, agent_id: str, app_id: str) -> List[Task]:
+    async def get_tasks(
+        self, namespace: str, agent_id: str, app_id: str
+    ) -> List[Task]:
         raise NotImplementedError

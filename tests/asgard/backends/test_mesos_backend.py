@@ -1,7 +1,11 @@
 import os
 from asynctest import TestCase, mock, skip
 from aioresponses import aioresponses
-from tests.utils import get_fixture, add_agent_running_tasks, build_mesos_cluster
+from tests.utils import (
+    get_fixture,
+    add_agent_running_tasks,
+    build_mesos_cluster,
+)
 from tests.conf import TEST_MESOS_ADDRESS
 
 import asgard.sdk.mesos
@@ -35,18 +39,27 @@ class MesosBackendTest(TestCase):
             agents = await self.mesos_backend.get_agents(namespace="asgard")
             self.assertEqual(4, len(agents))
             self.assertEqual(
-                set(["asgard"]), set([agent.attributes["owner"] for agent in agents])
+                set(["asgard"]),
+                set([agent.attributes["owner"] for agent in agents]),
             )
-            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S10", agents[0].id)
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S10", agents[0].id
+            )
             self.assertEqual(2, agents[0].total_apps)
 
-            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S11", agents[1].id)
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S11", agents[1].id
+            )
             self.assertEqual(0, agents[1].total_apps)
 
-            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S12", agents[2].id)
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S12", agents[2].id
+            )
             self.assertEqual(1, agents[2].total_apps)
 
-            self.assertEqual("ead07ffb-5a61-42c9-9386-21b680597e6c-S9", agents[3].id)
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S9", agents[3].id
+            )
             self.assertEqual(1, agents[3].total_apps)
 
     async def test_get_agents_remove_unused_fields(self):
@@ -66,12 +79,15 @@ class MesosBackendTest(TestCase):
             self.assertEqual(agent_id, agent.id)
             self.assertEqual(2, agent.total_apps)
 
-    async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(self):
+    async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(
+        self
+    ):
         slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(rsps, slave_id)
             agent = await self.mesos_backend.get_agent_by_id(
-                namespace="dev", agent_id=slave_id  # Agent from asgard-infra namespace
+                namespace="dev",
+                agent_id=slave_id,  # Agent from asgard-infra namespace
             )
             self.assertIsNone(agent)
 
@@ -89,7 +105,8 @@ class MesosBackendTest(TestCase):
                 status=200,
             )
             agent = await self.mesos_backend.get_agent_by_id(
-                namespace="dev", agent_id=slave_id  # Agent from asgard-infra namespace
+                namespace="dev",
+                agent_id=slave_id,  # Agent from asgard-infra namespace
             )
             self.assertIsNone(agent)
 
@@ -106,10 +123,14 @@ class MesosBackendTest(TestCase):
                 payload={"slaves": []},
                 status=200,
             )
-            apps = await self.mesos_backend.get_apps(namespace="dev", agent_id=slave_id)
+            apps = await self.mesos_backend.get_apps(
+                namespace="dev", agent_id=slave_id
+            )
             self.assertEqual(0, len(apps))
 
-    async def test_get_apps_returns_empty_list_if_no_apps_running_on_agent(self):
+    async def test_get_apps_returns_empty_list_if_no_apps_running_on_agent(
+        self
+    ):
         agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S4"
         slave = get_fixture(f"agents/{agent_id}/info.json")
         slave_id = slave["id"]

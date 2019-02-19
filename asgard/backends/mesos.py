@@ -106,7 +106,9 @@ class MesosBackend(Backend):
                 filtered_agents.append(mesos_agent)
         return filtered_agents
 
-    async def get_agent_by_id(self, namespace: str, agent_id: str) -> Optional[Agent]:
+    async def get_agent_by_id(
+        self, namespace: str, agent_id: str
+    ) -> Optional[Agent]:
         mesos_leader_address = await mesos.leader_address()
         agent_url = f"{mesos_leader_address}/slaves?slave_id={agent_id}"
         async with http_client.get(agent_url) as response:
@@ -127,5 +129,7 @@ class MesosBackend(Backend):
             return agent.applications
         return []
 
-    async def get_tasks(self, namespace: str, agent_id: str, app_id: str) -> List[Task]:
+    async def get_tasks(
+        self, namespace: str, agent_id: str, app_id: str
+    ) -> List[Task]:
         pass

@@ -10,7 +10,9 @@ class AgentsService:
     async def get_agents(self, namespace: str, backend) -> List[Agent]:
         return await backend.get_agents(namespace)
 
-    async def get_apps(self, namespace: str, agent_id: str, backend) -> List[App]:
+    async def get_apps(
+        self, namespace: str, agent_id: str, backend
+    ) -> List[App]:
         return await backend.get_apps(namespace, agent_id)
 
     async def get_tasks(

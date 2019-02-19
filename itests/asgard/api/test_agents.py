@@ -1,5 +1,6 @@
 from itests.util import BaseTestCase
 from tests.utils import get_fixture, build_mesos_cluster
+from tests.conf import TEST_MESOS_ADDRESS
 from importlib import reload
 from asynctest import mock, skip
 from asynctest.mock import CoroutineMock
@@ -16,8 +17,12 @@ class AgentsApiEndpointTest(BaseTestCase):
     async def setUp(self):
         await super(AgentsApiEndpointTest, self).setUp()
         self.client = await self.aiohttp_client(app)
-        self.mesos_address = "http://10.0.0.1:5050"
         self.user_auth_key = "c0c0b73b18864550a3e3b93a59c4b7d8"
+        self.mesos_leader_ip_pactcher = mock.patch(
+            "asgard.sdk.mesos.leader_address",
+            mock.CoroutineMock(return_value=TEST_MESOS_ADDRESS),
+        )
+        self.mesos_leader_ip_pactcher.start()
 
     def _prepare_additional_fixture_data(self):
         self.pg_data_mocker.add_data(
@@ -45,11 +50,12 @@ class AgentsApiEndpointTest(BaseTestCase):
 
     async def tearDown(self):
         await super(AgentsApiEndpointTest, self).tearDown()
+        mock.patch.stopall()
 
-    async def test_agents_list_should_return_only_agents_from_specific_account(self):
-        with mock.patch.dict(
-            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
-        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+    async def test_agents_list_should_return_only_agents_from_specific_account(
+        self
+    ):
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
@@ -58,7 +64,9 @@ class AgentsApiEndpointTest(BaseTestCase):
             )
             resp = await self.client.get(
                 "/agents",
-                headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"},
+                headers={
+                    "Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"
+                },
             )
             self.assertEqual(200, resp.status)
             data = await resp.json()
@@ -68,7 +76,8 @@ class AgentsApiEndpointTest(BaseTestCase):
                 set([agent["attributes"]["owner"] for agent in data["agents"]]),
             )
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44", data["agents"][0]["id"]
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
+                data["agents"][0]["id"],
             )
             self.assertEqual("MESOS", data["agents"][0]["type"])
 
@@ -76,9 +85,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with mock.patch.dict(
-            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
-        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
@@ -97,9 +104,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with mock.patch.dict(
-            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
-        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
@@ -115,19 +120,19 @@ class AgentsApiEndpointTest(BaseTestCase):
             data = await resp.json()
             self.assertEqual(2, len(data["agents"]))
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0", data["agents"][0]["id"]
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+                data["agents"][0]["id"],
             )
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3", data["agents"][1]["id"]
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",
+                data["agents"][1]["id"],
             )
 
     async def test_agents_with_atrrs_two_attrs_filter(self):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with mock.patch.dict(
-            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
-        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
@@ -143,7 +148,8 @@ class AgentsApiEndpointTest(BaseTestCase):
             data = await resp.json()
             self.assertEqual(1, len(data["agents"]))
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0", data["agents"][0]["id"]
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+                data["agents"][0]["id"],
             )
 
     async def test_agent_app_list_zero_apps_running(self):
@@ -151,9 +157,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         await self.pg_data_mocker.create()
 
         slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S3"
-        with mock.patch.dict(
-            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
-        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(rsps, slave_id)
             resp = await self.client.get(
                 f"/agents/{slave_id}/apps",
@@ -167,9 +171,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with mock.patch.dict(
-            os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
-        ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(rsps, "ead07ffb-5a61-42c9-9386-21b680597e6c-S0")
             resp = await self.client.get(
                 "/agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S0/apps",
