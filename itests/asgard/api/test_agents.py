@@ -1,5 +1,5 @@
 from itests.util import BaseTestCase
-from tests.utils import get_fixture
+from tests.utils import get_fixture, build_mesos_cluster
 from importlib import reload
 from asynctest import mock, skip
 from asynctest.mock import CoroutineMock
@@ -18,18 +18,6 @@ class AgentsApiEndpointTest(BaseTestCase):
         self.client = await self.aiohttp_client(app)
         self.mesos_address = "http://10.0.0.1:5050"
         self.user_auth_key = "c0c0b73b18864550a3e3b93a59c4b7d8"
-
-    def _mock_mesos_return_data(self, rsps):
-        rsps.get(
-            f"{self.mesos_address}/redirect",
-            status=301,
-            headers={"Location": self.mesos_address},
-        )
-        rsps.get(
-            f"{self.mesos_address}/slaves",
-            status=200,
-            payload=get_fixture("agents_multi_owner.json"),
-        )
 
     def _prepare_additional_fixture_data(self):
         self.pg_data_mocker.add_data(
@@ -58,18 +46,19 @@ class AgentsApiEndpointTest(BaseTestCase):
     async def tearDown(self):
         await super(AgentsApiEndpointTest, self).tearDown()
 
-    async def test_agents_list_should_return_only_agents_from_specific_account(
-        self
-    ):
+    async def test_agents_list_should_return_only_agents_from_specific_account(self):
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._mock_mesos_return_data(rsps)
+            build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S10",  # namespace=asgard
+            )
             resp = await self.client.get(
                 "/agents",
-                headers={
-                    "Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
+                headers={"Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"},
             )
             self.assertEqual(200, resp.status)
             data = await resp.json()
@@ -79,8 +68,7 @@ class AgentsApiEndpointTest(BaseTestCase):
                 set([agent["attributes"]["owner"] for agent in data["agents"]]),
             )
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
-                data["agents"][0]["id"],
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44", data["agents"][0]["id"]
             )
             self.assertEqual("MESOS", data["agents"][0]["type"])
 
@@ -91,7 +79,12 @@ class AgentsApiEndpointTest(BaseTestCase):
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._mock_mesos_return_data(rsps)
+            build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S10",  # namespace=asgard
+            )
             resp = await self.client.get(
                 "/agents/with-attrs?tag1=not-found",
                 headers={"Authorization": f"Token {self.user_auth_key}"},
@@ -107,7 +100,13 @@ class AgentsApiEndpointTest(BaseTestCase):
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._mock_mesos_return_data(rsps)
+            build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S4",  # namespace=asgard-dev
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",  # namespace=dev
+            )
             resp = await self.client.get(
                 "/agents/with-attrs?workload=general",
                 headers={"Authorization": f"Token {self.user_auth_key}"},
@@ -116,12 +115,10 @@ class AgentsApiEndpointTest(BaseTestCase):
             data = await resp.json()
             self.assertEqual(2, len(data["agents"]))
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
-                data["agents"][0]["id"],
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0", data["agents"][0]["id"]
             )
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",
-                data["agents"][1]["id"],
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3", data["agents"][1]["id"]
             )
 
     async def test_agents_with_atrrs_two_attrs_filter(self):
@@ -131,7 +128,13 @@ class AgentsApiEndpointTest(BaseTestCase):
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._mock_mesos_return_data(rsps)
+            build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S4",  # namespace=asgard-dev
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",  # namespace=dev
+            )
             resp = await self.client.get(
                 "/agents/with-attrs?workload=general&dc=gcp",
                 headers={"Authorization": f"Token {self.user_auth_key}"},
@@ -140,31 +143,20 @@ class AgentsApiEndpointTest(BaseTestCase):
             data = await resp.json()
             self.assertEqual(1, len(data["agents"]))
             self.assertEqual(
-                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
-                data["agents"][0]["id"],
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0", data["agents"][0]["id"]
             )
 
     async def test_agent_app_list_zero_apps_running(self):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        slave_fixture = get_fixture("agents_multi_owner.json")
-        slave = slave_fixture["slaves"][0]
-        slave_id = slave["id"]
-        slave_address = f"http://{slave['hostname']}:{slave['port']}"
-
+        slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S3"
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._mock_mesos_return_data(rsps)
-            rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={slave_id}",
-                payload=slave_fixture,
-                status=200,
-            )
-            rsps.get(f"{slave_address}/containers", payload=[], status=200)
+            build_mesos_cluster(rsps, slave_id)
             resp = await self.client.get(
-                "/agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S0/apps",
+                f"/agents/{slave_id}/apps",
                 headers={"Authorization": f"Token {self.user_auth_key}"},
             )
             self.assertEqual(200, resp.status)
@@ -183,17 +175,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         with mock.patch.dict(
             os.environ, HOLLOWMAN_MESOS_ADDRESS_0=self.mesos_address
         ), aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
-            self._mock_mesos_return_data(rsps)
-            rsps.get(
-                f"{self.mesos_address}/slaves?slave_id={slave_id}",
-                payload=slave_fixture,
-                status=200,
-            )
-            rsps.get(
-                f"{slave_address}/containers",
-                payload=get_fixture("agents_containers.json"),
-                status=200,
-            )
+            build_mesos_cluster(rsps, "ead07ffb-5a61-42c9-9386-21b680597e6c-S0")
             resp = await self.client.get(
                 "/agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S0/apps",
                 headers={"Authorization": f"Token {self.user_auth_key}"},
