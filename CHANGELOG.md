@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.79.0
+ * Remoção da constraint (antes obrigatória) mesos:LIKE:slave
+
 ### 0.78.0
  * Filtro que remove informação de namespace do campo lastTaskFailure de uma app;
 
