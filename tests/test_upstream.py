@@ -221,6 +221,41 @@ class UpstreamTest(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(b"OK", response.content)
 
+    def test_make_request_try_other_hosts_on_timeout(self):
+        """
+        O primeiro server que conseguirmos conectar, ou seja, que não lance
+        ConnectionError, é a resposta que vamos retornar
+        Endpoints atuais:
+            http://127.0.0.1:8080 > Invalido
+            http://172.30.0.1:8080 > Vallido
+            http://172.31.0.1:8080 > Invalido
+        """
+        marathon_addresses = [
+            "http://127.0.0.1:8080",
+            "http://172.30.0.1:8080",
+            "http://172.31.0.1:8080",
+        ]
+        with RequestsMock() as rsps, patch.multiple(
+            hollowman.conf, MARATHON_ADDRESSES=marathon_addresses
+        ), patch.multiple(
+            hollowman.conf, MARATHON_LEADER=marathon_addresses[0]
+        ):
+
+            rsps.add(
+                "GET",
+                url=marathon_addresses[0] + "/v2/apps",
+                body=requests.exceptions.ReadTimeout(),
+            )
+            rsps.add(
+                "GET",
+                url=marathon_addresses[1] + "/v2/apps",
+                status=200,
+                body="OK",
+            )
+            response = _make_request("/v2/apps", "get")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(b"OK", response.content)
+
     def test_remove_x_marathon_leader_header_from_upsream_response(self):
         marathon_addresses = ["http://127.0.0.1:8080"]
         with RequestsMock() as rsps, patch.multiple(
