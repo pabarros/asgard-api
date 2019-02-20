@@ -38,17 +38,14 @@ def _make_request(path, method, params=None, headers=None, data=None):
         try:
             url = "{}{}".format(marathon_backend, path)
             response = getattr(requests, method)(
-                url, params=params, headers=headers, data=data
+                url, params=params, headers=headers, data=data, timeout=3
             )
             leader_addr = response.headers.pop(
                 "X-Marathon-Leader", conf.MARATHON_ADDRESSES[0]
             )
             conf.MARATHON_LEADER = leader_addr
             logger.debug(
-                {
-                    "new_leader": conf.MARATHON_LEADER,
-                    "talked_to": marathon_backend,
-                }
+                {"new_leader": conf.MARATHON_LEADER, "talked_to": marathon_backend}
             )
             return response
         except requests.exceptions.ConnectionError as e:
