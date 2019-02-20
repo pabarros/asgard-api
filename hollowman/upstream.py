@@ -38,7 +38,7 @@ def _make_request(path, method, params=None, headers=None, data=None):
         try:
             url = "{}{}".format(marathon_backend, path)
             response = getattr(requests, method)(
-                url, params=params, headers=headers, data=data, timeout=3
+                url, params=params, headers=headers, data=data, timeout=(1, 5)
             )
             leader_addr = response.headers.pop(
                 "X-Marathon-Leader", conf.MARATHON_ADDRESSES[0]
