@@ -45,10 +45,15 @@ def _make_request(path, method, params=None, headers=None, data=None):
             )
             conf.MARATHON_LEADER = leader_addr
             logger.debug(
-                {"new_leader": conf.MARATHON_LEADER, "talked_to": marathon_backend}
+                {
+                    "new_leader": conf.MARATHON_LEADER,
+                    "talked_to": marathon_backend,
+                }
             )
             return response
         except requests.exceptions.ConnectionError as e:
+            pass
+        except requests.exceptions.ReadTimeout as timeout:
             pass
     raise Exception("No Marathon servers found")
 
