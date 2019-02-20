@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.80.0
+ * Adicionando ConnectTimeout nos requests para o Marathon (python síncrono)
+
 ### 0.79.0
  * Remoção da constraint (antes obrigatória) mesos:LIKE:slave
 
