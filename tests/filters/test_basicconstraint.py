@@ -16,10 +16,7 @@ class TestBasicConstraintFilter(unittest.TestCase):
         self.request_app = AsgardApp.from_json(self.single_full_app_fixture)
         self.original_app = Mock()
         self.user = Mock()
-        self.constraints = (
-            BasicConstraintFilter.mesos_constraint,
-            BasicConstraintFilter.workload_constraint,
-        )
+        self.constraints = (BasicConstraintFilter.workload_constraint,)
 
     def test_it_adds_default_constraints_if_none_present(self):
         self.request_app.constraints = []
@@ -74,10 +71,7 @@ class TestBasicConstraintFilter(unittest.TestCase):
         )
         self.assertEqual(
             result_app.constraints,
-            [
-                MarathonConstraint.from_json("workload:LIKE:xablau".split(":")),
-                self.filter.mesos_constraint,
-            ],
+            [MarathonConstraint.from_json("workload:LIKE:xablau".split(":"))],
         )
 
     def test_it_adds_only_workload_constraint_if_request_app_does_not_hanve_any_mesos_constraint(
