@@ -86,6 +86,18 @@ class MesosBackendTest(TestCase):
                 expected_app_ids, sorted([app.id for app in agent.applications])
             )
 
+    async def test_get_agent_by_id_includes_individual_usage_stats(self):
+        agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            build_mesos_cluster(rsps, agent_id)
+            agent = await self.mesos_backend.get_agent_by_id(
+                namespace="asgard", agent_id=agent_id
+            )
+            self.assertEqual(agent_id, agent.id)
+            self.assertEqual(
+                {"cpu_pct": "16.0", "ram_pct": "22.5"}, agent.stats
+            )
+
     async def test_get_agent_by_id_adds_app_count_on_error_dict_if_failed(self):
         """
         O campo total_apps deve estar no "errors" caso tenha acontecido alguma falha ao carregá-lo.
