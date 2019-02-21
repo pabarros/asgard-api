@@ -138,6 +138,34 @@ class AgentsApiEndpointTest(BaseTestCase):
                 {"cpu_pct": "44.76", "ram_pct": "45.46"}, data["stats"]
             )
 
+    async def test_agents_with_atrrs_one_attr_filter_with_account_id(self):
+        self._prepare_additional_fixture_data()
+        await self.pg_data_mocker.create()
+
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S4",  # namespace=asgard-dev
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",  # namespace=dev
+            )
+            resp = await self.client.get(
+                "/agents/with-attrs?workload=general&account_id=40",
+                headers={"Authorization": f"Token {self.user_auth_key}"},
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(2, len(data["agents"]))
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+                data["agents"][0]["id"],
+            )
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",
+                data["agents"][1]["id"],
+            )
+
     async def test_agents_with_atrrs_two_attrs_filter(self):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()

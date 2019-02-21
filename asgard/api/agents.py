@@ -68,7 +68,9 @@ def apply_attr_filter(
 @auth_required
 async def agents_with_attrs(request: web.Request):
     namespace = request["user"].current_account.namespace
-    filters = request.query
+    filters = request.query.copy()
+    filters.pop("account_id", None)
+
     agents = await agents_service.get_agents(namespace=namespace, backend=mesos)
     filtered_agents = apply_attr_filter(filters, agents)
 
