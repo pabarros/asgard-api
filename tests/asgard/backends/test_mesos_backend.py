@@ -5,6 +5,7 @@ from tests.utils import (
     get_fixture,
     add_agent_running_tasks,
     build_mesos_cluster,
+    ClusterOptions,
 )
 from tests.conf import TEST_MESOS_ADDRESS
 
@@ -69,7 +70,7 @@ class MesosBackendTest(TestCase):
             self.assertEqual(1, len(agents))
             self.assertEqual("asgard", agents[0].attributes["owner"])
 
-    async def test_get_agent_by_id_includes_app_count(self):
+    async def test_get_agent_by_id_includes_app_count_and_list(self):
         agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
         with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
             build_mesos_cluster(rsps, agent_id)
@@ -78,6 +79,27 @@ class MesosBackendTest(TestCase):
             )
             self.assertEqual(agent_id, agent.id)
             self.assertEqual(2, agent.total_apps)
+            expected_app_ids = sorted(
+                ["captura/wetl/visitcentral", "infra/asgard/api"]
+            )
+            self.assertEqual(
+                expected_app_ids, sorted([app.id for app in agent.applications])
+            )
+
+    async def test_get_agent_by_id_adds_app_count_on_error_dict_if_failed(self):
+        """
+        O campo total_apps deve estar no "errors" caso tenha acontecido alguma falha ao carregá-lo.
+        """
+        agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            build_mesos_cluster(
+                rsps, {"id": agent_id, "apps": ClusterOptions.CONNECTION_ERROR}
+            )
+            agent = await self.mesos_backend.get_agent_by_id(
+                namespace="asgard", agent_id=agent_id
+            )
+            self.assertEqual(agent_id, agent.id)
+            self.assertEqual({"total_apps": "INDISPONIVEL"}, agent.errors)
 
     async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(
         self

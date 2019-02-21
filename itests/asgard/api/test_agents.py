@@ -1,5 +1,5 @@
 from itests.util import BaseTestCase
-from tests.utils import get_fixture, build_mesos_cluster
+from tests.utils import get_fixture, build_mesos_cluster, ClusterOptions
 from tests.conf import TEST_MESOS_ADDRESS
 from importlib import reload
 from asynctest import mock, skip
@@ -81,7 +81,116 @@ class AgentsApiEndpointTest(BaseTestCase):
             )
             self.assertEqual("MESOS", data["agents"][0]["type"])
             self.assertEqual(
+                {"cpu_pct": "38.72", "ram_pct": "25.79"},
+                data["agents"][0]["stats"],
+            )
+            self.assertEqual(
                 {"cpu_pct": "38.72", "ram_pct": "25.79"}, data["stats"]
+            )
+            self.assertEqual(0, data["agents"][0]["total_apps"])
+
+    async def test_agents_list_includes_app_list(self):
+        self._prepare_additional_fixture_data()
+        await self.pg_data_mocker.create()
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S10",  # namespace=asgard
+            )
+            resp = await self.client.get(
+                "/agents",
+                headers={"Authorization": f"Token {self.user_auth_key}"},
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(2, len(data["agents"]))
+            self.assertEqual(
+                set(["asgard-infra"]),
+                set([agent["attributes"]["owner"] for agent in data["agents"]]),
+            )
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+                data["agents"][0]["id"],
+            )
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",
+                data["agents"][1]["id"],
+            )
+            self.assertEqual("MESOS", data["agents"][0]["type"])
+
+            self.assertEqual(5, data["agents"][0]["total_apps"])
+            expected_app_ids = sorted(
+                [
+                    "infra/asgard/api",
+                    "infra/rabbitmq",
+                    "captura/kirby/feeder",
+                    "portal/api",
+                    "captura/wetl/visitcentral",
+                ]
+            )
+            self.assertEqual(
+                expected_app_ids,
+                sorted(
+                    [app["id"] for app in data["agents"][0]["applications"]]
+                ),
+            )
+
+            self.assertEqual(0, data["agents"][1]["total_apps"])
+            expected_app_ids_agent_s3 = sorted([])
+            self.assertEqual(
+                expected_app_ids_agent_s3,
+                sorted(
+                    [app["id"] for app in data["agents"][1]["applications"]]
+                ),
+            )
+
+    async def test_agents_list_should_populate_errors_for_each_field(self):
+        """
+        Cada campo que tiver dado problema no momento de ser preenchido estará no
+        campo {"errors": {...}} onde a key é o nome do campo e o value é a mensagem de erro.
+        """
+
+        self._prepare_additional_fixture_data()
+        await self.pg_data_mocker.create()
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            build_mesos_cluster(
+                rsps,
+                {
+                    "id": "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+                    "apps": ClusterOptions.CONNECTION_ERROR,
+                },  # namespace=asgard-infra
+                {
+                    "id": "ead07ffb-5a61-42c9-9386-21b680597e6c-S3"
+                },  # namespace=asgard-infra
+                {
+                    "id": "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
+                },  # namespace=asgard
+            )
+
+            resp = await self.client.get(
+                "/agents",
+                headers={"Authorization": f"Token {self.user_auth_key}"},
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(2, len(data["agents"]))
+            self.assertEqual(
+                set(["asgard-infra"]),
+                set([agent["attributes"]["owner"] for agent in data["agents"]]),
+            )
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+                data["agents"][0]["id"],
+            )
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",
+                data["agents"][1]["id"],
+            )
+            self.assertEqual("MESOS", data["agents"][0]["type"])
+            self.assertTrue(
+                "INDISPONIVEL" in data["agents"][0]["errors"]["total_apps"]
             )
 
     async def test_agents_with_attrs_empty_response(self):
@@ -102,7 +211,11 @@ class AgentsApiEndpointTest(BaseTestCase):
             self.assertEqual(200, resp.status)
             data = await resp.json()
             self.assertEqual(
-                {"agents": [], "stats": {"cpu_pct": "0.0", "ram_pct": "0.0"}},
+                {
+                    "agents": [],
+                    "stats": {"cpu_pct": "0.0", "ram_pct": "0.0"},
+                    "errors": {},
+                },
                 data,
             )
 
@@ -188,6 +301,46 @@ class AgentsApiEndpointTest(BaseTestCase):
             self.assertEqual(
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
                 data["agents"][0]["id"],
+            )
+
+    async def test_agents_with_atrrs_includes_app_list(self):
+        self._prepare_additional_fixture_data()
+        await self.pg_data_mocker.create()
+
+        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+            build_mesos_cluster(
+                rsps,
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",  # namespace=asgard-infra
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S4",  # namespace=asgard-dev
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",  # namespace=dev
+            )
+            resp = await self.client.get(
+                "/agents/with-attrs?workload=general&dc=gcp",
+                headers={"Authorization": f"Token {self.user_auth_key}"},
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(1, len(data["agents"]))
+            self.assertEqual(
+                "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+                data["agents"][0]["id"],
+            )
+            self.assertEqual(5, data["agents"][0]["total_apps"])
+            expected_app_ids = sorted(
+                [
+                    "infra/asgard/api",
+                    "infra/rabbitmq",
+                    "captura/kirby/feeder",
+                    "portal/api",
+                    "captura/wetl/visitcentral",
+                ]
+            )
+            self.assertEqual(
+                expected_app_ids,
+                sorted(
+                    [app["id"] for app in data["agents"][0]["applications"]]
+                ),
             )
 
     async def test_agent_app_list_zero_apps_running(self):

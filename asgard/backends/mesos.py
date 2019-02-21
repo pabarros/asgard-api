@@ -128,7 +128,14 @@ class MesosBackend(Backend):
                 mesos_agent = MesosAgent(**agent_dict)
                 if not mesos_agent.attr_has_value("owner", namespace):
                     continue
-                mesos_agent.total_apps = len(await mesos_agent.apps())
+                try:
+                    mesos_agent.applications = await mesos_agent.apps()
+                    mesos_agent.total_apps = len(mesos_agent.applications)
+                except Exception as e:
+                    mesos_agent.add_error(
+                        field_name="total_apps", error_msg="INDISPONIVEL"
+                    )
+                await mesos_agent.calculate_stats()
                 filtered_agents.append(mesos_agent)
         return filtered_agents
 
@@ -144,8 +151,13 @@ class MesosBackend(Backend):
                 if not agent.attr_has_value("owner", namespace):
                     return None
 
-                agent.applications = await agent.apps()
-                agent.total_apps = len(agent.applications)
+                try:
+                    agent.applications = await agent.apps()
+                    agent.total_apps = len(agent.applications)
+                except Exception as e:
+                    agent.add_error(
+                        field_name="total_apps", error_msg="INDISPONIVEL"
+                    )
                 return agent
             return None
 
