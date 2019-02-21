@@ -1,4 +1,5 @@
 from typing import List, Type, Dict, Any
+from decimal import Decimal
 from asgard.app import app
 from asyncworker import RouteTypes
 from asyncworker.conf import settings
@@ -6,6 +7,7 @@ from aiohttp import web
 import aiohttp_cors
 
 
+from asgard.math import round_up
 from asgard.services import agents_service
 from asgard.backends import mesos
 from asgard.http.auth import auth_required
@@ -17,12 +19,34 @@ from asgard.api.resources.agents import AgentsResource
 from asgard.api.resources.apps import AppsResource
 
 
+def calculate_stats(agents):
+    total_cpus = sum(
+        [Decimal(agent.resources["cpus"]) for agent in agents]
+    ) or Decimal("1")
+    total_used_cpus = sum(
+        [Decimal(agent.used_resources["cpus"]) for agent in agents]
+    )
+
+    total_ram = sum(
+        [Decimal(agent.resources["mem"]) for agent in agents]
+    ) or Decimal("1")
+    total_used_ram = sum(
+        [Decimal(agent.used_resources["mem"]) for agent in agents]
+    )
+
+    return {
+        "cpu_pct": str(round_up(total_used_cpus / total_cpus * 100)),
+        "ram_pct": str(round_up(total_used_ram / total_ram * 100)),
+    }
+
+
 @app.route(["/agents"], type=RouteTypes.HTTP, methods=["GET"])
 @auth_required
 async def agents_handler(request: web.Request):
     namespace = request["user"].current_account.namespace
     agents = await agents_service.get_agents(namespace=namespace, backend=mesos)
-    return web.json_response(AgentsResource(agents=agents).dict())
+    stats = calculate_stats(agents)
+    return web.json_response(AgentsResource(agents=agents, stats=stats).dict())
 
 
 def apply_attr_filter(
@@ -48,7 +72,10 @@ async def agents_with_attrs(request: web.Request):
     agents = await agents_service.get_agents(namespace=namespace, backend=mesos)
     filtered_agents = apply_attr_filter(filters, agents)
 
-    return web.json_response(AgentsResource(agents=filtered_agents).dict())
+    stats = calculate_stats(filtered_agents)
+    return web.json_response(
+        AgentsResource(agents=filtered_agents, stats=stats).dict()
+    )
 
 
 @app.route(["/agents/{agent_id}/apps"], type=RouteTypes.HTTP, methods=["GET"])

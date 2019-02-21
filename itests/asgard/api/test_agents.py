@@ -80,6 +80,9 @@ class AgentsApiEndpointTest(BaseTestCase):
                 data["agents"][0]["id"],
             )
             self.assertEqual("MESOS", data["agents"][0]["type"])
+            self.assertEqual(
+                {"cpu_pct": "38.72", "ram_pct": "25.79"}, data["stats"]
+            )
 
     async def test_agents_with_attrs_empty_response(self):
         self._prepare_additional_fixture_data()
@@ -98,7 +101,10 @@ class AgentsApiEndpointTest(BaseTestCase):
             )
             self.assertEqual(200, resp.status)
             data = await resp.json()
-            self.assertEqual({"agents": []}, data)
+            self.assertEqual(
+                {"agents": [], "stats": {"cpu_pct": "0.0", "ram_pct": "0.0"}},
+                data,
+            )
 
     async def test_agents_with_atrrs_one_attr_filter(self):
         self._prepare_additional_fixture_data()
@@ -126,6 +132,10 @@ class AgentsApiEndpointTest(BaseTestCase):
             self.assertEqual(
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S3",
                 data["agents"][1]["id"],
+            )
+
+            self.assertEqual(
+                {"cpu_pct": "44.76", "ram_pct": "45.46"}, data["stats"]
             )
 
     async def test_agents_with_atrrs_two_attrs_filter(self):

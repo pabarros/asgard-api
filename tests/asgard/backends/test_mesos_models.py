@@ -50,3 +50,15 @@ class MesosAgentTest(TestCase):
             app_id = "apps/http/myapp"
             tasks = await self.agent.tasks(app_id=app_id)
             self.assertEqual(0, len(tasks))
+
+    async def test_mesos_agent_calculate_stats(self):
+        """
+        Each agent should be capable of calculating its ocupancy
+        """
+        agent_info = get_fixture(
+            "agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S10/info.json"
+        )
+        agent = MesosAgent(**agent_info)
+        self.assertEqual({}, agent.stats)
+        await agent.calculate_stats()
+        self.assertEqual({"cpu_pct": "16.0", "ram_pct": "22.5"}, agent.stats)

@@ -1,8 +1,10 @@
 from typing import Dict, Union, List, Any, Optional, Set
 from collections import defaultdict
+from decimal import Decimal, ROUND_UP
 from asgard.backends.base import Backend
 
 from asgard.sdk import mesos
+from asgard.math import round_up
 from asgard.http.client import http_client
 
 
@@ -42,9 +44,33 @@ class MesosAgent(Agent):
     resources: Dict[str, Union[str, int]]
     total_apps: int = 0
     applications: List[MesosApp] = []
+    stats: Optional[Dict[str, Any]] = {}
 
     def filter_by_attrs(self, kv):
         pass
+
+    async def calculate_stats(self):
+        """
+        Calculate usage statistics.
+            - CPU % usage
+            - RAM % usage
+        """
+        cpu_pct = (
+            Decimal(self.used_resources["cpus"])
+            / Decimal(self.resources["cpus"])
+            * 100
+        )
+
+        ram_pct = (
+            Decimal(self.used_resources["mem"])
+            / Decimal(self.resources["mem"])
+            * 100
+        )
+
+        self.stats = {
+            "cpu_pct": str(round_up(cpu_pct)),
+            "ram_pct": str(round_up(ram_pct)),
+        }
 
     @classmethod
     def _transform_to_asgard_app_id(cls, executor_id: str) -> str:

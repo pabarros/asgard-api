@@ -28,6 +28,10 @@ class Agent(Model, abc.ABC):
     async def apps(self) -> List[App]:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    async def calculate_stats(self):
+        raise NotImplementedError
+
 
 class AgentFactory(Model):
     def __new__(cls, *args, **kwargs) -> Agent:
