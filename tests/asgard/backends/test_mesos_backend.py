@@ -95,7 +95,7 @@ class MesosBackendTest(TestCase):
             )
             self.assertEqual(agent_id, agent.id)
             self.assertEqual(
-                {"cpu_pct": "16.0", "ram_pct": "22.5"}, agent.stats
+                {"cpu_pct": "16.00", "ram_pct": "22.50"}, agent.stats
             )
 
     async def test_get_agent_by_id_adds_app_count_on_error_dict_if_failed(self):

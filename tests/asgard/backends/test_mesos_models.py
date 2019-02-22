@@ -61,4 +61,4 @@ class MesosAgentTest(TestCase):
         agent = MesosAgent(**agent_info)
         self.assertEqual({}, agent.stats)
         await agent.calculate_stats()
-        self.assertEqual({"cpu_pct": "16.0", "ram_pct": "22.5"}, agent.stats)
+        self.assertEqual({"cpu_pct": "16.00", "ram_pct": "22.50"}, agent.stats)

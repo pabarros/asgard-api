@@ -213,7 +213,7 @@ class AgentsApiEndpointTest(BaseTestCase):
             self.assertEqual(
                 {
                     "agents": [],
-                    "stats": {"cpu_pct": "0.0", "ram_pct": "0.0"},
+                    "stats": {"cpu_pct": "0.00", "ram_pct": "0.00"},
                     "errors": {},
                 },
                 data,
