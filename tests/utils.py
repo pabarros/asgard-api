@@ -1,3 +1,4 @@
+from typing import Union, Dict, Any
 import json
 from enum import Enum, auto
 import os
@@ -53,7 +54,20 @@ def add_agent_running_tasks(rsps, agent_id, agent_apps):
         )
 
 
-def build_mesos_cluster(rsps, *agent_configs):
+def build_mesos_cluster(rsps, *agent_configs: Union[Dict[str, Any], str]):
+    """
+    Cria as chamadas necessárias no aioresponses para que um cluster de mesos
+    exista com os agents escolhidos. Dos dados de cada agent estão em `tests/fixtures/agents/<agent_id>/*`.
+
+    Quando o agent_config é um dict, possui o seguinte formato:
+        {
+            "id": Id do agent desejado
+            "apps": Uma das opções co enum tests.utils.ClusterOptions
+        }
+
+        se a chave "apps" não existir será escolhida a opção `ClusterOptions.ADD_APPS_FROM_FIXTURE`
+
+    """
     all_agents_info = []
     rsps.get(
         f"{TEST_MESOS_ADDRESS}/redirect",
