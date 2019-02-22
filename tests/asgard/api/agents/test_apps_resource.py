@@ -3,7 +3,7 @@ import unittest
 from pydantic import ValidationError
 
 from asgard.api.resources.apps import AppsResource
-from asgard.backends.mesos import MesosApp
+from asgard.backends.mesos.models import MesosApp
 
 
 class AppsResourceTests(unittest.TestCase):

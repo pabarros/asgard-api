@@ -1,8 +1,8 @@
 from typing import List, Dict, Any
 from pydantic import validator
 
-from asgard.services.models.agent import AgentFactory
-from asgard.services.models import Model
+from asgard.models import AgentFactory
+from asgard.models import Model
 
 
 class AgentsResource(Model):

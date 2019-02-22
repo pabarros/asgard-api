@@ -1,5 +1,5 @@
 import abc
-from asgard.services.models import Model
+from .base import Model
 
 
 class App(Model, abc.ABC):

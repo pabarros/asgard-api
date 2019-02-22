@@ -1,8 +1,8 @@
 from typing import List
 import abc
-from asgard.services.models import Model
+from .base import Model
 
-from asgard.services.models.app import App
+from asgard.models import App
 
 
 class Agent(Model, abc.ABC):

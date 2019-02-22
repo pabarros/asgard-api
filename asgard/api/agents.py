@@ -12,8 +12,7 @@ from asgard.services import agents_service
 from asgard.backends import mesos
 from asgard.http.auth import auth_required
 
-from asgard.services.models import Model
-from asgard.services.models.agent import Agent
+from asgard.models import Agent
 
 from asgard.api.resources.agents import AgentsResource
 from asgard.api.resources.apps import AppsResource

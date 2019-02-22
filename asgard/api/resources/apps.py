@@ -1,6 +1,7 @@
 from typing import List
-from asgard.services.models import Model
-from asgard.services.models.app import AppFactory
+
+from asgard.models import Model
+from asgard.models import AppFactory
 
 
 class AppsResource(Model):
