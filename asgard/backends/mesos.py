@@ -19,8 +19,7 @@ class MesosTask(Task):
 
     name: str
 
-    @classmethod
-    def _transform_to_asgard_task_name(cls, executor_id: str) -> str:
+    def transform_to_asgard_task_id(executor_id: str) -> str:
         task_name_part = executor_id.split("_")[1:]
         return "_".join(task_name_part)
 
@@ -29,6 +28,10 @@ class MesosApp(App):
     _type: str = "MESOS"
     type: str = "MESOS"
     id: str
+
+    def transform_to_asgard_app_id(executor_id: str) -> str:
+        task_name_part = executor_id.split(".")[0]
+        return "/".join(task_name_part.split("_")[1:])
 
 
 class MesosAgent(Agent):
@@ -72,11 +75,6 @@ class MesosAgent(Agent):
             "ram_pct": str(round_up(ram_pct)),
         }
 
-    @classmethod
-    def _transform_to_asgard_app_id(cls, executor_id: str) -> str:
-        task_name_part = executor_id.split(".")[0]
-        return "/".join(task_name_part.split("_")[1:])
-
     async def apps(self) -> List[App]:
         self_address = f"http://{self.hostname}:{self.port}"
         containers_url = f"{self_address}/containers"
@@ -85,7 +83,7 @@ class MesosAgent(Agent):
             data = await response.json()
             all_apps: Set[str] = set()
             for container_info in data:
-                app_id = MesosAgent._transform_to_asgard_app_id(
+                app_id = MesosApp.transform_to_asgard_app_id(
                     container_info["executor_id"]
                 )
                 if app_id not in all_apps:
@@ -100,13 +98,13 @@ class MesosAgent(Agent):
             data = await response.json()
             tasks_per_app: Dict[str, List[MesosTask]] = defaultdict(list)
             for container_info in data:
-                app_id_ = MesosAgent._transform_to_asgard_app_id(
+                app_id_ = MesosApp.transform_to_asgard_app_id(
                     container_info["executor_id"]
                 )
                 tasks_per_app[app_id_].append(
                     MesosTask(
                         **{
-                            "name": MesosTask._transform_to_asgard_task_name(
+                            "name": MesosTask.transform_to_asgard_task_id(
                                 container_info["executor_id"]
                             )
                         }

@@ -15,7 +15,7 @@ class MesosTaskTest(TestCase):
         )
         self.assertEqual(
             "scoutapp_mesos-master.a34109d3-2b99-11e9-a3c9-d2a7ebde729b",
-            MesosTask._transform_to_asgard_task_name(original_task_name),
+            MesosTask.transform_to_asgard_task_id(original_task_name),
         )
 
 

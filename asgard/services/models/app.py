@@ -5,6 +5,10 @@ from asgard.services.models import Model
 class App(Model, abc.ABC):
     _type: str
 
+    @abc.abstractstaticmethod
+    def transform_to_asgard_app_id(name: str) -> str:
+        raise NotImplementedError
+
 
 class AppFactory(Model):
     def __new__(cls, *args, **kwargs) -> App:
