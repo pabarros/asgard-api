@@ -2,7 +2,6 @@ from asgard.models import App
 
 
 class MesosApp(App):
-    _type: str = "MESOS"
     type: str = "MESOS"
     id: str
 

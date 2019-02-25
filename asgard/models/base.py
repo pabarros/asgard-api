@@ -11,10 +11,14 @@ class Model(PydanticBaseModel):
 
 class BaseModel(PydanticBaseModel):
     type: str
+    errors: Dict[str, str] = {}
+
+    def add_error(self, field_name, error_msg):
+        self.errors[field_name] = error_msg
 
 
 def ModelFactory(subclass_marker):
-    class _ModelFactory:
+    class _ModelFactory(PydanticBaseModel):
         def __new__(cls, *args, **kwargs):
             type_ = kwargs.pop("type")
             for subclass in subclass_marker.__subclasses__():

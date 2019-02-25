@@ -1,20 +1,11 @@
 import abc
-from .base import Model
+from .base import BaseModel, ModelFactory
 
 
-class App(Model, abc.ABC):
-    _type: str
-
+class App(BaseModel, abc.ABC):
     @abc.abstractstaticmethod
     def transform_to_asgard_app_id(name: str) -> str:
         raise NotImplementedError
 
 
-class AppFactory(Model):
-    def __new__(cls, *args, **kwargs) -> App:
-        type_ = kwargs.pop("type")
-        for subclass in App.__subclasses__():
-            if subclass._type == type_:
-                agent = subclass(*args, **kwargs)
-                return agent
-        raise ValueError(f"'{type_}' is an invalid App type. ")
+AppFactory = ModelFactory(App)

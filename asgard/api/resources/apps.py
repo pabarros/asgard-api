@@ -1,8 +1,9 @@
 from typing import List
 
-from asgard.models import Model
+from pydantic import BaseModel
+
 from asgard.models import AppFactory
 
 
-class AppsResource(Model):
+class AppsResource(BaseModel):
     apps: List[AppFactory] = []
