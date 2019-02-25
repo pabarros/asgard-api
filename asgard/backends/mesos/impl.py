@@ -42,7 +42,7 @@ class MesosBackend(Backend):
         agent_url = f"{mesos_leader_address}/slaves?slave_id={agent_id}"
         async with http_client.get(agent_url) as response:
             data = await response.json()
-            if len(data["slaves"]):
+            if data["slaves"]:
                 agent = MesosAgent(**data["slaves"][0])
                 if not agent.attr_has_value("owner", namespace):
                     return None
