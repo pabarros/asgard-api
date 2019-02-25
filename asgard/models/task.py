@@ -1,10 +1,8 @@
 import abc
-from .base import Model
+from .base import BaseModel
 
 
-class Task(Model, abc.ABC):
-    _type: str
-
+class Task(BaseModel, abc.ABC):
     @abc.abstractstaticmethod
     def transform_to_asgard_task_id(executor_id: str) -> str:
         raise NotImplementedError

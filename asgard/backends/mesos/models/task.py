@@ -2,8 +2,7 @@ from asgard.models import Task
 
 
 class MesosTask(Task):
-    _type: str = "MESOS"
-    typer: str = "MESOS"
+    type: str = "MESOS"
 
     name: str
 
