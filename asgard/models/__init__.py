@@ -1,4 +1,4 @@
-from .base import Model, BaseModel
+from .base import BaseModel
 
 
 from .task import Task

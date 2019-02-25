@@ -1,10 +1,9 @@
 from typing import List, Dict, Any
-from pydantic import validator
+from pydantic import validator, BaseModel
 
 from asgard.models import AgentFactory
-from asgard.models import Model
 
 
-class AgentsResource(Model):
+class AgentsResource(BaseModel):
     agents: List[AgentFactory] = []
     stats: Dict[str, Any] = {}

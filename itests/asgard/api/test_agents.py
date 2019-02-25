@@ -211,11 +211,7 @@ class AgentsApiEndpointTest(BaseTestCase):
             self.assertEqual(200, resp.status)
             data = await resp.json()
             self.assertEqual(
-                {
-                    "agents": [],
-                    "stats": {"cpu_pct": "0.00", "ram_pct": "0.00"},
-                    "errors": {},
-                },
+                {"agents": [], "stats": {"cpu_pct": "0.00", "ram_pct": "0.00"}},
                 data,
             )
 

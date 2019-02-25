@@ -1,13 +1,11 @@
 from typing import List
 import abc
-from .base import Model
+from .base import BaseModel, ModelFactory
 
 from asgard.models import App
 
 
-class Agent(Model, abc.ABC):
-    _type: str
-
+class Agent(BaseModel, abc.ABC):
     def has_attribute(self, attr_name):
         return attr_name in self.attributes
 
@@ -33,11 +31,4 @@ class Agent(Model, abc.ABC):
         raise NotImplementedError
 
 
-class AgentFactory(Model):
-    def __new__(cls, *args, **kwargs) -> Agent:
-        type_ = kwargs.pop("type")
-        for subclass in Agent.__subclasses__():
-            if subclass._type == type_:
-                agent = subclass(*args, **kwargs)
-                return agent
-        raise ValueError(f"'{type_}' is an invalid agent type. ")
+AgentFactory = ModelFactory(Agent)
