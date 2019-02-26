@@ -41,7 +41,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self.pg_data_mocker.add_data(
             Account,
             ["id", "name", "namespace", "owner"],
-            [[40, "Dev Team", "asgard-infra", "company"]],
+            [[40, "Dev Team", "infra", "asgard-infra"]],
         )
 
         self.pg_data_mocker.add_data(

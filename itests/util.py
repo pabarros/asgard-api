@@ -116,9 +116,9 @@ class BaseTestCase(TestCase):
             Account,
             ["id", "name", "namespace", "owner"],
             [
-                [10, "Dev Team", "dev", "company"],
-                [11, "Infra Team", "infra", "company"],
-                [12, "Other Team", "other", "company"],
+                [10, "Dev Team", "dev", "dev"],
+                [11, "Infra Team", "infra", "infra"],
+                [12, "Other Team", "other", "other"],
             ],
         )
 

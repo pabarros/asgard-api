@@ -42,7 +42,7 @@ def calculate_stats(agents):
 @app.route(["/agents"], type=RouteTypes.HTTP, methods=["GET"])
 @auth_required
 async def agents_handler(request: web.Request):
-    namespace = request["user"].current_account.namespace
+    namespace = request["user"].current_account.owner
     agents = await agents_service.get_agents(namespace=namespace, backend=mesos)
     stats = calculate_stats(agents)
     return web.json_response(AgentsResource(agents=agents, stats=stats).dict())
@@ -66,7 +66,7 @@ def apply_attr_filter(
 @app.route(["/agents/with-attrs"], type=RouteTypes.HTTP, methods=["GET"])
 @auth_required
 async def agents_with_attrs(request: web.Request):
-    namespace = request["user"].current_account.namespace
+    namespace = request["user"].current_account.owner
     filters = request.query.copy()
     filters.pop("account_id", None)
 
@@ -82,7 +82,7 @@ async def agents_with_attrs(request: web.Request):
 @app.route(["/agents/{agent_id}/apps"], type=RouteTypes.HTTP, methods=["GET"])
 @auth_required
 async def agent_apps(request: web.Request):
-    namespace = request["user"].current_account.namespace
+    namespace = request["user"].current_account.owner
     agent_id = request.match_info["agent_id"]
     apps = await agents_service.get_apps(
         namespace=namespace, agent_id=agent_id, backend=mesos
