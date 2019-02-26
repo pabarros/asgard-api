@@ -33,6 +33,8 @@ async def leader_address():
                     return f"http://{leader_ip}"
         except aiohttp.client_exceptions.ServerTimeoutError as timeout_error:
             pass
+        except aiohttp.client_exceptions.ClientConnectorError as connection_error:
+            pass
 
 
 def is_master_healthy(master_url):
