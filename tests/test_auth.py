@@ -65,6 +65,18 @@ class TestAuthentication(TestCase):
         )
         responses.add(
             method="GET",
+            url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/",
+            body=json.dumps({"apps": [fixture]}),
+            status=200,
+        )
+        responses.add(
+            method="GET",
+            url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//infra/",
+            body=json.dumps({"apps": [fixture]}),
+            status=200,
+        )
+        responses.add(
+            method="GET",
             url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//foo",
             body=json.dumps({"app": fixture}),
             status=200,

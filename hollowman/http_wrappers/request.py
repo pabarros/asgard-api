@@ -83,7 +83,11 @@ class Request(HTTPWrapper):
 
         if self.is_read_request():
             if self.is_list_apps_request():
-                apps = self.marathon_client.list_apps()
+                apps = list(
+                    self._get_original_group(
+                        self.request.user, self.object_id
+                    ).iterate_apps()
+                )
                 for app in apps:
                     yield self.merge_marathon_apps(MarathonApp(), app), app
             elif self.is_app_request():

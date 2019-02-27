@@ -217,6 +217,12 @@ class RequestHandlersTests(TestCase):
             with RequestsMock() as rsps:
                 rsps.add(
                     method="GET",
+                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/",
+                    body=json.dumps({"apps": []}),
+                    status=200,
+                )
+                rsps.add(
+                    method="GET",
                     url=conf.MARATHON_ADDRESSES[0] + "/v2/apps",
                     body=json.dumps({"apps": []}),
                     status=200,

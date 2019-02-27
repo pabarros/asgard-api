@@ -66,7 +66,7 @@ class SplitTests(TestCase):
             with RequestsMock() as rsps:
                 rsps.add(
                     method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps",
+                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/",
                     body=json.dumps(fixture),
                     status=200,
                 )
@@ -595,9 +595,9 @@ class JoinTests(TestCase):
             with RequestsMock() as rsps:
                 rsps.add(
                     method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps",
+                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/",
                     status=200,
-                    body="""{"apps":[]}""",
+                    body=json.dumps({"apps": []}),
                 )
                 apps = list(request.split())
                 joined_request = request.join(apps)

@@ -100,9 +100,6 @@ class SplitTests(unittest.TestCase):
             original_apps = [MarathonApp.from_json(app) for app in apps]
             client.get_app.side_effect = original_apps
             apps = list(response.split())
-            self.assertEqual(
-                [call("/foo"), call("/xablau")], client.get_app.call_args_list
-            )
 
         self.assertEqual(
             apps,

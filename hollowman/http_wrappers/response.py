@@ -28,12 +28,11 @@ class Response(HTTPWrapper):
         if self.is_read_request():
             response_content = json.loads(self.response.data)
             if self.is_list_apps_request():
-                for app in response_content["apps"]:
-                    response_app = AsgardApp.from_json(app)
-                    app = self.marathon_client.get_app(
-                        self.object_id or response_app.id
-                    )
-                    yield response_app, app
+                all_apps = list(
+                    AsgardAppGroup.from_json(response_content).iterate_apps()
+                )
+                for response_app in all_apps:
+                    yield response_app, response_app
                 return
             elif self.is_group_request():
                 response_group = AsgardAppGroup(
