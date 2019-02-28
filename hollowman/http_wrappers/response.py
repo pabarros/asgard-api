@@ -39,14 +39,7 @@ class Response(HTTPWrapper):
                     MarathonGroup.from_json(response_content)
                 )
                 for current_group in response_group.iterate_groups():
-                    group_id = current_group.id
-                    group_id_without_namespace = self._remove_namespace_if_exists(
-                        self.request.user.current_account.namespace, group_id
-                    )
-                    original_group = self._get_original_group(
-                        self.request.user, group_id_without_namespace
-                    )
-                    yield current_group, original_group
+                    yield current_group, current_group
                 return
             elif self.is_tasks_request():
                 for task in response_content["tasks"]:

@@ -59,42 +59,21 @@ class ResponsePipelineTest(unittest.TestCase):
                 status=HTTPStatus.OK,
                 headers={},
             )
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-b",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][1])
-                    ),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/groups//dev/group-b/group-b0",
-                    body=json.dumps(
-                        deepcopy(
-                            group_dev_namespace_fixture["groups"][1]["groups"][
-                                0
-                            ]
-                        )
-                    ),
-                    status=200,
-                )
 
-                response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch(
-                    user=self.user,
-                    request=response_wrapper,
-                    filters_pipeline={OperationType.READ: [DummyFilter()]},
-                    filter_method_name_callback=lambda *args: "response_group",
-                )
-                final_response_data = json.loads(final_response.data)
-                returned_group = MarathonGroup.from_json(final_response_data)
-                self.assertEqual("/dummy/dev/group-b", returned_group.id)
-                self.assertEqual(
-                    "/dummy/dev/group-b/group-b0", returned_group.groups[0].id
-                )
+            response_wrapper = Response(ctx.request, ok_response)
+            final_response = dispatch(
+                user=self.user,
+                request=response_wrapper,
+                filters_pipeline={OperationType.READ: [DummyFilter()]},
+                filter_method_name_callback=lambda *args: "response_group",
+            )
+            final_response_data = json.loads(final_response.data)
+            returned_group = MarathonGroup.from_json(final_response_data)
+
+            self.assertEqual("/dummy/dev/group-b", returned_group.id)
+            self.assertEqual(
+                "/dummy/dev/group-b/group-b0", returned_group.groups[0].id
+            )
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
     def test_filters_can_modify_all_apps_from_group_and_subgroups(
@@ -112,45 +91,23 @@ class ResponsePipelineTest(unittest.TestCase):
                 status=HTTPStatus.OK,
                 headers={},
             )
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-b",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][1])
-                    ),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/groups//dev/group-b/group-b0",
-                    body=json.dumps(
-                        deepcopy(
-                            group_dev_namespace_fixture["groups"][1]["groups"][
-                                0
-                            ]
-                        )
-                    ),
-                    status=200,
-                )
 
-                response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch(
-                    user=self.user,
-                    request=response_wrapper,
-                    filters_pipeline={OperationType.READ: [DummyFilter()]},
-                    filter_method_name_callback=lambda *args: "response_group",
-                )
-                final_response_data = json.loads(final_response.data)
-                returned_group = MarathonGroup.from_json(final_response_data)
-                self.assertEqual(
-                    "/dummy/dev/group-b/appb0", returned_group.apps[0].id
-                )
-                self.assertEqual(
-                    "/dummy/dev/group-b/group-b0/app0",
-                    returned_group.groups[0].apps[0].id,
-                )
+            response_wrapper = Response(ctx.request, ok_response)
+            final_response = dispatch(
+                user=self.user,
+                request=response_wrapper,
+                filters_pipeline={OperationType.READ: [DummyFilter()]},
+                filter_method_name_callback=lambda *args: "response_group",
+            )
+            final_response_data = json.loads(final_response.data)
+            returned_group = MarathonGroup.from_json(final_response_data)
+            self.assertEqual(
+                "/dummy/dev/group-b/appb0", returned_group.apps[0].id
+            )
+            self.assertEqual(
+                "/dummy/dev/group-b/group-b0/app0",
+                returned_group.groups[0].apps[0].id,
+            )
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
     def test_changes_from_all_filters_are_persisted_after_response_join(
@@ -170,48 +127,26 @@ class ResponsePipelineTest(unittest.TestCase):
                 status=HTTPStatus.OK,
                 headers={},
             )
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-b",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][1])
-                    ),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/groups//dev/group-b/group-b0",
-                    body=json.dumps(
-                        deepcopy(
-                            group_dev_namespace_fixture["groups"][1]["groups"][
-                                0
-                            ]
-                        )
-                    ),
-                    status=200,
-                )
 
-                ctx.request.user = self.user
-                response_wrapper = Response(ctx.request, ok_response)
-                final_response = dispatch(
-                    user=self.user,
-                    request=response_wrapper,
-                    filters_pipeline={
-                        OperationType.READ: [DummyFilter(), FooFilter()]
-                    },
-                    filter_method_name_callback=lambda *args: "response_group",
-                )
-                final_response_data = json.loads(final_response.data)
-                returned_group = MarathonGroup.from_json(final_response_data)
-                self.assertEqual(
-                    "/foo/dummy/dev/group-b/appb0", returned_group.apps[0].id
-                )
-                self.assertEqual(
-                    "/foo/dummy/dev/group-b/group-b0/app0",
-                    returned_group.groups[0].apps[0].id,
-                )
+            ctx.request.user = self.user
+            response_wrapper = Response(ctx.request, ok_response)
+            final_response = dispatch(
+                user=self.user,
+                request=response_wrapper,
+                filters_pipeline={
+                    OperationType.READ: [DummyFilter(), FooFilter()]
+                },
+                filter_method_name_callback=lambda *args: "response_group",
+            )
+            final_response_data = json.loads(final_response.data)
+            returned_group = MarathonGroup.from_json(final_response_data)
+            self.assertEqual(
+                "/foo/dummy/dev/group-b/appb0", returned_group.apps[0].id
+            )
+            self.assertEqual(
+                "/foo/dummy/dev/group-b/group-b0/app0",
+                returned_group.groups[0].apps[0].id,
+            )
 
     @unittest.skip(
         "Temos que decidir se vamos retornar o group com minimal=True ou False"

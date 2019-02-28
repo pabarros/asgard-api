@@ -136,63 +136,19 @@ class SplitTests(unittest.TestCase):
                 status=HTTPStatus.OK,
                 headers={},
             )
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/",
-                    body=json.dumps(deepcopy(group_dev_namespace_fixture)),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/a",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][0])
-                    ),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-b",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][1])
-                    ),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/groups//dev/group-b/group-b0",
-                    body=json.dumps(
-                        deepcopy(
-                            group_dev_namespace_fixture["groups"][1]["groups"][
-                                0
-                            ]
-                        )
-                    ),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-c",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][2])
-                    ),
-                    status=200,
-                )
 
-                ctx.request.user = self.user
-                response = Response(ctx.request, response)
-                groups_tuple = list(response.split())
-                self.assertEqual(5, len(groups_tuple))
-                expected_groups = [
-                    AsgardAppGroup(g)
-                    for g in AsgardAppGroup(
-                        MarathonGroup.from_json(group_dev_namespace_fixture)
-                    ).iterate_groups()
-                ]
-                # Compara com os groups originais
-                self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            groups_tuple = list(response.split())
+            self.assertEqual(5, len(groups_tuple))
+            expected_groups = [
+                AsgardAppGroup(g)
+                for g in AsgardAppGroup(
+                    MarathonGroup.from_json(group_dev_namespace_fixture)
+                ).iterate_groups()
+            ]
+            # Compara com os groups originais
+            self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
     @with_json_fixture("../fixtures/group_dev_namespace_with_apps.json")
     def test_split_group_nonroot_empty_group(self, group_dev_namespace_fixture):
@@ -204,30 +160,21 @@ class SplitTests(unittest.TestCase):
                 status=HTTPStatus.OK,
                 headers={},
             )
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-c",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][2])
-                    ),
-                    status=200,
-                )
 
-                ctx.request.user = self.user
-                response = Response(ctx.request, response)
-                groups_tuple = list(response.split())
-                self.assertEqual(1, len(groups_tuple))
-                expected_groups = [
-                    AsgardAppGroup(g)
-                    for g in AsgardAppGroup(
-                        MarathonGroup.from_json(
-                            group_dev_namespace_fixture["groups"][2]
-                        )
-                    ).iterate_groups()
-                ]
-                # Compara com os groups originais
-                self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            groups_tuple = list(response.split())
+            self.assertEqual(1, len(groups_tuple))
+            expected_groups = [
+                AsgardAppGroup(g)
+                for g in AsgardAppGroup(
+                    MarathonGroup.from_json(
+                        group_dev_namespace_fixture["groups"][2]
+                    )
+                ).iterate_groups()
+            ]
+            # Compara com os groups originais
+            self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
     @unittest.skip("A ser implementado")
     def test_split_groups_write_PUT_on_group(self):
@@ -245,43 +192,20 @@ class SplitTests(unittest.TestCase):
                 status=HTTPStatus.OK,
                 headers={},
             )
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-b",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][1])
-                    ),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/groups//dev/group-b/group-b0",
-                    body=json.dumps(
-                        deepcopy(
-                            group_dev_namespace_fixture["groups"][1]["groups"][
-                                0
-                            ]
-                        )
-                    ),
-                    status=200,
-                )
-
-                ctx.request.user = self.user
-                response = Response(ctx.request, response)
-                groups_tuple = list(response.split())
-                self.assertEqual(2, len(groups_tuple))
-                expected_groups = [
-                    AsgardAppGroup(g)
-                    for g in AsgardAppGroup(
-                        MarathonGroup.from_json(
-                            group_dev_namespace_fixture["groups"][1]
-                        )
-                    ).iterate_groups()
-                ]
-                # Compara com os groups originais
-                self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            groups_tuple = list(response.split())
+            self.assertEqual(2, len(groups_tuple))
+            expected_groups = [
+                AsgardAppGroup(g)
+                for g in AsgardAppGroup(
+                    MarathonGroup.from_json(
+                        group_dev_namespace_fixture["groups"][1]
+                    )
+                ).iterate_groups()
+            ]
+            # Compara com os groups originais
+            self.assertEqual(expected_groups, [g[1] for g in groups_tuple])
 
     @with_json_fixture("../fixtures/tasks/get.json")
     def test_split_tasks_GET(self, tasks_get_fixture):
@@ -500,42 +424,24 @@ class JoinTests(unittest.TestCase):
                 status=HTTPStatus.OK,
                 headers={},
             )
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/",
-                    body=json.dumps(deepcopy(group_dev_namespace_fixture)),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/group-b",
-                    body=json.dumps(
-                        deepcopy(group_dev_namespace_fixture["groups"][0])
-                    ),
-                    status=200,
-                )
 
-                ctx.request.user = self.user
-                response = Response(ctx.request, response)
-                groups_tuple = list(response.split())
-                joined_response = response.join(groups_tuple)
+            ctx.request.user = self.user
+            response = Response(ctx.request, response)
+            groups_tuple = list(response.split())
+            joined_response = response.join(groups_tuple)
 
-                joined_response_data = json.loads(joined_response.data)
-                self.assertEqual("/dev", joined_response_data["id"])
-                self.assertEqual(
-                    "/dev/group-b", joined_response_data["groups"][0]["id"]
-                )
-                self.assertEqual(
-                    [], joined_response_data["dependencies"]
-                )  # Groups should be reendered in full
-                self.assertEqual(
-                    1, len(joined_response_data["groups"][0]["apps"])
-                )
-                self.assertEqual(
-                    [],
-                    joined_response_data["groups"][0]["apps"][0]["constraints"],
-                )  # Apps should also be renderen in full
+            joined_response_data = json.loads(joined_response.data)
+            self.assertEqual("/dev", joined_response_data["id"])
+            self.assertEqual(
+                "/dev/group-b", joined_response_data["groups"][0]["id"]
+            )
+            self.assertEqual(
+                [], joined_response_data["dependencies"]
+            )  # Groups should be reendered in full
+            self.assertEqual(1, len(joined_response_data["groups"][0]["apps"]))
+            self.assertEqual(
+                [], joined_response_data["groups"][0]["apps"][0]["constraints"]
+            )  # Apps should also be renderen in full
 
     @with_json_fixture("../fixtures/tasks/get_single_namespace.json")
     def test_join_tasks_GET(self, tasks_single_namespace_fixture):
