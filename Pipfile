@@ -26,6 +26,7 @@ pydantic = "==0.14"
 aiohttp-cors = "==0.7.0"
 async-worker = "==0.8.0"
 python-dateutil = "==2.8.0"
+pytz = "==2018.4"
 
 [dev-packages]
 ipdb = "==0.11"
