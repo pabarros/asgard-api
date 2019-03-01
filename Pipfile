@@ -25,6 +25,7 @@ requests-oauthlib = "==1.1.0"
 pydantic = "==0.14"
 aiohttp-cors = "==0.7.0"
 async-worker = "==0.8.0"
+python-dateutil = "==2.8.0"
 
 [dev-packages]
 ipdb = "==0.11"
