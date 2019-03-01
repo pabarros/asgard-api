@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.81.0
+ * Removidas chamadas desnecessárias à API do Marathon nos requests GET /v2/apps e GET /v2/groups
+
 ### 0.80.0
  * Adicionando ConnectTimeout nos requests para o Marathon (python síncrono)
  * Implementação dos endpoints `/agents/*`
