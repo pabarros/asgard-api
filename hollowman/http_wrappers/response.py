@@ -28,26 +28,18 @@ class Response(HTTPWrapper):
         if self.is_read_request():
             response_content = json.loads(self.response.data)
             if self.is_list_apps_request():
-                for app in response_content["apps"]:
-                    response_app = AsgardApp.from_json(app)
-                    app = self.marathon_client.get_app(
-                        self.object_id or response_app.id
-                    )
-                    yield response_app, app
+                all_apps = list(
+                    AsgardAppGroup.from_json(response_content).iterate_apps()
+                )
+                for response_app in all_apps:
+                    yield response_app, response_app
                 return
             elif self.is_group_request():
                 response_group = AsgardAppGroup(
                     MarathonGroup.from_json(response_content)
                 )
                 for current_group in response_group.iterate_groups():
-                    group_id = current_group.id
-                    group_id_without_namespace = self._remove_namespace_if_exists(
-                        self.request.user.current_account.namespace, group_id
-                    )
-                    original_group = self._get_original_group(
-                        self.request.user, group_id_without_namespace
-                    )
-                    yield current_group, original_group
+                    yield current_group, current_group
                 return
             elif self.is_tasks_request():
                 for task in response_content["tasks"]:

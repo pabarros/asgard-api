@@ -163,19 +163,6 @@ class RequestHandlersTests(TestCase):
                     ),
                     status=200,
                 )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/groups//dev/group-b/group-b0",
-                    body=json.dumps(
-                        deepcopy(
-                            group_dev_namespace_fixture["groups"][1]["groups"][
-                                0
-                            ]
-                        )
-                    ),
-                    status=200,
-                )
                 response = client.get("/v2/groups/group-b", headers=auth_header)
                 self.assertEqual(200, response.status_code)
                 self.assertEqual("/group-b", json.loads(response.data)["id"])
@@ -215,6 +202,12 @@ class RequestHandlersTests(TestCase):
         }
         with application.test_client() as client:
             with RequestsMock() as rsps:
+                rsps.add(
+                    method="GET",
+                    url=conf.MARATHON_ADDRESSES[0] + "/v2/groups//dev/",
+                    body=json.dumps({"apps": []}),
+                    status=200,
+                )
                 rsps.add(
                     method="GET",
                     url=conf.MARATHON_ADDRESSES[0] + "/v2/apps",

@@ -74,41 +74,27 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_two = deepcopy(self.single_full_app_fixture)
             single_full_app_two["id"] = "/dev/other-app"
 
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//dev/foo",
-                    body=json.dumps({"app": single_full_app_one}),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//dev/other-app",
-                    body=json.dumps({"app": single_full_app_two}),
-                    status=200,
-                )
+            original_response = FlaskResponse(
+                response=json.dumps(
+                    {"apps": [single_full_app_one, single_full_app_two]}
+                ),
+                status=200,
+                headers={},
+            )
 
-                original_response = FlaskResponse(
-                    response=json.dumps(
-                        {"apps": [single_full_app_one, single_full_app_two]}
-                    ),
-                    status=200,
-                    headers={},
-                )
-
-                ctx.request.user = self.user
-                response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch(
-                    user=self.user,
-                    request=response_wrapper,
-                    filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
-                    filter_method_name_callback=lambda *args: "response",
-                )
-                response_data = json.loads(final_response.data)
-                self.assertEqual(200, final_response.status_code)
-                self.assertEqual(2, len(response_data["apps"]))
-                self.assertEqual("/foo", response_data["apps"][0]["id"])
-                self.assertEqual("/other-app", response_data["apps"][1]["id"])
+            ctx.request.user = self.user
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch(
+                user=self.user,
+                request=response_wrapper,
+                filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                filter_method_name_callback=lambda *args: "response",
+            )
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(2, len(response_data["apps"]))
+            self.assertEqual("/foo", response_data["apps"][0]["id"])
+            self.assertEqual("/other-app", response_data["apps"][1]["id"])
 
     def test_response_apps_remove_outside_current_namespace(self):
         with application.test_request_context("/v2/apps/", method="GET") as ctx:
@@ -121,54 +107,33 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_three = deepcopy(self.single_full_app_fixture)
             single_full_app_three["id"] = "/othernamespace/other-app"
 
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//dev/foo",
-                    body=json.dumps({"app": single_full_app_one}),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//dev/other-app",
-                    body=json.dumps({"app": single_full_app_two}),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/apps//othernamespace/other-app",
-                    body=json.dumps({"app": single_full_app_three}),
-                    status=200,
-                )
+            original_response = FlaskResponse(
+                response=json.dumps(
+                    {
+                        "apps": [
+                            single_full_app_one,
+                            single_full_app_two,
+                            single_full_app_three,
+                        ]
+                    }
+                ),
+                status=200,
+                headers={},
+            )
 
-                original_response = FlaskResponse(
-                    response=json.dumps(
-                        {
-                            "apps": [
-                                single_full_app_one,
-                                single_full_app_two,
-                                single_full_app_three,
-                            ]
-                        }
-                    ),
-                    status=200,
-                    headers={},
-                )
-
-                ctx.request.user = self.user
-                response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch(
-                    user=self.user,
-                    request=response_wrapper,
-                    filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
-                    filter_method_name_callback=lambda *args: "response",
-                )
-                response_data = json.loads(final_response.data)
-                self.assertEqual(200, final_response.status_code)
-                self.assertEqual(2, len(response_data["apps"]))
-                self.assertEqual("/foo", response_data["apps"][0]["id"])
-                self.assertEqual("/other-app", response_data["apps"][1]["id"])
+            ctx.request.user = self.user
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch(
+                user=self.user,
+                request=response_wrapper,
+                filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                filter_method_name_callback=lambda *args: "response",
+            )
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(2, len(response_data["apps"]))
+            self.assertEqual("/foo", response_data["apps"][0]["id"])
+            self.assertEqual("/other-app", response_data["apps"][1]["id"])
 
     def test_remove_from_response_apps_outside_same_prefix_namespace(self):
         """
@@ -185,56 +150,35 @@ class ResponsePipelineTest(unittest.TestCase):
             single_full_app_three = deepcopy(self.single_full_app_fixture)
             single_full_app_three["id"] = "/developers/other-app"
 
-            with RequestsMock() as rsps:
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//dev/foo",
-                    body=json.dumps({"app": single_full_app_one}),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//dev/other-app",
-                    body=json.dumps({"app": single_full_app_two}),
-                    status=200,
-                )
-                rsps.add(
-                    method="GET",
-                    url=conf.MARATHON_ADDRESSES[0]
-                    + "/v2/apps//developers/other-app",
-                    body=json.dumps({"app": single_full_app_three}),
-                    status=200,
-                )
+            original_response = FlaskResponse(
+                response=json.dumps(
+                    {
+                        "apps": [
+                            single_full_app_one,
+                            single_full_app_two,
+                            single_full_app_three,
+                        ]
+                    }
+                ),
+                status=200,
+                headers={},
+            )
 
-                original_response = FlaskResponse(
-                    response=json.dumps(
-                        {
-                            "apps": [
-                                single_full_app_one,
-                                single_full_app_two,
-                                single_full_app_three,
-                            ]
-                        }
-                    ),
-                    status=200,
-                    headers={},
-                )
-
-                ctx.request.user = self.user
-                response_wrapper = Response(ctx.request, original_response)
-                final_response = dispatch(
-                    user=self.user,
-                    request=response_wrapper,
-                    filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
-                    filter_method_name_callback=lambda *args: "response",
-                )
-                response_data = json.loads(final_response.data)
-                self.assertEqual(200, final_response.status_code)
-                self.assertEqual(2, len(response_data["apps"]))
-                self.assertEqual(
-                    ["/foo", "/other-app"],
-                    [app["id"] for app in response_data["apps"]],
-                )
+            ctx.request.user = self.user
+            response_wrapper = Response(ctx.request, original_response)
+            final_response = dispatch(
+                user=self.user,
+                request=response_wrapper,
+                filters_pipeline=FILTERS_PIPELINE[FilterType.RESPONSE],
+                filter_method_name_callback=lambda *args: "response",
+            )
+            response_data = json.loads(final_response.data)
+            self.assertEqual(200, final_response.status_code)
+            self.assertEqual(2, len(response_data["apps"]))
+            self.assertEqual(
+                ["/foo", "/other-app"],
+                [app["id"] for app in response_data["apps"]],
+            )
 
     def test_do_not_call_filter_if_it_doesnt_implement_response_method(self):
         class DummyRequestFilter:

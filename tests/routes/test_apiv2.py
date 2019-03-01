@@ -75,8 +75,9 @@ class TestAuthentication(TestCase):
                 )
                 rsps.add(
                     method="GET",
-                    url=conf.MARATHON_ADDRESSES[0] + "/v2/apps//foo",
-                    body=json.dumps({"app": fixture}),
+                    url=conf.MARATHON_ADDRESSES[0]
+                    + f"/v2/groups//{self.normal_user.accounts[0].namespace}/",
+                    body=json.dumps({"apps": [fixture]}),
                     status=200,
                 )
                 r = test_client.get("/v2/apps", headers=auth_header)
