@@ -12,6 +12,7 @@ install:
 script:
   - pipenv run lint
   - pipenv run fmt-check
+  - pipenv run isort-check
   - pipenv run all-tests
 after_success:
   - codecov
