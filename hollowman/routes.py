@@ -1,8 +1,15 @@
 import json
 
 import requests
-from flask import (Response, make_response, redirect, render_template, request,
-                   session, url_for)
+from flask import (
+    Response,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from hollowman import conf, http_wrappers, request_handlers, upstream
 from hollowman.app import application
@@ -11,8 +18,10 @@ from hollowman.auth.google import google_oauth2
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from hollowman.decorators import auth_required
 from hollowman.log import logger
-from hollowman.plugins import (get_plugin_registry_data,
-                               get_pulgin_load_status_data)
+from hollowman.plugins import (
+    get_plugin_registry_data,
+    get_pulgin_load_status_data,
+)
 
 
 def raw_proxy():

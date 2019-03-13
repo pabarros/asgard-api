@@ -4,8 +4,11 @@ from copy import deepcopy
 
 import responses
 from flask import Response as FlaskResponse
-from marathon.models import (MarathonConstraint, MarathonHealthCheck,
-                             MarathonTask)
+from marathon.models import (
+    MarathonConstraint,
+    MarathonHealthCheck,
+    MarathonTask,
+)
 from marathon.models.app import MarathonApp, MarathonUpgradeStrategy
 from mock import patch
 

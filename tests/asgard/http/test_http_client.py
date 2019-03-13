@@ -4,8 +4,11 @@ import asynctest
 from asynctest import mock
 from asynctest.mock import CoroutineMock, Mock, call
 
-from asgard.http.client import (_HttpClient, _HttpClientMaker,
-                                default_http_client_timeout)
+from asgard.http.client import (
+    _HttpClient,
+    _HttpClientMaker,
+    default_http_client_timeout,
+)
 
 
 class HttpClientTest(asynctest.TestCase):

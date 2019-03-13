@@ -6,8 +6,11 @@ import jwt
 from alchemytools.context import managed
 from flask import make_response, request, session
 
-from hollowman.auth import (_get_account_by_id, _get_user_by_authkey,
-                            _get_user_by_email)
+from hollowman.auth import (
+    _get_account_by_id,
+    _get_user_by_authkey,
+    _get_user_by_email,
+)
 from hollowman.conf import SECRET_KEY
 from hollowman.log import logger
 from hollowman.models import HollowmanSession, User

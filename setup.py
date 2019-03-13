@@ -2,7 +2,9 @@ from codecs import open  # To use a consistent encoding
 from os import path
 
 from setuptools import (  # Always prefer setuptools over distutils
-    find_packages, setup)
+    find_packages,
+    setup,
+)
 
 here = path.abspath(path.dirname(__file__))
 

@@ -79,9 +79,6 @@ class PgDataMocker:
             table.schema = original_schema
 
 
-
-
-
 class BaseTestCase(TestCase):
     async def setUp(self):
         with mock.patch.object(

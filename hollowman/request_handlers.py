@@ -8,8 +8,11 @@ from werkzeug.utils import cached_property
 
 from hollowman import conf, http_wrappers, upstream
 from hollowman.dispatcher import FILTERS_PIPELINE, dispatch
-from hollowman.hollowman_flask import (FilterType, HollowmanRequest,
-                                       OperationType)
+from hollowman.hollowman_flask import (
+    FilterType,
+    HollowmanRequest,
+    OperationType,
+)
 from hollowman.http_wrappers.base import RequestResource
 from hollowman.models import User
 

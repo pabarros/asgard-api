@@ -17,8 +17,12 @@ from hollowman import cache
 from hollowman.api.account import account_blueprint
 from hollowman.api.tasks import tasks_blueprint
 from hollowman.auth.jwt import jwt_auth
-from hollowman.conf import (CORS_WHITELIST, NEW_RELIC_APP_NAME,
-                            NEW_RELIC_LICENSE_KEY, SECRET_KEY)
+from hollowman.conf import (
+    CORS_WHITELIST,
+    NEW_RELIC_APP_NAME,
+    NEW_RELIC_LICENSE_KEY,
+    SECRET_KEY,
+)
 from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.log import dev_null_logger, logger
 from hollowman.metrics.zk.routes import zk_metrics_blueprint
@@ -89,7 +93,6 @@ def handler_500(error):
     request.current_exception = current_exception
 
     return Response(response=json.dumps(current_exception), status=500)
-
 
 
 marathon.log = dev_null_logger

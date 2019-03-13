@@ -4,7 +4,6 @@ from unittest import TestCase
 from flask import request
 
 from hollowman.app import application
-# from flask.wrappers import Request
 from hollowman.hollowman_flask import OperationType
 
 

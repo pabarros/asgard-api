@@ -15,8 +15,11 @@ from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.filters.transformjson import TransformJSONFilter
 from hollowman.filters.trim import TrimRequestFilter
 from hollowman.filters.uri import AddURIFilter
-from hollowman.hollowman_flask import (FilterType, HollowmanRequest,
-                                       OperationType)
+from hollowman.hollowman_flask import (
+    FilterType,
+    HollowmanRequest,
+    OperationType,
+)
 from hollowman.http_wrappers import Request
 from hollowman.http_wrappers.base import RequestResource
 from hollowman.http_wrappers.response import Response

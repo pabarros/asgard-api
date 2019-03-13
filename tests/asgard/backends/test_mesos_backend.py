@@ -7,8 +7,12 @@ import asgard.backends
 import asgard.sdk.mesos
 from asgard.backends.mesos import MesosBackend
 from tests.conf import TEST_MESOS_ADDRESS
-from tests.utils import (ClusterOptions, add_agent_running_tasks,
-                         build_mesos_cluster, get_fixture)
+from tests.utils import (
+    ClusterOptions,
+    add_agent_running_tasks,
+    build_mesos_cluster,
+    get_fixture,
+)
 
 
 class MesosBackendTest(TestCase):
