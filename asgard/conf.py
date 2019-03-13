@@ -15,3 +15,6 @@ ASGARD_HTTP_CLIENT_TOTAL_TIMEOUT = int(
 # Configs que foram migradas do pacote `hollowman.conf`.
 # Depois vamos mudar o prefixo de `HOLLOWMAN_` para `ASGARD_`
 SECRET_KEY = os.getenv("HOLLOWMAN_SECRET_KEY", "secret")
+TASK_FILEREAD_MAX_OFFSET: int = int(
+    os.getenv("ASGARD_TASK_FILEREAD_MAX_OFFSET", 52_428_800)
+)
