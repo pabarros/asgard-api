@@ -56,5 +56,5 @@ all-tests = "py.test -sv --cov=hollowman --cov=asgard --cov-report term-missing 
 lint = "mypy asgard --ignore-missing-imports"
 fmt = "black --py36 -v --line-length 80 ."
 fmt-check = "black --py36 --line-length 80 --check ."
-isort-check = "isort --recursive --line-width 80 --check-only ."
-isort = "isort --recursive --line-width 80 --apply ."
+isort-check = "isort --check-only --recursive --line-width 80 --use-parentheses --no-inline-sort --multi-line 3 --trailing-comma ."
+isort = "isort --apply --recursive --line-width 80 --use-parentheses --no-inline-sort --multi-line 3 --trailing-comma ."
