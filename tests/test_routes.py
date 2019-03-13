@@ -1,12 +1,12 @@
 import unittest
-from mock import patch
+
 from flask import Response
+from mock import patch
 
 import hollowman.routes
-from hollowman.app import application
 from hollowman import decorators
-from hollowman.models import User, Account, HollowmanSession
-
+from hollowman.app import application
+from hollowman.models import Account, HollowmanSession, User
 from tests import rebuild_schema
 
 

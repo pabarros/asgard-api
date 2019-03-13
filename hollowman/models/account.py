@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from sqlalchemy import Column, Integer, String, Sequence
+from sqlalchemy import Column, Integer, Sequence, String
 from sqlalchemy.orm import relationship
 
 from hollowman.models import BaseModel

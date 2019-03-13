@@ -1,7 +1,7 @@
-from flask import Flask, Request
+from enum import Enum, auto
 from json import loads
 
-from enum import Enum, auto
+from flask import Flask, Request
 
 
 class OperationType(Enum):

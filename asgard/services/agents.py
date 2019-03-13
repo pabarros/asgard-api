@@ -1,9 +1,6 @@
 from typing import List
 
-
-from asgard.models import Agent
-from asgard.models import App
-from asgard.models import Task
+from asgard.models import Agent, App, Task
 
 
 class AgentsService:

@@ -1,8 +1,8 @@
-import asynctest
 import os
-from asynctest import mock
 from importlib import reload
 
+import asynctest
+from asynctest import mock
 
 from asgard import conf
 

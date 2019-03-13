@@ -1,21 +1,19 @@
-import unittest
 import json
+import unittest
+from http import HTTPStatus
 from itertools import chain
 
 from flask import Response as FlaskResponse
 from marathon.models import MarathonDeployment
 from marathon.models.group import MarathonGroup
-from marathon.models.task import MarathonTask
 from marathon.models.queue import MarathonQueueItem
-
-from http import HTTPStatus
-
+from marathon.models.task import MarathonTask
 
 from hollowman.app import application
-from hollowman.models import Account, User
-from hollowman.marathonapp import AsgardApp
 from hollowman.filters.namespace import NameSpaceFilter
 from hollowman.http_wrappers.response import Response
+from hollowman.marathonapp import AsgardApp
+from hollowman.models import Account, User
 from tests.utils import with_json_fixture
 
 

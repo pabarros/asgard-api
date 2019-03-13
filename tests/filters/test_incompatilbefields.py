@@ -1,9 +1,8 @@
 import unittest
 
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
-from hollowman.marathonapp import AsgardApp
 from hollowman.http_wrappers.request import Request
-
+from hollowman.marathonapp import AsgardApp
 from tests.utils import with_json_fixture
 
 

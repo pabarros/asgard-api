@@ -1,21 +1,19 @@
-from typing import List, Type, Dict, Any
 from decimal import Decimal
-from asgard.app import app
+from typing import Any, Dict, List, Type
+
+import aiohttp_cors
+from aiohttp import web
 from asyncworker import RouteTypes
 from asyncworker.conf import settings
-from aiohttp import web
-import aiohttp_cors
-
-
-from asgard.math import round_up
-from asgard.services import agents_service
-from asgard.backends import mesos
-from asgard.http.auth import auth_required
-
-from asgard.models import Agent
 
 from asgard.api.resources.agents import AgentsResource
 from asgard.api.resources.apps import AppsResource
+from asgard.app import app
+from asgard.backends import mesos
+from asgard.http.auth import auth_required
+from asgard.math import round_up
+from asgard.models import Agent
+from asgard.services import agents_service
 
 
 def calculate_stats(agents):

@@ -1,32 +1,28 @@
 # encoding: utf-8
 
-from datetime import timedelta
 import json
-import traceback
-import sys
 import os
+import sys
+import traceback
+from datetime import timedelta
 
+import marathon
 import newrelic.agent
-
-from flask import request, Blueprint, Response
-from flask_cors import CORS
 import pkg_resources
+from flask import Blueprint, Response, request
+from flask_cors import CORS
 
-from hollowman.hollowman_flask import HollowmanFlask
-from hollowman.conf import (
-    SECRET_KEY,
-    CORS_WHITELIST,
-    NEW_RELIC_LICENSE_KEY,
-    NEW_RELIC_APP_NAME,
-)
-from hollowman.log import logger, dev_null_logger
-from hollowman.plugins import register_plugin
-from hollowman.auth.jwt import jwt_auth
-from hollowman.metrics.zk.routes import zk_metrics_blueprint
+import hollowman.routes
+from hollowman import cache
 from hollowman.api.account import account_blueprint
 from hollowman.api.tasks import tasks_blueprint
-from hollowman.plugins import load_all_metrics_plugins
-from hollowman import cache
+from hollowman.auth.jwt import jwt_auth
+from hollowman.conf import (CORS_WHITELIST, NEW_RELIC_APP_NAME,
+                            NEW_RELIC_LICENSE_KEY, SECRET_KEY)
+from hollowman.hollowman_flask import HollowmanFlask
+from hollowman.log import dev_null_logger, logger
+from hollowman.metrics.zk.routes import zk_metrics_blueprint
+from hollowman.plugins import load_all_metrics_plugins, register_plugin
 
 if NEW_RELIC_LICENSE_KEY and NEW_RELIC_APP_NAME:
     newrelic.agent.initialize()
@@ -95,11 +91,9 @@ def handler_500(error):
     return Response(response=json.dumps(current_exception), status=500)
 
 
-import marathon
 
 marathon.log = dev_null_logger
 
-import hollowman.routes
 
 register_plugin("example-plugin")
 register_plugin("session-checker-plugin")

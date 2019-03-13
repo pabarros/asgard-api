@@ -1,20 +1,16 @@
-from functools import wraps
+import json
 from collections import defaultdict
+from functools import wraps
 
 import jwt
-import json
-from flask import request, make_response, session
 from alchemytools.context import managed
+from flask import make_response, request, session
 
+from hollowman.auth import (_get_account_by_id, _get_user_by_authkey,
+                            _get_user_by_email)
 from hollowman.conf import SECRET_KEY
-from hollowman.models import HollowmanSession, User
 from hollowman.log import logger
-from hollowman.auth import (
-    _get_user_by_email,
-    _get_user_by_authkey,
-    _get_account_by_id,
-)
-
+from hollowman.models import HollowmanSession, User
 
 invalid_token_response_body = json.dumps(
     {"msg": "Authorization token is invalid"}

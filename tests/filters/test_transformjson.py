@@ -1,11 +1,10 @@
 import os
-
 import unittest
 from unittest import mock
 
+from hollowman.app import application
 from hollowman.filters.transformjson import TransformJSONFilter
 from hollowman.marathonapp import AsgardApp
-from hollowman.app import application
 from tests.utils import with_json_fixture
 
 

@@ -1,23 +1,20 @@
+import json
 from typing import Dict
+from unittest import TestCase
+from unittest.mock import NonCallableMock, patch
 
 import jwt
-import json
-
-from unittest import TestCase
-from unittest.mock import patch, NonCallableMock
-
 from flask import Response
 from requests.models import Response as RequestsResponse
 from requests.structures import CaseInsensitiveDict
 from responses import RequestsMock
 
-from hollowman.app import application
 from hollowman import conf
+from hollowman.app import application
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
+from hollowman.models import Account, HollowmanSession, User
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
-
-from hollowman.models import HollowmanSession, User, Account
 
 
 class TestAuthentication(TestCase):

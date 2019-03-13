@@ -1,10 +1,10 @@
-import requests
-import aiohttp
-
 from http import HTTPStatus
 
-from asgard.sdk.options import get_option
+import aiohttp
+import requests
+
 from asgard.http.client import http_client
+from asgard.sdk.options import get_option
 
 
 def get_mesos_leader_address():

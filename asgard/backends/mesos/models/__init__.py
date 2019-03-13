@@ -1,3 +1,3 @@
-from .task import MesosTask
-from .app import MesosApp
 from .agent import MesosAgent
+from .app import MesosApp
+from .task import MesosTask

@@ -1,20 +1,18 @@
 import json
+import unittest
+from copy import deepcopy
+from http import HTTPStatus
+
 from flask import Response as FlaskResponse
 from marathon.models.group import MarathonGroup
 from responses import RequestsMock
 
-
-import unittest
-from http import HTTPStatus
-from copy import deepcopy
-
-
 from hollowman import conf
-from hollowman.http_wrappers.response import Response
-from hollowman.hollowman_flask import OperationType
-from hollowman.models import User, Account
 from hollowman.app import application
 from hollowman.dispatcher import dispatch
+from hollowman.hollowman_flask import OperationType
+from hollowman.http_wrappers.response import Response
+from hollowman.models import Account, User
 from tests.utils import with_json_fixture
 
 

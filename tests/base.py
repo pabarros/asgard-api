@@ -3,7 +3,7 @@ from unittest.mock import patch
 from flask import Response
 
 import hollowman
-from hollowman.models import HollowmanSession, User, Account
+from hollowman.models import Account, HollowmanSession, User
 from tests import rebuild_schema
 
 

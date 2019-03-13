@@ -1,8 +1,9 @@
-from typing import List
 import abc
-from .base import BaseModel, ModelFactory
+from typing import List
 
 from asgard.models import App
+
+from .base import BaseModel, ModelFactory
 
 
 class Agent(BaseModel, abc.ABC):

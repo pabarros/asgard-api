@@ -1,27 +1,23 @@
-from flask import Response as FlaskResponse
-from copy import deepcopy
-import unittest
 import json
+import unittest
+from copy import deepcopy
+
 import responses
+from flask import Response as FlaskResponse
+from marathon.models import (MarathonConstraint, MarathonHealthCheck,
+                             MarathonTask)
+from marathon.models.app import MarathonApp, MarathonUpgradeStrategy
 from mock import patch
 
-from marathon.models import (
-    MarathonConstraint,
-    MarathonHealthCheck,
-    MarathonTask,
-)
-from marathon.models.app import MarathonUpgradeStrategy, MarathonApp
-
-from hollowman.app import application
-from hollowman.http_wrappers.request import Request, REMOVABLE_KEYS
-from hollowman.http_wrappers.response import Response
-from hollowman.http_wrappers.base import HTTPWrapper
-from hollowman.dispatcher import dispatch
 from hollowman import conf
-from hollowman.hollowman_flask import OperationType, FilterType
-from hollowman.models import User, Account
+from hollowman.app import application
+from hollowman.dispatcher import dispatch
+from hollowman.hollowman_flask import FilterType, OperationType
+from hollowman.http_wrappers.base import HTTPWrapper
+from hollowman.http_wrappers.request import REMOVABLE_KEYS, Request
+from hollowman.http_wrappers.response import Response
 from hollowman.marathonapp import AsgardApp
-
+from hollowman.models import Account, User
 from tests.utils import with_json_fixture
 
 

@@ -5,13 +5,13 @@
 # app.fetch
 # group.version
 
-import sys
 import json
+import sys
 
-from hollowman.marathon.group import AsgardAppGroup
 from marathon.models.group import MarathonGroup
 from marathon.util import MarathonJsonEncoder
 
+from hollowman.marathon.group import AsgardAppGroup
 
 data = open(sys.argv[1]).read()
 _g = AsgardAppGroup(MarathonGroup.from_json(json.loads(data)))

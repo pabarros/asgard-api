@@ -1,8 +1,9 @@
 import json
-from flask import request, Blueprint, make_response
 
-from hollowman.decorators import auth_required
+from flask import Blueprint, make_response, request
+
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
+from hollowman.decorators import auth_required
 
 account_blueprint = Blueprint(__name__, __name__)
 

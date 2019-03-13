@@ -1,17 +1,16 @@
 import abc
-from typing import Tuple, List
-from werkzeug.utils import cached_property
 from enum import Enum, auto
+from typing import List, Tuple
 
 from marathon import MarathonApp, NotFoundError
-from marathon.util import MarathonJsonEncoder
 from marathon.models.group import MarathonGroup
+from marathon.util import MarathonJsonEncoder
+from werkzeug.utils import cached_property
 
 from hollowman import conf
 from hollowman.hollowman_flask import OperationType
-from hollowman.marathonapp import AsgardApp
 from hollowman.marathon.group import AsgardAppGroup
-
+from hollowman.marathonapp import AsgardApp
 
 Apps = List[Tuple[AsgardApp, MarathonApp]]
 

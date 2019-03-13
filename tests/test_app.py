@@ -1,18 +1,16 @@
-from collections import namedtuple
-from mock import patch
-from unittest import TestCase, skip
-import responses
 import json
+from collections import namedtuple
+from unittest import TestCase, skip
 
-from hollowman.app import application
-from hollowman import conf
-from hollowman import decorators
+import responses
+from mock import patch
+
 import hollowman.upstream
-from hollowman.upstream import replay_request
-from hollowman.models import HollowmanSession, User, Account
-from hollowman import dispatcher
+from hollowman import conf, decorators, dispatcher
+from hollowman.app import application
 from hollowman.hollowman_flask import FilterType, OperationType
-
+from hollowman.models import Account, HollowmanSession, User
+from hollowman.upstream import replay_request
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
 

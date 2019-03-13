@@ -1,10 +1,9 @@
-from typing import Union, Dict, Any
 import json
-from enum import Enum, auto
 import os
-from typing import Dict
-from tests.conf import TEST_MESOS_ADDRESS
+from enum import Enum, auto
+from typing import Any, Dict, Union
 
+from tests.conf import TEST_MESOS_ADDRESS
 
 CURRENT_DIR = os.path.dirname(__file__)
 FIXTURES_PATH = os.path.join(CURRENT_DIR, "fixtures")

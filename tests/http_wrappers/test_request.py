@@ -1,10 +1,10 @@
 import json
-from unittest import TestCase, skip
-from unittest.mock import patch, Mock
-import responses
 from copy import deepcopy
+from unittest import TestCase, skip
+from unittest.mock import Mock, patch
 
-from marathon import NotFoundError, MarathonApp
+import responses
+from marathon import MarathonApp, NotFoundError
 from marathon.models.group import MarathonGroup
 from responses import RequestsMock
 
@@ -12,11 +12,10 @@ from hollowman import conf
 from hollowman.app import application
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.request import Request
-from hollowman.models import User, Account
 from hollowman.marathon.group import AsgardAppGroup
 from hollowman.marathonapp import AsgardApp
-
-from tests.utils import with_json_fixture, get_fixture
+from hollowman.models import Account, User
+from tests.utils import get_fixture, with_json_fixture
 
 
 class SplitTests(TestCase):

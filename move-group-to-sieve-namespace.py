@@ -1,10 +1,11 @@
-from hollowman.marathon.group import AsgardAppGroup
-from marathon.models.group import MarathonGroup
+import json
+import sys
+
 from marathon.client import MarathonClient
+from marathon.models.group import MarathonGroup
 from marathon.util import MarathonJsonEncoder
 
-import sys
-import json
+from hollowman.marathon.group import AsgardAppGroup
 
 
 def _patch_docker_params(params):

@@ -1,7 +1,8 @@
 from importlib import reload
+
 import asynctest
-from asgard import conf
-from asgard import app
+
+from asgard import app, conf
 
 
 class AsgardAppTest(asynctest.TestCase):

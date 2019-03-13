@@ -1,16 +1,14 @@
-import unittest
 import json
+import unittest
 from http import HTTPStatus
 
 from responses import RequestsMock
 
-from hollowman.conf import DEFAULT_MESOS_ADDRESS
+from hollowman import api, cache
 from hollowman.app import application
-from hollowman import cache
-from hollowman import api
-
+from hollowman.conf import DEFAULT_MESOS_ADDRESS
 from tests.base import BaseApiTests
-from tests.utils import with_json_fixture, get_raw_fixture
+from tests.utils import get_raw_fixture, with_json_fixture
 
 
 class TasksEndpointTest(BaseApiTests, unittest.TestCase):

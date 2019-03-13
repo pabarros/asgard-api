@@ -1,20 +1,17 @@
-from functools import wraps
+import json
 from collections import defaultdict
-from typing import Dict, Callable
-
-from aiohttp import web
-from sqlalchemy.orm.exc import NoResultFound
-import sqlalchemy
+from functools import wraps
+from typing import Callable, Dict
 
 import jwt
-import json
+import sqlalchemy
+from aiohttp import web
+from sqlalchemy.orm.exc import NoResultFound
 
 from asgard import db
-
 from hollowman.conf import SECRET_KEY
-from hollowman.models import HollowmanSession, User, Account, UserHasAccount
 from hollowman.log import logger
-
+from hollowman.models import Account, HollowmanSession, User, UserHasAccount
 
 unhandled_auth_error = {"msg": "Authorization failed. Unexpected error"}
 invalid_token_response_body = {"msg": "Authorization token is invalid"}

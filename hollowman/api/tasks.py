@@ -1,12 +1,13 @@
 import json
-import requests
 from http import HTTPStatus
 from uuid import uuid4
 
+import requests
 from flask import Blueprint, Response, redirect, request, url_for
-from hollowman.decorators import auth_required
-from hollowman.conf import MESOS_ADDRESSES
+
 from hollowman import cache
+from hollowman.conf import MESOS_ADDRESSES
+from hollowman.decorators import auth_required
 
 tasks_blueprint = Blueprint(__name__, __name__)
 

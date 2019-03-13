@@ -1,22 +1,18 @@
+import json
+import unittest
 from collections import namedtuple
+from unittest import TestCase, skip
 
 import jwt
-import json
-
-from mock import patch, MagicMock
-from unittest import TestCase, skip
-import unittest
-from flask import request
 import responses
+from flask import request
+from mock import MagicMock, patch
 
-from hollowman.app import application
-from hollowman.models import HollowmanSession, User, Account, UserHasAccount
-from hollowman import conf
-from hollowman import decorators
 import hollowman.upstream
+from hollowman import conf, decorators, routes
+from hollowman.app import application
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
-from hollowman import routes
-
+from hollowman.models import Account, HollowmanSession, User, UserHasAccount
 from tests import rebuild_schema
 from tests.utils import with_json_fixture
 

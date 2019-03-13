@@ -1,19 +1,17 @@
 import abc
+from http import HTTPStatus
 from typing import Optional
 
 from flask import Response
-from http import HTTPStatus
-
 from marathon.models import MarathonDeployment
 from werkzeug.utils import cached_property
 
-from hollowman.dispatcher import dispatch, FILTERS_PIPELINE
-from hollowman.hollowman_flask import HollowmanRequest, FilterType
-from hollowman import upstream, conf, http_wrappers
-from hollowman.hollowman_flask import OperationType
-from hollowman.models import User
+from hollowman import conf, http_wrappers, upstream
+from hollowman.dispatcher import FILTERS_PIPELINE, dispatch
+from hollowman.hollowman_flask import (FilterType, HollowmanRequest,
+                                       OperationType)
 from hollowman.http_wrappers.base import RequestResource
-
+from hollowman.models import User
 
 FILTERS_METHOD_NAMES = {
     RequestResource.APPS: "response",

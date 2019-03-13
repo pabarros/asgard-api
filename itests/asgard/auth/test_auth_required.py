@@ -1,17 +1,15 @@
-import jwt
 import asyncio
 
+import jwt
 from aiohttp import web
-from asynctest import skip, mock
-
+from asynctest import mock, skip
 from asyncworker import App
 from asyncworker.options import RouteTypes
 
 from asgard.http.auth import auth_required
 from asgard.http.auth.jwt import jwt_encode
-
-from tests.utils import with_json_fixture
 from itests.util import BaseTestCase
+from tests.utils import with_json_fixture
 
 
 class AuthRequiredTest(BaseTestCase):

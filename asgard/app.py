@@ -1,4 +1,5 @@
 from asyncworker import App
+
 from asgard import conf
 
 app = App(

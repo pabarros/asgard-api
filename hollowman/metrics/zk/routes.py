@@ -4,10 +4,10 @@ from http import HTTPStatus
 
 from flask import Blueprint, make_response
 
-from .telnet import send_command
-from .parser import parse_stat_output
-
 from asgard.options import get_option
+
+from .parser import parse_stat_output
+from .telnet import send_command
 
 zk_metrics_blueprint = Blueprint(__name__, __name__)
 

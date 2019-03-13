@@ -1,6 +1,7 @@
+import os
+
 from flask import request
 
-import os
 from hollowman.marathonapp import AsgardApp
 
 NET_BRIDGE = "BRIDGE"
