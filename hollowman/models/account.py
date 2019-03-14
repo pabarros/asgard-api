@@ -3,7 +3,7 @@
 from sqlalchemy import Column, Integer, Sequence, String
 from sqlalchemy.orm import relationship
 
-from hollowman.models import BaseModel
+from hollowman.models.base import BaseModel
 from hollowman.models.user_has_account import UserHasAccount
 
 

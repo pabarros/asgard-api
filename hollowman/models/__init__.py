@@ -12,5 +12,3 @@ from .user_has_account import UserHasAccount
 
 engine = create_engine(HOLLOWMAN_DB_URL, echo=HOLLOWMAN_DB_ECHO)
 HollowmanSession = sessionmaker(bind=engine)
-
-BaseModel = declarative_base()
