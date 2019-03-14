@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.82.0
+ * Migração pro CircleCI (https://github.com/B2W-BIT/asgard-api/pull/81)
+ * Adição do isort na pipeline (https://github.com/B2W-BIT/asgard-api/pull/80)
+ * Detecção de rotação dos logs das tasks. Backend: MESOS (https://github.com/B2W-BIT/asgard-api/pull/76)
+
 ### 0.81.2
  * Adicionando pytz
 
