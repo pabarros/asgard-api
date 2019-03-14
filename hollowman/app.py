@@ -27,6 +27,7 @@ from hollowman.hollowman_flask import HollowmanFlask
 from hollowman.log import dev_null_logger, logger
 from hollowman.metrics.zk.routes import zk_metrics_blueprint
 from hollowman.plugins import load_all_metrics_plugins, register_plugin
+from hollowman.routes import all_routes
 
 if NEW_RELIC_LICENSE_KEY and NEW_RELIC_APP_NAME:
     newrelic.agent.initialize()
@@ -46,6 +47,8 @@ application.config["JWT_EXPIRATION_DELTA"] = timedelta(days=7)
 application.register_blueprint(
     zk_metrics_blueprint, url_prefix="/_cat/metrics/zk"
 )
+
+application.register_blueprint(all_routes, url_prefix="")
 application.register_blueprint(account_blueprint, url_prefix="/hollow/account")
 application.register_blueprint(tasks_blueprint, url_prefix="/tasks")
 
