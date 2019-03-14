@@ -354,7 +354,7 @@ Para rodar as checagens faça:
 
 ```
 $ pipenv run fmt
-$ pipenv run isort
+$ pipenv run isort-fmt
 $ pipenv run lint
 ```
 
