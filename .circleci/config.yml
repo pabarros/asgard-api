@@ -23,6 +23,7 @@ jobs:
       - image: postgres:9.4
     steps:
       - checkout
+      - run: sudo apt-get install postgresql-client
       - run:
           name: Install pip/pipenv
           command: pip install --user -U pip==18.0 pipenv==2018.7.1
@@ -32,7 +33,7 @@ jobs:
       - run:
           name: Install asgard-api dev-mode
           command: pipenv run pip install -e .
-      - run: psql -c 'create database asgard;' -U postgres
+      - run: psql -c 'create database asgard;' -U postgres -p 5432 -h localhost
       - fmt-check
       - lint
       - all-tests
