@@ -1,12 +1,13 @@
 import json
-import requests
 from http import HTTPStatus
 from uuid import uuid4
 
-from flask import Blueprint, Response, redirect, request, url_for
-from hollowman.decorators import auth_required
-from hollowman.conf import MESOS_ADDRESSES
+import requests
+from flask import Blueprint, Response, request, url_for
+
 from hollowman import cache
+from hollowman.conf import MESOS_ADDRESSES, TASK_FILEREAD_MAX_OFFSET
+from hollowman.decorators import auth_required
 
 tasks_blueprint = Blueprint(__name__, __name__)
 
@@ -78,19 +79,34 @@ def task_files_read(task_id, user):
     if not slave_ip:
         return Response(response=json.dumps({}), status=404)
 
-    offset = request.args.get("offset", 0)
-    length = request.args.get("length", 1024)
+    file_was_truncated = False
+    offset: int = int(request.args.get("offset", 0))
+    length: int = int(request.args.get("length", 1024))
     path = request.args.get("path", "")
+
+    file_base_url = (
+        f"http://{slave_ip}:5051/files/read?path={sandbox_directory}{path}"
+    )
+
     files_info = requests.get(
-        f"http://{slave_ip}:5051/files/read?path={sandbox_directory}{path}&offset={offset}&length={length}"
+        f"{file_base_url}&offset={offset}&length={length}"
     )
 
     if files_info.status_code == HTTPStatus.NOT_FOUND:
         return Response(response=json.dumps({}), status=404)
     file_info_data = files_info.json()
 
+    if offset + length > TASK_FILEREAD_MAX_OFFSET:
+        new_offset_files_info = requests.get(
+            f"{file_base_url}&offset=-1"
+        ).json()
+        file_info_data["offset"] = new_offset_files_info["offset"]
+        file_was_truncated = True
+
     return Response(
-        response=json.dumps(file_info_data),
+        response=json.dumps(
+            {**file_info_data, "truncated": file_was_truncated}
+        ),
         status=200,
         mimetype="application/json",
     )
