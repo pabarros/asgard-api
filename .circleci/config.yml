@@ -32,6 +32,7 @@ jobs:
       - run:
           name: Install asgard-api dev-mode
           command: pipenv run pip install -e .
+      - run: psql -c 'create database asgard;' -U postgres
       - fmt-check
       - lint
       - all-tests
