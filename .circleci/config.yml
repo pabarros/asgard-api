@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  codecov: codecov/codecov@1.0.2
+  codecov: codecov/codecov@1.0.4
 
 commands:
   fmt-check:
@@ -37,6 +37,8 @@ jobs:
       - fmt-check
       - lint
       - all-tests
+      - codecov/upload:
+          flags: backend,unittest
 workflows:
   version: 2
   test:
