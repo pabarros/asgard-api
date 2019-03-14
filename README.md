@@ -350,7 +350,7 @@ Todos os PRs do projeto passam por um pipeline que conferem algumas coisas:
 
 Todas as checagens estão disponíveis como comandos do `pipenv`, então antes de cada push o ideal é rodas todas essas checagens.
 
-Para rodar as chegagens faça:
+Para rodar as checagens faça:
 
 ```
 $ pipenv run fmt
