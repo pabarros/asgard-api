@@ -2,7 +2,6 @@ import asyncio
 
 import asynctest
 import sqlalchemy
-from aiopg.sa import create_engine
 
 from asgard.db import _SessionMaker
 from hollowman.models import Account, User, UserHasAccount

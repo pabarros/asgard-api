@@ -1,7 +1,9 @@
 import abc
 from typing import List, Optional
 
-from asgard.models import Agent, App, Task
+from asgard.models.agent import Agent
+from asgard.models.app import App
+from asgard.models.task import Task
 
 
 class Backend(metaclass=abc.ABCMeta):

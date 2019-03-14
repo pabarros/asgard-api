@@ -1,4 +1,4 @@
-from asgard.models import App
+from asgard.models.app import App
 
 
 class MesosApp(App):

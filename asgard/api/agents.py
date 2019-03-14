@@ -12,7 +12,7 @@ from asgard.app import app
 from asgard.backends import mesos
 from asgard.http.auth import auth_required
 from asgard.math import round_up
-from asgard.models import Agent
+from asgard.models.agent import Agent
 from asgard.services import agents_service
 
 

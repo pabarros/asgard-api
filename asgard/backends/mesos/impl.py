@@ -1,7 +1,9 @@
 from typing import Any, Dict, List, Optional
 
 from asgard.backends.base import Backend
-from asgard.backends.mesos.models import MesosAgent, MesosApp, MesosTask
+from asgard.backends.mesos.models.agent import MesosAgent
+from asgard.backends.mesos.models.app import MesosApp
+from asgard.backends.mesos.models.task import MesosTask
 from asgard.http.client import http_client
 from asgard.sdk import mesos
 

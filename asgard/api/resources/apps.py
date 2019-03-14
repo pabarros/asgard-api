@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from asgard.models import AppFactory
+from asgard.models.app import AppFactory
 
 
 class AppsResource(BaseModel):
