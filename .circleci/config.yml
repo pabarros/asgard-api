@@ -16,7 +16,7 @@ commands:
   coverage:
     description: "Upload coverage data"
     steps:
-      - run: codecov
+      - run: pipenv run codecov
 
 jobs:
   test:
