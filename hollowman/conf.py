@@ -1,10 +1,11 @@
 import base64
 import os
 
+from marathon import MarathonClient
+
 # As configs estão, aos poucos, sendo migradas para o pacote `asgard.conf`
 from asgard.conf import SECRET_KEY, TASK_FILEREAD_MAX_OFFSET
 from asgard.options import get_option
-from marathon import MarathonClient
 
 ENABLED = "1"
 DISABLED = "0"
