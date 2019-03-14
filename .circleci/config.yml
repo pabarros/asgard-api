@@ -39,6 +39,7 @@ jobs:
       - fmt-check
       - lint
       - all-tests
+      - codecov
 workflows:
   version: 2
   test:
