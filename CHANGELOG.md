@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.81.2
+ * Adicionando pytz
+
 ### 0.81.0
  * Removidas chamadas desnecessárias à API do Marathon nos requests GET /v2/apps e GET /v2/groups
 
@@ -52,7 +55,7 @@
   - Gerando versão correta. A 0.68.0 foi gerada errado.
 
 ### 0.68.0
-  - Criação de um cache client. Cache client não dá raise caso o redis esteja fora do ar. 
+  - Criação de um cache client. Cache client não dá raise caso o redis esteja fora do ar.
   - Criação dos endpoints para download de arquivos de uma task
 
 ### 0.67.0
@@ -71,7 +74,7 @@
   - Atualização do plugin session-checker-plugin para não usar mais o objeto Sieve (e sim o objeto Bridge)
 
 ### 0.63.1
-  - Correção para apps que tinham o nome contento a string `*versions/`. 
+  - Correção para apps que tinham o nome contento a string `*versions/`.
 
 ### 0.63.0
   - IN-2425 Implemntação da API de file read/download para podermos ver os logs de uma task pela API do Asgard
