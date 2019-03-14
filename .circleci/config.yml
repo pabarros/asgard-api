@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  codecov: codecov/codecov@1.0.4
 
 commands:
   fmt-check:
@@ -15,6 +13,10 @@ commands:
     description: "Roda todos os testes do projeto (unitários e integração)"
     steps:
       - run: "pipenv run all-tests"
+  coverage:
+    description: "Upload coverage data"
+    steps:
+      - run: codecov
 
 jobs:
   test:
@@ -37,8 +39,6 @@ jobs:
       - fmt-check
       - lint
       - all-tests
-      - codecov/upload:
-          flags: backend,unittest
 workflows:
   version: 2
   test:
