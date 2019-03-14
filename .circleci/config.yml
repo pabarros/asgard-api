@@ -4,7 +4,7 @@ orbs:
 
 commands:
   fmt-check:
-    description: "Confirma que a formatação do código está correta"
+    description: "Confirma que a formatação do código"
     steps:
       - run: "pipenv run fmt-check"
   lint:
