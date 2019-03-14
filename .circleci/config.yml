@@ -9,6 +9,10 @@ commands:
     description: "Confirma que a tipagem do código está correta"
     steps:
       - run: "pipenv run lint"
+  isort-check:
+    description: "Confirma que a ordem dos imports está correta"
+    steps:
+      - run: "pipenv run isort-check"
   all-tests:
     description: "Roda todos os testes do projeto (unitários e integração)"
     steps:
@@ -37,6 +41,7 @@ jobs:
           command: pipenv run pip install -e .
       - run: psql -c 'create database asgard;' -U postgres -p 5432 -h localhost
       - fmt-check
+      - isort-check
       - lint
       - all-tests
       - coverage
