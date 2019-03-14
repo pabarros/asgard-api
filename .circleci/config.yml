@@ -41,7 +41,6 @@ jobs:
           command: pipenv run pip install -e .
       - run: psql -c 'create database asgard;' -U postgres -p 5432 -h localhost
       - fmt-check
-      - isort-check
       - lint
       - all-tests
       - coverage
