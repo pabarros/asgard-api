@@ -78,4 +78,17 @@ class UsersTestCase(BaseTestCase):
         mas o usuário não tem permissão para acessar a conta escolhida,
         devemos retornar HTTP 403
         """
-        self.fail()
+        jwt_token = jwt_encode(
+            {
+                "user": {
+                    "nome": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
+                    "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+                },
+                "current_account": {"id": 99, "name": ""},
+            }
+        )
+        resp = await self.client.get(
+            "/users/me",
+            headers={"Authorization": f"JWT {jwt_token.decode('utf-8')}"},
+        )
+        self.assertEqual(401, resp.status)
