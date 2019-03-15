@@ -76,6 +76,21 @@ class PgDataMocker:
             table.schema = original_schema
 
 
+ACCOUNT_DEV_NAME: str = "Dev Team"
+ACCOUNT_DEV_ID: int = 10
+ACCOUNT_DEV_NAMESPACE: str = "dev"
+ACCOUNT_DEV_OWNER: str = "dev"
+
+USER_WITH_NO_ACCOUNTS_AUTH_KEY = "7b4184bfe7d2349eb56bcfb9dc246cf8"
+USER_WITH_NO_ACCOUNTS_NAME = "User with no acounts"
+USER_WITH_NO_ACCOUNTS_EMAIL = "user-no-accounts@host.com"
+
+USER_WITH_MULTIPLE_ACCOUNTS_ID = 20
+USER_WITH_MULTIPLE_ACCOUNTS_EMAIL = "john@host.com"
+USER_WITH_MULTIPLE_ACCOUNTS_NAME = "John Doe"
+USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY = "69ed620926be4067a36402c3f7e9ddf0"
+
+
 class BaseTestCase(TestCase):
     async def setUp(self):
         with mock.patch.object(
@@ -87,16 +102,16 @@ class BaseTestCase(TestCase):
         self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
         self.users_fixture = [
             [
-                20,
-                "John Doe",
-                "john@host.com",
-                "69ed620926be4067a36402c3f7e9ddf0",
+                USER_WITH_MULTIPLE_ACCOUNTS_ID,
+                USER_WITH_MULTIPLE_ACCOUNTS_NAME,
+                USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+                USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
             ],
             [
                 21,
-                "User with no acounts",
-                "user-no-accounts@host.com",
-                "7b4184bfe7d2349eb56bcfb9dc246cf8",
+                USER_WITH_NO_ACCOUNTS_NAME,
+                USER_WITH_NO_ACCOUNTS_EMAIL,
+                USER_WITH_NO_ACCOUNTS_AUTH_KEY,
             ],
         ]
         self.pg_data_mocker.add_data(
@@ -109,7 +124,12 @@ class BaseTestCase(TestCase):
             Account,
             ["id", "name", "namespace", "owner"],
             [
-                [10, "Dev Team", "dev", "dev"],
+                [
+                    ACCOUNT_DEV_ID,
+                    ACCOUNT_DEV_NAME,
+                    ACCOUNT_DEV_NAMESPACE,
+                    ACCOUNT_DEV_OWNER,
+                ],
                 [11, "Infra Team", "infra", "infra"],
                 [12, "Other Team", "other", "other"],
             ],
@@ -119,7 +139,7 @@ class BaseTestCase(TestCase):
             UserHasAccount,
             ["id", "user_id", "account_id"],
             [
-                [10, 20, 10],
+                [10, 20, ACCOUNT_DEV_ID],
                 [11, 20, 11],
             ],  # John Doe, accounts: Dev Team, Infra Team
         )
@@ -128,7 +148,7 @@ class BaseTestCase(TestCase):
     async def tearDown(self):
         await self.pg_data_mocker.drop()
 
-    async def aiohttp_client(self, app: asyncworker.App):
+    async def aiohttp_client(self, app: asyncworker.App) -> TestClient:
         routes = app.routes_registry.http_routes
         http_app = web.Application()
         for route in routes:
