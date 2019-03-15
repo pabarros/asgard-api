@@ -3,7 +3,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, Table
 from sqlalchemy.orm import relation
 
-from hollowman.models import BaseModel
+from hollowman.models.base import BaseModel
 
 # class UserHasAccount(BaseModel):
 #    __tablename__ = "user_has_account"

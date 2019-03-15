@@ -1,13 +1,11 @@
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from asgard.backends.base import Backend
-
-from asgard.sdk import mesos
+from asgard.backends.mesos.models.agent import MesosAgent
+from asgard.backends.mesos.models.app import MesosApp
+from asgard.backends.mesos.models.task import MesosTask
 from asgard.http.client import http_client
-
-
-from asgard.backends.mesos.models import MesosTask
-from asgard.backends.mesos.models import MesosApp
-from asgard.backends.mesos.models import MesosAgent
+from asgard.sdk import mesos
 
 
 class MesosBackend(Backend):

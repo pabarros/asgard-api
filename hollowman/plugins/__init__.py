@@ -1,15 +1,15 @@
 # encoding: utf-8
 
-from enum import Enum
-import traceback
-import sys
 import logging
+import sys
+import traceback
+from enum import Enum
 
 import pkg_resources
 from simple_json_logger import JsonLogger
 
-from hollowman.log import logger
 from hollowman import conf
+from hollowman.log import logger
 
 
 class API_PLUGIN_TYPES(Enum):

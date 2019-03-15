@@ -1,11 +1,10 @@
-import os
 import logging
+import os
+import unittest
 from unittest import mock
 
-from hollowman import plugins, conf
+from hollowman import conf, plugins
 from hollowman.app import application
-
-import unittest
 
 
 class PluginLoaderTest(unittest.TestCase):

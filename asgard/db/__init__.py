@@ -1,5 +1,6 @@
 from aiopg.sa import create_engine
-from hollowman.conf import HOLLOWMAN_DB_URL, HOLLOWMAN_DB_ECHO
+
+from hollowman.conf import HOLLOWMAN_DB_ECHO, HOLLOWMAN_DB_URL
 
 from .session import _SessionMaker
 

@@ -1,6 +1,7 @@
 import os
-from asynctest import TestCase, mock
+
 from aioresponses import aioresponses
+from asynctest import TestCase, mock
 
 from asgard.sdk.mesos import leader_address
 

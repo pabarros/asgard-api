@@ -3,12 +3,12 @@ import unittest
 from http import HTTPStatus
 
 from responses import RequestsMock
-from tests.base import BaseApiTests
-from tests.utils import get_raw_fixture, with_json_fixture
 
 from hollowman import api, cache
 from hollowman.app import application
 from hollowman.conf import DEFAULT_MESOS_ADDRESS
+from tests.base import BaseApiTests
+from tests.utils import get_raw_fixture, with_json_fixture
 
 
 class TasksEndpointTest(BaseApiTests, unittest.TestCase):

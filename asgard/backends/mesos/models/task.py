@@ -1,4 +1,4 @@
-from asgard.models import Task
+from asgard.models.task import Task
 
 
 class MesosTask(Task):

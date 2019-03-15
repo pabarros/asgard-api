@@ -1,12 +1,12 @@
-import asynctest
 import asyncio
 
+import asynctest
+import sqlalchemy
+
 from asgard.db import _SessionMaker
-from hollowman.models import User, Account, UserHasAccount
-from aiopg.sa import create_engine
+from hollowman.models import Account, User, UserHasAccount
 from itests.util import PgDataMocker
 from tests.conf import TEST_PGSQL_DSN
-import sqlalchemy
 
 
 class ManagedAsContextManagerTest(asynctest.TestCase):

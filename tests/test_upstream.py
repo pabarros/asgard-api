@@ -1,18 +1,19 @@
 # encoding: utf-8
 
-from unittest import TestCase
-from mock import Mock, patch
-import mock
-import flask
-import requests
 import json
+from unittest import TestCase
+
+import flask
+import mock
+import requests
+import responses
+from mock import Mock, patch
 from requests.exceptions import ConnectionError
 from responses import RequestsMock
-import responses
 
-from hollowman.app import application
-from hollowman.upstream import replay_request, _make_request
 import hollowman.conf
+from hollowman.app import application
+from hollowman.upstream import _make_request, replay_request
 from tests import RequestStub
 
 

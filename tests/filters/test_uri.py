@@ -1,9 +1,8 @@
-from copy import copy
 import unittest
+from copy import copy
 
 from hollowman.filters.uri import AddURIFilter
 from hollowman.marathonapp import AsgardApp
-
 from tests.utils import with_json_fixture
 
 

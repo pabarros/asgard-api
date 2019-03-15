@@ -1,7 +1,7 @@
 from aiohttp import web
+from asyncworker import RouteTypes
 
 from asgard.app import app
-from asyncworker import RouteTypes
 
 
 @app.route(["/"], methods=["GET"], type=RouteTypes.HTTP)

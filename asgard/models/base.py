@@ -1,4 +1,5 @@
-from typing import Dict, Type, Generic
+from typing import Dict, Generic, Type
+
 from pydantic import BaseModel as PydanticBaseModel
 
 

@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_UP
+from decimal import ROUND_UP, Decimal
 
 
 def round_up(n: Decimal, prec: int = 2) -> Decimal:

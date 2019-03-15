@@ -2,7 +2,8 @@
 
 import json
 
-from hollowman.models import BaseModel, engine
+from hollowman.models import engine
+from hollowman.models.base import BaseModel
 
 
 class RequestStub(object):

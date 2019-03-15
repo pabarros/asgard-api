@@ -1,7 +1,8 @@
-from typing import List, Dict, Any
-from pydantic import validator, BaseModel
+from typing import Any, Dict, List
 
-from asgard.models import AgentFactory
+from pydantic import BaseModel
+
+from asgard.models.agent import AgentFactory
 
 
 class AgentsResource(BaseModel):

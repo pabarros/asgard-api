@@ -1,12 +1,12 @@
-from typing import Dict, Union, List, Optional, Any, Set
 from collections import defaultdict
-from asgard.models import Agent
+from decimal import Decimal
+from typing import Any, Dict, List, Optional, Set, Union
+
+from asgard.backends.mesos.models.app import MesosApp
+from asgard.backends.mesos.models.task import MesosTask
 from asgard.http.client import http_client
 from asgard.math import round_up
-from decimal import Decimal
-
-from asgard.backends.mesos.models import MesosApp
-from asgard.backends.mesos.models import MesosTask
+from asgard.models.agent import Agent
 
 
 class MesosAgent(Agent):

@@ -1,9 +1,9 @@
-from unittest import TestCase
-from hollowman.app import application
-from flask import request
 import json
+from unittest import TestCase
 
-# from flask.wrappers import Request
+from flask import request
+
+from hollowman.app import application
 from hollowman.hollowman_flask import OperationType
 
 

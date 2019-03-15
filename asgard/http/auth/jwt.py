@@ -1,4 +1,5 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+
 import jwt
 
 from hollowman.conf import SECRET_KEY

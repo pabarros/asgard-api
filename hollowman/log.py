@@ -1,6 +1,6 @@
 # encoding: utf-8
-import os
 import logging
+import os
 
 from simple_json_logger import JsonLogger
 

@@ -1,4 +1,5 @@
 import unittest
+
 from marathon.models.group import MarathonGroup
 
 from hollowman.marathon.group import AsgardAppGroup

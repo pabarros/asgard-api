@@ -1,14 +1,14 @@
 import json
+
 from flask import Response as FlaskResponse
-
-from marathon.models.group import MarathonGroup
-from marathon.models.task import MarathonTask
 from marathon.models.deployment import MarathonDeployment
+from marathon.models.group import MarathonGroup
 from marathon.models.queue import MarathonQueueItem
+from marathon.models.task import MarathonTask
 
-from hollowman.http_wrappers.base import HTTPWrapper, Apps
-from hollowman.marathonapp import AsgardApp
+from hollowman.http_wrappers.base import Apps, HTTPWrapper
 from hollowman.marathon.group import AsgardAppGroup
+from hollowman.marathonapp import AsgardApp
 
 
 class Response(HTTPWrapper):

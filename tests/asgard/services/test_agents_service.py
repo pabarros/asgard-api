@@ -1,8 +1,8 @@
 from asynctest import TestCase
 from asynctest.mock import Mock
 
-from asgard.services import AgentsService
 from asgard.backends.base import Backend
+from asgard.services import AgentsService
 
 
 class AgentsServicetTest(TestCase):

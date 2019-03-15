@@ -2,13 +2,24 @@ import asyncio
 import random
 import string
 from collections import defaultdict
-from typing import Dict, List, Type, Any, Iterable
-from asynctest import TestCase
-import asyncworker
+from importlib import reload
+from typing import Any, Dict, Iterable, List, Type
 
+import asyncworker
+from aiohttp import web
+from aiohttp.test_utils import TestClient, TestServer
 from aiopg.sa import Engine
+from asynctest import TestCase, mock
+from asyncworker import RouteTypes
+from asyncworker.signals.handlers.http import HTTPServer
 from sqlalchemy import Table
-from sqlalchemy.sql.ddl import CreateTable, CreateSchema, DropSchema
+from sqlalchemy.sql.ddl import CreateSchema, CreateTable, DropSchema
+
+import asgard.db
+import hollowman.conf
+from asgard.db import _SessionMaker
+from hollowman.models import Account, User, UserHasAccount
+from tests.conf import TEST_PGSQL_DSN
 
 
 class PgDataMocker:
@@ -66,21 +77,6 @@ class PgDataMocker:
         await self._drop_schema_only()
         for table, original_schema in self._original_table_schemas.items():
             table.schema = original_schema
-
-
-from asyncworker.signals.handlers.http import HTTPServer
-from asyncworker import RouteTypes
-import asyncio
-from aiohttp.test_utils import TestClient, TestServer
-from aiohttp import web
-from asgard.db import _SessionMaker
-from hollowman.models import User, Account, UserHasAccount
-
-from importlib import reload
-from asynctest import mock
-from tests.conf import TEST_PGSQL_DSN
-import hollowman.conf
-import asgard.db
 
 
 class BaseTestCase(TestCase):

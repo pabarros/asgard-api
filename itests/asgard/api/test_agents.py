@@ -1,16 +1,16 @@
-from itests.util import BaseTestCase
-from tests.utils import get_fixture, build_mesos_cluster, ClusterOptions
-from tests.conf import TEST_MESOS_ADDRESS
+import os
 from importlib import reload
+
+from aioresponses import aioresponses
 from asynctest import mock, skip
 from asynctest.mock import CoroutineMock
-import os
-
-from asgard.app import app
-from aioresponses import aioresponses
-from hollowman.models import User, Account, UserHasAccount
 
 from asgard.api import agents
+from asgard.app import app
+from hollowman.models import Account, User, UserHasAccount
+from itests.util import BaseTestCase
+from tests.conf import TEST_MESOS_ADDRESS
+from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
 
 
 class AgentsApiEndpointTest(BaseTestCase):

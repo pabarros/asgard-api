@@ -1,7 +1,7 @@
 import unittest
+
 from hollowman.filters.labels import LabelsFilter
 from hollowman.marathonapp import AsgardApp
-
 from tests.utils import with_json_fixture
 
 

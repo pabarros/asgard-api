@@ -1,17 +1,17 @@
-from flask import Response as FlaskResponse
-from copy import deepcopy
-import unittest
 import json
+import unittest
+from copy import deepcopy
+
+from flask import Response as FlaskResponse
 from responses import RequestsMock
 
-from hollowman.app import application
-from hollowman.http_wrappers.response import Response
-from hollowman.hollowman_flask import OperationType
-from hollowman.dispatcher import dispatch, FILTERS_PIPELINE, FilterType
 from hollowman import conf
-from hollowman.models import User, Account
+from hollowman.app import application
+from hollowman.dispatcher import FILTERS_PIPELINE, FilterType, dispatch
 from hollowman.filters.namespace import NameSpaceFilter
-
+from hollowman.hollowman_flask import OperationType
+from hollowman.http_wrappers.response import Response
+from hollowman.models import Account, User
 from tests.utils import with_json_fixture
 
 

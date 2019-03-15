@@ -1,4 +1,5 @@
 import logging
+
 from flask import Blueprint
 
 my_metrics_blue_print = Blueprint(__name__, __name__)

@@ -1,8 +1,9 @@
 import re
+
 import marathon.models.base
+from marathon.models.group import MarathonGroup
 
 marathon.models.base.ID_PATTERN = re.compile(".*")
-from marathon.models.group import MarathonGroup
 
 
 class AsgardAppGroup:

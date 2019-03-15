@@ -1,6 +1,7 @@
-import os
 import base64
+import os
 import unittest
+
 from mock import patch
 
 from hollowman import conf

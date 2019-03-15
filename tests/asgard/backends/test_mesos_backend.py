@@ -1,17 +1,18 @@
 import os
-from asynctest import TestCase, mock, skip
-from aioresponses import aioresponses
-from tests.utils import (
-    get_fixture,
-    add_agent_running_tasks,
-    build_mesos_cluster,
-    ClusterOptions,
-)
-from tests.conf import TEST_MESOS_ADDRESS
 
+from aioresponses import aioresponses
+from asynctest import TestCase, mock, skip
+
+import asgard.backends
 import asgard.sdk.mesos
 from asgard.backends.mesos import MesosBackend
-import asgard.backends
+from tests.conf import TEST_MESOS_ADDRESS
+from tests.utils import (
+    ClusterOptions,
+    add_agent_running_tasks,
+    build_mesos_cluster,
+    get_fixture,
+)
 
 
 class MesosBackendTest(TestCase):

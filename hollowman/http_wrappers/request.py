@@ -1,16 +1,15 @@
 import json
-from typing import Iterable, Dict
+from typing import Dict, Iterable
 
 from marathon import MarathonApp, NotFoundError
-from marathon.util import MarathonMinimalJsonEncoder
 from marathon.models.group import MarathonGroup
 from marathon.models.task import MarathonTask
+from marathon.util import MarathonMinimalJsonEncoder
 
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.base import Apps, HTTPWrapper
 from hollowman.marathon.group import AsgardAppGroup
 from hollowman.marathonapp import AsgardApp
-
 
 # Keys que são multi-valor e que devem
 # ser mergeados de forma especial quando

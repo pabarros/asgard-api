@@ -2,22 +2,21 @@ import json
 import unittest
 from copy import deepcopy
 from http import HTTPStatus
-from unittest.mock import patch, Mock, call
+from unittest.mock import Mock, call, patch
 
-from marathon import NotFoundError, MarathonApp
+from flask import Response as FlaskResponse
+from marathon import MarathonApp, NotFoundError
 from marathon.models.group import MarathonGroup
 from marathon.models.task import MarathonTask
-from flask import Response as FlaskResponse
 from responses import RequestsMock
 
 from hollowman import conf
 from hollowman.app import application
 from hollowman.http_wrappers import Response
-from hollowman.marathonapp import AsgardApp
 from hollowman.marathon.group import AsgardAppGroup
-from hollowman.models import User, Account
-
-from tests.utils import with_json_fixture, get_fixture
+from hollowman.marathonapp import AsgardApp
+from hollowman.models import Account, User
+from tests.utils import get_fixture, with_json_fixture
 
 
 class ResponseTest(unittest.TestCase):

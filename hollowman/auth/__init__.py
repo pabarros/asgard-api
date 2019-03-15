@@ -1,7 +1,7 @@
 from alchemytools.context import managed
 from sqlalchemy.orm.exc import NoResultFound
 
-from hollowman.models import HollowmanSession, User, Account
+from hollowman.models import Account, HollowmanSession, User
 
 
 def _expunge_user_and_accounts(session, user):

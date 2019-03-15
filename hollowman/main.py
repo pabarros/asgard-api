@@ -1,6 +1,6 @@
-from hollowman.app import application
 import os
 
+from hollowman.app import application
 
 if __name__ == "__main__":
     application.run(

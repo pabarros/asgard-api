@@ -1,30 +1,29 @@
 from tracemalloc import BaseFilter
-from typing import Iterable, Dict
+from typing import Dict, Iterable
 
-from hollowman.filters.basicconstraint import BasicConstraintFilter
 from marathon.models import MarathonDeployment, MarathonQueueItem
 from marathon.models.task import MarathonTask
 
-from hollowman.marathonapp import AsgardApp
-
-from hollowman.filters.uri import AddURIFilter
-from hollowman.filters.trim import TrimRequestFilter
-from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.appname import AddAppNameFilter
-from hollowman.filters.namespace import NameSpaceFilter
-from hollowman.hollowman_flask import (
-    OperationType,
-    FilterType,
-    HollowmanRequest,
-)
-from hollowman.filters.owner import AddOwnerConstraintFilter
+from hollowman.filters.basicconstraint import BasicConstraintFilter
 from hollowman.filters.defaultscale import DefaultScaleFilter
+from hollowman.filters.forcepull import ForcePullFilter
 from hollowman.filters.incompatiblefields import IncompatibleFieldsFilter
 from hollowman.filters.labels import LabelsFilter
-from hollowman.http_wrappers.response import Response
-from hollowman.http_wrappers.base import RequestResource
+from hollowman.filters.namespace import NameSpaceFilter
+from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.filters.transformjson import TransformJSONFilter
+from hollowman.filters.trim import TrimRequestFilter
+from hollowman.filters.uri import AddURIFilter
+from hollowman.hollowman_flask import (
+    FilterType,
+    HollowmanRequest,
+    OperationType,
+)
 from hollowman.http_wrappers import Request
+from hollowman.http_wrappers.base import RequestResource
+from hollowman.http_wrappers.response import Response
+from hollowman.marathonapp import AsgardApp
 
 FILTERS_METHOD_NAMES = {
     RequestResource.APPS: "response",

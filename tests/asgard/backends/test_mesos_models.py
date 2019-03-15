@@ -1,11 +1,9 @@
-from asynctest import TestCase
 from aioresponses import aioresponses
+from asynctest import TestCase
 
-
-from asgard.backends.mesos.models import MesosTask
-from asgard.backends.mesos.models import MesosAgent
-
-from tests.utils import get_fixture, build_mesos_cluster
+from asgard.backends.mesos.models.agent import MesosAgent
+from asgard.backends.mesos.models.task import MesosTask
+from tests.utils import build_mesos_cluster, get_fixture
 
 
 class MesosTaskTest(TestCase):

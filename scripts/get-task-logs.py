@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import requests
-import sys
 import os
+import sys
 
+import requests
 
 """
  Como usar:

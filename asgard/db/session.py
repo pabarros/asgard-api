@@ -1,5 +1,5 @@
-from aiopg.sa import create_engine
 import sqlalchemy
+from aiopg.sa import create_engine
 
 
 class _EngineWrapper:

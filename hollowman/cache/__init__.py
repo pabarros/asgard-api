@@ -1,5 +1,5 @@
-from flask_caching import Cache as Flask_Cache
 import redis
+from flask_caching import Cache as Flask_Cache
 
 from hollowman import conf
 from hollowman.log import logger

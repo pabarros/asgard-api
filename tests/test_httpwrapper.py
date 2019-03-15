@@ -2,9 +2,9 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 from hollowman.app import application
+from hollowman.http_wrappers.base import RequestResource
 from hollowman.http_wrappers.request import Request
 from hollowman.http_wrappers.response import Response
-from hollowman.http_wrappers.base import RequestResource
 
 
 class HTTPWrapperTest(TestCase):

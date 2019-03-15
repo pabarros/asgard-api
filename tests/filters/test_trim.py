@@ -1,8 +1,9 @@
+from unittest import TestCase
+
 from marathon import MarathonApp
 from mock import Mock
 
 from hollowman.filters.trim import TrimRequestFilter
-from unittest import TestCase
 
 
 class TrimRequestFilterTest(TestCase):

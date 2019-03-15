@@ -1,4 +1,5 @@
-from typing import Union, Optional
+from typing import Optional, Union
+
 from aiohttp import ClientSession, ClientTimeout  # type: ignore
 
 from asgard import conf

@@ -1,10 +1,11 @@
 # encoding: utf-8
 
-from hollowman.filters.forcepull import ForcePullFilter
 from unittest import TestCase
 
-from marathon.models.app import MarathonApp
 import mock
+from marathon.models.app import MarathonApp
+
+from hollowman.filters.forcepull import ForcePullFilter
 from tests.utils import with_json_fixture
 
 

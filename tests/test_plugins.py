@@ -1,13 +1,13 @@
 # encoding: utf-8
 
-import unittest
-import mock
 import json
+import unittest
+
+import mock
 
 from hollowman import plugins
-from hollowman.plugins import register_plugin
 from hollowman.app import application
-from hollowman import routes, decorators
+from hollowman.plugins import register_plugin
 
 
 class PluginEndpointTest(unittest.TestCase):
@@ -15,17 +15,6 @@ class PluginEndpointTest(unittest.TestCase):
         with mock.patch.multiple(plugins, PLUGIN_REGISTRY={}):
             response = application.test_client().get("/v2/plugins")
             self.assertDictEqual({"plugins": []}, json.loads(response.data))
-
-    def test_return_only_registered_plugins_not_empty(self):
-        plugin_data = {
-            "plugins": [
-                {"id": "some-example-plugin", "info": {"modules": ["ui"]}}
-            ]
-        }
-        with mock.patch.multiple(plugins, PLUGIN_REGISTRY={}):
-            register_plugin("some-example-plugin")
-            response = application.test_client().get("/v2/plugins")
-            self.assertDictEqual({}, json.loads(response.data))
 
     def test_return_only_registered_plugins_not_empty(self):
         plugin_registry = {

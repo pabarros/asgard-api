@@ -3,7 +3,6 @@ import unittest
 from marathon.models.constraint import MarathonConstraint
 
 from hollowman.marathonapp import AsgardApp
-
 from tests.utils import with_json_fixture
 
 

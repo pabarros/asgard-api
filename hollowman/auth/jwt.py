@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-from datetime import datetime
 import json
+from datetime import datetime
 
-from flask import make_response, current_app
-from flask_jwt import JWT, jwt_required, current_identity
+from flask import current_app, make_response
+from flask_jwt import JWT, current_identity, jwt_required
 
 jwt_auth = JWT()
 

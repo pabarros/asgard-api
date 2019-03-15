@@ -1,6 +1,6 @@
 from asynctest import TestCase
 
-from asgard.models.base import ModelFactory, BaseModel
+from asgard.models.base import BaseModel, ModelFactory
 
 
 class BaseModelTest(TestCase):

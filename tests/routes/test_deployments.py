@@ -8,7 +8,6 @@ from responses import RequestsMock
 from hollowman import conf
 from hollowman.app import application
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
-
 from tests.base import BaseApiTests
 from tests.utils import with_json_fixture
 

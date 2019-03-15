@@ -9,8 +9,8 @@ O Projeto Asgard existe com dois propósitos principais:
  - Facilitar a vida de quem desenvolve aplicações (de todo tipo);
  - Facilitar a vida de quem mantém uma infra-estrutura onde rodam centenas/milhares de aplicações
 
-O primeiro ponto é alcançado provendo uma Interface WEB (em uma API) universal onde a pessoa 
-responsável por um conjunto de aplicações possa ver, em um único lugar, todas as informações 
+O primeiro ponto é alcançado provendo uma Interface WEB (em uma API) universal onde a pessoa
+responsável por um conjunto de aplicações possa ver, em um único lugar, todas as informações
 sobre essas aplicações, como por exemplo: Quantiade de CPU/RAM alocada, Logs recentes gerados por
 cada instâncias dessas aplicações, lista das instâncias de cada aplicação, etc.
 
@@ -29,7 +29,7 @@ global, sem considerar times separados), etc.
 
 A ideia da Asgard API é ser o único ponto com o qual qualquer código (ou pessoa) deve falar. Essa API
 é quem vai abstrair todos os orquestradores suportados pelo projeto. A ideia do projeto é definir seus
-próprios Endpoints e Resources genéricos o suficiente para poderem ser transformados/traduzidos em 
+próprios Endpoints e Resources genéricos o suficiente para poderem ser transformados/traduzidos em
 Endpoints e Resources específicos do orquestrador escolhido.
 
 É a asgard API quem fala com os múltiplos orquestradores, é papel dela receber uma requisição da UI (ou
@@ -77,7 +77,7 @@ A Asgard API, internamente, possui 4 "pipelines" principais:
   - Response WRITE pipeline;
   - Response READ pipeline.
 
-Cada pipeline é composta por uma lista de "Filtros", um filtro pode fazer parte de mais de uma pipeline (até de todas se quiser). 
+Cada pipeline é composta por uma lista de "Filtros", um filtro pode fazer parte de mais de uma pipeline (até de todas se quiser).
 Um exemplo de filtro que está registrado em múltiplas pipelines é o [`namespace` filter](hollowman/filters/namespace.py).
 
 Cada pieline possui um "contrato" que o filtro deve obedecer para que possa fazer parte dessa pipeline, que é o que veremos a seguir.
@@ -97,7 +97,7 @@ Interface de um filtro de escrita:
 
 ```python
 class Filter:
-  
+
     def write_task(self, user, request_task, original_task):
         """
         Método chamado para cada task (instância de App) que está sendo
@@ -136,13 +136,13 @@ class Filter:
 
     def response(self, user, response_app, original_app) -> AsgardApp:
       return response_app
-      
+
     def response_group(self, user, response_group, original_group):
       return response_group
 
     def response_deployment(self, user, deployment: MarathonDeployment, original_deployment) -> MarathonDeployment:
       return deployment
-    
+
     def response_task(self, user, response_task, original_task):
       return response_task
 
@@ -153,7 +153,7 @@ class Filter:
 
 Cada método é chamado para cada um dos tipos de Resources que existem. Assim como nos filtros de escrita, os métodos
 são chamados individualmente para cada Resource envolvido nessa response, ex: Se estamos respondedo com uma lista de Apps,
-cada app será passada individualmente para o filtro, no método `response()`. 
+cada app será passada individualmente para o filtro, no método `response()`.
 
 Se o método retornar o próprio objeto ele será incluído no response final. Se for retornado `None`, esse Resource será **removido** do
 response final. Dessa forma um filtro consegue ocultar certos dados antes do response ser enviado ao cliente final.
@@ -235,7 +235,7 @@ Quando tiver a API rodando, você pode fazer um request para validar:
 
 ```
 $ curl -i http://127.0.0.1:5000/v2/apps/
-{"msg": "Authorization token is invalid"}% 
+{"msg": "Authorization token is invalid"}%
 ```
 
 Isso significa que você não está autenticado, o que é verdade, já que nem criamos seu novo usuário. Faremos isso agora.
@@ -266,7 +266,7 @@ Dessa forma, agora podemos fazer a seguinte requisição:
 
 ```
 curl -H "Authorization: Token a648638d589740879f25bf55648ccc21" http://127.0.0.1:5000/v2/apps
-{"apps": []}% 
+{"apps": []}%
 ```
 
 Agora sim você está vendo sua lista de apps, que obviamente é vazia. Nesse momento você está pronto
@@ -333,11 +333,29 @@ Para ligar um postgres localmente rode, na raiz do projeto:
 ```
 source dev/vars.sh
 source dev/network.sh
-source dev/pgsql.sh 
+source dev/pgsql.sh
 ```
 
 depois rode os testes:
 
 `PIPENV_DONT_LOAD_ENV=1 PYTHONPATH=. pipenv run py.test --cov=hollowman --cov=asgard --cov-report term-missing -v -s itests/`
 
+# Criando código para o projeto
 
+Todos os PRs do projeto passam por um pipeline que conferem algumas coisas:
+
+- type checking (feito com mypy)
+- code formatting (feito com black)
+- import sorting (feito com isort)
+
+Todas as checagens estão disponíveis como comandos do `pipenv`, então antes de cada push o ideal é rodas todas essas checagens.
+
+Para rodar as checagens faça:
+
+```
+$ pipenv run fmt
+$ pipenv run isort-fmt
+$ pipenv run lint
+```
+
+O recomendado é que essas checagens estejam configuradas para rodarem automaticamente na ferramenta que você estiver usando para desenvolver o projeto. As opções que são passadas para cada check podem ser vistas no [Pipfile](Pipfile).
