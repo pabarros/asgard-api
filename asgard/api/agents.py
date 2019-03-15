@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Dict, List, Type
+from typing import Any, Dict, List
 
 import aiohttp_cors
 from aiohttp import web
