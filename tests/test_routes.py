@@ -95,16 +95,6 @@ class RoutesTest(unittest.TestCase):
             )
         self.assertEqual(9, self.proxy_mock.call_count)
 
-    def test_v2_info(self):
-        with application.test_client() as client:
-            client.get(
-                "/v2/info",
-                headers={
-                    "Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
-            )
-            self.assertEqual(1, self.proxy_mock.call_count)
-
     def test_v2_leader(self):
         with application.test_client() as client:
             client.get(
@@ -150,3 +140,8 @@ class RoutesTest(unittest.TestCase):
                 },
             )
             self.assertEqual(1, self.proxy_mock.call_count)
+
+    def test_login_google(self):
+        with application.test_client() as client:
+            resp = client.get("/login/google")
+            self.assertEqual(302, resp.status_code)
