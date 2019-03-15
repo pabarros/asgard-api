@@ -1,35 +1,32 @@
-import asyncio
 import random
 import string
 from collections import defaultdict
 from importlib import reload
-from typing import Any, Dict, Iterable, List, Type
+from typing import Any, Dict, List, Type, Set
 
 import asyncworker
 from aiohttp import web
 from aiohttp.test_utils import TestClient, TestServer
 from aiopg.sa import Engine
 from asynctest import TestCase, mock
-from asyncworker import RouteTypes
-from asyncworker.signals.handlers.http import HTTPServer
 from sqlalchemy import Table
-from sqlalchemy.sql.ddl import CreateSchema, CreateTable, DropSchema
+from sqlalchemy.sql.ddl import CreateTable
+from tests.conf import TEST_PGSQL_DSN
 
 import asgard.db
 import hollowman.conf
 from asgard.db import _SessionMaker
 from hollowman.models import Account, User, UserHasAccount
-from tests.conf import TEST_PGSQL_DSN
 
 
 class PgDataMocker:
-    def __init__(self, pool: Engine):
+    def __init__(self, pool: Engine) -> None:
         self.data: Dict[Table, List[Dict]] = defaultdict(list)
         self.pool = pool
         self.schema = "".join(random.choices(string.ascii_lowercase, k=10))
-        self._used_tables = []
-        self._table_names = set()
-        self._original_table_schemas = {}
+        self._used_tables: List[Table] = []
+        self._table_names: Set[str] = set()
+        self._original_table_schemas: Dict[Table, str] = {}
 
     def add_data(
         self, model: Type, field_names: List[str], data: List[List[Any]]
