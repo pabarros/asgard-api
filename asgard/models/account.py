@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-from sqlalchemy import Column, Integer, Sequence, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
+from asgard.models.user_has_account import UserHasAccount
 from hollowman.models.base import BaseModel
-from hollowman.models.user_has_account import UserHasAccount
 
 
 class Account(BaseModel):  # type: ignore

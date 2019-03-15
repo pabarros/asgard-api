@@ -2,11 +2,11 @@ from collections import defaultdict
 from functools import wraps
 from typing import Callable, Dict
 
+import jwt
 import sqlalchemy
 from aiohttp import web
 from sqlalchemy.orm.exc import NoResultFound
 
-import jwt
 from asgard import db
 from hollowman.conf import SECRET_KEY
 from hollowman.log import logger

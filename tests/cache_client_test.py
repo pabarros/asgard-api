@@ -1,8 +1,6 @@
 import unittest
 from unittest import mock
 
-from redis.exceptions import ConnectionError
-
 from hollowman import cache
 from hollowman.app import application
 
