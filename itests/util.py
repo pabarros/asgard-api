@@ -12,6 +12,7 @@ from asynctest import TestCase, mock
 from sqlalchemy import Table
 from sqlalchemy.sql.ddl import CreateTable
 
+import asgard.backends.users
 import asgard.db
 import hollowman.conf
 from asgard.db import _SessionMaker
@@ -83,11 +84,38 @@ ACCOUNT_INFRA_ID: int = 11
 ACCOUNT_INFRA_NAMESPACE: str = "infra"
 ACCOUNT_INFRA_OWNER: str = "infra"
 
+
+ACCOUNT_INFRA_DICT = {
+    "id": ACCOUNT_INFRA_ID,
+    "name": ACCOUNT_INFRA_NAME,
+    "namespace": ACCOUNT_INFRA_NAMESPACE,
+    "owner": ACCOUNT_INFRA_OWNER,
+}
+
 ACCOUNT_DEV_NAME: str = "Dev Team"
 ACCOUNT_DEV_ID: int = 10
 ACCOUNT_DEV_NAMESPACE: str = "dev"
 ACCOUNT_DEV_OWNER: str = "dev"
 
+ACCOUNT_DEV_DICT = {
+    "id": ACCOUNT_DEV_ID,
+    "name": ACCOUNT_DEV_NAME,
+    "namespace": ACCOUNT_DEV_NAMESPACE,
+    "owner": ACCOUNT_DEV_OWNER,
+}
+
+USER_WITH_ONE_ACCOUNT_ID = 22
+USER_WITH_ONE_ACCOUNT_AUTH_KEY = ""
+USER_WITH_ONE_ACCOUNT_NAME = "User one account"
+USER_WITH_ONE_ACCOUNT_EMAIL = "userone@server.com"
+
+USER_WITH_ONE_ACCOUNT_DICT = {
+    "id": USER_WITH_ONE_ACCOUNT_ID,
+    "name": USER_WITH_ONE_ACCOUNT_NAME,
+    "email": USER_WITH_ONE_ACCOUNT_EMAIL,
+}
+
+USER_WITH_NO_ACCOUNTS_ID = 21
 USER_WITH_NO_ACCOUNTS_AUTH_KEY = "7b4184bfe7d2349eb56bcfb9dc246cf8"
 USER_WITH_NO_ACCOUNTS_NAME = "User with no acounts"
 USER_WITH_NO_ACCOUNTS_EMAIL = "user-no-accounts@host.com"
@@ -98,12 +126,20 @@ USER_WITH_MULTIPLE_ACCOUNTS_NAME = "John Doe"
 USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY = "69ed620926be4067a36402c3f7e9ddf0"
 
 
+USER_WITH_MULTIPLE_ACCOUNTS_DICT = {
+    "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
+    "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
+    "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+}
+
+
 class BaseTestCase(TestCase):
     async def setUp(self):
         with mock.patch.object(
             hollowman.conf, "HOLLOWMAN_DB_URL", TEST_PGSQL_DSN
         ):
             reload(asgard.db)
+            reload(asgard.backends.users)
 
         self.session = _SessionMaker(TEST_PGSQL_DSN)
         self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
@@ -115,10 +151,16 @@ class BaseTestCase(TestCase):
                 USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
             ],
             [
-                21,
+                USER_WITH_NO_ACCOUNTS_ID,
                 USER_WITH_NO_ACCOUNTS_NAME,
                 USER_WITH_NO_ACCOUNTS_EMAIL,
                 USER_WITH_NO_ACCOUNTS_AUTH_KEY,
+            ],
+            [
+                USER_WITH_ONE_ACCOUNT_ID,
+                USER_WITH_ONE_ACCOUNT_NAME,
+                USER_WITH_ONE_ACCOUNT_EMAIL,
+                USER_WITH_ONE_ACCOUNT_AUTH_KEY,
             ],
         ]
         self.pg_data_mocker.add_data(
@@ -151,8 +193,9 @@ class BaseTestCase(TestCase):
             UserHasAccount,
             ["id", "user_id", "account_id"],
             [
-                [10, 20, ACCOUNT_DEV_ID],
-                [11, 20, 11],
+                [10, USER_WITH_MULTIPLE_ACCOUNTS_ID, ACCOUNT_DEV_ID],
+                [11, USER_WITH_MULTIPLE_ACCOUNTS_ID, ACCOUNT_INFRA_ID],
+                [12, USER_WITH_ONE_ACCOUNT_ID, ACCOUNT_DEV_ID],
             ],  # John Doe, accounts: Dev Team, Infra Team
         )
         await self.pg_data_mocker.create()

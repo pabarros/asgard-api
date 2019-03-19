@@ -91,6 +91,7 @@ class Session:
 
 class _SessionMaker:
     def __init__(self, dsn, *args, **kwargs):
+        self._dsn = dsn
         self._engine_wrapper = _EngineWrapper(create_engine(dsn=dsn, **kwargs))
         self._connected = False
 
