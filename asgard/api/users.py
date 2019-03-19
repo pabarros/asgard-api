@@ -3,6 +3,7 @@ from typing import List
 from aiohttp.web import json_response
 from asyncworker import RouteTypes
 
+from asgard.api.resources.users import UserResource
 from asgard.app import app
 from asgard.http.auth import auth_required
 from asgard.http.auth.auth_required import _get_account_by_id
@@ -22,19 +23,14 @@ async def whoami(request):
     )
 
     alternate_accounts = [
-        await _get_account_by_id(acc_id) for acc_id in alternate_account_ids
+        await Account.from_alchemy_obj(await _get_account_by_id(acc_id))
+        for acc_id in alternate_account_ids
     ]
 
-    return json_response(
-        {
-            "name": request.user.tx_name,
-            "email": request.user.tx_email,
-            "current_account": {
-                "id": request.user.current_account.id,
-                "name": request.user.current_account.name,
-            },
-            "accounts": [
-                {"id": acc.id, "name": acc.name} for acc in alternate_accounts
-            ],
-        }
+    resource_response = UserResource(
+        user=await User.from_alchemy_obj(request.user),
+        current_account=await Account.from_alchemy_obj(current_account),
+        accounts=alternate_accounts,
     )
+
+    return json_response(resource_response.dict())
