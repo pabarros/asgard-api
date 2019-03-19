@@ -2,14 +2,14 @@ import json
 import unittest
 
 import jwt
-from tests import rebuild_schema
-from tests.utils import with_json_fixture
 
 from asgard.models.account import AccountDB as Account
 from hollowman.app import application
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from hollowman.conf import SECRET_KEY
 from hollowman.models import HollowmanSession, User
+from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
 
 class TestAccountEndpoints(unittest.TestCase):

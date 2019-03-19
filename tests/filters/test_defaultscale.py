@@ -1,11 +1,10 @@
 import unittest
 
-from tests.utils import with_json_fixture
-
 from asgard.models.account import AccountDB as Account
 from hollowman.filters.defaultscale import DefaultScaleFilter
 from hollowman.marathonapp import AsgardApp
 from hollowman.models import User
+from tests.utils import with_json_fixture
 
 
 class TestNamespaceFilter(unittest.TestCase):

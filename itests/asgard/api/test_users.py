@@ -8,6 +8,12 @@ from itests.util import (
     USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
     ACCOUNT_DEV_ID,
     ACCOUNT_DEV_NAME,
+    ACCOUNT_DEV_NAMESPACE,
+    ACCOUNT_DEV_OWNER,
+    ACCOUNT_INFRA_ID,
+    ACCOUNT_INFRA_NAME,
+    ACCOUNT_INFRA_NAMESPACE,
+    ACCOUNT_INFRA_OWNER,
 )
 
 
@@ -61,13 +67,30 @@ class UsersTestCase(BaseTestCase):
         data = await resp.json()
         self.assertDictEqual(
             {
-                "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
-                "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+                "user": {
+                    "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
+                    "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+                    "errors": {},
+                    "type": "ASGARD",
+                },
                 "current_account": {
                     "id": ACCOUNT_DEV_ID,
+                    "errors": {},
+                    "type": "ASGARD",
                     "name": ACCOUNT_DEV_NAME,
+                    "namespace": ACCOUNT_DEV_NAMESPACE,
+                    "owner": ACCOUNT_DEV_OWNER,
                 },
-                "accounts": [{"id": 11, "name": "Infra Team"}],
+                "accounts": [
+                    {
+                        "id": 11,
+                        "errors": {},
+                        "type": "ASGARD",
+                        "name": ACCOUNT_INFRA_NAME,
+                        "namespace": ACCOUNT_INFRA_NAMESPACE,
+                        "owner": ACCOUNT_INFRA_OWNER,
+                    }
+                ],
             },
             data,
         )

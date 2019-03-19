@@ -11,7 +11,6 @@ from aiopg.sa import Engine
 from asynctest import TestCase, mock
 from sqlalchemy import Table
 from sqlalchemy.sql.ddl import CreateTable
-from tests.conf import TEST_PGSQL_DSN
 
 import asgard.db
 import hollowman.conf
@@ -19,6 +18,7 @@ from asgard.db import _SessionMaker
 from asgard.models.account import AccountDB as Account
 from asgard.models.user import UserDB as User
 from asgard.models.user_has_account import UserHasAccount
+from tests.conf import TEST_PGSQL_DSN
 
 
 class PgDataMocker:
@@ -78,6 +78,11 @@ class PgDataMocker:
             table.schema = original_schema
 
 
+ACCOUNT_INFRA_NAME: str = "Infra Team"
+ACCOUNT_INFRA_ID: int = 11
+ACCOUNT_INFRA_NAMESPACE: str = "infra"
+ACCOUNT_INFRA_OWNER: str = "infra"
+
 ACCOUNT_DEV_NAME: str = "Dev Team"
 ACCOUNT_DEV_ID: int = 10
 ACCOUNT_DEV_NAMESPACE: str = "dev"
@@ -132,7 +137,12 @@ class BaseTestCase(TestCase):
                     ACCOUNT_DEV_NAMESPACE,
                     ACCOUNT_DEV_OWNER,
                 ],
-                [11, "Infra Team", "infra", "infra"],
+                [
+                    ACCOUNT_INFRA_ID,
+                    ACCOUNT_INFRA_NAME,
+                    ACCOUNT_INFRA_NAMESPACE,
+                    ACCOUNT_INFRA_OWNER,
+                ],
                 [12, "Other Team", "other", "other"],
             ],
         )

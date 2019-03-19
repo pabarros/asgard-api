@@ -1,11 +1,11 @@
 from unittest.mock import patch
 
 from flask import Response
-from tests import rebuild_schema
 
 import hollowman
 from asgard.models.account import AccountDB as Account
 from hollowman.models import HollowmanSession, User
+from tests import rebuild_schema
 
 
 class BaseApiTests:
