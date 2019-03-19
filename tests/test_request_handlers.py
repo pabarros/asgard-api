@@ -5,8 +5,6 @@ from unittest.mock import ANY, MagicMock, patch
 
 from marathon import MarathonApp
 from responses import RequestsMock
-from tests import rebuild_schema
-from tests.utils import with_json_fixture
 
 from asgard.models.account import AccountDB as Account
 from hollowman import conf
@@ -14,6 +12,8 @@ from hollowman.app import application
 from hollowman.http_wrappers.request import Request
 from hollowman.models import HollowmanSession, User
 from hollowman.request_handlers import new
+from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
 
 class RequestHandlersTests(TestCase):

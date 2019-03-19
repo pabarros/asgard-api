@@ -8,7 +8,6 @@ from flask import Response as FlaskResponse
 from marathon import MarathonApp
 from marathon.models.group import MarathonGroup
 from marathon.models.task import MarathonTask
-from tests.utils import with_json_fixture
 
 from asgard.models.account import AccountDB as Account
 from hollowman.app import application
@@ -16,6 +15,7 @@ from hollowman.http_wrappers import Response
 from hollowman.marathon.group import AsgardAppGroup
 from hollowman.marathonapp import AsgardApp
 from hollowman.models import User
+from tests.utils import with_json_fixture
 
 
 class ResponseTest(unittest.TestCase):

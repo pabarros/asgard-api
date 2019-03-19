@@ -3,14 +3,14 @@ from unittest import TestCase, skip
 
 import responses
 from mock import patch
-from tests import rebuild_schema
-from tests.utils import with_json_fixture
 
 from asgard.models.account import AccountDB as Account
 from hollowman import conf
 from hollowman.app import application
 from hollowman.models import HollowmanSession, User
 from hollowman.upstream import replay_request
+from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
 
 class DummyResponse(object):

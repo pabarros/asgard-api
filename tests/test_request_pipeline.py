@@ -10,7 +10,6 @@ from marathon.models import (
 )
 from marathon.models.app import MarathonUpgradeStrategy
 from mock import patch
-from tests.utils import with_json_fixture
 
 from asgard.models.account import AccountDB as Account
 from hollowman import conf
@@ -21,6 +20,7 @@ from hollowman.http_wrappers.base import HTTPWrapper
 from hollowman.http_wrappers.request import REMOVABLE_KEYS, Request
 from hollowman.marathonapp import AsgardApp
 from hollowman.models import User
+from tests.utils import with_json_fixture
 
 
 class RequestPipelineTest(unittest.TestCase):

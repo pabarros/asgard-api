@@ -2,12 +2,12 @@ import unittest
 
 from flask import Response
 from mock import patch
-from tests import rebuild_schema
 
 import hollowman.routes
 from asgard.models.account import AccountDB as Account
 from hollowman.app import application
 from hollowman.models import User, HollowmanSession
+from tests import rebuild_schema
 
 
 class RoutesTest(unittest.TestCase):

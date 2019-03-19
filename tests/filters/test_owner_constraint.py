@@ -1,13 +1,13 @@
 import unittest
 
 from marathon.models.constraint import MarathonConstraint
-from tests import rebuild_schema
-from tests.utils import with_json_fixture
 
 from asgard.models.account import AccountDB as Account
 from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.marathonapp import AsgardApp
 from hollowman.models import HollowmanSession, User
+from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
 
 class OwnerFilterTest(unittest.TestCase):

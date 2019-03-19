@@ -4,7 +4,6 @@ from http import HTTPStatus
 
 from flask import Response as FlaskResponse
 from marathon.models.group import MarathonGroup
-from tests.utils import with_json_fixture
 
 from asgard.models.account import AccountDB as Account
 from hollowman.app import application
@@ -12,6 +11,7 @@ from hollowman.dispatcher import dispatch
 from hollowman.hollowman_flask import OperationType
 from hollowman.http_wrappers.response import Response
 from hollowman.models import User
+from tests.utils import with_json_fixture
 
 
 class DummyFilter:
