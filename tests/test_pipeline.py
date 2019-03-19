@@ -1,19 +1,17 @@
 import json
 import unittest
-from copy import deepcopy
 from http import HTTPStatus
 
 from flask import Response as FlaskResponse
 from marathon.models.group import MarathonGroup
-from responses import RequestsMock
+from tests.utils import with_json_fixture
 
-from hollowman import conf
+from asgard.models.account import AccountDB as Account
 from hollowman.app import application
 from hollowman.dispatcher import dispatch
 from hollowman.hollowman_flask import OperationType
 from hollowman.http_wrappers.response import Response
-from hollowman.models import Account, User
-from tests.utils import with_json_fixture
+from hollowman.models import User
 
 
 class DummyFilter:

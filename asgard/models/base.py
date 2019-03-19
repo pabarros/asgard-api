@@ -1,6 +1,7 @@
-from typing import Dict, Generic, Type
+from typing import Dict, Type
 
 from pydantic import BaseModel as PydanticBaseModel
+from sqlalchemy.ext.declarative import declarative_base
 
 
 class BaseModel(PydanticBaseModel):
@@ -9,6 +10,9 @@ class BaseModel(PydanticBaseModel):
 
     def add_error(self, field_name, error_msg):
         self.errors[field_name] = error_msg
+
+
+BaseModelAlchemy = declarative_base()
 
 
 def ModelFactory(subclass_marker: Type[BaseModel]):

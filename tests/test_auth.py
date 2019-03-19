@@ -1,20 +1,19 @@
 import json
 import unittest
-from collections import namedtuple
-from unittest import TestCase, skip
+from unittest import TestCase
 
 import jwt
 import responses
 from flask import request
 from mock import MagicMock, patch
+from tests import rebuild_schema
+from tests.utils import with_json_fixture
 
-import hollowman.upstream
+from asgard.models.account import AccountDB as Account
 from hollowman import conf, decorators, routes
 from hollowman.app import application
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
-from hollowman.models import Account, HollowmanSession, User, UserHasAccount
-from tests import rebuild_schema
-from tests.utils import with_json_fixture
+from hollowman.models import HollowmanSession, User
 
 
 class TestAuthentication(TestCase):

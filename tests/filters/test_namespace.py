@@ -1,20 +1,17 @@
-import json
 import unittest
-from http import HTTPStatus
 from itertools import chain
 
-from flask import Response as FlaskResponse
 from marathon.models import MarathonDeployment
 from marathon.models.group import MarathonGroup
 from marathon.models.queue import MarathonQueueItem
 from marathon.models.task import MarathonTask
+from tests.utils import with_json_fixture
 
+from asgard.models.account import AccountDB as Account
 from hollowman.app import application
 from hollowman.filters.namespace import NameSpaceFilter
-from hollowman.http_wrappers.response import Response
 from hollowman.marathonapp import AsgardApp
-from hollowman.models import Account, User
-from tests.utils import with_json_fixture
+from hollowman.models import User
 
 
 class TestNamespaceFilter(unittest.TestCase):

@@ -8,9 +8,11 @@ from aiohttp import web
 from sqlalchemy.orm.exc import NoResultFound
 
 from asgard import db
+from asgard.models.account import AccountDB as Account
+from asgard.models.user import UserDB
+from asgard.models.user_has_account import UserHasAccount
 from hollowman.conf import SECRET_KEY
 from hollowman.log import logger
-from hollowman.models import Account, User, UserHasAccount
 
 unhandled_auth_error = {"msg": "Authorization failed. Unexpected error"}
 invalid_token_response_body = {"msg": "Authorization token is invalid"}
@@ -44,14 +46,14 @@ async def _get_account_by_id(account_id):
 
 
 def _build_base_query(session: db.session.AsgardDBConnection):
-    _join = User.__table__.join(
-        UserHasAccount, User.id == UserHasAccount.c.user_id, isouter=True
+    _join = UserDB.__table__.join(
+        UserHasAccount, UserDB.id == UserHasAccount.c.user_id, isouter=True
     ).join(
         Account.__table__,
         Account.id == UserHasAccount.c.account_id,
         isouter=True,
     )
-    session.query(User, Account.id.label("account_id")).join(_join)
+    session.query(UserDB, Account.id.label("account_id")).join(_join)
 
 
 async def _build_user_instance(
@@ -65,7 +67,7 @@ async def _build_user_instance(
         logger.warning(auth_failed_log_data)
         return None
     account_ids = [row.account_id for row in rows if row.account_id]
-    user = User(tx_name=rows[0].tx_name, tx_email=rows[0].tx_email)
+    user = UserDB(tx_name=rows[0].tx_name, tx_email=rows[0].tx_email)
     user.account_ids = account_ids
     return user
 
@@ -74,7 +76,7 @@ async def check_auth_token(token):
     async with db.AsgardDBSession() as session:
         return await _build_user_instance(
             session,
-            User.tx_authkey == token,
+            UserDB.tx_authkey == token,
             {
                 "event": "auth-failed",
                 "token-type": "apikey",
@@ -100,7 +102,7 @@ async def check_jwt_token(jwt_token):
     async with db.AsgardDBSession() as session:
         return await _build_user_instance(
             session,
-            User.tx_email == payload["user"]["email"],
+            UserDB.tx_email == payload["user"]["email"],
             {
                 "event": "auth-failed",
                 "token-type": "JWT",

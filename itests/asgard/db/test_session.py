@@ -2,11 +2,13 @@ import asyncio
 
 import asynctest
 import sqlalchemy
+from tests.conf import TEST_PGSQL_DSN
 
 from asgard.db import _SessionMaker
-from hollowman.models import Account, User, UserHasAccount
+from asgard.models.account import AccountDB as Account
+from asgard.models.user import UserDB as User
+from asgard.models.user_has_account import UserHasAccount
 from itests.util import PgDataMocker
-from tests.conf import TEST_PGSQL_DSN
 
 
 class ManagedAsContextManagerTest(asynctest.TestCase):

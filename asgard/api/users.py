@@ -6,6 +6,8 @@ from asyncworker import RouteTypes
 from asgard.app import app
 from asgard.http.auth import auth_required
 from asgard.http.auth.auth_required import _get_account_by_id
+from asgard.models.account import Account
+from asgard.models.user import User
 
 
 @app.route(["/users/me"], type=RouteTypes.HTTP, methods=["GET"])

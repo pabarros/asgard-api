@@ -7,15 +7,16 @@ import responses
 from marathon import MarathonApp, NotFoundError
 from marathon.models.group import MarathonGroup
 from responses import RequestsMock
+from tests.utils import get_fixture, with_json_fixture
 
+from asgard.models.account import AccountDB as Account
 from hollowman import conf
 from hollowman.app import application
 from hollowman.hollowman_flask import HollowmanRequest
 from hollowman.http_wrappers.request import Request
 from hollowman.marathon.group import AsgardAppGroup
 from hollowman.marathonapp import AsgardApp
-from hollowman.models import Account, User
-from tests.utils import get_fixture, with_json_fixture
+from hollowman.models import User
 
 
 class SplitTests(TestCase):

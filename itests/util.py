@@ -11,12 +11,14 @@ from aiopg.sa import Engine
 from asynctest import TestCase, mock
 from sqlalchemy import Table
 from sqlalchemy.sql.ddl import CreateTable
+from tests.conf import TEST_PGSQL_DSN
 
 import asgard.db
 import hollowman.conf
 from asgard.db import _SessionMaker
-from hollowman.models import Account, User, UserHasAccount
-from tests.conf import TEST_PGSQL_DSN
+from asgard.models.account import AccountDB as Account
+from asgard.models.user import UserDB as User
+from asgard.models.user_has_account import UserHasAccount
 
 
 class PgDataMocker:
