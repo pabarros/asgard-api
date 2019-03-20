@@ -174,3 +174,17 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
                 await conn.query(User).filter(
                     User.tx_email == "not-found"
                 ).one()
+
+    async def test_query_with_count_zero_results(self):
+        async with self.session() as conn:
+            result = (
+                await conn.query(User)
+                .filter(User.tx_email == "not-found")
+                .exists()
+            )
+            self.assertFalse(result)
+
+    async def test_query_with_count_with_results(self):
+        async with self.session() as conn:
+            result = await conn.query(User).filter(User.id == 20).exists()
+            self.assertEqual(1, result)

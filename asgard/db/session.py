@@ -68,6 +68,11 @@ class AsgardDBConnection:
             raise sqlalchemy.orm.exc.NoResultFound
         return result_list[0]
 
+    async def exists(self) -> bool:
+        self._query.limit(1)
+        result = await self.execute(self._query)
+        return len(await result.fetchall()) > 0
+
 
 class Session:
     def __init__(self, engine_wrapper):
