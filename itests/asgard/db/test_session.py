@@ -3,17 +3,17 @@ import asyncio
 import asynctest
 import sqlalchemy
 
+from asgard.conf import settings
 from asgard.db import _SessionMaker
 from asgard.models.account import AccountDB as Account
 from asgard.models.user import UserDB as User
 from asgard.models.user_has_account import UserHasAccount
 from itests.util import PgDataMocker
-from tests.conf import TEST_PGSQL_DSN
 
 
 class ManagedAsContextManagerTest(asynctest.TestCase):
     async def setUp(self):
-        self.session = _SessionMaker(TEST_PGSQL_DSN)
+        self.session = _SessionMaker(settings.DB_URL)
         self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
         self.users_fixture = [
             [10, "Novo User", "email@host.com"],
@@ -142,7 +142,7 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
         conexão está ocupada com a primeira query.
         """
 
-        SessionClass = _SessionMaker(TEST_PGSQL_DSN, maxsize=1)
+        SessionClass = _SessionMaker(settings.DB_URL, maxsize=1)
 
         async def coro():
             async with SessionClass() as conn1:

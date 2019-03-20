@@ -8,18 +8,17 @@ import asyncworker
 from aiohttp import web
 from aiohttp.test_utils import TestClient, TestServer
 from aiopg.sa import Engine
-from asynctest import TestCase, mock
+from asynctest import TestCase
 from sqlalchemy import Table
 from sqlalchemy.sql.ddl import CreateTable
 
 import asgard.backends.users
 import asgard.db
-import hollowman.conf
+from asgard.conf import settings
 from asgard.db import _SessionMaker
 from asgard.models.account import AccountDB as Account
 from asgard.models.user import UserDB as User
 from asgard.models.user_has_account import UserHasAccount
-from tests.conf import TEST_PGSQL_DSN
 
 
 class PgDataMocker:
@@ -135,13 +134,10 @@ USER_WITH_MULTIPLE_ACCOUNTS_DICT = {
 
 class BaseTestCase(TestCase):
     async def setUp(self):
-        with mock.patch.object(
-            hollowman.conf, "HOLLOWMAN_DB_URL", TEST_PGSQL_DSN
-        ):
-            reload(asgard.db)
-            reload(asgard.backends.users)
+        reload(asgard.db)
+        reload(asgard.backends.users)
 
-        self.session = _SessionMaker(TEST_PGSQL_DSN)
+        self.session = _SessionMaker(settings.DB_URL)
         self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
         self.users_fixture = [
             [
