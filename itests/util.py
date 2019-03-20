@@ -133,6 +133,8 @@ USER_WITH_MULTIPLE_ACCOUNTS_DICT = {
 
 
 class BaseTestCase(TestCase):
+    use_default_loop = True
+
     async def setUp(self):
         reload(asgard.db)
         reload(asgard.backends.users)
