@@ -1,11 +1,8 @@
 # encoding: utf-8
 
-from typing import List, Optional
-
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from asgard.models.account import AccountFactory
 from asgard.models.base import BaseModel, ModelFactory, BaseModelAlchemy
 from asgard.models.user_has_account import UserHasAccount
 

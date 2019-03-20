@@ -1,9 +1,11 @@
 # encoding: utf-8
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, func
 from sqlalchemy.orm import relationship
 
+from asgard.db import AsgardDBSession
 from asgard.models.base import BaseModel, ModelFactory, BaseModelAlchemy
+from asgard.models.user import User, UserDB
 from asgard.models.user_has_account import UserHasAccount
 
 
@@ -32,6 +34,20 @@ class Account(BaseModel):
             namespace=alchemy_obj.namespace,
             owner=alchemy_obj.owner,
         )
+
+    async def user_has_permission(self, user: User) -> bool:
+        _join = UserHasAccount.join(
+            UserDB, UserHasAccount.c.user_id == UserDB.id
+        )
+        async with AsgardDBSession() as s:
+            has_permission = (
+                await s.query(UserHasAccount.c.id)
+                .join(_join)
+                .filter(UserDB.tx_email == user.email)
+                .filter(UserHasAccount.c.account_id == self.id)
+                .exists()
+            )
+        return has_permission
 
 
 AccountFactory = ModelFactory(Account)
