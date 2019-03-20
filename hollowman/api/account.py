@@ -23,8 +23,6 @@ def me():
     )
 
 
-@account_blueprint.route("/change/<int:acc_id>", methods=["POST"])
-@auth_required()
 def change_account(acc_id):
     account_ids = [acc.id for acc in request.user.accounts]
     try:

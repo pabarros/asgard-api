@@ -76,69 +76,6 @@ class TestAccountEndpoints(unittest.TestCase):
             response = client.get("/hollow/account/me")
             self.assertEqual(401, response.status_code)
 
-    def test_change_account_has_permmission(self):
-        """
-        Troca para uma conta que o user atual está vinculado.
-        """
-        with application.app_context(), application.test_client() as client:
-            jwt_token = self.generate_jwt_token_for_user(
-                self.user, self.user.accounts[0]
-            )
-            response = client.post(
-                "/hollow/account/change/{}".format(self.user.accounts[1].id),
-                headers={
-                    "Authorization": "JWT {}".format(jwt_token.decode("utf8"))
-                },
-            )
-            self.assertEqual(200, response.status_code)
-            response_data = json.loads(response.data)
-
-            self.assertEqual(self.user.tx_email, response_data["user"]["email"])
-            self.assertEqual(self.user.tx_name, response_data["user"]["name"])
-            self.assertEqual(
-                self.user.accounts[1].id, response_data["current_account"]["id"]
-            )
-            self.assertEqual(
-                self.user.accounts[1].name,
-                response_data["current_account"]["name"],
-            )
-
-            jwt_response_token = response_data["jwt_token"]
-            self.assertTrue(jwt_response_token)
-            returned_token = jwt.decode(jwt_response_token, key=SECRET_KEY)
-            self.assertEqual(
-                self.user.tx_email, returned_token["user"]["email"]
-            )
-            self.assertEqual(self.user.tx_name, returned_token["user"]["name"])
-            self.assertEqual(
-                self.user.accounts[1].id,
-                returned_token["current_account"]["id"],
-            )
-            self.assertEqual(
-                self.user.accounts[1].name,
-                returned_token["current_account"]["name"],
-            )
-
-    def test_change_account_user_is_not_associated(self):
-        """
-        Retorna HTTP 401 se tentarmos trocar para uma conta que não
-        estamos vinculados, ou seja, não existe registro na tabela `user_has_account`
-        """
-        with application.app_context(), application.test_client() as client:
-            jwt_token = self.generate_jwt_token_for_user(
-                self.user, self.user.accounts[0]
-            )
-            response = client.post(
-                "/hollow/account/change/42",
-                headers={
-                    "Authorization": "JWT {}".format(jwt_token.decode("utf8"))
-                },
-            )
-            self.assertEqual(401, response.status_code)
-            self.assertEquals(
-                "Not associated with account", json.loads(response.data)["msg"]
-            )
-
     def test_change_to_next_account_one_account_left(self):
         """
         User tem duas accounts, está usando a primeira e pede pra trocar para a proxima.
