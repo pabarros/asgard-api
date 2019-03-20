@@ -25,7 +25,7 @@ async def change_account(request: web.Request):
     if account:
         permission_ok = await account.user_has_permission(user)
 
-    if permission_ok:
+    if permission_ok and account:
         new_token = jwt_encode(user, account)
         return web.json_response(headers={"JWT": new_token.decode("utf-8")})
 
