@@ -8,7 +8,13 @@ from asyncworker.options import RouteTypes
 
 from asgard.http.auth import auth_required
 from asgard.http.auth.jwt import jwt_encode
-from itests.util import BaseTestCase
+from asgard.models.account import Account
+from asgard.models.user import User
+from itests.util import (
+    BaseTestCase,
+    USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    ACCOUNT_INFRA_DICT,
+)
 from tests.utils import with_json_fixture
 
 
@@ -150,7 +156,9 @@ class AuthRequiredTest(BaseTestCase):
         Populates request.user if authentication is successful
         """
 
-        jwt_token = jwt_encode({"user": {"email": "john@host.com"}})
+        user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        account = Account(**ACCOUNT_INFRA_DICT)
+        jwt_token = jwt_encode(user, account)
         auth_header = {
             "Authorization": "JWT {}".format(jwt_token.decode("utf-8"))
         }

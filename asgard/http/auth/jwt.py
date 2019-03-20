@@ -2,10 +2,12 @@ from datetime import datetime, timedelta
 
 import jwt
 
+from asgard.models.account import Account
+from asgard.models.user import User
 from hollowman.conf import SECRET_KEY
 
 
-def jwt_encode(user_info):
+def jwt_encode(user: User, account: Account) -> bytes:
     iat = datetime.utcnow()
     exp = iat + timedelta(days=7)
     nbf = iat + timedelta(seconds=0)
@@ -14,8 +16,8 @@ def jwt_encode(user_info):
             "exp": exp,
             "iat": iat,
             "nbf": nbf,
-            "user": user_info.get("user"),
-            "current_account": user_info.get("current_account"),
+            "user": user.dict(),
+            "current_account": account.dict(),
         },
         SECRET_KEY,
     )

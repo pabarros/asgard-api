@@ -1,16 +1,19 @@
 from asgard.api import users
 from asgard.app import app
 from asgard.http.auth.jwt import jwt_encode
+from asgard.models.account import Account
+from asgard.models.user import User
 from itests.util import (
     BaseTestCase,
     USER_WITH_NO_ACCOUNTS_AUTH_KEY,
     USER_WITH_MULTIPLE_ACCOUNTS_NAME,
     USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+    USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     ACCOUNT_DEV_ID,
     ACCOUNT_DEV_NAME,
     ACCOUNT_DEV_NAMESPACE,
     ACCOUNT_DEV_OWNER,
-    ACCOUNT_INFRA_ID,
+    ACCOUNT_DEV_DICT,
     ACCOUNT_INFRA_NAME,
     ACCOUNT_INFRA_NAMESPACE,
     ACCOUNT_INFRA_OWNER,
@@ -47,18 +50,9 @@ class UsersTestCase(BaseTestCase):
         Conferir que a lista de contas alternativas, *não inclui* a conta atual,
         que está no token JWT
         """
-        jwt_token = jwt_encode(
-            {
-                "user": {
-                    "nome": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
-                    "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
-                },
-                "current_account": {
-                    "id": ACCOUNT_DEV_ID,
-                    "name": ACCOUNT_DEV_NAME,
-                },
-            }
-        )
+        user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        account = Account(**ACCOUNT_DEV_DICT)
+        jwt_token = jwt_encode(user, account)
         resp = await self.client.get(
             "/users/me",
             headers={"Authorization": f"JWT {jwt_token.decode('utf-8')}"},
@@ -101,15 +95,9 @@ class UsersTestCase(BaseTestCase):
         mas o usuário não tem permissão para acessar a conta escolhida,
         devemos retornar HTTP 403
         """
-        jwt_token = jwt_encode(
-            {
-                "user": {
-                    "nome": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
-                    "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
-                },
-                "current_account": {"id": 99, "name": ""},
-            }
-        )
+        user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        account = Account(id=99, name="", namespace="", owner="")
+        jwt_token = jwt_encode(user, account)
         resp = await self.client.get(
             "/users/me",
             headers={"Authorization": f"JWT {jwt_token.decode('utf-8')}"},
