@@ -37,6 +37,14 @@ http {
       proxy_pass      http://127.0.0.1:5002;
     }
 
+    location /users {
+      proxy_pass      http://127.0.0.1:5002;
+    }
+
+    location /accounts {
+      proxy_pass      http://127.0.0.1:5002;
+    }
+
     location / {
       proxy_pass      http://127.0.0.1:5001;
     }
