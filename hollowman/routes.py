@@ -137,7 +137,7 @@ def healhcheck():
 
 @all_routes.route("/login/google")
 def google_login():
-    callback = url_for("authorized", _external=True)
+    callback = url_for("hollowman.routes.authorized", _external=True)
     return google_oauth2.authorize(callback=callback)
 
 
