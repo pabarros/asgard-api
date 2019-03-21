@@ -1,3 +1,4 @@
+from asgard.db import AsgardDBSession
 from asgard.models.account import AccountDB, Account
 from asgard.models.user import User
 from itests.util import (
@@ -20,7 +21,7 @@ class AccountModelTest(BaseTestCase):
         await super(AccountModelTest, self).tearDown()
 
     async def test_transform_from_alchemy_object(self):
-        async with self.session() as s:
+        async with AsgardDBSession() as s:
             account_db = (
                 await s.query(AccountDB)
                 .filter(AccountDB.id == ACCOUNT_DEV_ID)

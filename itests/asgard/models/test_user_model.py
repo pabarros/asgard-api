@@ -1,3 +1,4 @@
+from asgard.db import AsgardDBSession
 from asgard.models.user import User, UserDB
 from itests.util import (
     BaseTestCase,
@@ -15,7 +16,7 @@ class UserModelTest(BaseTestCase):
         await super(UserModelTest, self).tearDown()
 
     async def test_user_trasnform_from_alchemy_object(self):
-        async with self.session() as s:
+        async with AsgardDBSession() as s:
             account_db = (
                 await s.query(UserDB)
                 .filter(UserDB.id == USER_WITH_MULTIPLE_ACCOUNTS_ID)

@@ -1,4 +1,5 @@
 from asgard.api.resources.users import UserResource
+from asgard.db import AsgardDBSession
 from asgard.models.account import AccountDB, Account
 from asgard.models.user import UserDB, User
 from itests.util import (
@@ -30,7 +31,7 @@ class UsersMeResourcesTest(BaseTestCase):
         outros modelos necessários.
         data = UsersMeResources(user=..., current_account=..., accounts=...)
         """
-        async with self.session() as s:
+        async with AsgardDBSession() as s:
             account = (
                 await s.query(AccountDB)
                 .filter(AccountDB.id == ACCOUNT_DEV_ID)

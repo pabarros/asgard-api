@@ -158,11 +158,6 @@ _pool = None
 class BaseTestCase(TestCase):
     use_default_loop = True
 
-    @property
-    def session(self):
-        global _session
-        return _session
-
     async def conn_pool(self):
         global _session, _pool
         if not _session:
@@ -172,8 +167,6 @@ class BaseTestCase(TestCase):
         return _pool
 
     async def setUp(self):
-        reload(asgard.db)
-        reload(asgard.backends.users)
 
         self.pg_data_mocker = PgDataMocker(pool=await self.conn_pool())
         self.users_fixture = [
