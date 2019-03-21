@@ -54,8 +54,8 @@ class AccountsApiTest(BaseTestCase):
             headers={"Authorization": f"JWT {jwt_token.decode('utf-8')}"},
         )
         self.assertEqual(200, resp.status)
-        await resp.json()
-        returned_token = jwt.decode(resp.headers["JWT"], key=SECRET_KEY)
+        data = await resp.json()
+        returned_token = jwt.decode(data["jwt"], key=SECRET_KEY)
         self.assertDictEqual(
             User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT).dict(),
             returned_token["user"],
