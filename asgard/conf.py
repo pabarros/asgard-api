@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     DB_URL: str
 
     class Config:
-        env_prefix = os.getenv("ENV", "ASGARD_")
+        env_prefix = os.getenv("ENV", "ASGARD") + "_"
 
 
 settings = Settings()
