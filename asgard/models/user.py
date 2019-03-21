@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from typing import Type, Tuple
+
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
