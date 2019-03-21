@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Dict, Type, TypeVar, Generic, Tuple
 
 from pydantic import BaseModel as PydanticBaseModel

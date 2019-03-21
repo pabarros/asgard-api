@@ -35,7 +35,10 @@ class User(BaseModel):
         )
 
     async def to_alchemy_obj(self) -> Tuple[UserDB, Type[UserDB]]:
-        return UserDB(id=self.id, tx_name=self.name, tx_email=self.email)
+        return (
+            UserDB(id=self.id, tx_name=self.name, tx_email=self.email),
+            UserDB,
+        )
 
 
 UserFactory = ModelFactory(User)
