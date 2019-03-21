@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from typing import Type, Tuple
+
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -20,12 +22,23 @@ class UserDB(BaseModelAlchemy):  # type: ignore
 
 class User(BaseModel):
     type: str = "ASGARD"
+    id: int
     name: str
     email: str
 
     @staticmethod
     async def from_alchemy_obj(alchemy_obj: UserDB) -> "User":
-        return User(name=alchemy_obj.tx_name, email=alchemy_obj.tx_email)
+        return User(
+            id=alchemy_obj.id,
+            name=alchemy_obj.tx_name,
+            email=alchemy_obj.tx_email,
+        )
+
+    async def to_alchemy_obj(self) -> Tuple[UserDB, Type[UserDB]]:
+        return (
+            UserDB(id=self.id, tx_name=self.name, tx_email=self.email),
+            UserDB,
+        )
 
 
 UserFactory = ModelFactory(User)

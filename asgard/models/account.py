@@ -35,6 +35,17 @@ class Account(BaseModel):
             owner=alchemy_obj.owner,
         )
 
+    async def to_alchemy_obj(self):
+        return (
+            AccountDB(
+                id=self.id,
+                name=self.name,
+                namespace=self.namespace,
+                owner=self.owner,
+            ),
+            AccountDB,
+        )
+
     async def user_has_permission(self, user: User) -> bool:
         _join = UserHasAccount.join(
             UserDB, UserHasAccount.c.user_id == UserDB.id

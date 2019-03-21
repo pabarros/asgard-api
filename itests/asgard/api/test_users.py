@@ -9,6 +9,7 @@ from itests.util import (
     USER_WITH_MULTIPLE_ACCOUNTS_NAME,
     USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_ID,
     ACCOUNT_DEV_ID,
     ACCOUNT_DEV_NAME,
     ACCOUNT_DEV_NAMESPACE,
@@ -64,6 +65,7 @@ class UsersTestCase(BaseTestCase):
                 "user": {
                     "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
                     "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+                    "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
                     "errors": {},
                     "type": "ASGARD",
                 },

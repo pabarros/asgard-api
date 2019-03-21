@@ -1,7 +1,11 @@
-from typing import Dict, Type
+from collections.abc import Mapping
+from typing import Dict, Type, TypeVar, Generic, Tuple
 
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative.api import DeclarativeMeta
+
+BaseModelAlchemy = declarative_base()
 
 
 class BaseModel(PydanticBaseModel):
@@ -11,8 +15,13 @@ class BaseModel(PydanticBaseModel):
     def add_error(self, field_name, error_msg):
         self.errors[field_name] = error_msg
 
+    async def from_alchemy_object(self, alchemy_obj) -> "BaseModel":
+        raise NotImplementedError
 
-BaseModelAlchemy = declarative_base()
+    async def to_alchemy_obj(
+        self
+    ) -> Tuple[DeclarativeMeta, Type[DeclarativeMeta]]:
+        raise NotImplementedError
 
 
 def ModelFactory(subclass_marker: Type[BaseModel]):
