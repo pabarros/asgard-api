@@ -11,6 +11,9 @@ class UserModelTest(BaseTestCase):
     async def setUp(self):
         await super(UserModelTest, self).setUp()
 
+    async def tearDown9(self):
+        await super(UserModelTest, self).tearDown()
+
     async def test_user_trasnform_from_alchemy_object(self):
         async with self.session() as s:
             account_db = (

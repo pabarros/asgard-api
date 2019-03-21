@@ -10,12 +10,15 @@ from itests.util import BaseTestCase, USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY
 from tests.utils import with_json_fixture
 
 
-class DeploymentsTests(BaseTestCase):
+class QueueTests(BaseTestCase):
     async def setUp(self):
-        await super(DeploymentsTests, self).setUp()
+        await super(QueueTests, self).setUp()
         self.auth_header = {
             "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
         }
+
+    async def tearDown(self):
+        await super(QueueTests, self).tearDown()
 
     def make_auth_header(self, user, account) -> Dict[str, str]:
         jwt_token = jwt_auth.jwt_encode_callback(

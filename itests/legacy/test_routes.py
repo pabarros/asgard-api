@@ -34,7 +34,8 @@ class RoutesTest(BaseTestCase):
         self.proxy_mock = self.proxy_mock_patcher.start()
         self.proxy_mock.return_value = Response(status=200)
 
-    def tearDown(self):
+    async def tearDown(self):
+        await super(RoutesTest, self).tearDown()
         self.proxy_mock_patcher.stop()
 
     def test_v2_artifacts(self):

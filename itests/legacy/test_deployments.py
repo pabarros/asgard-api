@@ -25,6 +25,9 @@ class DeploymentsTests(BaseTestCase):
         )
         self.auth_header = {"Authorization": f"JWT {token.decode('utf-8')}"}
 
+    async def tearDown(self):
+        await super(DeploymentsTests, self).tearDown()
+
     def test_v2_deployments_get(self):
         fixture = get_fixture("deployments/get.json")
         with application.test_client() as client, RequestsMock() as rsps:

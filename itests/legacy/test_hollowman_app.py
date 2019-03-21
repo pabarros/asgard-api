@@ -3,6 +3,7 @@ from unittest import TestCase, skip
 
 import responses
 from mock import patch
+from responses import RequestsMock
 
 from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
@@ -42,7 +43,8 @@ class HollowmanAppTest(BaseTestCase):
         )
         responses.start()
 
-    def tearDown(self):
+    async def tearDown(self):
+        await super(HollowmanAppTest, self).tearDown()
         responses.stop()
 
     def test_auth_error_returns_HTTP_401(self):
@@ -51,7 +53,7 @@ class HollowmanAppTest(BaseTestCase):
             self.assertEqual(401, response.status_code)
 
     def test_unexpected_error_returns_HTTP_500(self):
-        with application.test_client() as client:
+        with application.test_client() as client, RequestsMock():
             response = client.get(
                 "/v2/apps",
                 headers={
@@ -88,7 +90,3 @@ class HollowmanAppTest(BaseTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertTrue("Location" in response.headers)
             self.assertEqual(redirect_value, response.headers["Location"])
-
-    @skip("Need to find a way to test this. Any ideas ?")
-    def test_apiv2_path(self):
-        pass

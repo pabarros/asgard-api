@@ -21,6 +21,9 @@ class UsersMeResourcesTest(BaseTestCase):
     async def setUp(self):
         await super(UsersMeResourcesTest, self).setUp()
 
+    async def tearDown(self):
+        await super(UsersMeResourcesTest, self).tearDown()
+
     async def test_serialize_all_fields(self):
         """
         Confere que é possível serializar um UsersMeResources a apartir dos

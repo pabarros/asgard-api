@@ -26,6 +26,9 @@ class TasksEndpointTest(BaseTestCase):
             "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
         }
 
+    async def tearDown(self):
+        await super(TasksEndpointTest, self).tearDown()
+
     @unittest.skip("")
     def test_tasks_return_404_for_not_found_task(self):
         self.fail()

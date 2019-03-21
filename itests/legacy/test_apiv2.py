@@ -31,7 +31,8 @@ class AuthenticationTest(BaseTestCase):
 
         self.response_http_200 = Response(status=200)
 
-    def tearDown(self):
+    async def tearDown(self):
+        await super(AuthenticationTest, self).tearDown()
         patch.stopall()
 
     def make_auth_header(self, user, account) -> Dict[str, str]:

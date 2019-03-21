@@ -1,43 +1,37 @@
 import json
 from copy import deepcopy
-from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
 from marathon import MarathonApp
 from responses import RequestsMock
 
-from asgard.models.account import AccountDB as Account
+from asgard.models.account import AccountDB
+from asgard.models.user import UserDB
 from hollowman import conf
 from hollowman.app import application
 from hollowman.http_wrappers.request import Request
-from hollowman.models import HollowmanSession, User
 from hollowman.request_handlers import new
-from tests import rebuild_schema
+from itests.util import BaseTestCase
 from tests.utils import with_json_fixture
 
 
-class RequestHandlersTests(TestCase):
-    @with_json_fixture("single_full_app.json")
-    def setUp(self, single_full_app_fixture):
+class RequestHandlersTests(BaseTestCase):
+    async def setUp(self):
+        await super(RequestHandlersTests, self).setUp()
         self.request_apps = [
             (MarathonApp(id="/xablau"), MarathonApp(id="/xena")),
             (MarathonApp(id="/foo"), MarathonApp(id="/bar")),
         ]
 
-        rebuild_schema()
-        self.session = HollowmanSession()
-        self.user = User(
+        self.user = UserDB(
             tx_email="user@host.com.br",
             tx_name="John Doe",
             tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
         )
-        self.account_dev = Account(
+        self.account_dev = AccountDB(
             id=4, name="Dev Team", namespace="dev", owner="company"
         )
         self.user.accounts = [self.account_dev]
-        self.session.add(self.user)
-        self.session.add(self.account_dev)
-        self.session.commit()
 
     def test_it_call_dispatch_using_user_from_request(self):
         """
@@ -219,23 +213,18 @@ class RequestHandlersTests(TestCase):
                 self.assertEqual({"apps": []}, response_body)
 
 
-class DispatchResponse404Test(TestCase):
-    @with_json_fixture("single_full_app.json")
-    def setUp(self, single_full_app_fixture):
-        rebuild_schema()
-        self.session = HollowmanSession()
-        self.user = User(
+class DispatchResponse404Test(BaseTestCase):
+    async def setUp(self):
+        await super(DispatchResponse404Test, self).setUp()
+        self.user = UserDB(
             tx_email="user@host.com.br",
             tx_name="John Doe",
             tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
         )
-        self.account_dev = Account(
+        self.account_dev = AccountDB(
             id=4, name="Dev Team", namespace="dev", owner="company"
         )
         self.user.accounts = [self.account_dev]
-        self.session.add(self.user)
-        self.session.add(self.account_dev)
-        self.session.commit()
 
     def test_do_not_dispatch_response_pipeline_if_upstream_returns_404(self):
         auth_header = {
