@@ -4,13 +4,14 @@ from unittest import TestCase, skip
 import responses
 from mock import patch
 
-from asgard.models.account import AccountDB as Account
+from asgard.models.account import AccountDB
+from asgard.models.user import UserDB
 from hollowman import conf
 from hollowman.app import application
-from hollowman.models import HollowmanSession, User
 from hollowman.upstream import replay_request
+from itests.util import BaseTestCase
 from tests import rebuild_schema
-from tests.utils import with_json_fixture
+from tests.utils import with_json_fixture, get_fixture
 
 
 class DummyResponse(object):
@@ -20,23 +21,18 @@ class DummyResponse(object):
         self.status_code = 200
 
 
-class TestApp(TestCase):
-    @with_json_fixture("single_full_app.json")
-    def setUp(self, fixture):
-        rebuild_schema()
-        self.session = HollowmanSession()
-        self.user = User(
+class HollowmanAppTest(BaseTestCase):
+    async def setUp(self):
+        await super(HollowmanAppTest, self).setUp()
+        fixture = get_fixture("single_full_app.json")
+        self.user = UserDB(
             tx_email="user@host.com.br",
             tx_name="John Doe",
             tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
         )
-        self.session.add(self.user)
-        self.account_dev = Account(
+        self.account_dev = AccountDB(
             id=4, name="Dev Team", namespace="dev", owner="company"
         )
-        self.session.add(self.account_dev)
-        self.user.accounts = [self.account_dev]
-        self.session.commit()
         responses.add(
             method="GET",
             url=conf.MARATHON_ADDRESSES[0] + "/v2/apps",
@@ -47,7 +43,6 @@ class TestApp(TestCase):
         responses.start()
 
     def tearDown(self):
-        self.session.close()
         responses.stop()
 
     def test_auth_error_returns_HTTP_401(self):

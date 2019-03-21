@@ -1,26 +1,32 @@
 import json
-from typing import Dict
-from unittest import TestCase
 from unittest.mock import patch
 
 from responses import RequestsMock
 
+from asgard.http.auth.jwt import jwt_encode
+from asgard.models.account import Account
+from asgard.models.user import User
 from hollowman import conf
 from hollowman.app import application
-from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
-from tests.base import BaseApiTests
-from tests.utils import with_json_fixture
+from itests.util import (
+    BaseTestCase,
+    USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    ACCOUNT_DEV_DICT,
+)
+from tests.utils import with_json_fixture, get_fixture
 
 
-class DeploymentsTests(BaseApiTests, TestCase):
-    def make_auth_header(self, user, account) -> Dict[str, str]:
-        jwt_token = jwt_auth.jwt_encode_callback(
-            jwt_generate_user_info(user, account)
+class DeploymentsTests(BaseTestCase):
+    async def setUp(self):
+        await super(DeploymentsTests, self).setUp()
+        token = jwt_encode(
+            User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT),
+            Account(**ACCOUNT_DEV_DICT),
         )
-        return {"Authorization": "JWT {}".format(jwt_token.decode("utf-8"))}
+        self.auth_header = {"Authorization": f"JWT {token.decode('utf-8')}"}
 
-    @with_json_fixture("deployments/get.json")
-    def test_v2_deployments_get(self, fixture):
+    def test_v2_deployments_get(self):
+        fixture = get_fixture("deployments/get.json")
         with application.test_client() as client, RequestsMock() as rsps:
             rsps.add(
                 url=f"{conf.MARATHON_ADDRESSES[0]}/v2/deployments",

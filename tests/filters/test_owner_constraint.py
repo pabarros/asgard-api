@@ -1,36 +1,23 @@
-import unittest
-
+from asynctest import TestCase
 from marathon.models.constraint import MarathonConstraint
 
-from asgard.models.account import AccountDB as Account
+from asgard.models.account import Account
+from asgard.models.user import UserDB
 from hollowman.filters.owner import AddOwnerConstraintFilter
 from hollowman.marathonapp import AsgardApp
-from hollowman.models import HollowmanSession, User
-from tests import rebuild_schema
-from tests.utils import with_json_fixture
+from itests.util import ACCOUNT_DEV_DICT
+from tests.utils import get_fixture
 
 
-class OwnerFilterTest(unittest.TestCase):
-    @with_json_fixture("single_full_app.json")
-    def setUp(self, single_full_app_fixture):
+class OwnerFilterTest(TestCase):
+    def setUp(self):
+        single_full_app_fixture = get_fixture("single_full_app.json")
         self.filter = AddOwnerConstraintFilter()
-        rebuild_schema()
-        self.session = HollowmanSession()
-        self.user = User(
-            tx_email="user@host.com.br",
-            tx_name="John Doe",
-            tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
-        )
-        self.account_dev = Account(
-            id=4, name="Dev Team", namespace="dev", owner="company"
-        )
-        self.user.accounts = [self.account_dev]
-        self.session.add(self.user)
-        self.session.add(self.account_dev)
-        self.session.commit()
 
         self.request_app = AsgardApp.from_json(single_full_app_fixture)
         self.original_app = AsgardApp.from_json(single_full_app_fixture)
+        self.user = UserDB()
+        self.account_dev = Account(**ACCOUNT_DEV_DICT)
         self.user.current_account = self.account_dev
 
     def test_create_app_add_constraint_app_with_no_constraint(self):
