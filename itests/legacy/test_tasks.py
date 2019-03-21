@@ -4,14 +4,31 @@ from http import HTTPStatus
 
 from responses import RequestsMock
 
+from asgard.models.account import AccountDB
+from asgard.models.user import UserDB
 from hollowman import api, cache
 from hollowman.app import application
 from hollowman.conf import DEFAULT_MESOS_ADDRESS
-from tests.base import BaseApiTests
+from itests.util import (
+    ACCOUNT_DEV_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
+    BaseTestCase,
+)
 from tests.utils import get_raw_fixture, with_json_fixture
 
 
-class TasksEndpointTest(BaseApiTests, unittest.TestCase):
+class TasksEndpointTest(BaseTestCase):
+    async def setUp(self):
+        await super(TasksEndpointTest, self).setUp()
+        self.user = UserDB()
+        self.user.current_account = AccountDB(**ACCOUNT_DEV_DICT)
+        self.auth_header = {
+            "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+        }
+
+    async def tearDown(self):
+        await super(TasksEndpointTest, self).tearDown()
+
     @unittest.skip("")
     def test_tasks_return_404_for_not_found_task(self):
         self.fail()
@@ -165,7 +182,6 @@ class TasksEndpointTest(BaseApiTests, unittest.TestCase):
                 resp = client.get(
                     f"/tasks/{task_id}/files", headers=self.auth_header
                 )
-                resp_data = json.loads(resp.data)
                 self.assertEquals(404, resp.status_code)
 
     @with_json_fixture("../fixtures/api/tasks/task_file_read_response.json")
@@ -422,7 +438,6 @@ class TasksEndpointTest(BaseApiTests, unittest.TestCase):
                     f"/tasks/{task_id}/files/read?path=/not_found_file&offset=0&length=42",
                     headers=self.auth_header,
                 )
-                resp_data = json.loads(resp.data)
                 self.assertEquals(404, resp.status_code)
 
     def test_download_by_id_expired(self):

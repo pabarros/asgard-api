@@ -1,4 +1,5 @@
 from asgard.api.resources.users import UserResource
+from asgard.db import AsgardDBSession
 from asgard.models.account import AccountDB, Account
 from asgard.models.user import UserDB, User
 from itests.util import (
@@ -21,13 +22,16 @@ class UsersMeResourcesTest(BaseTestCase):
     async def setUp(self):
         await super(UsersMeResourcesTest, self).setUp()
 
+    async def tearDown(self):
+        await super(UsersMeResourcesTest, self).tearDown()
+
     async def test_serialize_all_fields(self):
         """
         Confere que é possível serializar um UsersMeResources a apartir dos
         outros modelos necessários.
         data = UsersMeResources(user=..., current_account=..., accounts=...)
         """
-        async with self.session() as s:
+        async with AsgardDBSession() as s:
             account = (
                 await s.query(AccountDB)
                 .filter(AccountDB.id == ACCOUNT_DEV_ID)
@@ -73,6 +77,7 @@ class UsersMeResourcesTest(BaseTestCase):
                     "user": {
                         "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
                         "errors": {},
+                        "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
                         "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
                         "type": "ASGARD",
                     },

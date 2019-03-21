@@ -15,10 +15,11 @@ from itests.util import (
 
 
 class UsersBackendTest(BaseTestCase):
-    use_default_loop = True
-
     async def setUp(self):
         await super(UsersBackendTest, self).setUp()
+
+    async def tearDown(self):
+        await super(UsersBackendTest, self).tearDown()
 
     async def test_get_alternate_accounts_for_user(self):
         user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)

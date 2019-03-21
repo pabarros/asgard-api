@@ -8,7 +8,7 @@ from aiohttp import web
 from sqlalchemy.orm.exc import NoResultFound
 
 from asgard import db
-from asgard.models.account import AccountDB as Account
+from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
 from asgard.models.user_has_account import UserHasAccount
 from hollowman.conf import SECRET_KEY
@@ -37,8 +37,8 @@ async def _get_account_by_id(account_id):
         async with db.AsgardDBSession() as s:
             try:
                 return (
-                    await s.query(Account)
-                    .filter(Account.id == account_id)
+                    await s.query(AccountDB)
+                    .filter(AccountDB.id == account_id)
                     .one()
                 )
             except NoResultFound:
@@ -49,11 +49,11 @@ def _build_base_query(session: db.session.AsgardDBConnection):
     _join = UserDB.__table__.join(
         UserHasAccount, UserDB.id == UserHasAccount.c.user_id, isouter=True
     ).join(
-        Account.__table__,
-        Account.id == UserHasAccount.c.account_id,
+        AccountDB.__table__,
+        AccountDB.id == UserHasAccount.c.account_id,
         isouter=True,
     )
-    session.query(UserDB, Account.id.label("account_id")).join(_join)
+    session.query(UserDB, AccountDB.id.label("account_id")).join(_join)
 
 
 async def _build_user_instance(
@@ -67,7 +67,9 @@ async def _build_user_instance(
         logger.warning(auth_failed_log_data)
         return None
     account_ids = [row.account_id for row in rows if row.account_id]
-    user = UserDB(tx_name=rows[0].tx_name, tx_email=rows[0].tx_email)
+    user = UserDB(
+        id=rows[0].id, tx_name=rows[0].tx_name, tx_email=rows[0].tx_email
+    )
     user.account_ids = account_ids
     return user
 

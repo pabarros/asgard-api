@@ -23,3 +23,19 @@ class BaseModelTest(TestCase):
             {"type": "ONE", "other_field": "value", "errors": {}},
             instance.dict(),
         )
+
+    async def test_check_transformation_method_to_alchemy(self):
+        class MyModel(BaseModel):
+            type = "type"
+
+        with self.assertRaises(NotImplementedError):
+            model = MyModel()
+            await model.to_alchemy_obj()
+
+    async def test_check_transformation_method_from_alchemy(self):
+        class MyModel(BaseModel):
+            type = "type"
+
+        with self.assertRaises(NotImplementedError):
+            model = MyModel()
+            await model.from_alchemy_object(None)

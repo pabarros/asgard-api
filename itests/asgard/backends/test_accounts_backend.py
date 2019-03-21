@@ -8,6 +8,9 @@ class AccountsBackendTest(BaseTestCase):
         await super(AccountsBackendTest, self).setUp()
         self.backend = AccountsBackend()
 
+    async def tearDown(self):
+        await super(AccountsBackendTest, self).tearDown()
+
     async def test_get_account_by_id_account_not_found(self):
         account = await self.backend.get_account_by_id(8000)
         self.assertIsNone(account)

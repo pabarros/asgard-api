@@ -1,56 +1,49 @@
 import json
 import unittest
-from unittest import TestCase
 
 import jwt
 import responses
 from flask import request
 from mock import MagicMock, patch
 
-from asgard.models.account import AccountDB as Account
+from asgard.http.auth.jwt import jwt_encode
+from asgard.models.account import AccountDB, Account
+from asgard.models.user import UserDB, User
 from hollowman import conf, decorators, routes
 from hollowman.app import application
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
-from hollowman.models import HollowmanSession, User
-from tests import rebuild_schema
-from tests.utils import with_json_fixture
+from itests.util import (
+    BaseTestCase,
+    ACCOUNT_DEV_DICT,
+    ACCOUNT_INFRA_DICT,
+    ACCOUNT_WITH_NO_USERS_DICT,
+    USER_WITH_NO_ACCOUNTS_AUTH_KEY,
+    USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_NAME,
+    USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+    USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
+    USER_WITH_NO_ACCOUNTS_DICT,
+)
+from tests.utils import get_fixture
 
 
-class TestAuthentication(TestCase):
-    @with_json_fixture("single_full_app.json")
-    def setUp(self, fixture):
-        rebuild_schema()
-        self.session = HollowmanSession()
-        self.user = User(
-            tx_email="user@host.com.br",
-            tx_name="John Doe",
-            tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
-        )
-        self.account_dev = Account(
-            id=4, name="Dev Team", namespace="dev", owner="company"
-        )
-        self.account_infra = Account(
-            name="Infra Team", namespace="infra", owner="company"
-        )
-        self.account_sup = Account(
+class AuthenticationTest(BaseTestCase):
+    async def setUp(self):
+        await super(AuthenticationTest, self).setUp()
+        fixture = get_fixture("single_full_app.json")
+        self.user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        self.account_dev = Account(**ACCOUNT_DEV_DICT)
+        self.account_infra = Account(**ACCOUNT_INFRA_DICT)
+        self.account_sup = AccountDB(
             name="Support Team", namespace="sup", owner="company"
         )
-        self.user.accounts = [self.account_dev, self.account_infra]
-        self.session.add(self.user)
-        self.session.add(self.account_dev)
-        self.session.add(self.account_infra)
-        self.session.add(self.account_sup)
-        self.user_with_no_accounts = User(
-            tx_email="user-no-accounts@host.com.br",
-            tx_name="No Accounts",
-            tx_authkey="7b4184bfe7d2349eb56bcfb9dc246cf8",
-        )
-        self.session.add(self.user_with_no_accounts)
-        self.account_with_no_user = Account(
-            name="Team Nobody", namespace="nobody", owner="nobody"
-        )
-        self.session.add(self.account_with_no_user)
-        self.session.commit()
+        # self.user.accounts = [self.account_dev, self.account_infra]
+        # self.session.add(self.user)
+        # self.session.add(self.account_dev)
+        # self.session.add(self.account_infra)
+        # self.session.add(self.account_sup)
+        self.user_with_no_accounts = User(**USER_WITH_NO_ACCOUNTS_DICT)
+        self.account_with_no_user = Account(**ACCOUNT_WITH_NO_USERS_DICT)
         self.response_http_200 = MagicMock(status_code=200)
         responses.add(
             method="GET",
@@ -78,9 +71,12 @@ class TestAuthentication(TestCase):
         )
         responses.start()
 
-    def tearDown(self):
-        self.session.close()
+    async def tearDown(self):
+        await super(AuthenticationTest, self).tearDown()
         responses.stop()
+
+    def auth_header(self, token):
+        return {"Authorization": f"Token {token}"}
 
     def test_populate_request_user_if_key_is_valid(self):
         """
@@ -89,23 +85,23 @@ class TestAuthentication(TestCase):
         with application.test_client() as client:
             r = client.get(
                 "/v2/apps",
-                headers={
-                    "Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
+                headers=self.auth_header(USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY),
             )
             self.assertEqual(200, r.status_code)
-            self.assertEqual("user@host.com.br", request.user.tx_email)
+            self.assertEqual(
+                USER_WITH_MULTIPLE_ACCOUNTS_EMAIL, request.user.tx_email
+            )
 
     def test_token_populate_default_account_if_request_account_is_empty(self):
         with application.test_client() as client:
             r = client.get(
                 "/v2/apps",
-                headers={
-                    "Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
+                headers=self.auth_header(USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY),
             )
             self.assertEqual(200, r.status_code)
-            self.assertEqual("user@host.com.br", request.user.tx_email)
+            self.assertEqual(
+                USER_WITH_MULTIPLE_ACCOUNTS_EMAIL, request.user.tx_email
+            )
             self.assertEqual(
                 self.account_dev.id, request.user.current_account.id
             )
@@ -141,9 +137,7 @@ class TestAuthentication(TestCase):
         """
         test_client = application.test_client()
         with application.app_context():
-            jwt_token = jwt_auth.jwt_encode_callback(
-                jwt_generate_user_info(self.user, self.account_with_no_user)
-            )
+            jwt_token = jwt_encode(self.user, self.account_with_no_user)
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode("utf-8"))
             }
@@ -158,9 +152,7 @@ class TestAuthentication(TestCase):
         with application.test_client() as client:
             r = client.get(
                 "/v2/apps",
-                headers={
-                    "Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
+                headers=self.auth_header(USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY),
             )
             self.assertEqual(200, r.status_code)
 
@@ -189,9 +181,7 @@ class TestAuthentication(TestCase):
         with application.test_client() as test_client, application.app_context(), patch.object(
             decorators, "HollowmanSession"
         ) as session_mock:
-            r = test_client.get(
-                "/v2/apps", headers={"Authorization": "JWT Token"}
-            )
+            test_client.get("/v2/apps", headers={"Authorization": "JWT Token"})
             self.assertEqual(0, session_mock.call_count)
 
     def test_token_return_401_if_user_is_not_associated_to_desired_account(
@@ -204,18 +194,14 @@ class TestAuthentication(TestCase):
         with application.test_client() as client:
             r = client.get(
                 "/v2/apps?account_id={}".format(account_id),
-                headers={
-                    "Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
+                headers=self.auth_header(USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY),
             )
             self.assertEqual(401, r.status_code)
 
     def test_return_200_if_jwt_token_valid(self):
         test_client = application.test_client()
         with application.app_context():
-            jwt_token = jwt_auth.jwt_encode_callback(
-                jwt_generate_user_info(self.user, self.account_dev)
-            )
+            jwt_token = jwt_encode(self.user, self.account_dev)
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode("utf-8"))
             }
@@ -224,16 +210,18 @@ class TestAuthentication(TestCase):
 
     def test_jwt_populate_request_user_if_token_is_valid(self):
         with application.app_context(), application.test_client() as test_client:
-            jwt_token = jwt_auth.jwt_encode_callback(
-                jwt_generate_user_info(self.user, self.account_infra)
-            )
+            jwt_token = jwt_encode(self.user, self.account_infra)
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode("utf-8"))
             }
             r = test_client.get("/v2/apps", headers=auth_header)
             self.assertEqual(200, r.status_code)
-            self.assertEqual("user@host.com.br", request.user.tx_email)
-            self.assertEqual(5, request.user.current_account.id)
+            self.assertEqual(
+                USER_WITH_MULTIPLE_ACCOUNTS_EMAIL, request.user.tx_email
+            )
+            self.assertEqual(
+                self.account_infra.id, request.user.current_account.id
+            )
 
     def test_jwt_auth_with_token_from_session_if_headers_not_present(self):
         """
@@ -244,11 +232,9 @@ class TestAuthentication(TestCase):
         with application.app_context(), patch.object(
             routes,
             "check_authentication_successful",
-            return_value={"email": self.user.tx_email},
+            return_value={"email": self.user.email},
         ):
-            jwt_token = jwt_auth.jwt_encode_callback(
-                jwt_generate_user_info(self.user, self.account_dev)
-            )
+            jwt_token = jwt_encode(self.user, self.account_dev)
 
             with test_client.session_transaction() as flask_session:
                 flask_session["jwt"] = jwt_token
@@ -286,35 +272,13 @@ class TestAuthentication(TestCase):
                 "Authorization token is invalid", json.loads(r.data)["msg"]
             )
 
-    def test_redirect_with_jwt_url_is_formed_with_unicode_jwt(self):
-        test_client = application.test_client()
-        jwt = MagicMock()
-
-        with application.app_context(), patch.object(
-            routes,
-            "check_authentication_successful",
-            return_value={"email": "user@host.com.br"},
-        ), patch.object(
-            routes.jwt_auth, "jwt_encode_callback", return_value=jwt
-        ), patch.object(
-            routes, "redirect"
-        ) as redirect:
-            response = test_client.get("/authenticate/google")
-
-            jwt.decode.assert_called_once_with("utf-8")
-            redirect.assert_called_once_with(
-                "{}?jwt={}".format(
-                    conf.REDIRECT_AFTER_LOGIN, jwt.decode.return_value
-                )
-            )
-
     def test_login_failed_invalid_oauth2(self):
         test_client = application.test_client()
 
         with application.app_context(), patch.object(
             routes, "check_authentication_successful", return_value={}
         ), patch.object(routes, "render_template") as render_mock:
-            response = test_client.get("/authenticate/google")
+            test_client.get("/authenticate/google")
 
             render_mock.assert_called_once_with(
                 "login-failed.html", reason="Invalid OAuth2 code"
@@ -328,7 +292,7 @@ class TestAuthentication(TestCase):
             "check_authentication_successful",
             return_value={"email": "not-found@host.com.br"},
         ), patch.object(routes, "render_template") as render_mock:
-            response = test_client.get("/authenticate/google")
+            test_client.get("/authenticate/google")
 
             render_mock.assert_called_once_with(
                 "login-failed.html", reason="User not found"
@@ -340,9 +304,9 @@ class TestAuthentication(TestCase):
         with application.app_context(), patch.object(
             routes,
             "check_authentication_successful",
-            return_value={"email": self.user_with_no_accounts.tx_email},
+            return_value={"email": self.user_with_no_accounts.email},
         ), patch.object(routes, "render_template") as render_mock:
-            response = test_client.get("/authenticate/google")
+            test_client.get("/authenticate/google")
 
             render_mock.assert_called_once_with(
                 "login-failed.html", reason="No associated accounts"
@@ -352,9 +316,7 @@ class TestAuthentication(TestCase):
         with application.test_client() as client:
             r = client.get(
                 "/v2/apps",
-                headers={
-                    "Authorization": "Token 7b4184bfe7d2349eb56bcfb9dc246cf8"
-                },
+                headers=self.auth_header(USER_WITH_NO_ACCOUNTS_AUTH_KEY),
             )
             self.assertEqual(401, r.status_code)
             self.assertEqual("No associated account", json.loads(r.data)["msg"])
@@ -369,24 +331,23 @@ class TestAuthentication(TestCase):
         with application.app_context(), patch.object(
             routes,
             "check_authentication_successful",
-            return_value={"email": self.user.tx_email},
+            return_value={"email": self.user.email},
         ), patch.object(routes, "redirect") as redirect_mock:
-            response = test_client.get("/authenticate/google")
+            test_client.get("/authenticate/google")
 
             jwt_token = redirect_mock.call_args_list[0][0][0].split("=")[1]
             token_content = jwt.decode(jwt_token, conf.SECRET_KEY)
 
-            self.assertEqual(self.user.tx_email, token_content["user"]["email"])
-            self.assertEqual(self.user.tx_name, token_content["user"]["name"])
+            self.assertEqual(self.user.email, token_content["user"]["email"])
+            self.assertEqual(self.user.name, token_content["user"]["name"])
             self.assertEqual(
-                self.user.accounts[0].id, token_content["current_account"]["id"]
+                self.account_dev.id, token_content["current_account"]["id"]
             )
             self.assertEqual(
-                self.user.accounts[0].name,
-                token_content["current_account"]["name"],
+                self.account_dev.name, token_content["current_account"]["name"]
             )
             self.assertEqual(
-                self.user.accounts[0].namespace,
+                self.account_dev.namespace,
                 token_content["current_account"]["namespace"],
             )
 
@@ -396,53 +357,39 @@ class TestAuthentication(TestCase):
         do usuário.
         """
         test_client = application.test_client()
-        jwt = MagicMock()
+        MagicMock()
 
         with application.app_context(), patch.object(
             routes,
             "check_authentication_successful",
-            return_value={"email": self.user.tx_email},
+            return_value={"email": self.user.email},
         ), patch.object(
             routes.jwt_auth, "jwt_encode_callback"
         ) as jwt_auth_mock:
-            response = test_client.get("/authenticate/google")
+            test_client.get("/authenticate/google")
 
+            user = UserDB(
+                tx_name=USER_WITH_MULTIPLE_ACCOUNTS_NAME,
+                tx_email=USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+            )
             jwt_auth_mock.assert_called_once_with(
-                jwt_generate_user_info(self.user, self.user.accounts[0])
+                jwt_generate_user_info(user, self.account_dev)
             )
 
     def test_token_return_401_if_user_has_no_associated_account(self):
         with application.test_client() as client:
             r = client.get(
                 "/v2/apps",
-                headers={
-                    "Authorization": " Token 7b4184bfe7d2349eb56bcfb9dc246cf8"
-                },
+                headers=self.auth_header(USER_WITH_NO_ACCOUNTS_AUTH_KEY),
             )
-            self.assertEqual(401, r.status_code)
-            self.assertEqual("No associated account", json.loads(r.data)["msg"])
-
-    @unittest.skip(
-        "Em teoria nunca vai existir um token JWT valido sem account_id. Mais detahes no teste test_jwt_populate_default_account_if_request_account_is_empty"
-    )
-    def test_jwt_return_401_if_user_has_no_associated_account(self):
-        test_client = application.test_client()
-        with application.app_context():
-            jwt_token = jwt_auth.jwt_encode_callback(
-                {"email": "user-no-accounts@host.com.br", "account_id": 2}
-            )
-            auth_header = {
-                "Authorization": "JWT {}".format(jwt_token.decode("utf-8"))
-            }
-            r = test_client.get("/v2/apps", headers=auth_header)
             self.assertEqual(401, r.status_code)
             self.assertEqual("No associated account", json.loads(r.data)["msg"])
 
     def test_jwt_return_401_if_when_account_does_not_exist(self):
         test_client = application.test_client()
         with application.app_context():
-            jwt_token = jwt_auth.jwt_encode_callback(
-                jwt_generate_user_info(self.user, Account(id=1024))
+            jwt_token = jwt_encode(
+                self.user, Account(id=2014, name="", namespace="", owner="")
             )
             auth_header = {
                 "Authorization": "JWT {}".format(jwt_token.decode("utf-8"))
@@ -457,9 +404,7 @@ class TestAuthentication(TestCase):
         with application.test_client() as client:
             r = client.get(
                 "/v2/apps?account_id=1024",
-                headers={
-                    "Authorization": " Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
+                headers=self.auth_header(USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY),
             )
             self.assertEqual(401, r.status_code)
             self.assertEqual(

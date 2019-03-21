@@ -4,35 +4,38 @@ from flask import Response
 from mock import patch
 
 import hollowman.routes
-from asgard.models.account import AccountDB as Account
+from asgard.models.account import AccountDB
+from asgard.models.user import UserDB
+from hollowman import decorators
 from hollowman.app import application
-from hollowman.models import User, HollowmanSession
+from itests.util import (
+    BaseTestCase,
+    ACCOUNT_DEV_ID,
+    ACCOUNT_DEV_NAME,
+    ACCOUNT_DEV_NAMESPACE,
+    ACCOUNT_DEV_OWNER,
+)
 from tests import rebuild_schema
 
 
-class RoutesTest(unittest.TestCase):
-    def setUp(self):
-        rebuild_schema()
-        self.session = HollowmanSession()
-        self.user = User(
-            tx_email="user@host.com.br",
-            tx_name="John Doe",
-            tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
-        )
-        self.account_dev = Account(
-            id=4, name="Dev Team", namespace="dev", owner="company"
+class RoutesTest(BaseTestCase):
+    async def setUp(self):
+        await super(RoutesTest, self).setUp()
+        self.user = UserDB()
+        self.account_dev = AccountDB(
+            id=ACCOUNT_DEV_ID,
+            name=ACCOUNT_DEV_NAME,
+            namespace=ACCOUNT_DEV_NAMESPACE,
+            owner=ACCOUNT_DEV_OWNER,
         )
         self.user.accounts = [self.account_dev]
-        self.session.add(self.account_dev)
-        self.session.add(self.user)
-        self.session.commit()
 
         self.proxy_mock_patcher = patch.object(hollowman.routes, "raw_proxy")
         self.proxy_mock = self.proxy_mock_patcher.start()
         self.proxy_mock.return_value = Response(status=200)
 
-    def tearDown(self):
-        self.session.close()
+    async def tearDown(self):
+        await super(RoutesTest, self).tearDown()
         self.proxy_mock_patcher.stop()
 
     def test_v2_artifacts(self):
@@ -95,6 +98,16 @@ class RoutesTest(unittest.TestCase):
             )
         self.assertEqual(9, self.proxy_mock.call_count)
 
+    def test_v2_info(self):
+        with application.test_client() as client:
+            client.get(
+                "/v2/info",
+                headers={
+                    "Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"
+                },
+            )
+            self.assertEqual(1, self.proxy_mock.call_count)
+
     def test_v2_leader(self):
         with application.test_client() as client:
             client.get(
@@ -110,16 +123,6 @@ class RoutesTest(unittest.TestCase):
                 },
             )
             self.assertEqual(2, self.proxy_mock.call_count)
-
-    def test_v2_info(self):
-        with application.test_client() as client:
-            client.get(
-                "/v2/info",
-                headers={
-                    "Authorization": "Token 69ed620926be4067a36402c3f7e9ddf0"
-                },
-            )
-            self.assertEqual(1, self.proxy_mock.call_count)
 
     def test_ping(self):
         with application.test_client() as client:
@@ -140,8 +143,3 @@ class RoutesTest(unittest.TestCase):
                 },
             )
             self.assertEqual(1, self.proxy_mock.call_count)
-
-    def test_login_google(self):
-        with application.test_client() as client:
-            resp = client.get("/login/google")
-            self.assertEqual(302, resp.status_code)

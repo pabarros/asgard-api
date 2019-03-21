@@ -103,6 +103,19 @@ ACCOUNT_DEV_DICT = {
     "owner": ACCOUNT_DEV_OWNER,
 }
 
+
+ACCOUNT_WITH_NO_USERS_ID = 12
+ACCOUNT_WITH_NO_USERS_NAME = "Other Team"
+ACCOUNT_WITH_NO_USERS_NAMESPACE = "other"
+ACCOUNT_WITH_NO_USERS_OWNER = "other"
+ACCOUNT_WITH_NO_USERS_DICT = {
+    "id": ACCOUNT_WITH_NO_USERS_ID,
+    "name": ACCOUNT_WITH_NO_USERS_NAME,
+    "namespace": ACCOUNT_WITH_NO_USERS_NAMESPACE,
+    "owner": ACCOUNT_WITH_NO_USERS_OWNER,
+}
+
+
 USER_WITH_ONE_ACCOUNT_ID = 22
 USER_WITH_ONE_ACCOUNT_AUTH_KEY = ""
 USER_WITH_ONE_ACCOUNT_NAME = "User one account"
@@ -138,15 +151,24 @@ USER_WITH_MULTIPLE_ACCOUNTS_DICT = {
 }
 
 
+_session = None
+_pool = None
+
+
 class BaseTestCase(TestCase):
     use_default_loop = True
 
-    async def setUp(self):
-        reload(asgard.db)
-        reload(asgard.backends.users)
+    async def conn_pool(self):
+        global _session, _pool
+        if not _session:
+            _session = _SessionMaker(settings.DB_URL)
+            _pool = await _session.engine()
 
-        self.session = _SessionMaker(settings.DB_URL)
-        self.pg_data_mocker = PgDataMocker(pool=await self.session.engine())
+        return _pool
+
+    async def setUp(self):
+
+        self.pg_data_mocker = PgDataMocker(pool=await self.conn_pool())
         self.users_fixture = [
             [
                 USER_WITH_MULTIPLE_ACCOUNTS_ID,
@@ -189,7 +211,12 @@ class BaseTestCase(TestCase):
                     ACCOUNT_INFRA_NAMESPACE,
                     ACCOUNT_INFRA_OWNER,
                 ],
-                [12, "Other Team", "other", "other"],
+                [
+                    ACCOUNT_WITH_NO_USERS_ID,
+                    ACCOUNT_WITH_NO_USERS_NAME,
+                    ACCOUNT_WITH_NO_USERS_NAMESPACE,
+                    ACCOUNT_WITH_NO_USERS_OWNER,
+                ],
             ],
         )
 
