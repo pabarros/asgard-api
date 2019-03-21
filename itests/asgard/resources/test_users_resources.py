@@ -77,6 +77,7 @@ class UsersMeResourcesTest(BaseTestCase):
                     "user": {
                         "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
                         "errors": {},
+                        "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
                         "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
                         "type": "ASGARD",
                     },

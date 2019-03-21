@@ -2,11 +2,11 @@ from collections import defaultdict
 from functools import wraps
 from typing import Callable, Dict
 
-import jwt
 import sqlalchemy
 from aiohttp import web
 from sqlalchemy.orm.exc import NoResultFound
 
+import jwt
 from asgard import db
 from asgard.models.account import AccountDB as Account
 from asgard.models.user import UserDB
@@ -67,7 +67,9 @@ async def _build_user_instance(
         logger.warning(auth_failed_log_data)
         return None
     account_ids = [row.account_id for row in rows if row.account_id]
-    user = UserDB(tx_name=rows[0].tx_name, tx_email=rows[0].tx_email)
+    user = UserDB(
+        id=rows[0].id, tx_name=rows[0].tx_name, tx_email=rows[0].tx_email
+    )
     user.account_ids = account_ids
     return user
 
