@@ -89,7 +89,7 @@ class Session:
     async def __aenter__(self) -> AsgardDBConnection:
         return await self.connection()
 
-    async def __aexit__(self, a, b, c):
+    async def __aexit__(self, exc_type, exc, tb):
         engine = await self._engine_wrapper.engine()
         engine.release(self.conn)
 
