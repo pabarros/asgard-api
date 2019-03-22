@@ -1,9 +1,5 @@
-from aiopg.sa import create_engine
-
-from hollowman.conf import HOLLOWMAN_DB_ECHO, HOLLOWMAN_DB_URL
+from asgard.conf import settings
 
 from .session import _SessionMaker
 
-AsgardDBSession = _SessionMaker(
-    HOLLOWMAN_DB_URL, echo=HOLLOWMAN_DB_ECHO, minsize=1
-)
+AsgardDBSession = _SessionMaker(settings.DB_URL, minsize=1)

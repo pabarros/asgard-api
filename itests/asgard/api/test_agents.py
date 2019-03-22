@@ -7,7 +7,9 @@ from asynctest.mock import CoroutineMock
 
 from asgard.api import agents
 from asgard.app import app
-from hollowman.models import Account, User, UserHasAccount
+from asgard.models.account import AccountDB
+from asgard.models.user import UserDB
+from asgard.models.user_has_account import UserHasAccount
 from itests.util import BaseTestCase
 from tests.conf import TEST_MESOS_ADDRESS
 from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
@@ -26,7 +28,7 @@ class AgentsApiEndpointTest(BaseTestCase):
 
     def _prepare_additional_fixture_data(self):
         self.pg_data_mocker.add_data(
-            User,
+            UserDB,
             ["id", "tx_name", "tx_email", "tx_authkey"],
             [
                 [
@@ -39,7 +41,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         )
 
         self.pg_data_mocker.add_data(
-            Account,
+            AccountDB,
             ["id", "name", "namespace", "owner"],
             [[40, "Dev Team", "infra", "asgard-infra"]],
         )

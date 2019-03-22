@@ -1,15 +1,20 @@
-import asyncio
-
 import jwt
 from aiohttp import web
-from asynctest import mock, skip
+from asynctest import skip
 from asyncworker import App
 from asyncworker.options import RouteTypes
 
 from asgard.http.auth import auth_required
 from asgard.http.auth.jwt import jwt_encode
-from itests.util import BaseTestCase
-from tests.utils import with_json_fixture
+from asgard.models.account import Account
+from asgard.models.user import User
+from itests.util import (
+    BaseTestCase,
+    USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+    USER_WITH_MULTIPLE_ACCOUNTS_ID,
+    ACCOUNT_INFRA_DICT,
+)
 
 
 class AuthRequiredTest(BaseTestCase):
@@ -22,7 +27,7 @@ class AuthRequiredTest(BaseTestCase):
         async def handler(r):
             auth_user = r["user"]
             data = {
-                "user": auth_user.tx_email,
+                "user": {"id": auth_user.id, "email": auth_user.tx_email},
                 "current_account": {
                     "id": auth_user.current_account.id,
                     "namespace": auth_user.current_account.namespace,
@@ -47,7 +52,13 @@ class AuthRequiredTest(BaseTestCase):
         )
         data = await resp.json()
         self.assertEqual(200, resp.status)
-        self.assertEqual("john@host.com", data["user"])
+        self.assertEqual(
+            {
+                "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
+                "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+            },
+            data["user"],
+        )
 
     async def test_auth_auth_fails_if_token_type_is_invalid(self):
 
@@ -104,7 +115,10 @@ class AuthRequiredTest(BaseTestCase):
         self.assertEqual(200, resp.status)
         self.assertEqual(
             {
-                "user": "john@host.com",
+                "user": {
+                    "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
+                    "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+                },
                 "current_account": {
                     "name": "Dev Team",
                     "id": 10,
@@ -150,7 +164,9 @@ class AuthRequiredTest(BaseTestCase):
         Populates request.user if authentication is successful
         """
 
-        jwt_token = jwt_encode({"user": {"email": "john@host.com"}})
+        user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        account = Account(**ACCOUNT_INFRA_DICT)
+        jwt_token = jwt_encode(user, account)
         auth_header = {
             "Authorization": "JWT {}".format(jwt_token.decode("utf-8"))
         }
@@ -158,7 +174,13 @@ class AuthRequiredTest(BaseTestCase):
         resp = await self.client.get("/", headers=auth_header)
         data = await resp.json()
         self.assertEqual(200, resp.status)
-        self.assertEqual("john@host.com", data["user"])
+        self.assertEqual(
+            {
+                "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
+                "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+            },
+            data["user"],
+        )
 
     async def test_jwt_auth_fails_if_jwt_token_is_invalid(self):
 

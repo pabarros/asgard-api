@@ -5,6 +5,8 @@
  * Adição do isort na pipeline (https://github.com/B2W-BIT/asgard-api/pull/80)
  * Detecção de rotação dos logs das tasks. Backend: MESOS (https://github.com/B2W-BIT/asgard-api/pull/76)
  * Fix na chamada ao `url_for` durante o processo de login (https://github.com/B2W-BIT/asgard-api/pull/83)
+ * Criação dos endpoints para troca de conta, podendo escolher para qual conta ir diretamente (https://github.com/B2W-BIT/asgard-api/pull/85)
+ * Config dos testes para *sempre* rodarem papontando para o banco de dev, que roda no docker.
 
 ### 0.81.2
  * Adicionando pytz

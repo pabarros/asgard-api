@@ -1,19 +1,16 @@
-import json
 import unittest
-from http import HTTPStatus
 from itertools import chain
 
-from flask import Response as FlaskResponse
 from marathon.models import MarathonDeployment
 from marathon.models.group import MarathonGroup
 from marathon.models.queue import MarathonQueueItem
 from marathon.models.task import MarathonTask
 
+from asgard.models.account import AccountDB as Account
 from hollowman.app import application
 from hollowman.filters.namespace import NameSpaceFilter
-from hollowman.http_wrappers.response import Response
 from hollowman.marathonapp import AsgardApp
-from hollowman.models import Account, User
+from hollowman.models import User
 from tests.utils import with_json_fixture
 
 
@@ -165,9 +162,6 @@ class TestNamespaceFilter(unittest.TestCase):
         original_app.tasks = []
         self.assertEqual(0, len(request_app.tasks))
 
-        modified_app = self.filter.response(
-            self.user, request_app, original_app
-        )
         self.assertEqual(0, len(self.request_app.tasks))
 
     @with_json_fixture("../fixtures/single_full_app_with_tasks.json")
@@ -274,18 +268,12 @@ class TestNamespaceFilter(unittest.TestCase):
             "/v2/groups/group-b", method="GET"
         ) as ctx:
             ctx.request.user = self.user
-            ok_response = FlaskResponse(
-                response=json.dumps(group_dev_namespace_fixture["groups"][1]),
-                status=HTTPStatus.OK,
-                headers={},
-            )
             response_group = original_group = MarathonGroup.from_json(
                 group_dev_namespace_fixture["groups"][1]
             )
             original_group = original_group = MarathonGroup.from_json(
                 group_dev_namespace_fixture["groups"][1]
             )
-            response_wrapper = Response(ctx.request, ok_response)
             filtered_group = self.filter.response_group(
                 self.user, response_group, original_group
             )
@@ -308,18 +296,12 @@ class TestNamespaceFilter(unittest.TestCase):
             "/v2/groups/group-b", method="GET"
         ) as ctx:
             ctx.request.user = self.user
-            ok_response = FlaskResponse(
-                response=json.dumps(group_dev_namespace_fixture["groups"][1]),
-                status=HTTPStatus.OK,
-                headers={},
-            )
             response_group = original_group = MarathonGroup.from_json(
                 group_dev_namespace_fixture["groups"][1]
             )
             original_group = original_group = MarathonGroup.from_json(
                 group_dev_namespace_fixture["groups"][1]
             )
-            response_wrapper = Response(ctx.request, ok_response)
             filtered_group = self.filter.response_group(
                 self.user, response_group, original_group
             )
@@ -337,15 +319,9 @@ class TestNamespaceFilter(unittest.TestCase):
             "/v2/groups/a", method="GET"
         ) as ctx:
             ctx.request.user = self.user
-            ok_response = FlaskResponse(
-                response=json.dumps(group_dev_namespace_fixture["groups"][0]),
-                status=HTTPStatus.OK,
-                headers={},
-            )
             response_group = original_group = MarathonGroup.from_json(
                 group_dev_namespace_fixture["groups"][0]
             )
-            response_wrapper = Response(ctx.request, ok_response)
             filtered_group = self.filter.response_group(
                 self.user, response_group, original_group
             )
@@ -373,17 +349,11 @@ class TestNamespaceFilter(unittest.TestCase):
             "/v2/groups/a", method="GET"
         ) as ctx:
             ctx.request.user = self.user
-            ok_response = FlaskResponse(
-                response=json.dumps(group_dev_namespace_fixture["groups"][0]),
-                status=HTTPStatus.OK,
-                headers={},
-            )
             response_group = original_group = MarathonGroup.from_json(
                 group_dev_namespace_fixture["groups"][0]
             )
             response_group.apps[0].tasks = []
             original_group.apps[0].tasks = []
-            response_wrapper = Response(ctx.request, ok_response)
             filtered_group = self.filter.response_group(
                 self.user, response_group, original_group
             )

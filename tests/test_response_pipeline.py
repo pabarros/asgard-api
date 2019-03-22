@@ -5,13 +5,14 @@ from copy import deepcopy
 from flask import Response as FlaskResponse
 from responses import RequestsMock
 
+from asgard.models.account import AccountDB as Account
 from hollowman import conf
 from hollowman.app import application
 from hollowman.dispatcher import FILTERS_PIPELINE, FilterType, dispatch
 from hollowman.filters.namespace import NameSpaceFilter
 from hollowman.hollowman_flask import OperationType
 from hollowman.http_wrappers.response import Response
-from hollowman.models import Account, User
+from hollowman.models import User
 from tests.utils import with_json_fixture
 
 

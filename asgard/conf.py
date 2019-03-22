@@ -1,5 +1,7 @@
 import os
 
+from pydantic import BaseSettings
+
 ASGARD_RABBITMQ_HOST = "127.0.0.1"
 ASGARD_RABBITMQ_USER = "guest"
 ASGARD_RABBITMQ_PASS = "guest"
@@ -18,3 +20,14 @@ SECRET_KEY = os.getenv("HOLLOWMAN_SECRET_KEY", "secret")
 TASK_FILEREAD_MAX_OFFSET: int = int(
     os.getenv("ASGARD_TASK_FILEREAD_MAX_OFFSET", 52_428_800)
 )
+
+
+class Settings(BaseSettings):
+
+    DB_URL: str
+
+    class Config:
+        env_prefix = os.getenv("ENV", "ASGARD") + "_"
+
+
+settings = Settings()

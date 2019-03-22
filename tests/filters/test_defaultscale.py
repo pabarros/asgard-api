@@ -1,15 +1,9 @@
-import json
 import unittest
-from http import HTTPStatus
 
-from flask import Response as FlaskResponse
-from marathon.models.group import MarathonGroup
-
-from hollowman.app import application
+from asgard.models.account import AccountDB as Account
 from hollowman.filters.defaultscale import DefaultScaleFilter
-from hollowman.http_wrappers.response import Response
 from hollowman.marathonapp import AsgardApp
-from hollowman.models import Account, User
+from hollowman.models import User
 from tests.utils import with_json_fixture
 
 

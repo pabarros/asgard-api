@@ -2,8 +2,8 @@
 
 import json
 
+from asgard.models.base import BaseModelAlchemy
 from hollowman.models import engine
-from hollowman.models.base import BaseModel
 
 
 class RequestStub(object):
@@ -27,5 +27,5 @@ class ContextStub(object):
 
 def rebuild_schema():
     assert engine.name == "sqlite"
-    BaseModel.metadata.drop_all(engine)
-    BaseModel.metadata.create_all(engine)
+    BaseModelAlchemy.metadata.drop_all(engine)
+    BaseModelAlchemy.metadata.create_all(engine)

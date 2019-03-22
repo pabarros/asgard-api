@@ -202,7 +202,7 @@ HOLLOWMAN_METRICS_ZK_ID_0=172.18.0.2
 HOLLOWMAN_METRICS_ZK_ID_1=172.18.0.3
 HOLLOWMAN_METRICS_ZK_ID_2=172.18.0.4
 
-HOLLOWMAN_DB_URL=postgresql://postgres:@172.18.0.41/asgard
+ASGARD_DB_URL=postgresql://postgres:@172.18.0.41/asgard
 
 HOLLOWMAN_MARATHON_ADDRESS_0=http://172.18.0.31:8080
 HOLLOWMAN_MARATHON_ADDRESS_1=http://172.18.0.31:8080
@@ -213,7 +213,7 @@ HOLLOWMAN_MESOS_ADDRESS_1=http://172.18.0.12:5050
 HOLLOWMAN_MESOS_ADDRESS_2=http://172.18.0.13:5050
 
 ```
-Você precisa passar todas as envs para ser posspivel rodar o código da API. O jeito mais simples de fazer isso é criar um arquivo chamado `.env`
+Você precisa passar todas as envs para ser possível rodar o código da API. O jeito mais simples de fazer isso é criar um arquivo chamado `.env`
 na raiz do projeto, contento todas as envs mostradas acima, exatamente com esses valores. Esse arquivo já está no `.gitignore`, por isso não será comitado.
 
 ## Rodando a Asgard API localmente
@@ -228,7 +228,7 @@ pipenv install --dev
 Para rodar a API, use:
 
 ```
-pipenv run api
+$ ./run-api-proxy.sh
 ```
 
 Quando tiver a API rodando, você pode fazer um request para validar:
@@ -312,6 +312,7 @@ Abra o ipython (também passando as mesmas envs que você passou para rodar a AP
 * HOLLOWMAN_REDIRECT_AFTER_LOGIN: URL pra onde o usuário será redirecionado após o fluxo do oauth2. O redirect é feito pra: `URL?jwt=<token_jwt>`
 * HOLLOWMAN_DB_ECHO: Define se os logs do SQLAlchemy estão ligados: Valores possíveis: 1|0. Default 0
 * HOLLOWMAN_DB_URL: URL completa (com user, pwd, host, schema) do banco de dados: Formato: `postgresql://<user>:<pwd>@<host>/<schema>`
+* ASGARD_DB_URL: É o mesmo valor da env `HOLLOWMAN_DB_URL` mas é usado pelo código novo, assíncrono.
 * ASGARD_LOGLEVEL: String indicando o loglevel a ser usado. Pode ser INFO, ERROR, DEBUG, WARNING, etc.
 
 
@@ -319,11 +320,8 @@ Abra o ipython (também passando as mesmas envs que você passou para rodar a AP
 
 Os testes estão divididos em dois: Unitários (`teste/`) e de Integração (`itests/`).
 
-O comando base para rodar os testes é essencialmente o mesmo, que é esse:
-`PIPENV_DONT_LOAD_ENV=1 pipenv run py.test --cov=hollowman --cov=asgard --cov-report term-missing -v -s`
-
 ## Rodando os testes unitários
-`PIPENV_DONT_LOAD_ENV=1 pipenv run py.test --cov=hollowman --cov=asgard --cov-report term-missing -v -s tests/`
+`PIPENV_DONT_LOAD_ENV=1 pipenv run test`
 
 ## Rodando os testes de integração
 
@@ -338,7 +336,7 @@ source dev/pgsql.sh
 
 depois rode os testes:
 
-`PIPENV_DONT_LOAD_ENV=1 PYTHONPATH=. pipenv run py.test --cov=hollowman --cov=asgard --cov-report term-missing -v -s itests/`
+`PIPENV_DONT_LOAD_ENV=1 PYTHONPATH=. pipenv run itest`
 
 # Criando código para o projeto
 

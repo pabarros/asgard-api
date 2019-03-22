@@ -14,38 +14,6 @@ class _EngineWrapper:
         return self._engine
 
 
-class Session:
-    def __init__(self, engine_wrapper):
-        self._engine_wrapper = engine_wrapper
-
-    async def engine(self):
-        return await self._engine_wrapper.engine()
-
-    async def connection(self):
-        engine = await self._engine_wrapper.engine()
-        self.conn = await engine._acquire()
-        return AsgardDBConnection(engine, self.conn, session=self)
-
-    async def __aenter__(self):
-        return await self.connection()
-
-    async def __aexit__(self, a, b, c):
-        engine = await self._engine_wrapper.engine()
-        engine.release(self.conn)
-
-
-class _SessionMaker:
-    def __init__(self, dsn, *args, **kwargs):
-        self._engine_wrapper = _EngineWrapper(create_engine(dsn=dsn, **kwargs))
-        self._connected = False
-
-    def __call__(self):
-        return Session(self._engine_wrapper)
-
-    async def engine(self):
-        return await self._engine_wrapper.engine()
-
-
 class AsgardDBConnection:
     def __init__(self, engine, conn, session):
         self.engine = engine
@@ -53,7 +21,7 @@ class AsgardDBConnection:
         self.session = session
         self._query = None
 
-    def query(self, *args):
+    def query(self, *args) -> "AsgardDBConnection":
         prepared_query_params = []
         for item in args:
             if type(item) is sqlalchemy.ext.declarative.api.DeclarativeMeta:
@@ -99,3 +67,41 @@ class AsgardDBConnection:
         if not len(result_list):
             raise sqlalchemy.orm.exc.NoResultFound
         return result_list[0]
+
+    async def exists(self) -> bool:
+        self._query.limit(1)
+        result = await self.execute(self._query)
+        return len(await result.fetchall()) > 0
+
+
+class Session:
+    def __init__(self, engine_wrapper):
+        self._engine_wrapper = engine_wrapper
+
+    async def engine(self):
+        return await self._engine_wrapper.engine()
+
+    async def connection(self):
+        engine = await self._engine_wrapper.engine()
+        self.conn = await engine._acquire()
+        return AsgardDBConnection(engine, self.conn, session=self)
+
+    async def __aenter__(self) -> AsgardDBConnection:
+        return await self.connection()
+
+    async def __aexit__(self, exc_type, exc, tb):
+        engine = await self._engine_wrapper.engine()
+        engine.release(self.conn)
+
+
+class _SessionMaker:
+    def __init__(self, dsn, *args, **kwargs):
+        self._dsn = dsn
+        self._engine_wrapper = _EngineWrapper(create_engine(dsn=dsn, **kwargs))
+        self._connected = False
+
+    def __call__(self) -> Session:
+        return Session(self._engine_wrapper)
+
+    async def engine(self):
+        return await self._engine_wrapper.engine()

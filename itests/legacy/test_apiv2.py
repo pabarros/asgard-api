@@ -1,47 +1,38 @@
 import json
 from typing import Dict
-from unittest import TestCase
-from unittest.mock import NonCallableMock, patch
+from unittest.mock import patch
 
-import jwt
 from flask import Response
-from requests.models import Response as RequestsResponse
-from requests.structures import CaseInsensitiveDict
 from responses import RequestsMock
 
+from asgard.models.account import Account
+from asgard.models.user import UserDB
 from hollowman import conf
 from hollowman.app import application
 from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
-from hollowman.models import Account, HollowmanSession, User
-from tests import rebuild_schema
+from itests.util import (
+    BaseTestCase,
+    ACCOUNT_DEV_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+    USER_WITH_MULTIPLE_ACCOUNTS_NAME,
+)
 from tests.utils import with_json_fixture
 
 
-class TestAuthentication(TestCase):
-    def setUp(self):
-        rebuild_schema()
-        self.session = HollowmanSession()
+class AuthenticationTest(BaseTestCase):
+    async def setUp(self):
+        await super(AuthenticationTest, self).setUp()
 
-        self.new_dispatcher_user = User(
-            tx_email="xablau@host.com.br",
-            tx_name="Xablau",
-            tx_authkey="69ed620926be4067a36402c3f7e9ddf0",
+        self.normal_user = UserDB(
+            tx_email=USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
+            tx_name=USER_WITH_MULTIPLE_ACCOUNTS_NAME,
         )
-        self.normal_user = User(
-            tx_email="user@host.com.br",
-            tx_name="John Doe",
-            tx_authkey="70ed620926be4067a36402c3f7e9ddf0",
-        )
-        self.account = Account(
-            name="New Account", namespace="acc", owner="company"
-        )
-        self.normal_user.accounts = [self.account]
-        self.session.add_all([self.new_dispatcher_user, self.normal_user])
-        self.session.commit()
+        self.account = Account(**ACCOUNT_DEV_DICT)
 
         self.response_http_200 = Response(status=200)
 
-    def tearDown(self):
+    async def tearDown(self):
+        await super(AuthenticationTest, self).tearDown()
         patch.stopall()
 
     def make_auth_header(self, user, account) -> Dict[str, str]:
@@ -60,9 +51,7 @@ class TestAuthentication(TestCase):
         """
         test_client = application.test_client()
         with application.app_context():
-            auth_header = self.make_auth_header(
-                self.normal_user, self.normal_user.accounts[0]
-            )
+            auth_header = self.make_auth_header(self.normal_user, self.account)
             with RequestsMock() as rsps:
                 rsps.add(
                     method="GET",
@@ -73,7 +62,7 @@ class TestAuthentication(TestCase):
                 rsps.add(
                     method="GET",
                     url=conf.MARATHON_ADDRESSES[0]
-                    + f"/v2/groups//{self.normal_user.accounts[0].namespace}/",
+                    + f"/v2/groups//{self.account.namespace}/",
                     body=json.dumps({"apps": [fixture]}),
                     status=200,
                 )
