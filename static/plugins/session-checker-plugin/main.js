@@ -85,8 +85,6 @@
 	  console.log("Request Pipelines feature not found...");
 	}
 
-	PluginHelper.injectComponent(_ChangeAccountComponent2.default, PluginMountPoints.NAVBAR_TOP_RIGHT);
-
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
