@@ -17,15 +17,11 @@ commands:
     description: "Roda todos os testes do projeto (unitários e integração)"
     steps:
       - run: "pipenv run all-tests"
-  coverage:
-    description: "Upload coverage data"
-    steps:
-      - run: pipenv run codecov
 
 jobs:
-  test:
+  py368: &template
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.6.8
       - image: postgres:9.4
     steps:
       - checkout
@@ -44,9 +40,25 @@ jobs:
       - isort-check
       - lint
       - all-tests
-      - coverage
+      - run:
+          when: on_success
+          command: pipenv run codecov
+  py37x:
+      <<: *template
+      docker:
+        - image: circleci/python:3.7
+        - image: postgres:9.4
+  py36x:
+      <<: *template
+      docker:
+        - image: circleci/python:3.6
+        - image: postgres:9.4
 workflows:
   version: 2
-  test:
+  required-checks:
     jobs:
-      - test
+      - py368
+      - py36x
+  optional-checks:
+    jobs:
+      - py37x
