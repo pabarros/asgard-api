@@ -1,12 +1,9 @@
-import unittest
-
 from flask import Response
 from mock import patch
 
 import hollowman.routes
 from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
-from hollowman import decorators
 from hollowman.app import application
 from itests.util import (
     BaseTestCase,
@@ -15,7 +12,6 @@ from itests.util import (
     ACCOUNT_DEV_NAMESPACE,
     ACCOUNT_DEV_OWNER,
 )
-from tests import rebuild_schema
 
 
 class RoutesTest(BaseTestCase):
