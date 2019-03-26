@@ -9,4 +9,10 @@ class App(BaseModel, abc.ABC):
         raise NotImplementedError
 
 
+class AppStats(BaseModel):
+    cpu_pct: str
+    ram_pct: str
+    timeframe: str
+
+
 AppFactory = ModelFactory(App)

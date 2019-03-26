@@ -12,7 +12,10 @@ from asgard.app import app
 from asgard.backends import mesos
 from asgard.http.auth import auth_required
 from asgard.math import round_up
+from asgard.models.account import Account
 from asgard.models.agent import Agent
+from asgard.models.app import App
+from asgard.models.user import User
 from asgard.services import agents_service
 
 
@@ -40,8 +43,9 @@ def calculate_stats(agents):
 @app.route(["/agents"], type=RouteTypes.HTTP, methods=["GET"])
 @auth_required
 async def agents_handler(request: web.Request):
-    namespace = request["user"].current_account.owner
-    agents = await agents_service.get_agents(namespace=namespace, backend=mesos)
+    user = await User.from_alchemy_obj(request["user"])
+    account = await Account.from_alchemy_obj(request["user"].current_account)
+    agents = await agents_service.get_agents(user, account, mesos)
     stats = calculate_stats(agents)
     return web.json_response(AgentsResource(agents=agents, stats=stats).dict())
 
@@ -64,11 +68,13 @@ def apply_attr_filter(
 @app.route(["/agents/with-attrs"], type=RouteTypes.HTTP, methods=["GET"])
 @auth_required
 async def agents_with_attrs(request: web.Request):
-    namespace = request["user"].current_account.owner
+    user = await User.from_alchemy_obj(request["user"])
+    account = await Account.from_alchemy_obj(request["user"].current_account)
+
     filters = request.query.copy()
     filters.pop("account_id", None)
 
-    agents = await agents_service.get_agents(namespace=namespace, backend=mesos)
+    agents = await agents_service.get_agents(user, account, backend=mesos)
     filtered_agents = apply_attr_filter(filters, agents)
 
     stats = calculate_stats(filtered_agents)
@@ -80,11 +86,14 @@ async def agents_with_attrs(request: web.Request):
 @app.route(["/agents/{agent_id}/apps"], type=RouteTypes.HTTP, methods=["GET"])
 @auth_required
 async def agent_apps(request: web.Request):
-    namespace = request["user"].current_account.owner
+    apps: List[App] = []
+    user = await User.from_alchemy_obj(request["user"])
+    account = await Account.from_alchemy_obj(request["user"].current_account)
     agent_id = request.match_info["agent_id"]
-    apps = await agents_service.get_apps(
-        namespace=namespace, agent_id=agent_id, backend=mesos
-    )
+
+    agent = await agents_service.get_agent_by_id(agent_id, user, account, mesos)
+    if agent:
+        apps = agent.applications
     return web.json_response(AppsResource(apps=apps).dict())
 
 
