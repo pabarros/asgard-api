@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from asgard.models.account import Account
 from asgard.models.agent import Agent
-from asgard.models.app import App
+from asgard.models.app import App, AppStats
 from asgard.models.task import Task
 from asgard.models.user import User
 
@@ -33,6 +33,12 @@ class AppsBackend(abc.ABC):
         """
         Retorna todas as instâncias atualmente rodando para a App `app`.
         """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def get_app_stats(
+        self, app: App, timeframe: str, user: User, account: Account
+    ) -> AppStats:
         raise NotImplementedError
 
 
@@ -90,4 +96,10 @@ class Orchestrator(metaclass=abc.ABCMeta):
     async def get_agent_by_id(
         self, agent_id: str, user: User, account: Account
     ) -> Optional[Agent]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def get_app_stats(
+        self, app: App, timeframe: str, user: User, account: Account
+    ) -> AppStats:
         raise NotImplementedError

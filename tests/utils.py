@@ -5,6 +5,8 @@ from typing import Any, Dict, Union
 
 from tests.conf import TEST_MESOS_ADDRESS
 
+from asgard.conf import settings
+
 CURRENT_DIR = os.path.dirname(__file__)
 FIXTURES_PATH = os.path.join(CURRENT_DIR, "fixtures")
 
@@ -51,6 +53,28 @@ def add_agent_running_tasks(rsps, agent_id, agent_apps):
             exception=ConnectionError(),
             status=200,
         )
+
+
+def add_agent_task_stats(rsps, agent_id):
+    task_stats_datapoints = get_fixture(f"agents/{agent_id}/app_stats.json")
+    task_stats_aggr = get_fixture(
+        f"agents/{agent_id}/app_stats_aggr_results.json"
+    )
+    app_name = task_stats_datapoints[0]["appname"].strip("/")
+    app_name_for_index_path = app_name.replace("/", "-")
+    url = f"{settings.STATS_API_URL}/asgard-app-stats-{app_name_for_index_path}-*/_search"
+    data = {
+        "took": 325,
+        "timed_out": False,
+        "_shards": {"total": 240, "successful": 240, "failed": 0},
+        "hits": {
+            "total": 1_015_808,
+            "max_score": 1,
+            "hits": task_stats_datapoints,
+        },
+        "aggregations": task_stats_aggr,
+    }
+    rsps.get(url, payload=data, status=200)
 
 
 def build_mesos_cluster(rsps, *agent_configs: Union[Dict[str, Any], str]):

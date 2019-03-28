@@ -3,7 +3,7 @@ from asyncworker import RouteTypes
 
 from asgard.api.resources.apps import AppStatsResource
 from asgard.app import app
-from asgard.backends.apps import AppsBackend
+from asgard.backends import mesos
 from asgard.models.account import Account
 from asgard.models.user import User
 from asgard.services.apps import AppsService
@@ -17,7 +17,7 @@ async def app_stats(request: web.Request):
 
     account = await Account.from_alchemy_obj(user.current_account)
     stats = await AppsService.get_app_stats(
-        app_id, timeframe, user, account, AppsBackend()
+        app_id, timeframe, user, account, mesos
     )
 
     return web.json_response(AppStatsResource(stats=stats))

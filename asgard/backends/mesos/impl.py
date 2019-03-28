@@ -7,7 +7,7 @@ from asgard.backends.mesos.models.task import MesosTask
 from asgard.http.client import http_client
 from asgard.models.account import Account
 from asgard.models.agent import Agent
-from asgard.models.app import App
+from asgard.models.app import App, AppStats
 from asgard.models.user import User
 from asgard.sdk import mesos
 
@@ -76,3 +76,8 @@ class MesosOrchestrator(Orchestrator):
         self, user: User, agent: Agent
     ) -> List[MesosApp]:
         return agent.applications
+
+    async def get_app_stats(
+        self, app: App, timeframe: str, user: User, account: Account
+    ) -> AppStats:
+        raise NotImplementedError

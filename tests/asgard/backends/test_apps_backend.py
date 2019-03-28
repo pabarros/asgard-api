@@ -1,7 +1,6 @@
-from asynctest import TestCase, skip
+from asynctest import TestCase
 
 
-@skip("Future")
 class AppsBackendTest(TestCase):
     async def test_apps_app_not_found(self):
         self.fail()
