@@ -40,24 +40,10 @@ class MesosAgentsBackend(AgentsBackend):
         return filtered_agents
 
     async def get_by_id(
-        self, agentd_id: str, user: User, account: Account
-    ) -> Optional[Agent]:
-        raise NotImplementedError
-
-    async def get_apps_running(self, user: User, agent: Agent) -> List[App]:
-        raise NotImplementedError
-
-
-class MesosOrchestrator(Orchestrator):
-    async def get_agents(
-        self, user: User, account: Account
-    ) -> List[MesosAgent]:
-        return await self.agents_backend.get_agents(user, account)
-
-    async def get_agent_by_id(
         self, agent_id: str, user: User, account: Account
-    ) -> Optional[MesosAgent]:
+    ) -> Optional[Agent]:
         owner = account.owner
+
         mesos_leader_address = await mesos.leader_address()
         agent_url = f"{mesos_leader_address}/slaves?slave_id={agent_id}"
         async with http_client.get(agent_url) as response:
@@ -72,12 +58,27 @@ class MesosOrchestrator(Orchestrator):
                 return agent
             return None
 
+    async def get_apps_running(self, user: User, agent: Agent) -> List[App]:
+        return agent.applications
+
+
+class MesosOrchestrator(Orchestrator):
+    async def get_agents(
+        self, user: User, account: Account
+    ) -> List[MesosAgent]:
+        return await self.agents_backend.get_agents(user, account)
+
+    async def get_agent_by_id(
+        self, agent_id: str, user: User, account: Account
+    ) -> Optional[MesosAgent]:
+        return await self.agents_backend.get_by_id(agent_id, user, account)
+
     async def get_apps_running_for_agent(
         self, user: User, agent: Agent
     ) -> List[MesosApp]:
-        return agent.applications
+        return await self.agents_backend.get_apps_running(user, agent)
 
     async def get_app_stats(
-        self, app: App, timeframe: str, user: User, account: Account
+        self, app: App, user: User, account: Account
     ) -> AppStats:
-        raise NotImplementedError
+        return await self.apps_backend.get_app_stats(app, user, account)

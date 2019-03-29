@@ -1,3 +1,4 @@
+import asyncio
 import random
 import string
 from collections import defaultdict
@@ -5,6 +6,7 @@ from importlib import reload
 from typing import Any, Dict, List, Type, Set
 
 import asyncworker
+from aioelasticsearch import Elasticsearch
 from aiohttp import web
 from aiohttp.test_utils import TestClient, TestServer
 from aiopg.sa import Engine
@@ -168,6 +170,7 @@ class BaseTestCase(TestCase):
 
     async def setUp(self):
 
+        self.esclient = Elasticsearch([settings.STATS_API_URL])
         self.pg_data_mocker = PgDataMocker(pool=await self.conn_pool())
         self.users_fixture = [
             [
@@ -244,3 +247,18 @@ class BaseTestCase(TestCase):
         await server.start_server()
 
         return client
+
+    async def _load_app_stats_into_storage(
+        self, index_name, timestamp_to_use, datapoints
+    ):
+        """
+        Carrega no elasticsearch local os datapoints de estatísticas de apps
+        O `timestamp` usado em cada datapoint é o `timestamp_to_use`.
+        """
+        for datapoint in datapoints:
+            datapoint["timestamp"] = timestamp_to_use.isoformat()
+            await self.esclient.index(
+                index=index_name, doc_type="stats", body=datapoint
+            )
+        # para dar tempo do Elasticsearch local indexar os dados recém inseridos
+        await asyncio.sleep(1)

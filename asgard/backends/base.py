@@ -10,34 +10,8 @@ from asgard.models.user import User
 
 class AppsBackend(abc.ABC):
     @abc.abstractmethod
-    async def get_apps_definition(
-        self, user: User, account: Account
-    ) -> List[App]:
-        """
-        Retorna a definição de todas as Apps da conta Account
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def get_by_id(
-        self, app_id: str, user: User, account: Account
-    ) -> Optional[App]:
-        """
-        Retorna a definicão de uma app, com id `app_id`.
-        Ess app deve existir na conta `account`
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def get_tasks(self, app: App) -> Optional[Task]:
-        """
-        Retorna todas as instâncias atualmente rodando para a App `app`.
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
     async def get_app_stats(
-        self, app: App, timeframe: str, user: User, account: Account
+        self, app: App, user: User, account: Account
     ) -> AppStats:
         raise NotImplementedError
 
@@ -100,6 +74,6 @@ class Orchestrator(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     async def get_app_stats(
-        self, app: App, timeframe: str, user: User, account: Account
+        self, app: App, user: User, account: Account
     ) -> AppStats:
         raise NotImplementedError

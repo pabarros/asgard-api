@@ -3,9 +3,8 @@ import os
 from enum import Enum, auto
 from typing import Any, Dict, Union
 
-from tests.conf import TEST_MESOS_ADDRESS
-
 from asgard.conf import settings
+from tests.conf import TEST_MESOS_ADDRESS
 
 CURRENT_DIR = os.path.dirname(__file__)
 FIXTURES_PATH = os.path.join(CURRENT_DIR, "fixtures")
@@ -55,14 +54,14 @@ def add_agent_running_tasks(rsps, agent_id, agent_apps):
         )
 
 
-def add_agent_task_stats(rsps, agent_id):
+def add_agent_task_stats(rsps, agent_id, index_name):
     task_stats_datapoints = get_fixture(f"agents/{agent_id}/app_stats.json")
     task_stats_aggr = get_fixture(
         f"agents/{agent_id}/app_stats_aggr_results.json"
     )
     app_name = task_stats_datapoints[0]["appname"].strip("/")
     app_name_for_index_path = app_name.replace("/", "-")
-    url = f"{settings.STATS_API_URL}/asgard-app-stats-{app_name_for_index_path}-*/_search"
+    url = f"{settings.STATS_API_URL}/{index_name}/_search"
     data = {
         "took": 325,
         "timed_out": False,

@@ -15,7 +15,6 @@ class AppStats(BaseModel):
     type: str = "ASGARD"
     cpu_pct: str
     ram_pct: str
-    timeframe: str
 
 
 AppFactory = ModelFactory(App)

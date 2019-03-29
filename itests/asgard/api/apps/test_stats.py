@@ -1,12 +1,75 @@
-from itests.util import BaseTestCase
+from datetime import datetime, timezone
+
+from aioresponses import aioresponses
+from freezegun import freeze_time
+
+from asgard.api import apps
+from asgard.app import app
+from asgard.conf import settings
+from asgard.models.app import AppStats
+from itests.util import (
+    BaseTestCase,
+    ACCOUNT_DEV_ID,
+    USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
+)
+from tests.utils import build_mesos_cluster, add_agent_task_stats, get_fixture
 
 
 class AppStatsTest(BaseTestCase):
-    async def test_apps_stats_empty_stats_for_timeperiod(self):
-        self.fail()
+    async def setUp(self):
+        await super(AppStatsTest, self).setUp()
+        self.client = await self.aiohttp_client(app)
+        self.utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+        self.INDEX_NAME = (
+            f"asgard-app-stats-{self.utc_now.strftime('%Y-%m-%d-%H')}"
+        )
+
+    @freeze_time("2019-03-29")
+    async def test_apps_stats_empty_stats_for_existing_app(self):
+        with aioresponses(
+            passthrough=["http://127.0.0.1", settings.STATS_API_URL]
+        ) as rsps:
+            agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
+            build_mesos_cluster(rsps, agent_id)  # namespace=asgard-infra
+
+            app_stats_datapoints = get_fixture(
+                f"agents/{agent_id}/app_stats.json"
+            )
+
+            await self._load_app_stats_into_storage(
+                self.INDEX_NAME, self.utc_now, app_stats_datapoints
+            )
+            resp = await self.client.get(
+                f"/apps/infra/asgard/api/stats?account_id={ACCOUNT_DEV_ID}",
+                headers={
+                    "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+                },
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(
+                AppStats(cpu_pct="0.25", ram_pct="15.05").dict(), data["stats"]
+            )
 
     async def test_apps_stats_app_not_found(self):
-        self.fail()
+        with aioresponses(
+            passthrough=["http://127.0.0.1", settings.STATS_API_URL]
+        ) as rsps:
+            agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
+            build_mesos_cluster(rsps, agent_id)  # namespace=asgard-infra
 
-    async def test_apps_stats_return_stats_for_timeframe(self):
-        self.fail()
+            app_stats_datapoints = get_fixture(
+                f"agents/{agent_id}/app_stats.json"
+            )
+
+            resp = await self.client.get(
+                f"/apps/asgard/api/not-exist/stats?account_id={ACCOUNT_DEV_ID}",
+                headers={
+                    "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+                },
+            )
+            self.assertEqual(200, resp.status)
+            data = await resp.json()
+            self.assertEqual(
+                AppStats(cpu_pct="0", ram_pct="0").dict(), data["stats"]
+            )

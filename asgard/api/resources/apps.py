@@ -10,4 +10,4 @@ class AppsResource(BaseModel):
 
 
 class AppStatsResource(BaseModel):
-    stats = AppStats
+    stats: AppStats
