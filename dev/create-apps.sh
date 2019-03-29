@@ -23,9 +23,6 @@ put_json "${BASEDIR}/dev/apps/asgard-dev/httpbin.json"
 # 172.18.80.1
 put_json "${BASEDIR}/dev/apps/asgard/rabbitmq.json"
 
-# 172.18.70.1
-docker run --rm --net=asgard --ip 172.18.70.1 --name "asgard_elasticsearch_$$" -d elasticsearch:5.5-alpine
-
 # 172.18.70.2
 put_json "${BASEDIR}/dev/apps/asgard/fluentd.json"
 
@@ -49,4 +46,3 @@ done
 
 echo "Restaurando configs do Kibana..."
 curl --data-binary @${BASEDIR}/dev/kibana-indices.json -X POST  http://172.18.70.1:9200/.kibana/_bulk
-
