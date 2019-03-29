@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "edec8b2419a0f728ab392e43ef20bb9d3eec24a139f39d016049bb1038c30b1c"
+            "sha256": "db1075bd4f7c851c34239d16a3e0aa19f8061138b7970823369f0911e208b507"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -672,6 +672,14 @@
             ],
             "version": "==4.4.0"
         },
+        "freezegun": {
+            "hashes": [
+                "sha256:6cb82b276f83f2acce67f121dc2656f4df26c71e32238334eb071170b892a278",
+                "sha256:e839b43bfbe8158b4d62bb97e6313d39f3586daf48e1314fb1083d2ef17700da"
+            ],
+            "index": "pypi",
+            "version": "==0.3.11"
+        },
         "idna": {
             "hashes": [
                 "sha256:3cb5ce08046c4e3a560fc02f138d0ac63e00f8ce5901a56b32ec8b7994082aab",
@@ -852,6 +860,14 @@
             ],
             "index": "pypi",
             "version": "==2.4.0"
+        },
+        "python-dateutil": {
+            "hashes": [
+                "sha256:7e6584c74aeed623791615e26efd690f29817a27c73085b78e4bad02493df2fb",
+                "sha256:c89805f6f4d64db21ed966fda138f8a5ed7a4fdbc1a8ee329ce1b74e3c74da9e"
+            ],
+            "index": "pypi",
+            "version": "==2.8.0"
         },
         "requests": {
             "hashes": [
