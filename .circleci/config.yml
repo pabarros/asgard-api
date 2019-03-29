@@ -23,6 +23,7 @@ jobs:
     docker:
       - image: circleci/python:3.6.8
       - image: postgres:9.4
+      - image: elasticsearch:5.5-alpine
     steps:
       - checkout
       - run: sudo apt-get install postgresql-client
