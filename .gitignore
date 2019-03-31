@@ -70,3 +70,7 @@ debug.log
 # Chef environements
 /compose/*.env
 .mypy_cache/
+docs-src/doctrees/
+docs-src/_build
+docs/.doctrees
+docs/.buildinfo
