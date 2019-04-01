@@ -4,12 +4,13 @@ from aioresponses import aioresponses
 from asynctest import TestCase, mock
 
 from asgard.sdk.mesos import leader_address
+from tests.conf import TEST_LOCAL_AIOHTTP_ADDRESS, TEST_MESOS_ADDRESS
 
 
 class TestMesos(TestCase):
     async def test_get_mesos_leader_ip(self):
         mesos_addresses = [
-            "http://10.0.2.1:5050",
+            TEST_MESOS_ADDRESS,
             "http://10.0.2.3:5050",
             "http://10.0.2.2:5050",
         ]
@@ -19,14 +20,14 @@ class TestMesos(TestCase):
             HOLLOWMAN_MESOS_ADDRESS_1=mesos_addresses[1],
             HOLLOWMAN_MESOS_ADDRESS_2=mesos_addresses[2],
         ), aioresponses(
-            passthrough=["http://127.0.0.1", "http://10.0.2.1:5050"]
+            passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS, TEST_MESOS_ADDRESS]
         ) as rsps:
             rsps.get(
                 mesos_addresses[1] + "/redirect",
                 status=302,
                 body="",
-                headers={"Location": "//10.0.2.2:5050"},
+                headers={"Location": TEST_MESOS_ADDRESS},
             )
             mesos_leader_ip = await leader_address()
 
-            self.assertEqual("http://10.0.2.2:5050", mesos_leader_ip)
+            self.assertEqual(TEST_MESOS_ADDRESS, mesos_leader_ip)

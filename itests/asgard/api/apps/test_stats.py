@@ -12,6 +12,7 @@ from itests.util import (
     ACCOUNT_DEV_ID,
     USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
 )
+from tests.conf import TEST_LOCAL_AIOHTTP_ADDRESS
 from tests.utils import build_mesos_cluster, add_agent_task_stats, get_fixture
 
 
@@ -24,12 +25,18 @@ class AppStatsTest(BaseTestCase):
             f"asgard-app-stats-{self.utc_now.strftime('%Y-%m-%d-%H')}"
         )
 
-    @freeze_time("2019-03-29")
+    async def tearDown(self):
+        await super(AppStatsTest, self).tearDown()
+        await self.esclient.indices.delete(
+            index=self.INDEX_NAME, ignore=[400, 404]
+        )
+
     async def test_apps_stats_empty_stats_for_existing_app(self):
         with aioresponses(
-            passthrough=["http://127.0.0.1", settings.STATS_API_URL]
+            passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS, settings.STATS_API_URL]
         ) as rsps:
             agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
+
             build_mesos_cluster(rsps, agent_id)  # namespace=asgard-infra
 
             app_stats_datapoints = get_fixture(
@@ -53,7 +60,7 @@ class AppStatsTest(BaseTestCase):
 
     async def test_apps_stats_app_not_found(self):
         with aioresponses(
-            passthrough=["http://127.0.0.1", settings.STATS_API_URL]
+            passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS, settings.STATS_API_URL]
         ) as rsps:
             agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
             build_mesos_cluster(rsps, agent_id)  # namespace=asgard-infra

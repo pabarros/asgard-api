@@ -11,7 +11,7 @@ from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
 from asgard.models.user_has_account import UserHasAccount
 from itests.util import BaseTestCase
-from tests.conf import TEST_MESOS_ADDRESS
+from tests.conf import TEST_MESOS_ADDRESS, TEST_LOCAL_AIOHTTP_ADDRESS
 from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
 
 
@@ -57,7 +57,7 @@ class AgentsApiEndpointTest(BaseTestCase):
     async def test_agents_list_should_return_only_agents_from_specific_account(
         self
     ):
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
@@ -94,7 +94,7 @@ class AgentsApiEndpointTest(BaseTestCase):
     async def test_agents_list_includes_app_list(self):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
@@ -156,7 +156,7 @@ class AgentsApiEndpointTest(BaseTestCase):
 
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 {
@@ -199,7 +199,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S44",
@@ -221,7 +221,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
@@ -253,7 +253,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
@@ -281,7 +281,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
@@ -305,7 +305,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",  # namespace=asgard-infra
@@ -346,7 +346,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         await self.pg_data_mocker.create()
 
         slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S3"
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, slave_id)
             resp = await self.client.get(
                 f"/agents/{slave_id}/apps",
@@ -360,7 +360,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, "ead07ffb-5a61-42c9-9386-21b680597e6c-S0")
             resp = await self.client.get(
                 "/agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S0/apps",

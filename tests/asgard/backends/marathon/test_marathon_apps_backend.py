@@ -1,5 +1,5 @@
 from aioresponses import aioresponses
-from asynctest import TestCase, mock
+from asynctest import TestCase
 from freezegun import freeze_time
 
 from asgard.backends.marathon.impl import MarathonAppsBackend
@@ -8,11 +8,7 @@ from asgard.models.account import Account
 from asgard.models.app import AppStats
 from asgard.models.user import User
 from itests.util import USER_WITH_MULTIPLE_ACCOUNTS_DICT, ACCOUNT_DEV_DICT
-from tests.utils import (
-    TEST_MESOS_ADDRESS,
-    build_mesos_cluster,
-    add_agent_task_stats,
-)
+from tests.utils import build_mesos_cluster, add_agent_task_stats
 
 
 class MarathonAppsBackendTest(TestCase):
@@ -24,7 +20,7 @@ class MarathonAppsBackendTest(TestCase):
 
     @freeze_time("2019-03-29")
     async def test_get_app_stats_has_some_data(self):
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses() as rsps:
             agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
             build_mesos_cluster(rsps, agent_id)
             add_agent_task_stats(

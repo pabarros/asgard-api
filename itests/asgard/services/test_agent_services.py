@@ -11,7 +11,7 @@ from itests.util import (
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     ACCOUNT_DEV_DICT,
 )
-from tests.conf import TEST_MESOS_ADDRESS
+from tests.conf import TEST_MESOS_ADDRESS, TEST_LOCAL_AIOHTTP_ADDRESS
 from tests.utils import build_mesos_cluster
 
 
@@ -38,7 +38,7 @@ class AgentsServiceTest(BaseTestCase):
     async def test_get_apps_running_for_agent_mesos_orchestrator_zero_apps(
         self
     ):
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S44"
             build_mesos_cluster(rsps, agent_id)
             agent = await self.agents_service.get_agent_by_id(
@@ -52,7 +52,7 @@ class AgentsServiceTest(BaseTestCase):
     async def test_get_apps_running_for_agent_mesos_orchestrator_some_apps(
         self
     ):
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S9"
             build_mesos_cluster(rsps, agent_id)
             self.account.owner = "asgard"

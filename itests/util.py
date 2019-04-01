@@ -1,4 +1,5 @@
 import asyncio
+import os
 import random
 import string
 from collections import defaultdict
@@ -236,15 +237,19 @@ class BaseTestCase(TestCase):
 
     async def tearDown(self):
         await self.pg_data_mocker.drop()
+        if hasattr(self, "server"):
+            await self.server.close()
 
     async def aiohttp_client(self, app: asyncworker.App) -> TestClient:
         routes = app.routes_registry.http_routes
         http_app = web.Application()
         for route in routes:
             http_app.router.add_route(**route)
-        server = TestServer(http_app)
-        client = TestClient(server)
-        await server.start_server()
+        self.server = TestServer(
+            http_app, port=os.environ["TEST_ASYNCWORKER_HTTP_PORT"]
+        )
+        client = TestClient(self.server)
+        await self.server.start_server()
 
         return client
 

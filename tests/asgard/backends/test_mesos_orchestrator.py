@@ -10,7 +10,7 @@ from asgard.backends.mesos.impl import MesosOrchestrator, MesosAgentsBackend
 from asgard.models.account import Account
 from asgard.models.user import User
 from itests.util import USER_WITH_MULTIPLE_ACCOUNTS_DICT, ACCOUNT_DEV_DICT
-from tests.conf import TEST_MESOS_ADDRESS
+from tests.conf import TEST_MESOS_ADDRESS, TEST_LOCAL_AIOHTTP_ADDRESS
 from tests.utils import (
     ClusterOptions,
     add_agent_running_tasks,
@@ -40,7 +40,7 @@ class MesosOrchestratorTest(TestCase):
         mock.patch.stopall()
 
     async def test_get_agents_filtered_by_namespace(self):
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps,
                 "ead07ffb-5a61-42c9-9386-21b680597e6c-S10",
@@ -78,7 +78,7 @@ class MesosOrchestratorTest(TestCase):
             self.assertEqual(1, agents[3].total_apps)
 
     async def test_get_agents_remove_unused_fields(self):
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, "ead07ffb-5a61-42c9-9386-21b680597e6c-S9")
             agents = await self.mesos_backend.get_agents(
                 self.user, self.account
@@ -88,7 +88,7 @@ class MesosOrchestratorTest(TestCase):
 
     async def test_get_agent_by_id_includes_app_count_and_list(self):
         agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, agent_id)
             agent = await self.mesos_backend.get_agent_by_id(
                 agent_id, self.user, self.account
@@ -104,7 +104,7 @@ class MesosOrchestratorTest(TestCase):
 
     async def test_get_agent_by_id_includes_individual_usage_stats(self):
         agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, agent_id)
             agent = await self.mesos_backend.get_agent_by_id(
                 agent_id, self.user, self.account
@@ -119,7 +119,7 @@ class MesosOrchestratorTest(TestCase):
         O campo total_apps deve estar no "errors" caso tenha acontecido alguma falha ao carregá-lo.
         """
         agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(
                 rsps, {"id": agent_id, "apps": ClusterOptions.CONNECTION_ERROR}
             )
@@ -133,7 +133,7 @@ class MesosOrchestratorTest(TestCase):
         self
     ):
         slave_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S0"
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, slave_id)
             agent = await self.mesos_backend.get_agent_by_id(
                 slave_id,  # Agent from asgard-infra namespace
@@ -144,7 +144,7 @@ class MesosOrchestratorTest(TestCase):
 
     async def test_get_agent_by_id_return_None_if_agent_not_found(self):
         slave_id = "39e1a8e3-0fd1-4ba6-981d-e01318944957-S2"
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             rsps.get(
                 f"{TEST_MESOS_ADDRESS}/redirect",
                 status=301,
@@ -169,7 +169,7 @@ class MesosOrchestratorTest(TestCase):
         slave = get_fixture(f"agents/{agent_id}/info.json")
         slave_id = slave["id"]
         self.account.owner = slave["attributes"]["owner"]
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, agent_id)
             agent = await self.mesos_backend.get_agent_by_id(
                 slave_id, self.user, self.account
@@ -186,7 +186,7 @@ class MesosOrchestratorTest(TestCase):
         slave_owner = slave["attributes"]["owner"]
         self.account.owner = slave_owner
 
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             build_mesos_cluster(rsps, agent_id)
             agent = await self.mesos_backend.get_agent_by_id(
                 slave_id, self.user, self.account
