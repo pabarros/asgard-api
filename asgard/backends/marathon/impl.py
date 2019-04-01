@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import List, Optional
 
 from aioelasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
@@ -10,24 +9,10 @@ from asgard.conf import settings
 from asgard.math import round_up
 from asgard.models.account import Account
 from asgard.models.app import App, AppStats
-from asgard.models.task import Task
 from asgard.models.user import User
 
 
 class MarathonAppsBackend(AppsBackend):
-    async def get_apps_definition(
-        self, user: User, account: Account
-    ) -> List[App]:
-        raise NotImplementedError
-
-    async def get_by_id(
-        self, app_id: str, user: User, account: Account
-    ) -> Optional[App]:
-        raise NotImplementedError
-
-    async def get_tasks(self, app: App) -> Optional[Task]:
-        raise NotImplementedError
-
     async def get_app_stats(
         self, app: App, user: User, account: Account
     ) -> AppStats:
