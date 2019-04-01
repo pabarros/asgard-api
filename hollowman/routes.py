@@ -195,7 +195,7 @@ def plugins():
 
 @all_routes.route("/v2/plugins/<string:plugin_id>/main.js")
 def main_js(plugin_id):
-    return redirect("static/plugins/{}/main.js".format(plugin_id))
+    return redirect("/static/plugins/{}/main.js".format(plugin_id))
 
 
 @all_routes.route("/plugins")
