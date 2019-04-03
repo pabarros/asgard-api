@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timezone
 
 from aioelasticsearch import Elasticsearch
+from tests.utils import get_fixture
 
 from asgard.backends.marathon.impl import MarathonAppsBackend
 from asgard.backends.mesos.models.app import MesosApp
@@ -14,7 +15,6 @@ from itests.util import (
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     ACCOUNT_DEV_DICT,
 )
-from tests.utils import get_fixture
 
 
 class MarathonAppsBackendTest(BaseTestCase):
@@ -48,6 +48,17 @@ class MarathonAppsBackendTest(BaseTestCase):
         backend = MarathonAppsBackend()
         user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
         account = Account(**ACCOUNT_DEV_DICT)
+        async with Elasticsearch([settings.STATS_API_URL]) as es:
+            raw = await es.search(index=self.INDEX_NAME)
+            cpu_pcts = [
+                hit["_source"]["cpu_pct"] for hit in raw["hits"]["hits"]
+            ]
+            mem_pcts = [
+                hit["_source"]["mem_pct"] for hit in raw["hits"]["hits"]
+            ]
+            self.assertEqual(5, len(cpu_pcts))
+            self.assertEqual(5, len(mem_pcts))
+
         app_stats = await backend.get_app_stats(app, user, account)
         self.assertEqual(AppStats(cpu_pct="0.25", ram_pct="15.05"), app_stats)
 

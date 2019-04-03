@@ -16,7 +16,6 @@ class MarathonAppsBackend(AppsBackend):
     async def get_app_stats(
         self, app: App, user: User, account: Account
     ) -> AppStats:
-        es = Elasticsearch([settings.STATS_API_URL])
         utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
         index_name = f"asgard-app-stats-{utc_now.strftime('%Y-%m-%d')}-*"
 
@@ -33,7 +32,8 @@ class MarathonAppsBackend(AppsBackend):
         query.aggs.bucket("avg_cpu_thr_pct", A("avg", field="cpu_thr_pct"))
         dict_query = query.to_dict()
 
-        raw_result = await es.search(index=index_name, body=dict_query)
+        async with Elasticsearch([settings.STATS_API_URL]) as es:
+            raw_result = await es.search(index=index_name, body=dict_query)
 
         if raw_result["hits"]["hits"]:
             app_stats_result = raw_result["aggregations"]
