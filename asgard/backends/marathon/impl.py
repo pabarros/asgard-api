@@ -32,10 +32,15 @@ class MarathonAppsBackend(AppsBackend):
         query.aggs.bucket("avg_cpu_thr_pct", A("avg", field="cpu_thr_pct"))
         dict_query = query.to_dict()
 
-        async with Elasticsearch([settings.STATS_API_URL]) as es:
-            raw_result = await es.search(index=index_name, body=dict_query)
+        errors = {}
+        raw_result = None
+        try:
+            async with Elasticsearch([settings.STATS_API_URL]) as es:
+                raw_result = await es.search(index=index_name, body=dict_query)
+        except Exception as e:
+            errors["global"] = str(e)
 
-        if raw_result["hits"]["hits"]:
+        if raw_result and raw_result["hits"]["hits"]:
             app_stats_result = raw_result["aggregations"]
             cpu_pct = round_up(
                 Decimal(str(app_stats_result["avg_cpu_pct"]["value"]))
@@ -50,8 +55,10 @@ class MarathonAppsBackend(AppsBackend):
             cpu_pct = Decimal(0)
             mem_pct = Decimal(0)
             cpu_thr_pct = Decimal(0)
+
         return AppStats(
             cpu_pct=str(cpu_pct),
             ram_pct=str(mem_pct),
             cpu_thr_pct=str(cpu_thr_pct),
+            errors=errors,
         )
