@@ -15,6 +15,7 @@ class AppStats(BaseModel):
     type: str = "ASGARD"
     cpu_pct: str
     ram_pct: str
+    cpu_thr_pct: str
 
 
 AppFactory = ModelFactory(App)

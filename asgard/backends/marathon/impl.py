@@ -43,7 +43,15 @@ class MarathonAppsBackend(AppsBackend):
             mem_pct = round_up(
                 Decimal(str(app_stats_result["avg_mem_pct"]["value"]))
             )
+            cpu_thr_pct = round_up(
+                Decimal(str(app_stats_result["avg_cpu_thr_pct"]["value"]))
+            )
         else:
             cpu_pct = Decimal(0)
             mem_pct = Decimal(0)
-        return AppStats(cpu_pct=str(cpu_pct), ram_pct=str(mem_pct))
+            cpu_thr_pct = Decimal(0)
+        return AppStats(
+            cpu_pct=str(cpu_pct),
+            ram_pct=str(mem_pct),
+            cpu_thr_pct=str(cpu_thr_pct),
+        )

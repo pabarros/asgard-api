@@ -55,7 +55,10 @@ class AppStatsTest(BaseTestCase):
             self.assertEqual(200, resp.status)
             data = await resp.json()
             self.assertEqual(
-                AppStats(cpu_pct="0.25", ram_pct="15.05").dict(), data["stats"]
+                AppStats(
+                    cpu_pct="0.25", ram_pct="15.05", cpu_thr_pct="1.00"
+                ).dict(),
+                data["stats"],
             )
 
     async def test_apps_stats_app_not_found(self):
@@ -78,5 +81,6 @@ class AppStatsTest(BaseTestCase):
             self.assertEqual(200, resp.status)
             data = await resp.json()
             self.assertEqual(
-                AppStats(cpu_pct="0", ram_pct="0").dict(), data["stats"]
+                AppStats(cpu_pct="0", ram_pct="0", cpu_thr_pct="0").dict(),
+                data["stats"],
             )

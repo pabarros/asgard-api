@@ -29,4 +29,7 @@ class MarathonAppsBackendTest(TestCase):
             stats = await self.apps_backend.get_app_stats(
                 MesosApp(id="infra-asgard-api"), self.user, self.account
             )
-            self.assertEqual(AppStats(cpu_pct="4.51", ram_pct="22.68"), stats)
+            self.assertEqual(
+                AppStats(cpu_pct="4.51", ram_pct="22.68", cpu_thr_pct="2.89"),
+                stats,
+            )
