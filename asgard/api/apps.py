@@ -11,7 +11,7 @@ from asgard.services.apps import AppsService
 
 
 @app.route(
-    ["/apps/{app_id:[a-z0-9/-]+}/stats"], type=RouteTypes.HTTP, methods=["GET"]
+    ["/apps/{app_id:[.a-z0-9/-]+}/stats"], type=RouteTypes.HTTP, methods=["GET"]
 )
 @auth_required
 async def app_stats(request: web.Request):
