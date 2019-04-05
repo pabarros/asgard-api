@@ -23,6 +23,9 @@ class MesosAgent(Agent):
     applications: List[MesosApp] = []
     stats: Optional[Dict[str, Any]] = {}
 
+    def filter_by_attrs(self, kv):
+        pass
+
     async def calculate_stats(self):
         """
         Calculate usage statistics.
