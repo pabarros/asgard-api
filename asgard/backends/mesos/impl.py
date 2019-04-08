@@ -1,9 +1,11 @@
 from typing import Any, Dict, List, Optional
 
 from asgard.backends.base import Orchestrator, AgentsBackend, AppsBackend
+from asgard.backends.mesos.client.impl import MesosClient
 from asgard.backends.mesos.models.agent import MesosAgent
 from asgard.backends.mesos.models.app import MesosApp
 from asgard.backends.mesos.models.task import MesosTask
+from asgard.conf import settings
 from asgard.http.client import http_client
 from asgard.models.account import Account
 from asgard.models.agent import Agent
@@ -39,24 +41,16 @@ class MesosAgentsBackend(AgentsBackend):
                 filtered_agents.append(mesos_agent)
         return filtered_agents
 
-    async def get_by_id(
-        self, agent_id: str, user: User, account: Account
-    ) -> Optional[Agent]:
-        owner = account.owner
-
-        mesos_leader_address = await mesos.leader_address()
-        agent_url = f"{mesos_leader_address}/slaves?slave_id={agent_id}"
-        async with http_client.get(agent_url) as response:
-            data = await response.json()
-            if data["slaves"]:
-                agent = MesosAgent(**data["slaves"][0])
-                if not agent.attr_has_value("owner", owner):
-                    return None
-
+    async def get_agent_by_id(
+        self, namespace: str, agent_id: str
+    ) -> Optional[MesosAgent]:
+        async with MesosClient(*settings.MESOS_API_URLS) as mesos:
+            agent = await mesos.get_agent_by_id(agent_id=agent_id)
+            if agent and agent.attr_has_value("owner", namespace):
                 await populate_apps(agent)
                 await agent.calculate_stats()
                 return agent
-            return None
+        return None
 
     async def get_apps_running(self, user: User, agent: Agent) -> List[App]:
         return agent.applications
