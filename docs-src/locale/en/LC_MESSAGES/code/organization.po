@@ -1,0 +1,99 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2019, B2W Digital
+# This file is distributed under the same license as the Asgard API package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Asgard API \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-04-08 15:07-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: ../../code/organization.rst:3
+msgid "Organização do código"
+msgstr ""
+
+#: ../../code/organization.rst:5
+msgid ""
+"Esse documento dá uma visão gerãl de como o código do asgard está "
+"organziado."
+msgstr ""
+
+#: ../../code/organization.rst:7
+msgid ""
+"O pacote principal é o `:py:package:asgard`. Dentro desse pacote temos "
+"algumas macro-subdivisões."
+msgstr ""
+
+#: ../../code/organization.rst:9
+msgid ""
+"``asgard/api``: Contém todo o código que lida com a camada HTTP, ou seja,"
+" são os endpoints da API;"
+msgstr ""
+
+#: ../../code/organization.rst:10
+msgid ""
+"``asgard/services``: Esse é o código que faz a \"ponte\" entre os "
+"enpoints HTTP e o restante do código do projeto. A ideia principal é que "
+"os endpoints HTTP não conheçam nada além dessa camadad e services."
+msgstr ""
+
+#: ../../code/organization.rst:11
+msgid ""
+"``asgard/backends``: Aqui está as implementações concretas de todos os "
+"backend que o Asgard suporta. Backend são serviços com os quais a Asgard "
+"API consegue se comunicar. Atualmente a Asgard API se comunica com a API "
+"do Mesos e do Marathon para prover suas funcionalidades;"
+msgstr ""
+
+#: ../../code/organization.rst:12
+msgid ""
+"``asgard/models``: Contém os objetos que são usados para passar dados "
+"engre as camadas (http, service, backends) do projeto;"
+msgstr ""
+
+#: ../../code/organization.rst:14
+msgid "Conteúdo:"
+msgstr ""
+
+#~ msgid "O código do asgard está organizado da seguinte forma:"
+#~ msgstr ""
+
+#~ msgid "O pacote principal é o `py:package:asgard`."
+#~ msgstr ""
+
+#~ msgid "O pacote principal é o `:py:package:asgard`."
+#~ msgstr ""
+
+#~ msgid "``asgard/api``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``asgard/api`` : Contém todo o código"
+#~ " que lida com a camada HTTP, ou"
+#~ " seja, são os endpoints da API;"
+#~ msgstr ""
+
+#~ msgid "``asgard/models``"
+#~ msgstr ""
+
+#~ msgid "``asgard/services``"
+#~ msgstr ""
+
+#~ msgid "``asgard/backends``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``asgard/models``: Contém os objetos que "
+#~ "são usados para passar dados engre "
+#~ "as camadas do projeto;"
+#~ msgstr ""
+
