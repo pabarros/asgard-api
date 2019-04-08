@@ -1,13 +1,11 @@
 import json
-import unittest
 
 import jwt
 
 from asgard.http.auth.jwt import jwt_encode
-from asgard.models.account import AccountDB, Account
-from asgard.models.user import User, UserDB
+from asgard.models.account import Account
+from asgard.models.user import User
 from hollowman.app import application
-from hollowman.auth.jwt import jwt_auth, jwt_generate_user_info
 from hollowman.conf import SECRET_KEY
 from itests.util import (
     BaseTestCase,
@@ -16,7 +14,6 @@ from itests.util import (
     ACCOUNT_DEV_DICT,
     ACCOUNT_INFRA_DICT,
 )
-from tests import rebuild_schema
 
 
 class AccountEndpointsTest(BaseTestCase):

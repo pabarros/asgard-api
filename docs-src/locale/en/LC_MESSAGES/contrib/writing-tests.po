@@ -1,0 +1,183 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2019, B2W Digital
+# This file is distributed under the same license as the Asgard API package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Asgard API \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-04-01 10:48-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: ../../contrib/writing-tests.rst:3
+msgid "Escrevendo testes para o projeto"
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:6
+msgid "Os testes do projeto Asgard estão dvididos em duas categorias:"
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:8 ../../contrib/writing-tests.rst:20
+msgid "Testes unitários"
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:9 ../../contrib/writing-tests.rst:25
+msgid "Testes funcionais"
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:11
+msgid ""
+"Os testes unitários estão abaixo da pasta ``tests/`` e os funcionais "
+"estão abaixo da pasta ``itests/``. A diferença entre eles é que os testes"
+" funcionais dependem de recursos externos, como por exemplo Banco de "
+"daos, ElasticSearch, etc."
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:15
+msgid "Localização dos testes dentro de suas respectivas pastas"
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:17
+msgid ""
+"Os arquivos de teste devem seguir a mesma hierarquia de pastas do código "
+"que está sendo testando. Pegando um exemplo: Os testes da classe "
+":py:class:`asgard.services.AppsService` que está declarada em "
+"``asgard/services/apps.py`` devem estar abaixo da pasta "
+"``tests/asard/service/``. Nesse caso estão em "
+"``tests/asgard/services/test_apps_service.py``."
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:22
+msgid ""
+"Os testes unitários sçao escritos com ``asynctest`` e devem ser subclasse"
+" de :py:class:`asynctest.TestCase`."
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:27
+msgid ""
+"Todos os testes funcionais são subclasses da classe "
+":py:class:`tests.util.BaseTestCase`. Importante notar que todos as "
+"classes de teste precisam implementar os métodos :py:meth:`setUp(self)` e"
+" :py:meth:`tearDown(self)`. Esses métodos são, na verdade, corotinas. "
+"Então sua classe de tests deve declara-los també como corotinas. Um "
+"exemplo de caso de teste para um teste funcional."
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:38
+msgid ""
+"Essa é a base para uma nova classe de teste que implementa testes "
+"funcionais."
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:40
+msgid ""
+"Se se teste é um teste que chama a API do asgard, existe uma corotina que"
+" que te devolve um ``aiohttp_client``, dessa forma:"
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:51
+msgid ""
+"A partir desse momento você pode chamar a API do Asgard usando esse "
+"client, como se fosse um cliente http comum."
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:54
+msgid "Usando aiohttp_client com aioresponses"
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:56
+msgid ""
+"Quando estamos escrevendo testes que fazem chamadaas reais à API do "
+"Asgard e ao mesmo tempo precisamos mocker alguma outra requisição que o "
+"código da API fará, precisamos passar uma opção especial para o "
+"aioresponses, que é o ``passthrough``."
+msgstr ""
+
+#: ../../contrib/writing-tests.rst:67
+msgid ""
+"Quaisquer outros serviços HTTP que precisarem ser usados pelo teste (sem "
+"mock) devem ser adicionados à lista que está sendo passada para o "
+"``aioresponses``."
+msgstr ""
+
+#~ msgid ""
+#~ "Todos os testes funcionais são "
+#~ "subclasses da classe :py:`tests.util.BaseTestCase`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Todos os testes funcionais são "
+#~ "subclasses da classe "
+#~ ":python:`tests.util.BaseTestCase`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Todos os testes funcionais são "
+#~ "subclasses da classe "
+#~ ":py:class:`tests.util.BaseTestCase`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Todos os testes funcionais são "
+#~ "subclasses da classe "
+#~ ":py:class:`tests.util.BaseTestCase`, :py:func:`open`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Todos os testes funcionais são "
+#~ "subclasses da classe "
+#~ ":py:class:`tests.util.BaseTestCase <bla>`,"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Todos os testes funcionais são "
+#~ "subclasses da classe "
+#~ ":py:class:`tests.util.BaseTestCase`. Importante notar "
+#~ "que todos as classes de teste "
+#~ "precisam implementar os métodos "
+#~ ":py:meth:`setUp(self)` e :py:meth:`tearDown(self)`."
+#~ msgstr ""
+
+#~ msgid "Escrevendo casos de teste que usam aioresponses"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Quando estamos escrevendo que fazem "
+#~ "chamadaas reais à API do Asgard e"
+#~ " ao mesmo tempo precisamos mocker "
+#~ "alguma outra requisição que o código "
+#~ "da APi fará, precisamos passar uma "
+#~ "opção especial para o aioresponses, que"
+#~ " é o ``passthrough``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Quando estamos escrevendo testes que "
+#~ "fazem chamadaas reais à API do "
+#~ "Asgard e ao mesmo tempo precisamos "
+#~ "mocker alguma outra requisição que o "
+#~ "código da APi fará, precisamos passar"
+#~ " uma opção especial para o "
+#~ "aioresponses, que é o ``passthrough``."
+#~ msgstr ""
+
+#~ msgid ". toctree::"
+#~ msgstr ""
+
+#~ msgid "maxdepth"
+#~ msgstr ""
+
+#~ msgid "2"
+#~ msgstr ""
+
+#~ msgid "writing-tests.rst"
+#~ msgstr ""
+

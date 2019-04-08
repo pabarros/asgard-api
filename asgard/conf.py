@@ -25,6 +25,7 @@ TASK_FILEREAD_MAX_OFFSET: int = int(
 class Settings(BaseSettings):
 
     DB_URL: str
+    STATS_API_URL: str
 
     class Config:
         env_prefix = os.getenv("ENV", "ASGARD") + "_"

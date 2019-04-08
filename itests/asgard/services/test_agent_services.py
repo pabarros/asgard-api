@@ -1,0 +1,65 @@
+from aioresponses import aioresponses
+from asynctest import mock
+
+from asgard.backends.marathon.impl import MarathonAppsBackend
+from asgard.backends.mesos.impl import MesosAgentsBackend, MesosOrchestrator
+from asgard.models.account import Account
+from asgard.models.user import User
+from asgard.services.agents import AgentsService
+from itests.util import (
+    BaseTestCase,
+    USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    ACCOUNT_DEV_DICT,
+)
+from tests.conf import TEST_MESOS_ADDRESS, TEST_LOCAL_AIOHTTP_ADDRESS
+from tests.utils import build_mesos_cluster
+
+
+class AgentsServiceTest(BaseTestCase):
+    async def setUp(self):
+        await super(AgentsServiceTest, self).setUp()
+        self.mesos_leader_ip_pactcher = mock.patch(
+            "asgard.sdk.mesos.leader_address",
+            mock.CoroutineMock(return_value=TEST_MESOS_ADDRESS),
+        )
+        self.mesos_leader_ip_pactcher.start()
+        self.mesos_orchestrator = MesosOrchestrator(
+            agents_backend=MesosAgentsBackend(),
+            apps_backend=MarathonAppsBackend(),
+        )
+        self.user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        self.account = Account(**ACCOUNT_DEV_DICT)
+        self.agents_service = AgentsService()
+
+    async def tearDown(self):
+        await super(AgentsServiceTest, self).tearDown()
+        mock.patch.stopall()
+
+    async def test_get_apps_running_for_agent_mesos_orchestrator_zero_apps(
+        self
+    ):
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
+            agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S44"
+            build_mesos_cluster(rsps, agent_id)
+            agent = await self.agents_service.get_agent_by_id(
+                agent_id, self.user, self.account, self.mesos_orchestrator
+            )
+            apps = await self.agents_service.get_apps_running_for_agent(
+                self.user, agent, self.mesos_orchestrator
+            )
+            self.assertEquals([], apps)
+
+    async def test_get_apps_running_for_agent_mesos_orchestrator_some_apps(
+        self
+    ):
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
+            agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S9"
+            build_mesos_cluster(rsps, agent_id)
+            self.account.owner = "asgard"
+            agent = await self.agents_service.get_agent_by_id(
+                agent_id, self.user, self.account, self.mesos_orchestrator
+            )
+            apps = await self.agents_service.get_apps_running_for_agent(
+                self.user, agent, self.mesos_orchestrator
+            )
+            self.assertEquals(1, len(apps))

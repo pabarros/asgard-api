@@ -1,3 +1,4 @@
-from asgard.backends.mesos.impl import MesosBackend
+from asgard.backends.marathon.impl import MarathonAppsBackend
+from asgard.backends.mesos.impl import MesosOrchestrator, MesosAgentsBackend
 
-mesos = MesosBackend()
+mesos = MesosOrchestrator(MesosAgentsBackend(), MarathonAppsBackend())

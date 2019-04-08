@@ -9,6 +9,7 @@
  * Config dos testes para *sempre* rodarem papontando para o banco de dev, que roda no docker.
  * Alteração do plugin session-checker para não mais exibir o nome do usuário. Isso já está sendo feito na UI (https://github.com/B2W-BIT/asgard-ui/pull/4).  (https://github.com/B2W-BIT/asgard-api/pull/92)
  * Configuração do CircleCI para rodar os testes com py3.6.x, py3.7.x e py3.6.8 (https://github.com/B2W-BIT/asgard-api/pull/91)
+ * Criação de endpoint `/apps/{id}/stats` que retorna dados de uso de CPU/RAM da app com id `{id}`; (https://github.com/B2W-BIT/asgard-api/pull/96)
 
 
 ### 0.81.2

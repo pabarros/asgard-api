@@ -19,10 +19,6 @@ class Agent(BaseModel, abc.ABC):
         )
 
     @abc.abstractmethod
-    def filter_by_attrs(self, attrs_kv):
-        raise NotImplementedError
-
-    @abc.abstractmethod
     async def apps(self) -> List[App]:
         raise NotImplementedError
 

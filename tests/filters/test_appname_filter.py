@@ -4,7 +4,6 @@ import mock
 from marathon.models.app import MarathonApp
 
 from hollowman.filters.appname import AddAppNameFilter
-from tests import ContextStub, RequestStub
 from tests.utils import with_json_fixture
 
 

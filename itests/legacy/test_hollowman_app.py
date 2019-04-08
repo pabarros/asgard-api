@@ -1,5 +1,4 @@
 import json
-from unittest import TestCase, skip
 
 import responses
 from mock import patch
@@ -11,8 +10,7 @@ from hollowman import conf
 from hollowman.app import application
 from hollowman.upstream import replay_request
 from itests.util import BaseTestCase
-from tests import rebuild_schema
-from tests.utils import with_json_fixture, get_fixture
+from tests.utils import get_fixture
 
 
 class DummyResponse(object):

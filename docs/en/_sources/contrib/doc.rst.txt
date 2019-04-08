@@ -20,3 +20,9 @@ pipenv run make docs
 Isso vai gerar todas as documentações, em todas as línguas configuradas. Atualmente `pt_BR` em `en`. A documentação `pt_BR` será gerada na pasta `docs/` e as traduçõees estarão também dentro dessa pasta, abaixo de sub-pastas com o código da língua escolhida.
 
 por exemplo, a tradução para `en` estará em `docs/en`.
+
+
+.. toctree::
+   :maxdepth: 2
+
+   writing-tests.rst
