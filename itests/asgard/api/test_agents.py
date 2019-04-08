@@ -1,18 +1,14 @@
-import os
-from importlib import reload
-
 from aioresponses import aioresponses
-from asynctest import mock, skip
-from asynctest.mock import CoroutineMock
+from asynctest import mock
+from tests.utils import ClusterOptions, build_mesos_cluster
 
 from asgard.api import agents
 from asgard.app import app
+from asgard.conf import settings
 from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
 from asgard.models.user_has_account import UserHasAccount
 from itests.util import BaseTestCase
-from tests.conf import TEST_MESOS_ADDRESS, TEST_LOCAL_AIOHTTP_ADDRESS
-from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
 
 
 class AgentsApiEndpointTest(BaseTestCase):
@@ -22,7 +18,7 @@ class AgentsApiEndpointTest(BaseTestCase):
         self.user_auth_key = "c0c0b73b18864550a3e3b93a59c4b7d8"
         self.mesos_leader_ip_pactcher = mock.patch(
             "asgard.sdk.mesos.leader_address",
-            mock.CoroutineMock(return_value=TEST_MESOS_ADDRESS),
+            mock.CoroutineMock(return_value=settings.MESOS_API_URLS[0]),
         )
         self.mesos_leader_ip_pactcher.start()
 

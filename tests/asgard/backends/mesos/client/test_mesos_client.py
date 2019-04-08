@@ -1,10 +1,10 @@
 from aioresponses import aioresponses
 from asynctest import TestCase, skip
-from tests.utils import build_mesos_cluster, get_fixture
 
 from asgard.backends.mesos.client.impl import MesosClient
 from asgard.backends.mesos.models.agent import MesosAgent
 from asgard.conf import settings
+from tests.utils import build_mesos_cluster, get_fixture
 
 
 class MesosClientTestCase(TestCase):
