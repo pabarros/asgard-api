@@ -1,7 +1,5 @@
 from aioresponses import aioresponses
 from asynctest import TestCase, mock
-from tests.conf import TEST_LOCAL_AIOHTTP_ADDRESS
-from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
 
 from asgard.backends.marathon.impl import MarathonAppsBackend
 from asgard.backends.mesos.impl import MesosOrchestrator, MesosAgentsBackend
@@ -9,6 +7,8 @@ from asgard.conf import settings
 from asgard.models.account import Account
 from asgard.models.user import User
 from itests.util import USER_WITH_MULTIPLE_ACCOUNTS_DICT, ACCOUNT_DEV_DICT
+from tests.conf import TEST_LOCAL_AIOHTTP_ADDRESS
+from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
 
 
 class MesosOrchestratorTest(TestCase):
@@ -156,7 +156,7 @@ class MesosOrchestratorTest(TestCase):
 
     async def test_get_apps_returns_empty_list_if_agent_not_found(self):
         slave_id = "39e1a8e3-0fd1-4ba6-981d-e01318944957-S2"
-        with aioresponses(passthrough=["http://127.0.0.1"]) as rsps:
+        with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
             rsps.get(
                 f"{settings.MESOS_API_URLS[0]}/redirect",
                 status=301,
@@ -167,8 +167,12 @@ class MesosOrchestratorTest(TestCase):
                 payload={"slaves": []},
                 status=200,
             )
-            apps = await self.mesos_backend.get_apps(
-                namespace="dev", agent_id=slave_id
+
+            agent = await self.mesos_backend.get_agent_by_id(
+                slave_id, self.user, self.account
+            )
+            apps = await self.mesos_backend.get_apps_running_for_agent(
+                self.user, agent
             )
             self.assertEqual(0, len(apps))
 

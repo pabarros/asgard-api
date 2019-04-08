@@ -41,19 +41,21 @@ class MesosAgentsBackend(AgentsBackend):
                 filtered_agents.append(mesos_agent)
         return filtered_agents
 
-    async def get_agent_by_id(
-        self, namespace: str, agent_id: str
+    async def get_by_id(
+        self, agent_id: str, user: User, account: Account
     ) -> Optional[MesosAgent]:
         async with MesosClient(*settings.MESOS_API_URLS) as mesos:
             agent = await mesos.get_agent_by_id(agent_id=agent_id)
-            if agent and agent.attr_has_value("owner", namespace):
+            if agent and agent.attr_has_value("owner", account.owner):
                 await populate_apps(agent)
                 await agent.calculate_stats()
                 return agent
         return None
 
     async def get_apps_running(self, user: User, agent: Agent) -> List[App]:
-        return agent.applications
+        if agent:
+            return agent.applications
+        return []
 
 
 class MesosOrchestrator(Orchestrator):
