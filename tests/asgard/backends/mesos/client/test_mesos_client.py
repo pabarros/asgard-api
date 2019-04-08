@@ -2,7 +2,7 @@ from aioresponses import aioresponses
 from asynctest import TestCase, skip
 
 from asgard.backends.mesos.client.impl import MesosClient
-from asgard.backends.mesos.models.agent import MesosAgent
+from asgard.backends.mesos.client.models.agent import MesosAgent
 from asgard.conf import settings
 from tests.utils import build_mesos_cluster, get_fixture
 
@@ -31,7 +31,6 @@ class MesosClientTestCase(TestCase):
                     },
                     agent.attributes,
                 )
-                self.assertEqual("MESOS", agent.type)
                 self.assertEqual("172.18.0.51", agent.hostname)
                 self.assertEqual(5051, agent.port)
                 self.assertEqual(True, agent.active)

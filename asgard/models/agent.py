@@ -1,5 +1,5 @@
 import abc
-from typing import List, Dict, Union, Optional, Any
+from typing import List, Dict, Optional, Any
 
 from asgard.models.app import App, AppFactory
 from asgard.models.base import BaseModel, ModelFactory
@@ -11,9 +11,10 @@ class Agent(BaseModel, abc.ABC):
     active: bool
     version: str
     port: int
-    used_resources: Dict[str, Union[str, int]]
+    used_resources: Dict[str, str]
     attributes: Dict[str, str]
-    resources: Dict[str, Union[str, int]]
+    resources: Dict[str, str]
+
     total_apps: int = 0
     applications: List[AppFactory] = []
     stats: Optional[Dict[str, Any]] = {}

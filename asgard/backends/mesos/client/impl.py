@@ -1,6 +1,6 @@
 from typing import List, Tuple, Optional, Dict
 
-from asgard.backends.mesos.models.agent import MesosAgent
+from asgard.backends.mesos.client.models.agent import MesosAgent
 from asgard.http.client import http_client
 
 

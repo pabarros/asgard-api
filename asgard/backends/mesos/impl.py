@@ -25,8 +25,9 @@ class MesosAgentsBackend(AgentsBackend):
     ) -> List[MesosAgent]:
         async with MesosClient(*settings.MESOS_API_URLS) as mesos:
             filtered_agents: List[MesosAgent] = []
-            agents = await mesos.get_agents()
-            for agent in agents:
+            client_agents = await mesos.get_agents()
+            for client_agent in client_agents:
+                agent = client_agent.to_asgard_model(MesosAgent)
                 if not agent.attr_has_value("owner", account.owner):
                     continue
                 await populate_apps(agent)
@@ -38,11 +39,14 @@ class MesosAgentsBackend(AgentsBackend):
         self, agent_id: str, user: User, account: Account
     ) -> Optional[MesosAgent]:
         async with MesosClient(*settings.MESOS_API_URLS) as mesos:
-            agent = await mesos.get_agent_by_id(agent_id=agent_id)
-            if agent and agent.attr_has_value("owner", account.owner):
-                await populate_apps(agent)
-                await agent.calculate_stats()
-                return agent
+            client_agent = await mesos.get_agent_by_id(agent_id=agent_id)
+            if client_agent:
+                agent = client_agent.to_asgard_model(MesosAgent)
+
+                if agent.attr_has_value("owner", account.owner):
+                    await populate_apps(agent)
+                    await agent.calculate_stats()
+                    return agent
         return None
 
     async def get_apps_running(self, user: User, agent: Agent) -> List[App]:
