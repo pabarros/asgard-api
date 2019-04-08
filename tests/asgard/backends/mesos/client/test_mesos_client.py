@@ -56,6 +56,32 @@ class MesosClientTestCase(TestCase):
                     agent.resources,
                 )
 
+    async def test_mesos_client_get_agents(self):
+        """
+        Retorna a lista de agents do cluster mesos
+        """
+        agent_ids = [
+            "ead07ffb-5a61-42c9-9386-21b680597e6c-S0",
+            "ead07ffb-5a61-42c9-9386-21b680597e6c-S10",
+            "ead07ffb-5a61-42c9-9386-21b680597e6c-S4",
+        ]
+        async with MesosClient(*settings.MESOS_API_URLS) as mesos:
+            with aioresponses() as rsps:
+                build_mesos_cluster(rsps, *agent_ids)
+                agents = await mesos.get_agents()
+                self.assertEquals(3, len(agents))
+                self.assertEqual(agent_ids, [agent.id for agent in agents])
+
+    async def test_mesos_client_get_agents_empty_cluster(self):
+        """
+        Retorna a lista de agents do cluster mesos
+        """
+        async with MesosClient(*settings.MESOS_API_URLS) as mesos:
+            with aioresponses() as rsps:
+                build_mesos_cluster(rsps)
+                agents = await mesos.get_agents()
+                self.assertEquals(0, len(agents))
+
     async def test_mesos_client_get_agent_by_id_agent_not_found(self):
         agent_id = "agent-not-found"
         async with MesosClient(*settings.MESOS_API_URLS) as mesos:
@@ -116,4 +142,4 @@ class MesosClientTestCase(TestCase):
                     exception=Exception("Connection Error"),
                 )
                 with self.assertRaises(Exception):
-                    await mesos.get_agent_by_id(agent_id=agent_id)
+                    await mesos.get_agent_by_id(agent_id="id")

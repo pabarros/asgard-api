@@ -32,3 +32,10 @@ class MesosClient:
             return agent
 
         return None
+
+    async def get_agents(self) -> List[MesosAgent]:
+        data = await self._json_response(f"/slaves")
+        if "slaves" in data:
+            agents = [MesosAgent(**agent_info) for agent_info in data["slaves"]]
+            return agents
+        return []

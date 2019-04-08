@@ -1,9 +1,7 @@
 from aioresponses import aioresponses
-from asynctest import mock
 
 from asgard.api import agents
 from asgard.app import app
-from asgard.conf import settings
 from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
 from asgard.models.user_has_account import UserHasAccount
@@ -17,11 +15,6 @@ class AgentsApiEndpointTest(BaseTestCase):
         await super(AgentsApiEndpointTest, self).setUp()
         self.client = await self.aiohttp_client(app)
         self.user_auth_key = "c0c0b73b18864550a3e3b93a59c4b7d8"
-        self.mesos_leader_ip_pactcher = mock.patch(
-            "asgard.sdk.mesos.leader_address",
-            mock.CoroutineMock(return_value=settings.MESOS_API_URLS[0]),
-        )
-        self.mesos_leader_ip_pactcher.start()
 
     def _prepare_additional_fixture_data(self):
         self.pg_data_mocker.add_data(
@@ -49,7 +42,6 @@ class AgentsApiEndpointTest(BaseTestCase):
 
     async def tearDown(self):
         await super(AgentsApiEndpointTest, self).tearDown()
-        mock.patch.stopall()
 
     async def test_agents_list_should_return_only_agents_from_specific_account(
         self

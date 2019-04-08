@@ -3,7 +3,6 @@ from asynctest import mock
 
 from asgard.backends.marathon.impl import MarathonAppsBackend
 from asgard.backends.mesos.impl import MesosAgentsBackend, MesosOrchestrator
-from asgard.conf import settings
 from asgard.models.account import Account
 from asgard.models.user import User
 from asgard.services.agents import AgentsService
@@ -19,11 +18,6 @@ from tests.utils import build_mesos_cluster
 class AgentsServiceTest(BaseTestCase):
     async def setUp(self):
         await super(AgentsServiceTest, self).setUp()
-        self.mesos_leader_ip_pactcher = mock.patch(
-            "asgard.sdk.mesos.leader_address",
-            mock.CoroutineMock(return_value=settings.MESOS_API_URLS[0]),
-        )
-        self.mesos_leader_ip_pactcher.start()
         self.mesos_orchestrator = MesosOrchestrator(
             agents_backend=MesosAgentsBackend(),
             apps_backend=MarathonAppsBackend(),
@@ -34,7 +28,6 @@ class AgentsServiceTest(BaseTestCase):
 
     async def tearDown(self):
         await super(AgentsServiceTest, self).tearDown()
-        mock.patch.stopall()
 
     async def test_get_apps_running_for_agent_mesos_orchestrator_zero_apps(
         self

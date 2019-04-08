@@ -13,11 +13,6 @@ from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
 
 class MesosOrchestratorTest(TestCase):
     async def setUp(self):
-        self.mesos_leader_ip_pactcher = mock.patch(
-            "asgard.sdk.mesos.leader_address",
-            mock.CoroutineMock(return_value=settings.MESOS_API_URLS[0]),
-        )
-        self.mesos_leader_ip_pactcher.start()
         self.user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
         self.account = Account(**ACCOUNT_DEV_DICT)
         self.account.owner = "asgard"
@@ -27,9 +22,6 @@ class MesosOrchestratorTest(TestCase):
         self.mesos_backend = MesosOrchestrator(
             MesosAgentsBackend(), MarathonAppsBackend()
         )
-
-    async def tearDown(self):
-        mock.patch.stopall()
 
     async def test_get_agents_filtered_by_namespace(self):
         with aioresponses(passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]) as rsps:
