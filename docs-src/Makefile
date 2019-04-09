@@ -21,5 +21,6 @@ help:
 docs:
 	@make gettext
 	@sphinx-intl update -p _build/gettext -l en
+	@sphinx-apidoc ../asgard/  -o src/asgard
 	@sphinx-build -b html . ../docs
 	@sphinx-build -D language=en -b html . ../docs/en
