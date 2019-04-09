@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Services &#8212; Asgard API  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Backends" href="backends.html" />
+    <link rel="prev" title="Endpoints HTTP" href="api.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="services">
+<span id="asgard-services"></span><h1>Services<a class="headerlink" href="#services" title="Permalink to this headline">¶</a></h1>
+<p>Service faz o papel da “ponte” entre os endpoints HTTP e todo restante do código. E ideia é que os endppints HTTP só consigam interagir com o restante do código através de um “Service”.</p>
+<p>A ideia dos “Services” é mapear todas as possíveis ações que a Asgard API pode executar.</p>
+<p>Vejamos um exemplo:</p>
+<p>O endpoint <a class="reference internal" href="../src/asgard/asgard.api.html#asgard.api.agents.agents_handler" title="asgard.api.agents.agents_handler"><code class="xref py py-meth docutils literal notranslate"><span class="pre">/agents</span></code></a> é quem retorna a lista de agents de um cluster. Esse endpoints HTTP connhece apenas o <code class="docutils literal notranslate"><span class="pre">AgentsService</span></code>. Ali estão todas as ações que os endpoints HTTP relacionados com <code class="docutils literal notranslate"><span class="pre">Agents</span></code> podem executar.</p>
+<p>Aqui está a implementação do <code class="docutils literal notranslate"><span class="pre">AgentsService</span></code>:</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">asgard.services.agents.</code><code class="descname">AgentsService</code><a class="reference internal" href="../_modules/asgard/services/agents.html#AgentsService"><span class="viewcode-link">[source]</span></a></dt>
+<dd><dl class="method">
+<dt>
+<code class="descname">get_agent_by_id</code><span class="sig-paren">(</span><em>agent_id: str</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em>, <em>backend: asgard.backends.base.Orchestrator</em><span class="sig-paren">)</span> &#x2192; Optional[asgard.models.agent.Agent]<a class="reference internal" href="../_modules/asgard/services/agents.html#AgentsService.get_agent_by_id"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">get_agents</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em>, <em>backend: asgard.backends.base.Orchestrator</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.agent.Agent]<a class="reference internal" href="../_modules/asgard/services/agents.html#AgentsService.get_agents"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">get_apps_running_for_agent</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>agent: asgard.models.agent.Agent</em>, <em>backend: asgard.backends.base.Orchestrator</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.app.App]<a class="reference internal" href="../_modules/asgard/services/agents.html#AgentsService.get_apps_running_for_agent"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<p>Perceba como os métodos do <code class="docutils literal notranslate"><span class="pre">AgentsService</span></code> recebem objetos concretos em vez de tipos primitivos, esses são os <a class="reference internal" href="../src/asgard/asgard.models.html#module-asgard.models" title="asgard.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Models</span></code></a>. A única exceção é quando precisamos buscar um objeto usando seu identificador único (<code class="docutils literal notranslate"><span class="pre">id</span></code>), nesse caso passamos o valor do <code class="docutils literal notranslate"><span class="pre">id</span></code> mesmo, já que essa busca é justamente quem vai fazer a troca de um “id” por um objeto preenchido.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introdução</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="organization.html">Organização do código</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api.html">Endpoints HTTP</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends.html">Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">&lt;no title&gt;</a><ul>
+  <li><a href="organization.html">Organização do código</a><ul>
+      <li>Previous: <a href="api.html" title="previous chapter">Endpoints HTTP</a></li>
+      <li>Next: <a href="backends.html" title="next chapter">Backends</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/code/services.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt_BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Backends &#8212; documentação Asgard API </title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Buscar" href="../search.html" />
+    <link rel="next" title="Models" href="models.html" />
+    <link rel="prev" title="Services" href="services.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="backends">
+<span id="asgard-backends"></span><h1>Backends<a class="headerlink" href="#backends" title="Link permanente para este título">¶</a></h1>
+<p>Os Backends são a implementaçao concreta com as outras APIs com as quais a Asgard API consegue se comunicar.</p>
+<p>Na mesma linha dos <a class="reference internal" href="services.html#asgard-services"><span class="std std-ref">Services</span></a>, esses objetos devem mapear todas as ações que um determinado backend deve ser capaz de realizar.</p>
+<p>O backend são dividiso em <a class="reference internal" href="../src/asgard/asgard.backends.html#asgard.backends.base.AgentsBackend" title="asgard.backends.base.AgentsBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentsBackend</span></code></a> e <a class="reference internal" href="../src/asgard/asgard.backends.html#asgard.backends.base.AppsBackend" title="asgard.backends.base.AppsBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppsBackends</span></code></a>. Esss são objetos abstratos que definem quais ações cada um desses backends podem executar.</p>
+<p>A junção de múltiplos <code class="docutils literal notranslate"><span class="pre">Backends</span></code> forma um “Orquestrador”, modelado no objeto <code class="docutils literal notranslate"><span class="pre">Orchestrator</span></code>. Esse é o objeto principal em termos de funcionalidades da Asgard API, é esse objeto quem define o que a Asgard API consegue fazer, em termos de orquestração.</p>
+<p>Abaixo está a implementação do objeto <code class="docutils literal notranslate"><span class="pre">Orchestrator</span></code></p>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">asgard.backends.base.</code><code class="descname">Orchestrator</code><span class="sig-paren">(</span><em>agents_backend: asgard.backends.base.AgentsBackend</em>, <em>apps_backend: asgard.backends.base.AppsBackend</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/asgard/backends/base.html#Orchestrator"><span class="viewcode-link">[código fonte]</span></a></dt>
+<dd><p>Classe abstrata que mapeia todas as ações que um orquestrador pode excutar.
+As depdenências injetadas aqui são implementações que efetivamente falam com cada um dos backends suportados.</p>
+<dl class="method">
+<dt>
+<code class="descname">get_agent_by_id</code><span class="sig-paren">(</span><em>agent_id: str</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; Optional[asgard.models.agent.Agent]<a class="reference internal" href="../_modules/asgard/backends/base.html#Orchestrator.get_agent_by_id"><span class="viewcode-link">[código fonte]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">get_agents</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.agent.Agent]<a class="reference internal" href="../_modules/asgard/backends/base.html#Orchestrator.get_agents"><span class="viewcode-link">[código fonte]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">get_app_stats</code><span class="sig-paren">(</span><em>app: asgard.models.app.App</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; asgard.models.app.AppStats<a class="reference internal" href="../_modules/asgard/backends/base.html#Orchestrator.get_app_stats"><span class="viewcode-link">[código fonte]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">get_apps_running_for_agent</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>agent: asgard.models.agent.Agent</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.app.App]<a class="reference internal" href="../_modules/asgard/backends/base.html#Orchestrator.get_apps_running_for_agent"><span class="viewcode-link">[código fonte]</span></a></dt>
+<dd><p>Método que retorna todas as apps que estão atualmente rodando no agent referido.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>A asgard API suporte alguns Backends:</p>
+<ul class="simple">
+<li><p>Mesos</p></li>
+<li><p>Marathon</p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navegação</h3>
+<p class="caption"><span class="caption-text">Conteúdo:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introdução</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="organization.html">Organização do código</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api.html">Endpoints HTTP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="services.html">Services</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">&lt;no title&gt;</a><ul>
+  <li><a href="organization.html">Organização do código</a><ul>
+      <li>Previous: <a href="services.html" title="capítulo anterior">Services</a></li>
+      <li>Next: <a href="models.html" title="próximo capítulo">Models</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Busca rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/code/backends.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

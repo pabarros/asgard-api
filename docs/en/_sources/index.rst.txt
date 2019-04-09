@@ -7,16 +7,13 @@ Bem vindos à documentação oficial do projeto Asgard
 ====================================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Conteúdo:
 
    intro.rst
-   contrib/doc.rst
+   code/index.rst
+   contrib/index.rst
 
-Introdução
-==========
-
-Essa é a documentação oficial do projeto Asgard.
 
 
 

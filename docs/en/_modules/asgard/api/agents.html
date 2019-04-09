@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>asgard.api.agents &#8212; Asgard API  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for asgard.api.agents</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="n">Decimal</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">aiohttp_cors</span>
+<span class="kn">from</span> <span class="nn">aiohttp</span> <span class="k">import</span> <span class="n">web</span>
+<span class="kn">from</span> <span class="nn">asyncworker</span> <span class="k">import</span> <span class="n">RouteTypes</span>
+<span class="kn">from</span> <span class="nn">asyncworker.conf</span> <span class="k">import</span> <span class="n">settings</span>
+
+<span class="kn">from</span> <span class="nn">asgard.api.resources.agents</span> <span class="k">import</span> <span class="n">AgentsResource</span>
+<span class="kn">from</span> <span class="nn">asgard.api.resources.apps</span> <span class="k">import</span> <span class="n">AppsResource</span>
+<span class="kn">from</span> <span class="nn">asgard.app</span> <span class="k">import</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">asgard.backends</span> <span class="k">import</span> <span class="n">mesos</span>
+<span class="kn">from</span> <span class="nn">asgard.http.auth</span> <span class="k">import</span> <span class="n">auth_required</span>
+<span class="kn">from</span> <span class="nn">asgard.math</span> <span class="k">import</span> <span class="n">round_up</span>
+<span class="kn">from</span> <span class="nn">asgard.models.account</span> <span class="k">import</span> <span class="n">Account</span>
+<span class="kn">from</span> <span class="nn">asgard.models.agent</span> <span class="k">import</span> <span class="n">Agent</span>
+<span class="kn">from</span> <span class="nn">asgard.models.app</span> <span class="k">import</span> <span class="n">App</span>
+<span class="kn">from</span> <span class="nn">asgard.models.user</span> <span class="k">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">asgard.services</span> <span class="k">import</span> <span class="n">agents_service</span>
+
+
+<div class="viewcode-block" id="calculate_stats"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.agents.calculate_stats">[docs]</a><span class="k">def</span> <span class="nf">calculate_stats</span><span class="p">(</span><span class="n">agents</span><span class="p">):</span>
+    <span class="n">total_cpus</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">Decimal</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;cpus&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">]</span>
+    <span class="p">)</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="n">total_used_cpus</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">Decimal</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">used_resources</span><span class="p">[</span><span class="s2">&quot;cpus&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">total_ram</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">Decimal</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;mem&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">]</span>
+    <span class="p">)</span> <span class="ow">or</span> <span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+    <span class="n">total_used_ram</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">Decimal</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">used_resources</span><span class="p">[</span><span class="s2">&quot;mem&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;cpu_pct&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">round_up</span><span class="p">(</span><span class="n">total_used_cpus</span> <span class="o">/</span> <span class="n">total_cpus</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)),</span>
+        <span class="s2">&quot;ram_pct&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">round_up</span><span class="p">(</span><span class="n">total_used_ram</span> <span class="o">/</span> <span class="n">total_ram</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)),</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="agents_handler"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.agents.agents_handler">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">([</span><span class="s2">&quot;/agents&quot;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="nd">@auth_required</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">agents_handler</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">from_alchemy_obj</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">])</span>
+    <span class="n">account</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Account</span><span class="o">.</span><span class="n">from_alchemy_obj</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">current_account</span><span class="p">)</span>
+    <span class="n">agents</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agents_service</span><span class="o">.</span><span class="n">get_agents</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">mesos</span><span class="p">)</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">calculate_stats</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">AgentsResource</span><span class="p">(</span><span class="n">agents</span><span class="o">=</span><span class="n">agents</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="apply_attr_filter"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.agents.apply_attr_filter">[docs]</a><span class="k">def</span> <span class="nf">apply_attr_filter</span><span class="p">(</span>
+    <span class="n">filters_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">agents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Agent</span><span class="p">]:</span>
+
+    <span class="n">filtered_agents</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+        <span class="n">all_filters</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">agent</span><span class="o">.</span><span class="n">attr_has_value</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">filters_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">filters_dict</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">all_filters</span><span class="p">):</span>
+            <span class="n">filtered_agents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">agent</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filtered_agents</span></div>
+
+
+<div class="viewcode-block" id="agents_with_attrs"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.agents.agents_with_attrs">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">([</span><span class="s2">&quot;/agents/with-attrs&quot;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="nd">@auth_required</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">agents_with_attrs</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">from_alchemy_obj</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">])</span>
+    <span class="n">account</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Account</span><span class="o">.</span><span class="n">from_alchemy_obj</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">current_account</span><span class="p">)</span>
+
+    <span class="n">filters</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">filters</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;account_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">agents</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agents_service</span><span class="o">.</span><span class="n">get_agents</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">mesos</span><span class="p">)</span>
+    <span class="n">filtered_agents</span> <span class="o">=</span> <span class="n">apply_attr_filter</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span> <span class="n">agents</span><span class="p">)</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">calculate_stats</span><span class="p">(</span><span class="n">filtered_agents</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span>
+        <span class="n">AgentsResource</span><span class="p">(</span><span class="n">agents</span><span class="o">=</span><span class="n">filtered_agents</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="agent_apps"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.agents.agent_apps">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">([</span><span class="s2">&quot;/agents/</span><span class="si">{agent_id}</span><span class="s2">/apps&quot;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="nd">@auth_required</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">agent_apps</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="n">apps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">App</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">User</span><span class="o">.</span><span class="n">from_alchemy_obj</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">])</span>
+    <span class="n">account</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Account</span><span class="o">.</span><span class="n">from_alchemy_obj</span><span class="p">(</span><span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">current_account</span><span class="p">)</span>
+    <span class="n">agent_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">match_info</span><span class="p">[</span><span class="s2">&quot;agent_id&quot;</span><span class="p">]</span>
+
+    <span class="n">agent</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agents_service</span><span class="o">.</span><span class="n">get_agent_by_id</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">account</span><span class="p">,</span> <span class="n">mesos</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">agent</span><span class="p">:</span>
+        <span class="n">apps</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">applications</span>
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">AppsResource</span><span class="p">(</span><span class="n">apps</span><span class="o">=</span><span class="n">apps</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="patched_startup"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.agents.patched_startup">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">patched_startup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+
+    <span class="n">app</span><span class="p">[</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">routes</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">routes_registry</span><span class="o">.</span><span class="n">http_routes</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">routes</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">app</span><span class="p">[</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">][</span><span class="s2">&quot;app&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">http_app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">Application</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span><span class="p">:</span>
+        <span class="n">http_app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="o">**</span><span class="n">route</span><span class="p">)</span>
+
+    <span class="n">cors</span> <span class="o">=</span> <span class="n">aiohttp_cors</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
+        <span class="n">http_app</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;*&quot;</span><span class="p">:</span> <span class="n">aiohttp_cors</span><span class="o">.</span><span class="n">ResourceOptions</span><span class="p">(</span>
+                <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">expose_headers</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">allow_headers</span><span class="o">=</span><span class="s2">&quot;*&quot;</span>
+            <span class="p">)</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Configure CORS on all routes.</span>
+    <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">http_app</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">routes</span><span class="p">()):</span>
+        <span class="n">cors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">route</span><span class="p">)</span>
+
+    <span class="n">app</span><span class="p">[</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">][</span><span class="s2">&quot;runner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">http_app</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">app</span><span class="p">[</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">][</span><span class="s2">&quot;runner&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    <span class="n">app</span><span class="p">[</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">][</span><span class="s2">&quot;site&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">TCPSite</span><span class="p">(</span>
+        <span class="n">runner</span><span class="o">=</span><span class="n">app</span><span class="p">[</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">][</span><span class="s2">&quot;runner&quot;</span><span class="p">],</span>
+        <span class="n">host</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">HTTP_HOST</span><span class="p">,</span>
+        <span class="n">port</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">HTTP_PORT</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">await</span> <span class="n">app</span><span class="p">[</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">][</span><span class="s2">&quot;site&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<span class="n">app</span><span class="o">.</span><span class="n">_on_startup</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">app</span><span class="o">.</span><span class="n">_on_startup</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patched_startup</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code/organization.html">Organização do código</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

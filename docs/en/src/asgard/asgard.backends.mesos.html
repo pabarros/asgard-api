@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>asgard.backends.mesos package &#8212; Asgard API  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="asgard-backends-mesos-package">
+<h1>asgard.backends.mesos package<a class="headerlink" href="#asgard-backends-mesos-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="asgard.backends.mesos.client.html">asgard.backends.mesos.client package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.client.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asgard.backends.mesos.client.models.html">asgard.backends.mesos.client.models package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="asgard.backends.mesos.client.models.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asgard.backends.mesos.client.models.html#module-asgard.backends.mesos.client.models.agent">asgard.backends.mesos.client.models.agent module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asgard.backends.mesos.client.models.html#module-asgard.backends.mesos.client.models">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.client.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.client.html#module-asgard.backends.mesos.client.impl">asgard.backends.mesos.client.impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.client.html#module-asgard.backends.mesos.client">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="asgard.backends.mesos.models.html">asgard.backends.mesos.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.models.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.models.html#module-asgard.backends.mesos.models.agent">asgard.backends.mesos.models.agent module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.models.html#module-asgard.backends.mesos.models.app">asgard.backends.mesos.models.app module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.models.html#module-asgard.backends.mesos.models.task">asgard.backends.mesos.models.task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="asgard.backends.mesos.models.html#module-asgard.backends.mesos.models">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asgard.backends.mesos.impl">
+<span id="asgard-backends-mesos-impl-module"></span><h2>asgard.backends.mesos.impl module<a class="headerlink" href="#module-asgard.backends.mesos.impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="asgard.backends.mesos.impl.MesosAgentsBackend">
+<em class="property">class </em><code class="descclassname">asgard.backends.mesos.impl.</code><code class="descname">MesosAgentsBackend</code><a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosAgentsBackend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosAgentsBackend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="asgard.backends.html#asgard.backends.base.AgentsBackend" title="asgard.backends.base.AgentsBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">asgard.backends.base.AgentsBackend</span></code></a></p>
+<dl class="method">
+<dt id="asgard.backends.mesos.impl.MesosAgentsBackend.get_agents">
+<code class="descname">get_agents</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; List[asgard.backends.mesos.models.agent.MesosAgent]<a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosAgentsBackend.get_agents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosAgentsBackend.get_agents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna todos os Agents da conta <cite>account</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="asgard.backends.mesos.impl.MesosAgentsBackend.get_apps_running">
+<code class="descname">get_apps_running</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>agent: asgard.models.agent.Agent</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.app.App]<a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosAgentsBackend.get_apps_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosAgentsBackend.get_apps_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retornas lista de App que está rodando nesse agent</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="asgard.backends.mesos.impl.MesosAgentsBackend.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>agent_id: str</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; Optional[asgard.backends.mesos.models.agent.MesosAgent]<a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosAgentsBackend.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosAgentsBackend.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna o agent de id <cite>agentd_id</cite> pertencente à conta <cite>account</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="asgard.backends.mesos.impl.MesosOrchestrator">
+<em class="property">class </em><code class="descclassname">asgard.backends.mesos.impl.</code><code class="descname">MesosOrchestrator</code><span class="sig-paren">(</span><em>agents_backend: asgard.backends.base.AgentsBackend</em>, <em>apps_backend: asgard.backends.base.AppsBackend</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosOrchestrator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosOrchestrator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="asgard.backends.html#asgard.backends.base.Orchestrator" title="asgard.backends.base.Orchestrator"><code class="xref py py-class docutils literal notranslate"><span class="pre">asgard.backends.base.Orchestrator</span></code></a></p>
+<dl class="method">
+<dt id="asgard.backends.mesos.impl.MesosOrchestrator.get_agent_by_id">
+<code class="descname">get_agent_by_id</code><span class="sig-paren">(</span><em>agent_id: str</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; Optional[asgard.backends.mesos.models.agent.MesosAgent]<a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosOrchestrator.get_agent_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosOrchestrator.get_agent_by_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.backends.mesos.impl.MesosOrchestrator.get_agents">
+<code class="descname">get_agents</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; List[asgard.backends.mesos.models.agent.MesosAgent]<a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosOrchestrator.get_agents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosOrchestrator.get_agents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.backends.mesos.impl.MesosOrchestrator.get_app_stats">
+<code class="descname">get_app_stats</code><span class="sig-paren">(</span><em>app: asgard.models.app.App</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em><span class="sig-paren">)</span> &#x2192; asgard.models.app.AppStats<a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosOrchestrator.get_app_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosOrchestrator.get_app_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.backends.mesos.impl.MesosOrchestrator.get_apps_running_for_agent">
+<code class="descname">get_apps_running_for_agent</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>agent: asgard.models.agent.Agent</em><span class="sig-paren">)</span> &#x2192; List[asgard.backends.mesos.models.app.MesosApp]<a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#MesosOrchestrator.get_apps_running_for_agent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.MesosOrchestrator.get_apps_running_for_agent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Método que retorna todas as apps que estão atualmente rodando no agent referido.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="asgard.backends.mesos.impl.populate_apps">
+<code class="descclassname">asgard.backends.mesos.impl.</code><code class="descname">populate_apps</code><span class="sig-paren">(</span><em>agent</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/backends/mesos/impl.html#populate_apps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.backends.mesos.impl.populate_apps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-asgard.backends.mesos">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asgard.backends.mesos" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/organization.html">Organização do código</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/src/asgard/asgard.backends.mesos.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

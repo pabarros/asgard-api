@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt_BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>asgard.db package &#8212; documentação Asgard API </title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script type="text/javascript" src="../../_static/translations.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Buscar" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="asgard-db-package">
+<h1>asgard.db package<a class="headerlink" href="#asgard-db-package" title="Link permanente para este título">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link permanente para este título">¶</a></h2>
+</div>
+<div class="section" id="module-asgard.db.session">
+<span id="asgard-db-session-module"></span><h2>asgard.db.session module<a class="headerlink" href="#module-asgard.db.session" title="Link permanente para este título">¶</a></h2>
+<dl class="class">
+<dt id="asgard.db.session.AsgardDBConnection">
+<em class="property">class </em><code class="descclassname">asgard.db.session.</code><code class="descname">AsgardDBConnection</code><span class="sig-paren">(</span><em>engine</em>, <em>conn</em>, <em>session</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection" title="Link permanente para esta definição">¶</a></dt>
+<dd><p>Base: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.all">
+<code class="descname">all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.all"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.all" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.begin">
+<code class="descname">begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.begin"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.begin" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.execute"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.execute" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.exists">
+<code class="descname">exists</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.exists"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.exists" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.filter">
+<code class="descname">filter</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.filter"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.filter" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.join">
+<code class="descname">join</code><span class="sig-paren">(</span><em>join_clause</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.join"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.join" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.one">
+<code class="descname">one</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.one"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.one" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.query">
+<code class="descname">query</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span> &#x2192; asgard.db.session.AsgardDBConnection<a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.query"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.query" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.AsgardDBConnection.release">
+<code class="descname">release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#AsgardDBConnection.release"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.AsgardDBConnection.release" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="asgard.db.session.Session">
+<em class="property">class </em><code class="descclassname">asgard.db.session.</code><code class="descname">Session</code><span class="sig-paren">(</span><em>engine_wrapper</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#Session"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.Session" title="Link permanente para esta definição">¶</a></dt>
+<dd><p>Base: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="asgard.db.session.Session.connection">
+<code class="descname">connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#Session.connection"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.Session.connection" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.db.session.Session.engine">
+<code class="descname">engine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asgard/db/session.html#Session.engine"><span class="viewcode-link">[código fonte]</span></a><a class="headerlink" href="#asgard.db.session.Session.engine" title="Link permanente para esta definição">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asgard.db">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asgard.db" title="Link permanente para este título">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navegação</h3>
+<p class="caption"><span class="caption-text">Conteúdo:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/organization.html">Organização do código</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Busca rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Ir" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/src/asgard/asgard.db.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

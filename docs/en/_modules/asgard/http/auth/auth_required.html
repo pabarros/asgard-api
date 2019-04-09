@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>asgard.http.auth.auth_required &#8212; Asgard API  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for asgard.http.auth.auth_required</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">jwt</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span>
+<span class="kn">from</span> <span class="nn">aiohttp</span> <span class="k">import</span> <span class="n">web</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm.exc</span> <span class="k">import</span> <span class="n">NoResultFound</span>
+
+<span class="kn">from</span> <span class="nn">asgard</span> <span class="k">import</span> <span class="n">db</span>
+<span class="kn">from</span> <span class="nn">asgard.models.account</span> <span class="k">import</span> <span class="n">AccountDB</span>
+<span class="kn">from</span> <span class="nn">asgard.models.user</span> <span class="k">import</span> <span class="n">UserDB</span>
+<span class="kn">from</span> <span class="nn">asgard.models.user_has_account</span> <span class="k">import</span> <span class="n">UserHasAccount</span>
+<span class="kn">from</span> <span class="nn">hollowman.conf</span> <span class="k">import</span> <span class="n">SECRET_KEY</span>
+<span class="kn">from</span> <span class="nn">hollowman.log</span> <span class="k">import</span> <span class="n">logger</span>
+
+<span class="n">unhandled_auth_error</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="s2">&quot;Authorization failed. Unexpected error&quot;</span><span class="p">}</span>
+<span class="n">invalid_token_response_body</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="s2">&quot;Authorization token is invalid&quot;</span><span class="p">}</span>
+<span class="n">permission_denied_on_account_response_body</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="s2">&quot;Permission Denied to access this account&quot;</span>
+<span class="p">}</span>
+<span class="n">no_associated_account_response_error</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="s2">&quot;No associated account&quot;</span><span class="p">}</span>
+<span class="n">account_does_not_exist_response_error</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="s2">&quot;Account does not exist&quot;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="make_response"><a class="viewcode-back" href="../../../../src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.make_response">[docs]</a><span class="k">def</span> <span class="nf">make_response</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">status_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status_code</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TokenTypes"><a class="viewcode-back" href="../../../../src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.TokenTypes">[docs]</a><span class="k">class</span> <span class="nc">TokenTypes</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">USER_TOKEN</span> <span class="o">=</span> <span class="s2">&quot;Token&quot;</span>
+    <span class="n">JWT</span> <span class="o">=</span> <span class="s2">&quot;JWT&quot;</span></div>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_get_account_by_id</span><span class="p">(</span><span class="n">account_id</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">account_id</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">db</span><span class="o">.</span><span class="n">AsgardDBSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">AccountDB</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">AccountDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">account_id</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">one</span><span class="p">()</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">NoResultFound</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_build_base_query</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">AsgardDBConnection</span><span class="p">):</span>
+    <span class="n">_join</span> <span class="o">=</span> <span class="n">UserDB</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">UserHasAccount</span><span class="p">,</span> <span class="n">UserDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">UserHasAccount</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">isouter</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">AccountDB</span><span class="o">.</span><span class="n">__table__</span><span class="p">,</span>
+        <span class="n">AccountDB</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">UserHasAccount</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">account_id</span><span class="p">,</span>
+        <span class="n">isouter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">UserDB</span><span class="p">,</span> <span class="n">AccountDB</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">&quot;account_id&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_join</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">_build_user_instance</span><span class="p">(</span>
+    <span class="n">session</span><span class="p">:</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">AsgardDBConnection</span><span class="p">,</span>
+    <span class="n">query_additional_criteria</span><span class="p">:</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">BinaryExpression</span><span class="p">,</span>
+    <span class="n">auth_failed_log_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">_build_base_query</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">query_additional_criteria</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">auth_failed_log_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">account_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">account_id</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">account_id</span><span class="p">]</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">UserDB</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">tx_name</span><span class="o">=</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tx_name</span><span class="p">,</span> <span class="n">tx_email</span><span class="o">=</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tx_email</span>
+    <span class="p">)</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">account_ids</span> <span class="o">=</span> <span class="n">account_ids</span>
+    <span class="k">return</span> <span class="n">user</span>
+
+
+<div class="viewcode-block" id="check_auth_token"><a class="viewcode-back" href="../../../../src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.check_auth_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">check_auth_token</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">db</span><span class="o">.</span><span class="n">AsgardDBSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">_build_user_instance</span><span class="p">(</span>
+            <span class="n">session</span><span class="p">,</span>
+            <span class="n">UserDB</span><span class="o">.</span><span class="n">tx_authkey</span> <span class="o">==</span> <span class="n">token</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;auth-failed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;token-type&quot;</span><span class="p">:</span> <span class="s2">&quot;apikey&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Key not found&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_jwt_token"><a class="viewcode-back" href="../../../../src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.check_jwt_token">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">check_jwt_token</span><span class="p">(</span><span class="n">jwt_token</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">jwt_token</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">SECRET_KEY</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid-token&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;token-type&quot;</span><span class="p">:</span> <span class="s2">&quot;jwt&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">jwt_token</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">db</span><span class="o">.</span><span class="n">AsgardDBSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">_build_user_instance</span><span class="p">(</span>
+            <span class="n">session</span><span class="p">,</span>
+            <span class="n">UserDB</span><span class="o">.</span><span class="n">tx_email</span> <span class="o">==</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">][</span><span class="s2">&quot;email&quot;</span><span class="p">],</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;auth-failed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;token-type&quot;</span><span class="p">:</span> <span class="s2">&quot;JWT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;user not found&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">][</span><span class="s2">&quot;email&quot;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_extract_account_id_from_jwt</span><span class="p">(</span><span class="n">jwt_token</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">jwt_token</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">SECRET_KEY</span><span class="p">)[</span><span class="s2">&quot;current_account&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="not_authenticated"><a class="viewcode-back" href="../../../../src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.not_authenticated">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">not_authenticated</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<span class="n">AUTH_TYPES</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">not_authenticated</span><span class="p">)</span>
+<span class="n">AUTH_TYPES</span><span class="p">[</span><span class="n">TokenTypes</span><span class="o">.</span><span class="n">USER_TOKEN</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_auth_token</span>
+<span class="n">AUTH_TYPES</span><span class="p">[</span><span class="n">TokenTypes</span><span class="o">.</span><span class="n">JWT</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_jwt_token</span>
+
+
+<div class="viewcode-block" id="auth_required"><a class="viewcode-back" href="../../../../src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.auth_required">[docs]</a><span class="k">def</span> <span class="nf">auth_required</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">auth_header</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;Authorization&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid-type invalid-token&quot;</span>
+            <span class="p">)</span>
+            <span class="n">token_type</span><span class="p">,</span> <span class="n">token</span> <span class="o">=</span> <span class="n">auth_header</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+            <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AUTH_TYPES</span><span class="p">[</span><span class="n">token_type</span><span class="p">](</span><span class="n">token</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">invalid_token_response_body</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">account_ids</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">no_associated_account_response_error</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span>
+
+            <span class="n">request_account_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;account_id&quot;</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="n">_extract_account_id_from_jwt</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">request_account_on_db</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_get_account_by_id</span><span class="p">(</span>
+                <span class="n">request_account_id</span> <span class="ow">or</span> <span class="n">user</span><span class="o">.</span><span class="n">account_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">request_account_id</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">request_account_on_db</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">account_does_not_exist_response_error</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">request_account_on_db</span><span class="o">.</span><span class="n">id</span>
+                <span class="ow">and</span> <span class="n">request_account_on_db</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">account_ids</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span>
+                    <span class="n">permission_denied_on_account_response_body</span><span class="p">,</span> <span class="mi">401</span>
+                <span class="p">)</span>
+
+            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span>
+            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">current_account</span> <span class="o">=</span> <span class="n">request_account_on_db</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">({</span><span class="s2">&quot;exc&quot;</span><span class="p">:</span> <span class="n">e</span><span class="p">,</span> <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;auth-unhandled-error&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="n">make_response</span><span class="p">(</span><span class="n">unhandled_auth_error</span><span class="p">,</span> <span class="mi">401</span><span class="p">)</span>
+
+        <span class="n">user</span><span class="o">.</span><span class="n">current_account</span> <span class="o">=</span> <span class="n">request_account_on_db</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">fn</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code/organization.html">Organização do código</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
