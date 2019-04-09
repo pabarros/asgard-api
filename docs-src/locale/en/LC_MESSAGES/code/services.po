@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-08 16:30-0300\n"
+"POT-Creation-Date: 2019-04-09 15:22-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,44 +17,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: ../../code/services.rst:3
+#: ../../code/services.rst:4
 msgid "Services"
 msgstr ""
 
-#: ../../code/services.rst:5
+#: ../../code/services.rst:7
 msgid ""
 "Service faz o papel da \"ponte\" entre os endpoints HTTP e todo restante "
 "do código. E ideia é que os endppints HTTP só consigam interagir com o "
 "restante do código através de um \"Service\"."
 msgstr ""
 
-#: ../../code/services.rst:7
+#: ../../code/services.rst:9
 msgid ""
 "A ideia dos \"Services\" é mapear todas as possíveis ações que a Asgard "
 "API pode executar."
 msgstr ""
 
-#: ../../code/services.rst:11
+#: ../../code/services.rst:13
 msgid "Vejamos um exemplo:"
 msgstr ""
 
-#: ../../code/services.rst:13
+#: ../../code/services.rst:15
 msgid ""
-"O endpoint ``/agents`` é quem retorna a lista de agents de um cluster. "
-"Esse endpoints HTTP connhece apenas o ``AgentsService``. Ali estão todas "
-"as ações que os endpoints HTTP relacionados com ``Agents`` podem "
-"executar."
+"O endpoint :py:meth:`/agents <asgard.api.agents.agents_handler>` é quem "
+"retorna a lista de agents de um cluster. Esse endpoints HTTP connhece "
+"apenas o ``AgentsService``. Ali estão todas as ações que os endpoints "
+"HTTP relacionados com ``Agents`` podem executar."
 msgstr ""
 
-#: ../../code/services.rst:15
+#: ../../code/services.rst:17
 msgid "Aqui está a implementação do ``AgentsService``:"
 msgstr ""
 
-#: ../../code/services.rst:19
+#: ../../code/services.rst:25
 msgid ""
 "Perceba como os métodos do ``AgentsService`` recebem objetos concretos em"
-" vez de tipos primitivos, esses são os :ref:`Models <asgard.models>`. A "
-"única exceção é quando precisamos buscar um objeto usando seu "
+" vez de tipos primitivos, esses são os :py:mod:`Models <asgard.models>`. "
+"A única exceção é quando precisamos buscar um objeto usando seu "
 "identificador único (``id``), nesse caso passamos o valor do ``id`` "
 "mesmo, já que essa busca é justamente quem vai fazer a troca de um \"id\""
 " por um objeto preenchido."
@@ -182,5 +182,41 @@ msgstr ""
 #~ " busca é justamente quem vai fazer"
 #~ " a troca de um \"id\" por um"
 #~ " objeto preenchido."
+#~ msgstr ""
+
+#~ msgid "Aqui está a implementação do ``AgentsService``:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Aqui está a implementação do "
+#~ ":py:class:`AgentsService "
+#~ "<asgard.services.agents.AgentsService>`:"
+#~ msgstr ""
+
+#~ msgid "Aqui está a implementação do :py:class:``AgentsService``:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "O endpoint ``/agents`` é quem retorna"
+#~ " a lista de agents de um "
+#~ "cluster. Esse endpoints HTTP connhece "
+#~ "apenas o ``AgentsService``. Ali estão "
+#~ "todas as ações que os endpoints "
+#~ "HTTP relacionados com ``Agents`` podem "
+#~ "executar."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Perceba como os métodos do "
+#~ "``AgentsService`` recebem objetos concretos em"
+#~ " vez de tipos primitivos, esses são"
+#~ " os :py:module:`Models <asgard.models>`. A "
+#~ "única exceção é quando precisamos buscar"
+#~ " um objeto usando seu identificador "
+#~ "único (``id``), nesse caso passamos o"
+#~ " valor do ``id`` mesmo, já que "
+#~ "essa busca é justamente quem vai "
+#~ "fazer a troca de um \"id\" por "
+#~ "um objeto preenchido."
 #~ msgstr ""
 

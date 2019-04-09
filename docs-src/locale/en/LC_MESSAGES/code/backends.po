@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-08 16:41-0300\n"
+"POT-Creation-Date: 2019-04-09 15:35-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,9 +36,10 @@ msgstr ""
 
 #: ../../code/backends.rst:11
 msgid ""
-"O backend são dividiso em ``AgentsBackend`` e ``AppsBackends``. Esss são "
-"objetos abstratos que definem quais ações cada um desses backends podem "
-"executar."
+"O backend são dividiso em :py:class:`AgentsBackend "
+"<asgard.backends.base.AgentsBackend>` e :py:class:`AppsBackends "
+"<asgard.backends.base.AppsBackend>`. Esss são objetos abstratos que "
+"definem quais ações cada um desses backends podem executar."
 msgstr ""
 
 #: ../../code/backends.rst:13
@@ -53,15 +54,28 @@ msgstr ""
 msgid "Abaixo está a implementação do objeto ``Orchestrator``"
 msgstr ""
 
-#: ../../code/backends.rst:19
-msgid "A asgard API suporte alguns Backends:"
+#: asgard.backends.base.Orchestrator:1 of
+msgid ""
+"Classe abstrata que mapeia todas as ações que um orquestrador pode "
+"excutar. As depdenências injetadas aqui são implementações que "
+"efetivamente falam com cada um dos backends suportados."
 msgstr ""
 
-#: ../../code/backends.rst:21
-msgid "Mesos"
+#: asgard.backends.base.Orchestrator.get_apps_running_for_agent:1 of
+msgid ""
+"Método que retorna todas as apps que estão atualmente rodando no agent "
+"referido."
 msgstr ""
 
 #: ../../code/backends.rst:22
+msgid "A asgard API suporte alguns Backends:"
+msgstr ""
+
+#: ../../code/backends.rst:24
+msgid "Mesos"
+msgstr ""
+
+#: ../../code/backends.rst:25
 msgid "Marathon"
 msgstr ""
 
@@ -70,5 +84,21 @@ msgstr ""
 #~ "<asgard.services>`, esses objetos devem mapear"
 #~ " todas as ações que um determinado"
 #~ " backend deve ser capaz de realizer."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "O backend são dividiso em "
+#~ "``AgentsBackend`` e ``AppsBackends``. Esss são"
+#~ " objetos abstratos que definem quais "
+#~ "ações cada um desses backends podem "
+#~ "executar."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "O backend são dividiso em "
+#~ ":py:class:`AgentsBackend <asgard.backends.base.AgentsBackend>`"
+#~ " e ``AppsBackends``. Esss são objetos "
+#~ "abstratos que definem quais ações cada"
+#~ " um desses backends podem executar."
 #~ msgstr ""
 

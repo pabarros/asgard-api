@@ -19,12 +19,12 @@ Os arquivos de teste devem seguir a mesma hierarquia de pastas do código que es
 Testes unitários
 ----------------
 
-Os testes unitários sçao escritos com ``asynctest`` e devem ser subclasse de :py:class:`asynctest.TestCase`.
+Os testes unitários são escritos com ``asynctest`` e devem ser subclasse de ``asynctest.TestCase``.
 
 Testes funcionais
 -----------------
 
-Todos os testes funcionais são subclasses da classe :py:class:`tests.util.BaseTestCase`. Importante notar que todos as classes de teste precisam implementar os métodos :py:meth:`setUp(self)` e :py:meth:`tearDown(self)`. Esses métodos são, na verdade, corotinas. Então sua classe de tests deve declara-los també como corotinas. Um exemplo de caso de teste para um teste funcional.
+Todos os testes funcionais são subclasses da classe :py:class:`itests.util.BaseTestCase`. Importante notar que todos as classes de teste precisam implementar os métodos :py:meth:`setUp(self)` e :py:meth:`tearDown(self)`. Esses métodos são, na verdade, corotinas. Então sua classe de tests deve declara-los també como corotinas. Um exemplo de caso de teste para um teste funcional.
 
 .. code:: python
 
