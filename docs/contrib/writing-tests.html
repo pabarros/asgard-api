@@ -15,7 +15,8 @@
     <script type="text/javascript" src="../_static/translations.js"></script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Buscar" href="../search.html" />
-    <link rel="prev" title="Contribuindo com o projeto" href="doc.html" />
+    <link rel="next" title="Escrevendo uma implementação de um novo Orquestrador" href="write-new-orquestrator.html" />
+    <link rel="prev" title="Criando código para o projeto" href="writing-code.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -33,7 +34,7 @@
           <div class="body" role="main">
             
   <div class="section" id="escrevendo-testes-para-o-projeto">
-<h1>Escrevendo testes para o projeto<a class="headerlink" href="#escrevendo-testes-para-o-projeto" title="Link permanente para este título">¶</a></h1>
+<span id="writing-tests"></span><h1>Escrevendo testes para o projeto<a class="headerlink" href="#escrevendo-testes-para-o-projeto" title="Link permanente para este título">¶</a></h1>
 <p>Os testes do projeto Asgard estão dvididos em duas categorias:</p>
 <ul class="simple">
 <li><p>Testes unitários</p></li>
@@ -42,14 +43,14 @@
 <p>Os testes unitários estão abaixo da pasta <code class="docutils literal notranslate"><span class="pre">tests/</span></code> e os funcionais estão abaixo da pasta <code class="docutils literal notranslate"><span class="pre">itests/</span></code>. A diferença entre eles é que os testes funcionais dependem de recursos externos, como por exemplo Banco de daos, ElasticSearch, etc.</p>
 <div class="section" id="localizacao-dos-testes-dentro-de-suas-respectivas-pastas">
 <h2>Localização dos testes dentro de suas respectivas pastas<a class="headerlink" href="#localizacao-dos-testes-dentro-de-suas-respectivas-pastas" title="Link permanente para este título">¶</a></h2>
-<p>Os arquivos de teste devem seguir a mesma hierarquia de pastas do código que está sendo testando. Pegando um exemplo: Os testes da classe <code class="xref py py-class docutils literal notranslate"><span class="pre">asgard.services.AppsService</span></code> que está declarada em <code class="docutils literal notranslate"><span class="pre">asgard/services/apps.py</span></code> devem estar abaixo da pasta <code class="docutils literal notranslate"><span class="pre">tests/asard/service/</span></code>. Nesse caso estão em <code class="docutils literal notranslate"><span class="pre">tests/asgard/services/test_apps_service.py</span></code>.</p>
+<p>Os arquivos de teste devem seguir a mesma hierarquia de pastas do código que está sendo testando. Pegando um exemplo: Os testes da classe <a class="reference internal" href="../src/asgard/asgard.services.html#asgard.services.apps.AppsService" title="asgard.services.apps.AppsService"><code class="xref py py-class docutils literal notranslate"><span class="pre">asgard.services.apps.AppsService</span></code></a> que está declarada em <code class="docutils literal notranslate"><span class="pre">asgard/services/apps.py</span></code> devem estar abaixo da pasta <code class="docutils literal notranslate"><span class="pre">tests/asgard/service/</span></code>. Nesse caso estão em <code class="docutils literal notranslate"><span class="pre">tests/asgard/services/test_apps_service.py</span></code>.</p>
 <div class="section" id="testes-unitarios">
 <h3>Testes unitários<a class="headerlink" href="#testes-unitarios" title="Link permanente para este título">¶</a></h3>
 <p>Os testes unitários são escritos com <code class="docutils literal notranslate"><span class="pre">asynctest</span></code> e devem ser subclasse de <code class="docutils literal notranslate"><span class="pre">asynctest.TestCase</span></code>.</p>
 </div>
 <div class="section" id="testes-funcionais">
 <h3>Testes funcionais<a class="headerlink" href="#testes-funcionais" title="Link permanente para este título">¶</a></h3>
-<p>Todos os testes funcionais são subclasses da classe <code class="xref py py-class docutils literal notranslate"><span class="pre">itests.util.BaseTestCase</span></code>. Importante notar que todos as classes de teste precisam implementar os métodos <code class="xref py py-meth docutils literal notranslate"><span class="pre">setUp(self)()</span></code> e <code class="xref py py-meth docutils literal notranslate"><span class="pre">tearDown(self)()</span></code>. Esses métodos são, na verdade, corotinas. Então sua classe de tests deve declara-los també como corotinas. Um exemplo de caso de teste para um teste funcional.</p>
+<p>Todos os testes funcionais são subclasses da classe <code class="docutils literal notranslate"><span class="pre">itests.util.BaseTestCase</span></code>. Importante notar que todos as classes de teste precisam implementar os métodos <code class="docutils literal notranslate"><span class="pre">setUp(self)</span></code> e <code class="docutils literal notranslate"><span class="pre">tearDown(self)</span></code>. Esses métodos são, na verdade, corotinas. Então sua classe de teste deve declará-los também como corotinas. Um exemplo de caso de teste para um teste funcional.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyTestCase</span><span class="p">(</span><span class="n">BaseTestCase</span><span class="p">):</span>
    <span class="n">async</span> <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
      <span class="n">await</span> <span class="nb">super</span><span class="p">(</span><span class="n">MyTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
@@ -105,12 +106,13 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introdução</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../code/organization.html">Organização do código</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="doc.html">Contribuindo com o projeto</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="doc.html#atualizando-a-documentacao-do-projeto">Atualizando a documentação do projeto</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="doc.html#gerando-a-versao-html-da-documentacao">Gerando a versão html da documentação</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Escrevendo testes para o projeto</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Contribuindo com o projeto</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="doc-update.html">Atualizando a documentação do projeto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc-gen.html">Gerando a versão html da documentação</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html">Rodando o projeto localmente</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-code.html">Criando código para o projeto</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Escrevendo testes para o projeto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="write-new-orquestrator.html">Escrevendo uma implementação de um novo Orquestrador</a></li>
 </ul>
 </li>
 </ul>
@@ -119,10 +121,9 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="index.html">&lt;no title&gt;</a><ul>
-  <li><a href="doc.html">Contribuindo com o projeto</a><ul>
-      <li>Previous: <a href="doc.html" title="capítulo anterior">Contribuindo com o projeto</a></li>
-  </ul></li>
+  <li><a href="index.html">Contribuindo com o projeto</a><ul>
+      <li>Previous: <a href="writing-code.html" title="capítulo anterior">Criando código para o projeto</a></li>
+      <li>Next: <a href="write-new-orquestrator.html" title="próximo capítulo">Escrevendo uma implementação de um novo Orquestrador</a></li>
   </ul></li>
   </ul></li>
 </ul>

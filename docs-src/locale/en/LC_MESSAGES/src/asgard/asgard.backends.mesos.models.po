@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 14:36-0300\n"
+"POT-Creation-Date: 2019-04-10 09:20-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,4 +66,22 @@ msgstr ""
 #: ../../src/asgard/asgard.backends.mesos.models.rst:33
 msgid "Module contents"
 msgstr ""
+
+#~ msgid "Base: :class:`asgard.models.agent.Agent`"
+#~ msgstr ""
+
+#~ msgid "Calculate usage statistics."
+#~ msgstr ""
+
+#~ msgid "CPU % usage"
+#~ msgstr ""
+
+#~ msgid "RAM % usage"
+#~ msgstr ""
+
+#~ msgid "Base: :class:`asgard.models.app.App`"
+#~ msgstr ""
+
+#~ msgid "Base: :class:`asgard.models.task.Task`"
+#~ msgstr ""
 

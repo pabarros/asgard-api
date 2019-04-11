@@ -1,9 +1,8 @@
-from typing import Dict, Type, Union
+from typing import Dict, Type
 
 from pydantic import BaseModel as PydanticBaseModel
 
 from asgard.backends.mesos.models.agent import MesosAgent as AsgardMesosAgent
-from asgard.models.base import BaseModel
 
 
 class MesosAgent(PydanticBaseModel):

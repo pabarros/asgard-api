@@ -1,4 +1,6 @@
 
+.. _writing-tests:
+
 Escrevendo testes para o projeto
 ================================
 
@@ -14,7 +16,7 @@ Os testes unitários estão abaixo da pasta ``tests/`` e os funcionais estão ab
 Localização dos testes dentro de suas respectivas pastas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Os arquivos de teste devem seguir a mesma hierarquia de pastas do código que está sendo testando. Pegando um exemplo: Os testes da classe :py:class:`asgard.services.AppsService` que está declarada em ``asgard/services/apps.py`` devem estar abaixo da pasta ``tests/asard/service/``. Nesse caso estão em ``tests/asgard/services/test_apps_service.py``.
+Os arquivos de teste devem seguir a mesma hierarquia de pastas do código que está sendo testando. Pegando um exemplo: Os testes da classe :py:class:`asgard.services.apps.AppsService` que está declarada em ``asgard/services/apps.py`` devem estar abaixo da pasta ``tests/asgard/service/``. Nesse caso estão em ``tests/asgard/services/test_apps_service.py``.
 
 Testes unitários
 ----------------
@@ -24,7 +26,7 @@ Os testes unitários são escritos com ``asynctest`` e devem ser subclasse de ``
 Testes funcionais
 -----------------
 
-Todos os testes funcionais são subclasses da classe :py:class:`itests.util.BaseTestCase`. Importante notar que todos as classes de teste precisam implementar os métodos :py:meth:`setUp(self)` e :py:meth:`tearDown(self)`. Esses métodos são, na verdade, corotinas. Então sua classe de tests deve declara-los també como corotinas. Um exemplo de caso de teste para um teste funcional.
+Todos os testes funcionais são subclasses da classe ``itests.util.BaseTestCase``. Importante notar que todos as classes de teste precisam implementar os métodos ``setUp(self)`` e ``tearDown(self)``. Esses métodos são, na verdade, corotinas. Então sua classe de teste deve declará-los também como corotinas. Um exemplo de caso de teste para um teste funcional.
 
 .. code:: python
 
@@ -51,7 +53,7 @@ Se se teste é um teste que chama a API do asgard, existe uma corotina que que t
 A partir desse momento você pode chamar a API do Asgard usando esse client, como se fosse um cliente http comum.
 
 Usando aiohttp_client com aioresponses
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Quando estamos escrevendo testes que fazem chamadaas reais à API do Asgard e ao mesmo tempo precisamos mocker alguma outra requisição que o código da API fará, precisamos passar uma opção especial para o aioresponses, que é o ``passthrough``.
 

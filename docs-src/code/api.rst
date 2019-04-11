@@ -1,4 +1,6 @@
 
+.. _asgard.http:
+
 Endpoints HTTP
 ==============
 
