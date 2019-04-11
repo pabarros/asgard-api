@@ -47,4 +47,4 @@ Atualmente a Asgard API já possui implementação de :py:class:`AgentsService <
 Kubernetes - Futuro
 ~~~~~~~~~~~~~~~~~~~
 
-Assim que as interfacec ``AgentsService`` e ``AppsServices`` estiverem mais bem defindas poderemos começar uma implementação para suportar orquestração de containers com `Kubernetes <https://kubernetes.io/>`_.
+Assim que as interfaces ``AgentsService`` e ``AppsServices`` estiverem mais bem defindas poderemos começar uma implementação para suportar orquestração de containers com `Kubernetes <https://kubernetes.io/>`_.
