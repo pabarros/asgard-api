@@ -44,11 +44,11 @@
 <p>Os arquivos de teste devem seguir a mesma hierarquia de pastas do código que está sendo testando. Pegando um exemplo: Os testes da classe <code class="xref py py-class docutils literal notranslate"><span class="pre">asgard.services.AppsService</span></code> que está declarada em <code class="docutils literal notranslate"><span class="pre">asgard/services/apps.py</span></code> devem estar abaixo da pasta <code class="docutils literal notranslate"><span class="pre">tests/asard/service/</span></code>. Nesse caso estão em <code class="docutils literal notranslate"><span class="pre">tests/asgard/services/test_apps_service.py</span></code>.</p>
 <div class="section" id="testes-unitarios">
 <h3>Testes unitários<a class="headerlink" href="#testes-unitarios" title="Permalink to this headline">¶</a></h3>
-<p>Os testes unitários sçao escritos com <code class="docutils literal notranslate"><span class="pre">asynctest</span></code> e devem ser subclasse de <code class="xref py py-class docutils literal notranslate"><span class="pre">asynctest.TestCase</span></code>.</p>
+<p>Os testes unitários são escritos com <code class="docutils literal notranslate"><span class="pre">asynctest</span></code> e devem ser subclasse de <code class="docutils literal notranslate"><span class="pre">asynctest.TestCase</span></code>.</p>
 </div>
 <div class="section" id="testes-funcionais">
 <h3>Testes funcionais<a class="headerlink" href="#testes-funcionais" title="Permalink to this headline">¶</a></h3>
-<p>Todos os testes funcionais são subclasses da classe <code class="xref py py-class docutils literal notranslate"><span class="pre">tests.util.BaseTestCase</span></code>. Importante notar que todos as classes de teste precisam implementar os métodos <code class="xref py py-meth docutils literal notranslate"><span class="pre">setUp(self)()</span></code> e <code class="xref py py-meth docutils literal notranslate"><span class="pre">tearDown(self)()</span></code>. Esses métodos são, na verdade, corotinas. Então sua classe de tests deve declara-los també como corotinas. Um exemplo de caso de teste para um teste funcional.</p>
+<p>Todos os testes funcionais são subclasses da classe <code class="xref py py-class docutils literal notranslate"><span class="pre">itests.util.BaseTestCase</span></code>. Importante notar que todos as classes de teste precisam implementar os métodos <code class="xref py py-meth docutils literal notranslate"><span class="pre">setUp(self)()</span></code> e <code class="xref py py-meth docutils literal notranslate"><span class="pre">tearDown(self)()</span></code>. Esses métodos são, na verdade, corotinas. Então sua classe de tests deve declara-los també como corotinas. Um exemplo de caso de teste para um teste funcional.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyTestCase</span><span class="p">(</span><span class="n">BaseTestCase</span><span class="p">):</span>
    <span class="n">async</span> <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
      <span class="n">await</span> <span class="nb">super</span><span class="p">(</span><span class="n">MyTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
@@ -103,9 +103,13 @@
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code/organization.html">Organização do código</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="doc.html">Contribuindo com o projeto</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="doc.html#atualizando-a-documentacao-do-projeto">Atualizando a documentação do projeto</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="doc.html#gerando-a-versao-html-da-documentacao">Gerando a versão html da documentação</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="doc.html#gerando-a-versao-html-da-documentacao">Gerando a versão html da documentação</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Escrevendo testes para o projeto</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -114,8 +118,10 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">&lt;no title&gt;</a><ul>
   <li><a href="doc.html">Contribuindo com o projeto</a><ul>
       <li>Previous: <a href="doc.html" title="previous chapter">Contribuindo com o projeto</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
 </ul>

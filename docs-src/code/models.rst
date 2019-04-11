@@ -1,0 +1,4 @@
+.. _asgard.models:
+
+Models
+======

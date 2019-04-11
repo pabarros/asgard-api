@@ -4,7 +4,6 @@ from enum import Enum, auto
 from typing import Any, Dict, Union
 
 from asgard.conf import settings
-from tests.conf import TEST_MESOS_ADDRESS
 
 CURRENT_DIR = os.path.dirname(__file__)
 FIXTURES_PATH = os.path.join(CURRENT_DIR, "fixtures")
@@ -92,10 +91,18 @@ def build_mesos_cluster(rsps, *agent_configs: Union[Dict[str, Any], str]):
     """
     all_agents_info = []
     rsps.get(
-        f"{TEST_MESOS_ADDRESS}/redirect",
+        f"{settings.MESOS_API_URLS[0]}/redirect",
         status=301,
-        headers={"Location": TEST_MESOS_ADDRESS},
+        headers={"Location": settings.MESOS_API_URLS[0]},
     )
+
+    for mesos_master_url in settings.MESOS_API_URLS:
+        rsps.get(
+            f"{mesos_master_url}/redirect",
+            status=301,
+            headers={"Location": settings.MESOS_API_URLS[0]},
+        )
+
     for agent_config in agent_configs:
         if isinstance(agent_config, str):
             agent_id = agent_config
@@ -110,13 +117,18 @@ def build_mesos_cluster(rsps, *agent_configs: Union[Dict[str, Any], str]):
         all_agents_info.append(agent_info)
         add_agent_running_tasks(rsps, agent_id, agent_apps)
         rsps.get(
-            f"{TEST_MESOS_ADDRESS}/slaves?slave_id={agent_id}",
+            f"{settings.MESOS_API_URLS[0]}/slaves?slave_id={agent_id}",
+            payload={"slaves": [agent_info]},
+            status=200,
+        )
+        rsps.get(
+            f"{settings.MESOS_API_URLS[0]}/slaves?slave_id={agent_id}",
             payload={"slaves": [agent_info]},
             status=200,
         )
 
     rsps.get(
-        f"{TEST_MESOS_ADDRESS}/slaves",
+        f"{settings.MESOS_API_URLS[0]}/slaves",
         payload={"slaves": all_agents_info},
         status=200,
     )

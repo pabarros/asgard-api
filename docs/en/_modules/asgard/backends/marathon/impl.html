@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>asgard.backends.marathon.impl &#8212; Asgard API  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for asgard.backends.marathon.impl</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="n">Decimal</span>
+
+<span class="kn">from</span> <span class="nn">aioelasticsearch</span> <span class="k">import</span> <span class="n">Elasticsearch</span>
+<span class="kn">from</span> <span class="nn">elasticsearch_dsl</span> <span class="k">import</span> <span class="n">Search</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">A</span>
+
+<span class="kn">from</span> <span class="nn">asgard.backends.base</span> <span class="k">import</span> <span class="n">AppsBackend</span>
+<span class="kn">from</span> <span class="nn">asgard.conf</span> <span class="k">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">asgard.math</span> <span class="k">import</span> <span class="n">round_up</span>
+<span class="kn">from</span> <span class="nn">asgard.models.account</span> <span class="k">import</span> <span class="n">Account</span>
+<span class="kn">from</span> <span class="nn">asgard.models.app</span> <span class="k">import</span> <span class="n">App</span><span class="p">,</span> <span class="n">AppStats</span>
+<span class="kn">from</span> <span class="nn">asgard.models.user</span> <span class="k">import</span> <span class="n">User</span>
+
+
+<div class="viewcode-block" id="MarathonAppsBackend"><a class="viewcode-back" href="../../../../src/asgard/asgard.backends.marathon.html#asgard.backends.marathon.impl.MarathonAppsBackend">[docs]</a><span class="k">class</span> <span class="nc">MarathonAppsBackend</span><span class="p">(</span><span class="n">AppsBackend</span><span class="p">):</span>
+<div class="viewcode-block" id="MarathonAppsBackend.get_app_stats"><a class="viewcode-back" href="../../../../src/asgard/asgard.backends.marathon.html#asgard.backends.marathon.impl.MarathonAppsBackend.get_app_stats">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_app_stats</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span> <span class="n">App</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span> <span class="n">account</span><span class="p">:</span> <span class="n">Account</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AppStats</span><span class="p">:</span>
+        <span class="n">utc_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        <span class="n">index_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;asgard-app-stats-{utc_now.strftime(&#39;%Y-%m-</span><span class="si">%d</span><span class="s2">&#39;)}-*&quot;</span>
+
+        <span class="n">bool_query</span> <span class="o">=</span> <span class="n">Q</span><span class="p">(</span>
+            <span class="s2">&quot;bool&quot;</span><span class="p">,</span>
+            <span class="n">must</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">Q</span><span class="p">(</span><span class="s2">&quot;term&quot;</span><span class="p">,</span> <span class="n">appname__keyword</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;/</span><span class="si">{account.namespace}</span><span class="s2">/</span><span class="si">{app.id}</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="n">Q</span><span class="p">(</span><span class="s2">&quot;range&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;gte&quot;</span><span class="p">:</span> <span class="s2">&quot;now-1h&quot;</span><span class="p">}),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Search</span><span class="p">()</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">bool_query</span><span class="p">)</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">aggs</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s2">&quot;avg_cpu_pct&quot;</span><span class="p">,</span> <span class="n">A</span><span class="p">(</span><span class="s2">&quot;avg&quot;</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s2">&quot;cpu_pct&quot;</span><span class="p">))</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">aggs</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s2">&quot;avg_mem_pct&quot;</span><span class="p">,</span> <span class="n">A</span><span class="p">(</span><span class="s2">&quot;avg&quot;</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s2">&quot;mem_pct&quot;</span><span class="p">))</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">aggs</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="s2">&quot;avg_cpu_thr_pct&quot;</span><span class="p">,</span> <span class="n">A</span><span class="p">(</span><span class="s2">&quot;avg&quot;</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s2">&quot;cpu_thr_pct&quot;</span><span class="p">))</span>
+        <span class="n">dict_query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">raw_result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">Elasticsearch</span><span class="p">([</span><span class="n">settings</span><span class="o">.</span><span class="n">STATS_API_URL</span><span class="p">])</span> <span class="k">as</span> <span class="n">es</span><span class="p">:</span>
+                <span class="n">raw_result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index_name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">dict_query</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">errors</span><span class="p">[</span><span class="s2">&quot;global&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">raw_result</span> <span class="ow">and</span> <span class="n">raw_result</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="s2">&quot;hits&quot;</span><span class="p">]:</span>
+            <span class="n">app_stats_result</span> <span class="o">=</span> <span class="n">raw_result</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">]</span>
+            <span class="n">cpu_pct</span> <span class="o">=</span> <span class="n">round_up</span><span class="p">(</span>
+                <span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">app_stats_result</span><span class="p">[</span><span class="s2">&quot;avg_cpu_pct&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]))</span>
+            <span class="p">)</span>
+            <span class="n">mem_pct</span> <span class="o">=</span> <span class="n">round_up</span><span class="p">(</span>
+                <span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">app_stats_result</span><span class="p">[</span><span class="s2">&quot;avg_mem_pct&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]))</span>
+            <span class="p">)</span>
+            <span class="n">cpu_thr_pct</span> <span class="o">=</span> <span class="n">round_up</span><span class="p">(</span>
+                <span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">app_stats_result</span><span class="p">[</span><span class="s2">&quot;avg_cpu_thr_pct&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]))</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cpu_pct</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">mem_pct</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">cpu_thr_pct</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">AppStats</span><span class="p">(</span>
+            <span class="n">cpu_pct</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">cpu_pct</span><span class="p">),</span>
+            <span class="n">ram_pct</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">mem_pct</span><span class="p">),</span>
+            <span class="n">cpu_thr_pct</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">cpu_thr_pct</span><span class="p">),</span>
+            <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code/organization.html">Organização do código</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

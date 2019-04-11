@@ -11,18 +11,13 @@ from itests.util import (
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     ACCOUNT_DEV_DICT,
 )
-from tests.conf import TEST_MESOS_ADDRESS, TEST_LOCAL_AIOHTTP_ADDRESS
+from tests.conf import TEST_LOCAL_AIOHTTP_ADDRESS
 from tests.utils import build_mesos_cluster
 
 
 class AgentsServiceTest(BaseTestCase):
     async def setUp(self):
         await super(AgentsServiceTest, self).setUp()
-        self.mesos_leader_ip_pactcher = mock.patch(
-            "asgard.sdk.mesos.leader_address",
-            mock.CoroutineMock(return_value=TEST_MESOS_ADDRESS),
-        )
-        self.mesos_leader_ip_pactcher.start()
         self.mesos_orchestrator = MesosOrchestrator(
             agents_backend=MesosAgentsBackend(),
             apps_backend=MarathonAppsBackend(),
@@ -33,7 +28,6 @@ class AgentsServiceTest(BaseTestCase):
 
     async def tearDown(self):
         await super(AgentsServiceTest, self).tearDown()
-        mock.patch.stopall()
 
     async def test_get_apps_running_for_agent_mesos_orchestrator_zero_apps(
         self

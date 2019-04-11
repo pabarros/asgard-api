@@ -11,17 +11,9 @@ from asgard.models.agent import Agent
 
 class MesosAgent(Agent):
     type: str = "MESOS"
-    id: str
-    hostname: str
-    active: bool
-    version: str
-    port: int
-    used_resources: Dict[str, Union[str, int]]
-    attributes: Dict[str, str]
-    resources: Dict[str, Union[str, int]]
-    total_apps: int = 0
-    applications: List[MesosApp] = []
-    stats: Optional[Dict[str, Any]] = {}
+
+    def filter_by_attrs(self, kv):
+        pass
 
     async def calculate_stats(self):
         """

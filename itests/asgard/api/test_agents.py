@@ -1,9 +1,4 @@
-import os
-from importlib import reload
-
 from aioresponses import aioresponses
-from asynctest import mock, skip
-from asynctest.mock import CoroutineMock
 
 from asgard.api import agents
 from asgard.app import app
@@ -11,8 +6,8 @@ from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
 from asgard.models.user_has_account import UserHasAccount
 from itests.util import BaseTestCase
-from tests.conf import TEST_MESOS_ADDRESS, TEST_LOCAL_AIOHTTP_ADDRESS
-from tests.utils import ClusterOptions, build_mesos_cluster, get_fixture
+from tests.conf import TEST_LOCAL_AIOHTTP_ADDRESS
+from tests.utils import ClusterOptions, build_mesos_cluster
 
 
 class AgentsApiEndpointTest(BaseTestCase):
@@ -20,11 +15,6 @@ class AgentsApiEndpointTest(BaseTestCase):
         await super(AgentsApiEndpointTest, self).setUp()
         self.client = await self.aiohttp_client(app)
         self.user_auth_key = "c0c0b73b18864550a3e3b93a59c4b7d8"
-        self.mesos_leader_ip_pactcher = mock.patch(
-            "asgard.sdk.mesos.leader_address",
-            mock.CoroutineMock(return_value=TEST_MESOS_ADDRESS),
-        )
-        self.mesos_leader_ip_pactcher.start()
 
     def _prepare_additional_fixture_data(self):
         self.pg_data_mocker.add_data(
@@ -52,7 +42,6 @@ class AgentsApiEndpointTest(BaseTestCase):
 
     async def tearDown(self):
         await super(AgentsApiEndpointTest, self).tearDown()
-        mock.patch.stopall()
 
     async def test_agents_list_should_return_only_agents_from_specific_account(
         self
@@ -356,7 +345,7 @@ class AgentsApiEndpointTest(BaseTestCase):
             data = await resp.json()
             self.assertEqual(0, len(data["apps"]))
 
-    async def test_agent_appp_list_apps_running(self):
+    async def test_agent_app_list_apps_running(self):
         self._prepare_additional_fixture_data()
         await self.pg_data_mocker.create()
 

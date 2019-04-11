@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>asgard.services package &#8212; Asgard API  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="asgard-services-package">
+<h1>asgard.services package<a class="headerlink" href="#asgard-services-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asgard.services.accounts">
+<span id="asgard-services-accounts-module"></span><h2>asgard.services.accounts module<a class="headerlink" href="#module-asgard.services.accounts" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="asgard.services.accounts.AccountsService">
+<em class="property">class </em><code class="descclassname">asgard.services.accounts.</code><code class="descname">AccountsService</code><a class="reference internal" href="../../_modules/asgard/services/accounts.html#AccountsService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.accounts.AccountsService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="asgard.services.accounts.AccountsService.get_account_by_id">
+<em class="property">static </em><code class="descname">get_account_by_id</code><span class="sig-paren">(</span><em>account_id: int</em>, <em>backend: asgard.backends.accounts.AccountsBackend</em><span class="sig-paren">)</span> &#x2192; Optional[asgard.models.account.Account]<a class="reference internal" href="../../_modules/asgard/services/accounts.html#AccountsService.get_account_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.accounts.AccountsService.get_account_by_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asgard.services.agents">
+<span id="asgard-services-agents-module"></span><h2>asgard.services.agents module<a class="headerlink" href="#module-asgard.services.agents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="asgard.services.agents.AgentsService">
+<em class="property">class </em><code class="descclassname">asgard.services.agents.</code><code class="descname">AgentsService</code><a class="reference internal" href="../../_modules/asgard/services/agents.html#AgentsService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.agents.AgentsService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="asgard.services.agents.AgentsService.get_agent_by_id">
+<code class="descname">get_agent_by_id</code><span class="sig-paren">(</span><em>agent_id: str</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em>, <em>backend: asgard.backends.base.Orchestrator</em><span class="sig-paren">)</span> &#x2192; Optional[asgard.models.agent.Agent]<a class="reference internal" href="../../_modules/asgard/services/agents.html#AgentsService.get_agent_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.agents.AgentsService.get_agent_by_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.services.agents.AgentsService.get_agents">
+<code class="descname">get_agents</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em>, <em>backend: asgard.backends.base.Orchestrator</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.agent.Agent]<a class="reference internal" href="../../_modules/asgard/services/agents.html#AgentsService.get_agents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.agents.AgentsService.get_agents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asgard.services.agents.AgentsService.get_apps_running_for_agent">
+<code class="descname">get_apps_running_for_agent</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>agent: asgard.models.agent.Agent</em>, <em>backend: asgard.backends.base.Orchestrator</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.app.App]<a class="reference internal" href="../../_modules/asgard/services/agents.html#AgentsService.get_apps_running_for_agent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.agents.AgentsService.get_apps_running_for_agent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asgard.services.apps">
+<span id="asgard-services-apps-module"></span><h2>asgard.services.apps module<a class="headerlink" href="#module-asgard.services.apps" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="asgard.services.apps.AppsService">
+<em class="property">class </em><code class="descclassname">asgard.services.apps.</code><code class="descname">AppsService</code><a class="reference internal" href="../../_modules/asgard/services/apps.html#AppsService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.apps.AppsService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="asgard.services.apps.AppsService.get_app_stats">
+<em class="property">static </em><code class="descname">get_app_stats</code><span class="sig-paren">(</span><em>app_id: str</em>, <em>user: asgard.models.user.User</em>, <em>account: asgard.models.account.Account</em>, <em>orchestrator: asgard.backends.base.Orchestrator</em><span class="sig-paren">)</span> &#x2192; asgard.models.app.AppStats<a class="reference internal" href="../../_modules/asgard/services/apps.html#AppsService.get_app_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.apps.AppsService.get_app_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asgard.services.users">
+<span id="asgard-services-users-module"></span><h2>asgard.services.users module<a class="headerlink" href="#module-asgard.services.users" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="asgard.services.users.UsersService">
+<em class="property">class </em><code class="descclassname">asgard.services.users.</code><code class="descname">UsersService</code><a class="reference internal" href="../../_modules/asgard/services/users.html#UsersService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.users.UsersService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="asgard.services.users.UsersService.get_alternate_accounts">
+<em class="property">static </em><code class="descname">get_alternate_accounts</code><span class="sig-paren">(</span><em>user: asgard.models.user.User</em>, <em>current_account: asgard.models.account.Account</em>, <em>backend: asgard.backends.users.UsersBackend</em><span class="sig-paren">)</span> &#x2192; List[asgard.models.account.Account]<a class="reference internal" href="../../_modules/asgard/services/users.html#UsersService.get_alternate_accounts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asgard.services.users.UsersService.get_alternate_accounts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asgard.services">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asgard.services" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Asgard API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code/organization.html">Organização do código</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contrib/doc.html">Contribuindo com o projeto</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/src/asgard/asgard.services.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

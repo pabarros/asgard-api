@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-30 17:02-0300\n"
+"POT-Creation-Date: 2019-04-08 14:46-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,27 +25,19 @@ msgstr "Contents:"
 msgid "Bem vindos à documentação oficial do projeto Asgard"
 msgstr "Welcome to the official documentation of the Asgard Project"
 
-#: ../../index.rst:16
-msgid "Introdução"
-msgstr "Introduction"
-
-#: ../../index.rst:18
-msgid "Essa é a documentação oficial do projeto Asgard."
-msgstr "This is the official documentation for the Asgard project"
-
-#: ../../index.rst:23
+#: ../../index.rst:20
 msgid "Indices and tables"
 msgstr ""
 
-#: ../../index.rst:25
+#: ../../index.rst:22
 msgid ":ref:`genindex`"
 msgstr ""
 
-#: ../../index.rst:26
+#: ../../index.rst:23
 msgid ":ref:`modindex`"
 msgstr ""
 
-#: ../../index.rst:27
+#: ../../index.rst:24
 msgid ":ref:`search`"
 msgstr ""
 
@@ -54,3 +46,10 @@ msgstr ""
 
 #~ msgid "Contents:"
 #~ msgstr ""
+
+#~ msgid "Introdução"
+#~ msgstr "Introduction"
+
+#~ msgid "Essa é a documentação oficial do projeto Asgard."
+#~ msgstr "This is the official documentation for the Asgard project"
+
