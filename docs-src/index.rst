@@ -9,6 +9,7 @@ Bem vindos à documentação oficial do projeto Asgard
 .. toctree::
    :maxdepth: 3
    :caption: Conteúdo:
+   :titlesonly:
 
    intro.rst
    code/index.rst

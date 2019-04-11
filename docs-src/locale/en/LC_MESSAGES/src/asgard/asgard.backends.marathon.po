@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 14:36-0300\n"
+"POT-Creation-Date: 2019-04-10 09:20-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,4 +36,7 @@ msgstr ""
 #: ../../src/asgard/asgard.backends.marathon.rst:17
 msgid "Module contents"
 msgstr ""
+
+#~ msgid "Base: :class:`asgard.backends.base.AppsBackend`"
+#~ msgstr ""
 

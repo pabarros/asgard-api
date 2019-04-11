@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 14:36-0300\n"
+"POT-Creation-Date: 2019-04-10 09:20-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,4 +62,25 @@ msgstr ""
 #: ../../src/asgard/asgard.backends.mesos.rst:25
 msgid "Module contents"
 msgstr ""
+
+#~ msgid "Base: :class:`asgard.backends.base.AgentsBackend`"
+#~ msgstr ""
+
+#~ msgid "Retorna todos os Agents da conta `account`."
+#~ msgstr ""
+
+#~ msgid "Retornas lista de App que está rodando nesse agent"
+#~ msgstr ""
+
+#~ msgid "Retorna o agent de id `agentd_id` pertencente à conta `account`"
+#~ msgstr ""
+
+#~ msgid "Base: :class:`asgard.backends.base.Orchestrator`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Método que retorna todas as apps "
+#~ "que estão atualmente rodando no agent"
+#~ " referido."
+#~ msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-30 17:20-0300\n"
+"POT-Creation-Date: 2019-04-11 08:56-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,53 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-
-#: ../../contrib/doc.rst:3
-msgid "Contribuindo com o projeto"
-msgstr ""
-
-#: ../../contrib/doc.rst:6
-msgid "Atualizando a documentação do projeto"
-msgstr ""
-
-#: ../../contrib/doc.rst:9
-msgid ""
-"A documentação do projeto é feita com sphinx. A língua padrão para a "
-"documentação é `pt_BR`, mas traduções podem ser feitas para outras "
-"línguas. As configurações já estão preparadas para traduzir para `en`."
-msgstr ""
-
-#: ../../contrib/doc.rst:11
-msgid ""
-"A tradução é feita segundo a recomendação do projeto sphinx, que é usando"
-" gettext."
-msgstr ""
-
-#: ../../contrib/doc.rst:14
-msgid "Gerando a versão html da documentação"
-msgstr ""
-
-#: ../../contrib/doc.rst:16
-msgid ""
-"Para gerar a versão final da documentação, entre na pasta `docs-src` e "
-"rode:"
-msgstr ""
-
-#: ../../contrib/doc.rst:18
-msgid "pipenv run make docs"
-msgstr ""
-
-#: ../../contrib/doc.rst:20
-msgid ""
-"Isso vai gerar todas as documentações, em todas as línguas configuradas. "
-"Atualmente `pt_BR` em `en`. A documentação `pt_BR` será gerada na pasta "
-"`docs/` e as traduçõees estarão também dentro dessa pasta, abaixo de sub-"
-"pastas com o código da língua escolhida."
-msgstr ""
-
-#: ../../contrib/doc.rst:22
-msgid "por exemplo, a tradução para `en` estará em `docs/en`."
-msgstr ""
 
 #~ msgid "por exemplo, a atrdução para `en` estará em `docs/en`."
 #~ msgstr ""
@@ -85,5 +38,52 @@ msgstr ""
 #~ " também dentro dessa pasta, abaixo de"
 #~ " sub-pastas com o código da "
 #~ "língua escolhida."
+#~ msgstr ""
+
+#~ msgid "Atualizando a documentação do projeto"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A documentação do projeto é feita "
+#~ "com sphinx. A língua padrão para a"
+#~ " documentação é `pt_BR`, mas traduções "
+#~ "podem ser feitas para outras línguas."
+#~ " As configurações já estão preparadas "
+#~ "para traduzir para `en`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A tradução é feita segundo a "
+#~ "recomendação do projeto sphinx, que é"
+#~ " usando gettext."
+#~ msgstr ""
+
+#~ msgid "Gerando a versão html da documentação"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Para gerar a versão final da "
+#~ "documentação, entre na pasta `docs-src`"
+#~ " e rode:"
+#~ msgstr ""
+
+#~ msgid "pipenv run make docs"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Isso vai gerar todas as documentações,"
+#~ " em todas as línguas configuradas. "
+#~ "Atualmente `pt_BR` em `en`. A "
+#~ "documentação `pt_BR` será gerada na "
+#~ "pasta `docs/` e as traduçõees estarão"
+#~ " também dentro dessa pasta, abaixo de"
+#~ " sub-pastas com o código da "
+#~ "língua escolhida."
+#~ msgstr ""
+
+#~ msgid "por exemplo, a tradução para `en` estará em `docs/en`."
+#~ msgstr ""
+
+#~ msgid "Contribuindo com o projeto"
 #~ msgstr ""
 

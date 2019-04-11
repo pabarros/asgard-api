@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-08 15:21-0300\n"
+"POT-Creation-Date: 2019-04-11 11:18-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,305 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: ../../code/models.rst:2
+#: ../../code/models.rst:4
 msgid "Models"
 msgstr ""
+
+#: ../../code/models.rst:7
+msgid ""
+"Os models são os objetos que todo o codebase da Asgard API deve usar para"
+" transitar informações entre suas camadas, desde o request HTTP que "
+"chegou no endpoint até o momento em que temos que falar com a API do "
+":ref:`Orquestrador <asgard.backends.orquestrador>` real."
+msgstr ""
+
+#: ../../code/models.rst:11
+msgid "Existem alguns tipos de modelo no projeto:"
+msgstr ""
+
+#: ../../code/models.rst:14
+msgid ""
+":ref:`Asgard Models <asgard.models.base>`, estão no pacote "
+":py:mod:`asgard.models`"
+msgstr ""
+
+#: ../../code/models.rst:15
+msgid ""
+":ref:`Backend Models <asgard.models.backend>`, estão no pacote "
+"``asgard.backends.*.models``"
+msgstr ""
+
+#: ../../code/models.rst:16
+msgid ""
+":ref:`Client Models <asgard.models.client>`, estão o pacote "
+"``asgard.backends.*.client.models``"
+msgstr ""
+
+#: ../../code/models.rst:18
+msgid "Abaixo temos uma explicação sobre cada um deles."
+msgstr ""
+
+#: ../../code/models.rst:24
+msgid "Asgard Models"
+msgstr ""
+
+#: ../../code/models.rst:26
+msgid ""
+"Esses são models abstratos que servem de modelo Base para os modelos que "
+"estão em ``asgard.backends.*.models``. A ideia é ter um modelo único para"
+" todos os backends, dessa forma mesmo que tenhamos múltiplos backends "
+"retornando cada um seus modelos, todos serão filhos dos \"BaseModels\" "
+"que estão em ``asgard.models.*``."
+msgstr ""
+
+#: ../../code/models.rst:28
+msgid ""
+"Imagine que temos duas implementações de :ref:`AgentsBackend "
+"<asgard.backends>`:"
+msgstr ""
+
+#: ../../code/models.rst:30
+msgid "MesosAgentsBackends"
+msgstr ""
+
+#: ../../code/models.rst:31
+msgid "K8sAgentsBackend"
+msgstr ""
+
+#: ../../code/models.rst:33
+msgid "nesse caso teríamos os respectivos models em:"
+msgstr ""
+
+#: ../../code/models.rst:35
+msgid "``asgard.backends.mesos.models.agent.Agent``"
+msgstr ""
+
+#: ../../code/models.rst:36
+msgid "``asgard.backends.k8s.models.agent.Agent``"
+msgstr ""
+
+#: ../../code/models.rst:38
+msgid "Ambos os models seriam declarados dess forma:"
+msgstr ""
+
+#: ../../code/models.rst:50
+msgid ""
+"Ambos os models podem ter métodos/campos específicos do seus backends, "
+"mas ao mesmo tempo precisam preencher os campos exigidos pelo model base,"
+" :py:class:`asgard.models.agent.Agent`."
+msgstr ""
+
+#: ../../code/models.rst:52
+msgid ""
+"Isso significa que podemos ter em uma mesma lista (``agents: "
+"List[Agent]``) objetos de dos dois backends, pois eles são filhos da "
+"mesma classe base. Extrapolando isso para um momento onde temos que "
+"listar os agents desses dois backends, poderíamos fazer algo como:"
+msgstr ""
+
+#: ../../code/models.rst:84
+msgid ""
+"Essa é a ideia principal dos models: Ter objetos comuns que podem ser "
+"passados e combinados com objetos do mesmo tipo mas providos por outras "
+"implementações."
+msgstr ""
+
+#: ../../code/models.rst:90
+msgid "Backend Models"
+msgstr ""
+
+#: ../../code/models.rst:92
+msgid ""
+"Os Models de cada backend são, na vedade, implementações do modelos "
+"abstratos. Eles podem conter campos/métodos específicos de cada backend "
+"mas precisam implementar todos os métodos abstratos exigidos pelos "
+"``asgard.models.*``."
+msgstr ""
+
+#: ../../code/models.rst:94
+msgid ""
+"Cada backend model deve definir o valor do seu campo ``type``. Esse campo"
+" é uma string e pode ser escolhido livremente pela implementação do "
+"backend. Esse campo é serializado junto com o modelo e serve para "
+"diferenciar de qual backend aquele objeto veio."
+msgstr ""
+
+#: ../../code/models.rst:100
+msgid "Client Models"
+msgstr ""
+
+#: ../../code/models.rst:103
+msgid ""
+"Os Client Models são models usados internamente pelos backends. Cada "
+"implementação de :ref:`asgard.backends` precisa falar com uma API para "
+"implementar suas funcionalidades, por exemplo, o "
+":py:class`asgard.backend.mesos.impl.MesosAgentsBackend` por exemplo "
+"precisa falar com a API do `mesos <https://mesos.apache.org>`_ para "
+"fornecer os dados corretos."
+msgstr ""
+
+#: ../../code/models.rst:105
+msgid ""
+"A ideia é que cada backend tenha seus próprios clients que também recebem"
+" (como parâmetro) e retornem **modelos**. Os Client Models depois são "
+"transformados em Backend Models para poderem ser serializados pela API "
+"HTTP do asgard."
+msgstr ""
+
+#: ../../code/models.rst:108
+msgid ""
+"O Client model é o mapeamento bruto do que a API do backend retorna. "
+"Então pegando um exemplo de retorno da API do Mesos, endpoint `/slaves "
+"<http://mesos.apache.org/documentation/latest/endpoints/master/slaves/>`_."
+msgstr ""
+
+#: ../../code/models.rst:129
+msgid "Um possível mapeamento de Client Model para essa resposta poderia ser:"
+msgstr ""
+
+#: ../../code/models.rst:150
+msgid ""
+"Esse model estaria em "
+"``asgard.backends.mesos.client.models.agent.MesosAgent``"
+msgstr ""
+
+#: ../../code/models.rst:152
+msgid ""
+"A responsabilidade se transformar em Backend Model é do próprio Client "
+"Model. A forma que escolhemos de transformar um Client Model em seu "
+"respectivo Backend Model é adicionando um método chamado "
+"``to_asgard_model()`` que recebe a classe do Backend Model para o qual "
+"será transformado."
+msgstr ""
+
+#: ../../code/models.rst:154
+msgid ""
+"Pegando ainda esse exemplo, essa seria um possível implementação da "
+"transformação de Client Model para Backend Model."
+msgstr ""
+
+#: ../../code/models.rst:171
+msgid ""
+"Esse é o código que deve \"traduzir\" os campos da API do backend para os"
+" campos do modelo que será usado por todo o código do Asgard."
+msgstr ""
+
+#~ msgid ""
+#~ "Os models são os objetos que todo"
+#~ " o codebase da Asgard API deve "
+#~ "usar para transitar informações entre "
+#~ "suas camadas, desde o request HTTP "
+#~ "que chegou no endpoint até o "
+#~ "momento em que temos que falar com"
+#~ " a API do :ref:`Orquestrador "
+#~ "<asgard.backends.orquestrador>` real."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Os models são os objetos que todo"
+#~ " o codebase da Asgard API deve "
+#~ "usar para transitar informações entre "
+#~ "suas camadas, desde o request HTTP "
+#~ "que chegou no endpoint até o "
+#~ "momento em que temos que falar com"
+#~ " a API do :ref:`Orquestrador <asgard-"
+#~ "backends-orquestrador>` real."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Os models são os objetos que todo"
+#~ " o codebase da Asgard API deve "
+#~ "usar para transitar informações entre "
+#~ "suas camadas, desde o request HTTP "
+#~ "que chegou no endpoint até o "
+#~ "momento em que temos que falar com"
+#~ " a API do :ref:`asgard-backends-"
+#~ "orquestrador` real."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Os models são os objetos que todo"
+#~ " o codebase da Asgard API deve "
+#~ "usar para transitar informações entre "
+#~ "suas camadas, desde o request HTTP "
+#~ "que chegou no endpoint até o "
+#~ "momento em que temos que falar com"
+#~ " a API do :ref:`Bla <asgard-"
+#~ "backends-orquestrador>` real."
+#~ msgstr ""
+
+#~ msgid "Asgard Models, estão no pacote :py:module:`asgard.models`"
+#~ msgstr ""
+
+#~ msgid "Imagine que temos duas implementações de AgentsBackend[1]_"
+#~ msgstr ""
+
+#~ msgid "Asgard Backends :ref:`asgard.backends`"
+#~ msgstr ""
+
+#~ msgid "Asgard :ref:`asgard.backends`"
+#~ msgstr ""
+
+#~ msgid "Imagine que temos duas implementações de AgentsBackend [1]_"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Amobos os models podem ter "
+#~ "métodos/campos específicos do seus backends,"
+#~ " mas ao mesmo tempo precisam "
+#~ "preencher os campos exigidos pelo model"
+#~ " base, :py:class:`asgard.models.agent.Agent`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Isso significa que podemos ter em "
+#~ "uma mesma lista (``agents: List[Agent]``) "
+#~ "objetos de dos dois backends, pois "
+#~ "eles são filhos da mesma classe "
+#~ "base."
+#~ msgstr ""
+
+#~ msgid "Asgard Models, estão no pacote :py:mod:`asgard.models`"
+#~ msgstr ""
+
+#~ msgid "Backend Models, estão no pacote ``asgard.backends.*.models``"
+#~ msgstr ""
+
+#~ msgid "Client Models, estão o pacote ``asgard.backends.*.client.models``"
+#~ msgstr ""
+
+#~ msgid "Imagine que temos duas implementações de AgentsBackend [1]_:"
+#~ msgstr ""
+
+#~ msgid ":ref:`Asgard Backends <asgard.backends>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "O Client model é o mapeamento "
+#~ "bruto do que a API do backend "
+#~ "retorna. Então pegando um exemplo de "
+#~ "retorno da API do Mesos, endpoint "
+#~ "`/slaves "
+#~ "<http://mesos.apache.org/documentation/latest/endpoints/master/slaves/>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A responsabilidade se transformar em "
+#~ "Backend Model é do próprio Client "
+#~ "Model."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A responsabilidade se transformar em "
+#~ "Backend Model é do próprio Client "
+#~ "Model. A forma que escolhemos de "
+#~ "transformar um Client Model em seu "
+#~ "respectivo Backend Model é adicionando "
+#~ "um método chamado `to_asgard_model()` que "
+#~ "recebe a classe do Backend Model "
+#~ "para o qual será transformado."
+#~ msgstr ""
+
+#~ msgid "Pegando ainda esse"
+#~ msgstr ""
 

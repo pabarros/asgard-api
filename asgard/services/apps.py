@@ -10,5 +10,9 @@ class AppsService:
     async def get_app_stats(
         app_id: str, user: User, account: Account, orchestrator: Orchestrator
     ) -> AppStats:
+        """
+        Retorna estatísticas de uso de CPU/RAM/CPU thr de uma app. O Cálculo considera todas as instâncias dessa app.
+        Retorna um objeto :py:class:`AppStats <asgard.models.app.AppStats>`
+        """
         app = MesosApp(id=app_id)
         return await orchestrator.get_app_stats(app, user, account)

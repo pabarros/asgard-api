@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-11 08:56-0300\n"
+"POT-Creation-Date: 2019-04-11 11:54-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: ../../contrib/index.rst:2
-msgid "Contribuindo com o projeto"
+#: ../../contrib/legacy-api.rst:2
+msgid "Código legado da Asgard API"
+msgstr ""
+
+#: ../../contrib/legacy-api.rst:4
+msgid ""
+"A Asgard API começou com sendo um projeto `flask "
+"<http://flask.pocoo.org/docs/1.0/>`, usando python 2.7."
+msgstr ""
+
+#: ../../contrib/legacy-api.rst:6
+msgid ""
+"Todo esse código está abaixo da pasta ``hollowman/``, que inclusive era o"
+" nome antigo do projeto, antes de se chamar Asgard."
 msgstr ""
 

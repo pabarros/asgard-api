@@ -1,6 +1,11 @@
-
+Contribuindo com o projeto
+==========================
 
 .. toctree::
-   :maxdepth: 2
 
-   doc.rst
+   doc-update.rst
+   doc-gen.rst
+   running-local.rst
+   writing-code.rst
+   writing-tests.rst
+   write-new-orquestrator.rst

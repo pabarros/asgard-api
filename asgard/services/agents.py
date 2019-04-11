@@ -4,7 +4,6 @@ from asgard.backends.base import Orchestrator
 from asgard.models.account import Account
 from asgard.models.agent import Agent
 from asgard.models.app import App
-from asgard.models.task import Task
 from asgard.models.user import User
 
 
@@ -12,6 +11,9 @@ class AgentsService:
     async def get_agents(
         self, user: User, account: Account, backend: Orchestrator
     ) -> List[Agent]:
+        """
+        Lista todos os agentes de cluster asgard. Essa litsa vem do orquestrador que é passado como parametro.
+        """
         return await backend.get_agents(user, account)
 
     async def get_apps_running_for_agent(

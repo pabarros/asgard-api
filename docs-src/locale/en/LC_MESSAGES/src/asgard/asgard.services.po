@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 14:36-0300\n"
+"POT-Creation-Date: 2019-04-10 10:12-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,8 +39,21 @@ msgstr ""
 msgid "asgard.services.agents module"
 msgstr ""
 
+#: asgard.services.agents.AgentsService.get_agents:1 of
+msgid ""
+"Lista todos os agentes de cluster asgard. Essa litsa vem do orquestrador "
+"que é passado como parametro."
+msgstr ""
+
 #: ../../src/asgard/asgard.services.rst:24
 msgid "asgard.services.apps module"
+msgstr ""
+
+#: asgard.services.apps.AppsService.get_app_stats:1 of
+msgid ""
+"Retorna estatísticas de uso de CPU/RAM/CPU thr de uma app. O Cálculo "
+"considera todas as instâncias dessa app. Retorna um objeto "
+":py:class:`AppStats <asgard.models.app.AppStats>`"
 msgstr ""
 
 #: ../../src/asgard/asgard.services.rst:32
@@ -50,4 +63,7 @@ msgstr ""
 #: ../../src/asgard/asgard.services.rst:41
 msgid "Module contents"
 msgstr ""
+
+#~ msgid "Base: :class:`object`"
+#~ msgstr ""
 

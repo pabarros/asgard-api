@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 15:35-0300\n"
+"POT-Creation-Date: 2019-04-10 13:57-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgstr ""
 
 #: ../../code/backends.rst:7
 msgid ""
-"Os Backends são a implementaçao concreta com as outras APIs com as quais "
+"Os Backends são a implementação concreta com as outras APIs com as quais "
 "a Asgard API consegue se comunicar."
 msgstr ""
 
@@ -35,23 +35,47 @@ msgid ""
 msgstr ""
 
 #: ../../code/backends.rst:11
-msgid ""
-"O backend são dividiso em :py:class:`AgentsBackend "
-"<asgard.backends.base.AgentsBackend>` e :py:class:`AppsBackends "
-"<asgard.backends.base.AppsBackend>`. Esss são objetos abstratos que "
-"definem quais ações cada um desses backends podem executar."
+msgid "O backend estão atualmente divididos em:"
 msgstr ""
 
 #: ../../code/backends.rst:13
-msgid ""
-"A junção de múltiplos ``Backends`` forma um \"Orquestrador\", modelado no"
-" objeto ``Orchestrator``. Esse é o objeto principal em termos de "
-"funcionalidades da Asgard API, é esse objeto quem define o que a Asgard "
-"API consegue fazer, em termos de orquestração."
+msgid ":py:class:`AgentsBackend <asgard.backends.base.AgentsBackend>`"
 msgstr ""
 
-#: ../../code/backends.rst:15
-msgid "Abaixo está a implementação do objeto ``Orchestrator``"
+#: ../../code/backends.rst:14
+msgid ":py:class:`AppsBackends <asgard.backends.base.AppsBackend>`"
+msgstr ""
+
+#: ../../code/backends.rst:17
+msgid ""
+"Esss são objetos abstratos que definem quais ações cada um desses "
+"backends podem executar. As implementações desses backends é que vão "
+"adicionar suporte ao projeto Asgard a falar com múltiplos outros "
+"projetos/APIs."
+msgstr ""
+
+#: ../../code/backends.rst:19
+msgid ""
+"A junção de múltiplos ``Backends`` forma um \"Orquestrador\", modelado no"
+" objeto :py:class:`Orchestrator <asgard.backends.base.Orchestrator>`. "
+"Esse é o objeto principal em termos de funcionalidades da Asgard API, é "
+"esse objeto quem define o que a Asgard API consegue fazer, em termos de "
+"orquestração de containers."
+msgstr ""
+
+#: ../../code/backends.rst:25
+msgid "Orquestrador"
+msgstr ""
+
+#: ../../code/backends.rst:27
+msgid ""
+"O Objeto :py:class:`Orchestrator <asgard.backends.base.Orchestrator>` é a"
+" junção de múltiplos backends. Uma instância de Orquestator recebe seus "
+"backends como parâmetros em seu construtor."
+msgstr ""
+
+#: ../../code/backends.rst:30
+msgid "Abaixo está a implementação do objeto ``Orchestrator``:"
 msgstr ""
 
 #: asgard.backends.base.Orchestrator:1 of
@@ -67,16 +91,39 @@ msgid ""
 "referido."
 msgstr ""
 
-#: ../../code/backends.rst:22
-msgid "A asgard API suporte alguns Backends:"
+#: ../../code/backends.rst:38
+msgid "Orquetsradores atualmente suportados"
 msgstr ""
 
-#: ../../code/backends.rst:24
+#: ../../code/backends.rst:41
 msgid "Mesos"
 msgstr ""
 
-#: ../../code/backends.rst:25
-msgid "Marathon"
+#: ../../code/backends.rst:43
+msgid ""
+"O Mesos é um cluster manager que suporta uma variadeade de orquestrdores "
+"de containers. Como temos modelado o backend de Agents separados do "
+"Backend de Apps podemos ter múltiplas implementações do Orchestrator "
+"Mesos com backends variados."
+msgstr ""
+
+#: ../../code/backends.rst:45
+msgid ""
+"Atualmente a Asgard API já possui implementação de "
+":py:class:`AgentsService <asgard.services.agents.AgentsService>` para "
+"`Apache Mesos <https://mesos.apache.org/>`_ e faremos uma implementação "
+"de AppsService (interface ainda a ser definida) para Mesosphere Marathon."
+msgstr ""
+
+#: ../../code/backends.rst:48
+msgid "Kubernetes - Futuro"
+msgstr ""
+
+#: ../../code/backends.rst:50
+msgid ""
+"Assim que as interfacec ``AgentsService`` e ``AppsServices`` estiverem "
+"mais bem defindas poderemos começar uma implementação para suportar "
+"orquestração de containers com `Kubernetes <https://kubernetes.io/>`_."
 msgstr ""
 
 #~ msgid ""
@@ -100,5 +147,78 @@ msgstr ""
 #~ " e ``AppsBackends``. Esss são objetos "
 #~ "abstratos que definem quais ações cada"
 #~ " um desses backends podem executar."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Classe abstrata que mapeia todas as "
+#~ "ações que um orquestrador pode excutar."
+#~ " As depdenências injetadas aqui são "
+#~ "implementações que efetivamente falam com "
+#~ "cada um dos backends suportados."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Método que retorna todas as apps "
+#~ "que estão atualmente rodando no agent"
+#~ " referido."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Os Backends são a implementaçao concreta"
+#~ " com as outras APIs com as "
+#~ "quais a Asgard API consegue se "
+#~ "comunicar."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "O backend são dividiso em "
+#~ ":py:class:`AgentsBackend <asgard.backends.base.AgentsBackend>`"
+#~ " e :py:class:`AppsBackends "
+#~ "<asgard.backends.base.AppsBackend>`. Esss são "
+#~ "objetos abstratos que definem quais "
+#~ "ações cada um desses backends podem "
+#~ "executar."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A junção de múltiplos ``Backends`` forma"
+#~ " um \"Orquestrador\", modelado no objeto"
+#~ " ``Orchestrator``. Esse é o objeto "
+#~ "principal em termos de funcionalidades "
+#~ "da Asgard API, é esse objeto quem"
+#~ " define o que a Asgard API "
+#~ "consegue fazer, em termos de "
+#~ "orquestração."
+#~ msgstr ""
+
+#~ msgid "Abaixo está a implementação do objeto ``Orchestrator``"
+#~ msgstr ""
+
+#~ msgid "A asgard API suporte alguns Backends:"
+#~ msgstr ""
+
+#~ msgid "Marathon"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Atualmente a Asgard API já possui "
+#~ "implementação de :py:class:`AgentsService "
+#~ "<asgard.services.agents.AgentsService>` para `Apache "
+#~ "Mesos <http://mesos.apache.org/>`_ e de "
+#~ "AppsService par o Mesosphere Marathon."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Assim que as interfacec ``AgentsService`` "
+#~ "e ``AppsServices`` estiverem mais bem "
+#~ "defindas poderemos começar uma implementação"
+#~ " para suportar orquestração de containers"
+#~ " com Kubernetes."
+#~ msgstr ""
+
+#~ msgid "A asgard API suporte alguns orquestradores:"
+#~ msgstr ""
+
+#~ msgid "Kubernetes"
 #~ msgstr ""
 

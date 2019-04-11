@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asgard API \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 15:22-0300\n"
+"POT-Creation-Date: 2019-04-10 13:49-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,23 +34,49 @@ msgid ""
 "API pode executar."
 msgstr ""
 
-#: ../../code/services.rst:13
-msgid "Vejamos um exemplo:"
+#: ../../code/services.rst:12
+msgid "Os services estão hoje divididos em:"
+msgstr ""
+
+#: ../../code/services.rst:14
+msgid ":py:class:`AgentsService <asgard.services.agents.AgentsService>`"
 msgstr ""
 
 #: ../../code/services.rst:15
-msgid ""
-"O endpoint :py:meth:`/agents <asgard.api.agents.agents_handler>` é quem "
-"retorna a lista de agents de um cluster. Esse endpoints HTTP connhece "
-"apenas o ``AgentsService``. Ali estão todas as ações que os endpoints "
-"HTTP relacionados com ``Agents`` podem executar."
+msgid ":py:class:`AppsSerivce <asgard.services.apps.AppsService>`"
 msgstr ""
 
 #: ../../code/services.rst:17
-msgid "Aqui está a implementação do ``AgentsService``:"
+msgid ""
+"Essas são classes concretas e ali estão todas as ações que podem ser "
+"executadas em cada service. À medida em que mais endpints HTTP forem "
+"surgindo podemos criar novos services para que esses endpoints possam "
+"executar suas funções."
 msgstr ""
 
-#: ../../code/services.rst:25
+#: ../../code/services.rst:19
+msgid ""
+"O papel dos Services é falar com os backends, que são as implementações "
+"efetivas, que realmente vão às APIs que compõem o projeto Asgard."
+msgstr ""
+
+#: ../../code/services.rst:22
+msgid "AgentsService"
+msgstr ""
+
+#: ../../code/services.rst:24
+msgid ""
+"Aqui está a implementação do ``AgentsService``, mostrando os métodos "
+"disponíveis:"
+msgstr ""
+
+#: asgard.services.agents.AgentsService.get_agents:1 of
+msgid ""
+"Lista todos os agentes de cluster asgard. Essa litsa vem do orquestrador "
+"que é passado como parametro."
+msgstr ""
+
+#: ../../code/services.rst:32
 msgid ""
 "Perceba como os métodos do ``AgentsService`` recebem objetos concretos em"
 " vez de tipos primitivos, esses são os :py:mod:`Models <asgard.models>`. "
@@ -58,6 +84,23 @@ msgid ""
 "identificador único (``id``), nesse caso passamos o valor do ``id`` "
 "mesmo, já que essa busca é justamente quem vai fazer a troca de um \"id\""
 " por um objeto preenchido."
+msgstr ""
+
+#: ../../code/services.rst:35
+msgid "AppsService"
+msgstr ""
+
+#: ../../code/services.rst:37
+msgid ""
+"Aqui está a implementação do :py:class:`AppsService "
+"<asgard.services.apps.AppsServices>`:"
+msgstr ""
+
+#: asgard.services.apps.AppsService.get_app_stats:1 of
+msgid ""
+"Retorna estatísticas de uso de CPU/RAM/CPU thr de uma app. O Cálculo "
+"considera todas as instâncias dessa app. Retorna um objeto "
+":py:class:`AppStats <asgard.models.app.AppStats>`"
 msgstr ""
 
 #~ msgid ""
@@ -218,5 +261,60 @@ msgstr ""
 #~ "essa busca é justamente quem vai "
 #~ "fazer a troca de um \"id\" por "
 #~ "um objeto preenchido."
+#~ msgstr ""
+
+#~ msgid "Vejamos um exemplo:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "O endpoint :py:meth:`/agents "
+#~ "<asgard.api.agents.agents_handler>` é quem retorna"
+#~ " a lista de agents de um "
+#~ "cluster. Esse endpoints HTTP connhece "
+#~ "apenas o ``AgentsService``. Ali estão "
+#~ "todas as ações que os endpoints "
+#~ "HTTP relacionados com ``Agents`` podem "
+#~ "executar."
+#~ msgstr ""
+
+#~ msgid "`AgentsService <asgard.services.agents.AgentsService`;"
+#~ msgstr ""
+
+#~ msgid "`AppsSerivce <asgard.services.apps.AppsService`."
+#~ msgstr ""
+
+#~ msgid ":py:class:`AgentsService <asgard.services.agents.AgentsService`;"
+#~ msgstr ""
+
+#~ msgid ":py:class:`AppsSerivce <asgard.services.apps.AppsService`."
+#~ msgstr ""
+
+#~ msgid ":py:class:`AgentsService <asgard.services.agents.AgentsService>`;"
+#~ msgstr ""
+
+#~ msgid ":py:class:`AppsSerivce <asgard.services.apps.AppsService>`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "O endpoint :py:meth:`/agents "
+#~ "<asgard.api.agents.agents_handler>` é quem retorna"
+#~ " a lista de agents de um "
+#~ "cluster. Esse endpoints HTTP connhece "
+#~ "apenas o ``AgentsService``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Essa é uma classe abstrata e ali"
+#~ " estão todas as ações que podem "
+#~ "ser executadas nesse service."
+#~ msgstr ""
+
+#~ msgid "Implementações concretas do ``AgentsService``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Essas são classes concretas e ali "
+#~ "estão todas as ações que podem ser"
+#~ " executadas em cada service."
 #~ msgstr ""
 
