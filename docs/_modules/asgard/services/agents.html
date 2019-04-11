@@ -38,7 +38,6 @@
 <span class="kn">from</span> <span class="nn">asgard.models.account</span> <span class="k">import</span> <span class="n">Account</span>
 <span class="kn">from</span> <span class="nn">asgard.models.agent</span> <span class="k">import</span> <span class="n">Agent</span>
 <span class="kn">from</span> <span class="nn">asgard.models.app</span> <span class="k">import</span> <span class="n">App</span>
-<span class="kn">from</span> <span class="nn">asgard.models.task</span> <span class="k">import</span> <span class="n">Task</span>
 <span class="kn">from</span> <span class="nn">asgard.models.user</span> <span class="k">import</span> <span class="n">User</span>
 
 
@@ -46,6 +45,9 @@
 <div class="viewcode-block" id="AgentsService.get_agents"><a class="viewcode-back" href="../../../src/asgard/asgard.services.html#asgard.services.agents.AgentsService.get_agents">[documentos]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_agents</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span> <span class="n">account</span><span class="p">:</span> <span class="n">Account</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="n">Orchestrator</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Agent</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lista todos os agentes de cluster asgard. Essa litsa vem do orquestrador que é passado como parametro.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="k">await</span> <span class="n">backend</span><span class="o">.</span><span class="n">get_agents</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">account</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AgentsService.get_apps_running_for_agent"><a class="viewcode-back" href="../../../src/asgard/asgard.services.html#asgard.services.agents.AgentsService.get_apps_running_for_agent">[documentos]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_apps_running_for_agent</span><span class="p">(</span>
@@ -79,7 +81,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introdução</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code/organization.html">Organização do código</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contrib/doc.html">Contribuindo com o projeto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contrib/index.html">Contribuindo com o projeto</a></li>
 </ul>
 
 <div class="relations">

@@ -16,7 +16,7 @@
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Buscar" href="../search.html" />
     <link rel="next" title="Services" href="services.html" />
-    <link rel="prev" title="Organização do código" href="organization.html" />
+    <link rel="prev" title="Código legado da Asgard API" href="legacy-api.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,7 +34,7 @@
           <div class="body" role="main">
             
   <div class="section" id="endpoints-http">
-<h1>Endpoints HTTP<a class="headerlink" href="#endpoints-http" title="Link permanente para este título">¶</a></h1>
+<span id="asgard-http"></span><h1>Endpoints HTTP<a class="headerlink" href="#endpoints-http" title="Link permanente para este título">¶</a></h1>
 <p>O pacote <code class="docutils literal notranslate"><span class="pre">asgard.api</span></code> contém a definição de todos os endpoints HTTP e os objetos que representam as resposram serializadas por esses endpoints.</p>
 <p>Para cada endpoint na API HTTP, por exemplo, <code class="docutils literal notranslate"><span class="pre">/agents</span></code>, temos nesse pacote a definição das rotas desse endpoint em <code class="docutils literal notranslate"><span class="pre">asgard/api/agents.py</span></code>. Isso deve valer para todas as rotas do projeto.</p>
 <p>Para cada sub-rota de um endpoint, por exemplo, <code class="docutils literal notranslate"><span class="pre">/agents/with-attrs</span></code> temos definido em <code class="docutils literal notranslate"><span class="pre">asgard/api/resources</span></code> um modelo que representa essa resposta que será serializada por essa rota.</p>
@@ -87,13 +87,14 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introdução</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="organization.html">Organização do código</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="legacy-api.html">Código legado da Asgard API</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Endpoints HTTP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="services.html">Services</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backends.html">Backends</a></li>
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../contrib/doc.html">Contribuindo com o projeto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contrib/index.html">Contribuindo com o projeto</a></li>
 </ul>
 
 <div class="relations">
@@ -102,7 +103,7 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">&lt;no title&gt;</a><ul>
   <li><a href="organization.html">Organização do código</a><ul>
-      <li>Previous: <a href="organization.html" title="capítulo anterior">Organização do código</a></li>
+      <li>Previous: <a href="legacy-api.html" title="capítulo anterior">Código legado da Asgard API</a></li>
       <li>Next: <a href="services.html" title="próximo capítulo">Services</a></li>
   </ul></li>
   </ul></li>

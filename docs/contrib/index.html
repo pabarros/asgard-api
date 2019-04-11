@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt_BR">
   <head>
     <meta charset="utf-8" />
-    <title>&lt;no title&gt; &#8212; documentação Asgard API </title>
+    <title>Contribuindo com o projeto &#8212; documentação Asgard API </title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="../_static/translations.js"></script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Buscar" href="../search.html" />
-    <link rel="next" title="Contribuindo com o projeto" href="doc.html" />
+    <link rel="next" title="Atualizando a documentação do projeto" href="doc-update.html" />
     <link rel="prev" title="Models" href="../code/models.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -33,14 +33,43 @@
 
           <div class="body" role="main">
             
-  <div class="toctree-wrapper compound">
+  <div class="section" id="contribuindo-com-o-projeto">
+<h1>Contribuindo com o projeto<a class="headerlink" href="#contribuindo-com-o-projeto" title="Link permanente para este título">¶</a></h1>
+<div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="doc.html">Contribuindo com o projeto</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="doc.html#atualizando-a-documentacao-do-projeto">Atualizando a documentação do projeto</a></li>
-<li class="toctree-l2"><a class="reference internal" href="doc.html#gerando-a-versao-html-da-documentacao">Gerando a versão html da documentação</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc-update.html">Atualizando a documentação do projeto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc-gen.html">Gerando a versão html da documentação</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running-local.html">Rodando o projeto localmente</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#rodando-a-asgard-api-localmente">Rodando a Asgard API localmente</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#ligando-todos-os-containers-necesarios-para-rodar-o-projeto-completo">Ligando todos os containers necesários para rodar o projeto completo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#desligando-todo-o-ambiente">Desligando todo o ambiente</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#rodando-a-api">Rodando a API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#criando-um-novo-usuario-para-desenvolvimento">Criando um novo usuário para desenvolvimento</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#logando-na-ui">Logando na UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#evoluindo-o-banco-de-dados">Evoluindo o banco de dados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html#rodando-os-testes-do-projeto">Rodando os testes do projeto</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="running-local.html#rodando-os-testes-unitarios">Rodando os testes unitários</a></li>
+<li class="toctree-l3"><a class="reference internal" href="running-local.html#rodando-os-testes-de-integracao">Rodando os testes de integração</a></li>
 </ul>
 </li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing-code.html">Criando código para o projeto</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing-tests.html">Escrevendo testes para o projeto</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="writing-tests.html#localizacao-dos-testes-dentro-de-suas-respectivas-pastas">Localização dos testes dentro de suas respectivas pastas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="writing-tests.html#testes-unitarios">Testes unitários</a></li>
+<li class="toctree-l3"><a class="reference internal" href="writing-tests.html#testes-funcionais">Testes funcionais</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="writing-tests.html#usando-aiohttp-client-com-aioresponses">Usando aiohttp_client com aioresponses</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="write-new-orquestrator.html">Escrevendo uma implementação de um novo Orquestrador</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="write-new-orquestrator.html#agents-backend">Agents backend</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 
 
@@ -61,10 +90,18 @@
 
 <h3>Navegação</h3>
 <p class="caption"><span class="caption-text">Conteúdo:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intro.html">Introdução</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../code/organization.html">Organização do código</a></li>
-<li class="toctree-l1"><a class="reference internal" href="doc.html">Contribuindo com o projeto</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contribuindo com o projeto</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc-update.html">Atualizando a documentação do projeto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc-gen.html">Gerando a versão html da documentação</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running-local.html">Rodando o projeto localmente</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-code.html">Criando código para o projeto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-tests.html">Escrevendo testes para o projeto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="write-new-orquestrator.html">Escrevendo uma implementação de um novo Orquestrador</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
@@ -72,7 +109,7 @@
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="../code/models.html" title="capítulo anterior">Models</a></li>
-      <li>Next: <a href="doc.html" title="próximo capítulo">Contribuindo com o projeto</a></li>
+      <li>Next: <a href="doc-update.html" title="próximo capítulo">Atualizando a documentação do projeto</a></li>
   </ul></li>
 </ul>
 </div>
