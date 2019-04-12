@@ -1,0 +1,73 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2019, B2W Digital
+# This file is distributed under the same license as the Asgard API package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Asgard API \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-04-12 10:26-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: ../../changelog/v0.83.0.rst:2
+msgid "0.83.0"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:5
+msgid "Asgard API"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:7
+msgid ""
+"[`PR $85 <https://github.com/B2W-BIT/asgard-api/pull/85>`_] Criar "
+"endpoints para o menu de profile e troca de conta"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:8
+msgid ""
+"[`PR #96 <https://github.com/B2W-BIT/asgard-api/pull/96>`_] Criar "
+"endpoint que retorna estatísticas básicas de uma App"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:9
+msgid ""
+"[`PR #92 <https://github.com/B2W-BIT/asgard-api/pull/92>`_] Mudando a "
+"versão do session-checker-plugin"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:10
+msgid ""
+"[`PR #87 <https://github.com/B2W-BIT/asgard-api/pull/87>`_] "
+"Feature/always use asgard pydantic models"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:11
+msgid ""
+"[`PR #86 <https://github.com/B2W-BIT/asgard-api/pull/86>`_] Stop using "
+"HOLLOWMAN_DB_URL"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:12
+msgid ""
+"[`PR #83 <https://github.com/B2W-BIT/asgard-api/pull/83>`_] Corrigindo "
+"nome do handler passado para ``url_for``"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:13
+msgid ""
+"[`PR #91 <https://github.com/B2W-BIT/asgard-api/pull/91>`_] Circle CI "
+"multi-build"
+msgstr ""
+
+#: ../../changelog/v0.83.0.rst:16
+msgid "Asgard UI"
+msgstr ""
+

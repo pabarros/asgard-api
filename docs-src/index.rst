@@ -14,6 +14,7 @@ Bem vindos à documentação oficial do projeto Asgard
    intro.rst
    code/index.rst
    contrib/index.rst
+   changelog/index.rst
 
 
 
