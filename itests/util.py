@@ -266,4 +266,4 @@ class BaseTestCase(TestCase):
                 index=index_name, doc_type="stats", body=datapoint
             )
         # para dar tempo do Elasticsearch local indexar os dados recém inseridos
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)

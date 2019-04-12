@@ -42,12 +42,6 @@ class AsgardDBConnection:
     def begin(self):
         return self.conn.begin()
 
-    async def __aiter__(self):
-        return await self.execute(self._query)
-
-    async def __aexit__(self, *args, **kwargs):
-        return await self.session.__aexit__(*args, **kwargs)
-
     async def execute(self, *args, **kwargs):
         return await self.conn.execute(*args, **kwargs)
 

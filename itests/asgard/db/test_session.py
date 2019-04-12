@@ -78,14 +78,6 @@ class ManagedAsContextManagerTest(asynctest.TestCase):
             self.assertEqual("John Doe", result[1].tx_name)
             self.assertEqual("Outro User", result[2].tx_name)
 
-    async def test_iterate_result_with_async_for(self):
-        expected_users_data = []
-        async with self.session() as conn:
-            async for u in conn.query(User):
-                expected_users_data.append([u.id, u.tx_name, u.tx_email])
-
-        self.assertEqual(expected_users_data, self.users_fixture)
-
     async def test_query_with_model_no_filters_all_fields(self):
         async with self.session() as conn:
             self.assertEqual(2, len(list(await conn.query(User).all())))
