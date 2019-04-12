@@ -1,0 +1,13 @@
+0.83.0
+======
+
+Asgard API
+----------
+
+- [`PR $85 <https://github.com/B2W-BIT/asgard-api/pull/85>`_] Criar endpoints para o menu de profile e troca de conta
+- [`PR #96 <https://github.com/B2W-BIT/asgard-api/pull/96>`_] Criar endpoint que retorna estatísticas básicas de uma App
+- [`PR #92 <https://github.com/B2W-BIT/asgard-api/pull/92>`_] Mudando a versão do session-checker-plugin
+- [`PR #87 <https://github.com/B2W-BIT/asgard-api/pull/87>`_] Feature/always use asgard pydantic models
+- [`PR #86 <https://github.com/B2W-BIT/asgard-api/pull/86>`_] Stop using HOLLOWMAN_DB_URL
+- [`PR #83 <https://github.com/B2W-BIT/asgard-api/pull/83>`_] Corrigindo nome do handler passado para ``url_for``
+- [`PR #91 <https://github.com/B2W-BIT/asgard-api/pull/91>`_] Circle CI multi-build
