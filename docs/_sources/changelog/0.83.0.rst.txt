@@ -1,0 +1,5 @@
+0.83.0
+======
+
+
+[`PR #91 <https://github.com/B2W-BIT/asgard-api/pull/91>`_] Circle CI multi-build
