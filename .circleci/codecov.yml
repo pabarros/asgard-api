@@ -14,3 +14,13 @@ coverage:
         flags: typehint
         target: 25
         base: auto
+    patch:
+      default: off
+      unittest:
+        flags: unittest
+        target: 90
+        base: auto
+      typehint:
+        flags: typehint
+        target: 25
+        base: auto
