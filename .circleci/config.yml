@@ -13,6 +13,16 @@ commands:
     description: "Confirma que a ordem dos imports está correta"
     steps:
       - run: "pipenv run isort-check"
+  typehint-cov:
+    description: "Upload de coverage de typehint"
+    steps:
+      - run:
+          name: "Typehint coverage report"
+          command: |
+            mkdir -p .mypy/xml/cov
+            pipenv run lint --cobertura-xml-report .mypy/xml/cov
+            pipenv run codecov --flags typehint --file .mypy/xml/cov/cobertura.xml
+            rm -rf .mypy/
   all-tests:
     description: "Roda todos os testes do projeto (unitários e integração)"
     steps:
@@ -43,10 +53,11 @@ jobs:
       - fmt-check
       - isort-check
       - lint
+      - typehint-cov
       - all-tests
       - run:
           when: on_success
-          command: pipenv run codecov
+          command: pipenv run codecov --flags unittest
   py37x:
       <<: *template
       docker:

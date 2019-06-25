@@ -1,3 +1,26 @@
 codecov:
   notify:
     require_ci_to_pass: no
+
+coverage:
+  status:
+    project:
+      default: off
+      unittest:
+        flags: unittest
+        target: auto
+        base: auto
+      typehint:
+        flags: typehint
+        target: auto
+        base: auto
+    patch:
+      default: off
+      unittest:
+        flags: unittest
+        target: auto
+        base: auto
+      typehint:
+        flags: typehint
+        target: auto
+        base: auto
