@@ -8,9 +8,9 @@ coverage:
       default: off
       unittest:
         flags: unittest
-        target: auto
+        target: 90
         base: auto
       typehint:
         flags: typehint
-        target: auto
+        target: 25
         base: auto
