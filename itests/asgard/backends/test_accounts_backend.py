@@ -1,6 +1,14 @@
 from asgard.backends.accounts import AccountsBackend
 from asgard.models.account import Account
-from itests.util import BaseTestCase, ACCOUNT_DEV_ID, ACCOUNT_DEV_DICT
+from asgard.models.user import User
+from itests.util import (
+    BaseTestCase,
+    ACCOUNT_DEV_ID,
+    ACCOUNT_DEV_DICT,
+    ACCOUNT_WITH_NO_USERS_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    USER_WITH_ONE_ACCOUNT_DICT,
+)
 
 
 class AccountsBackendTest(BaseTestCase):
@@ -22,3 +30,21 @@ class AccountsBackendTest(BaseTestCase):
     async def test_account_list_all_accounts_empty_result(self):
         accounts = await self.backend.get_accounts()
         self.assertEquals(3, len(accounts))
+
+    async def test_accounts_get_users_account_has_users(self):
+        account = Account(**ACCOUNT_DEV_DICT)
+        users = await self.backend.get_users_from_account(account)
+        self.assertEqual(2, len(users))
+        self.assertEqual(
+            [
+                User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT),
+                User(**USER_WITH_ONE_ACCOUNT_DICT),
+            ],
+            users,
+        )
+
+    async def test_accounts_get_users_account_does_not_have_any_users(self):
+        account = Account(**ACCOUNT_WITH_NO_USERS_DICT)
+        users = await self.backend.get_users_from_account(account)
+        self.assertEqual(0, len(users))
+        self.assertEqual([], users)

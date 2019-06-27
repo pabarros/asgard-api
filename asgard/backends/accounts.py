@@ -4,6 +4,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from asgard.db import AsgardDBSession
 from asgard.models.account import Account, AccountDB
+from asgard.models.user import User, UserDB
+from asgard.models.user_has_account import UserHasAccount
 
 
 class AccountsBackend:
@@ -24,3 +26,20 @@ class AccountsBackend:
             result = await s.query(AccountDB).all()
             accounts = [await Account.from_alchemy_obj(item) for item in result]
             return accounts
+
+    async def get_users_from_account(self, account: Account) -> List[User]:
+        async with AsgardDBSession() as s:
+            _join = UserHasAccount.join(
+                UserDB, UserHasAccount.c.user_id == UserDB.id
+            )
+            users = (
+                await s.query(UserDB)
+                .join(
+                    UserHasAccount.join(
+                        UserDB, UserHasAccount.c.user_id == UserDB.id
+                    )
+                )
+                .filter(UserHasAccount.c.account_id == account.id)
+                .all()
+            )
+            return [await User.from_alchemy_obj(u) for u in users]
