@@ -35,7 +35,7 @@
 <span></span><span class="kn">from</span> <span class="nn">aiohttp</span> <span class="k">import</span> <span class="n">web</span>
 <span class="kn">from</span> <span class="nn">asyncworker</span> <span class="k">import</span> <span class="n">RouteTypes</span>
 
-<span class="kn">from</span> <span class="nn">asgard.api.resources.accounts</span> <span class="k">import</span> <span class="n">AccountsResource</span>
+<span class="kn">from</span> <span class="nn">asgard.api.resources.accounts</span> <span class="k">import</span> <span class="n">AccountsResource</span><span class="p">,</span> <span class="n">AccountResource</span>
 <span class="kn">from</span> <span class="nn">asgard.app</span> <span class="k">import</span> <span class="n">app</span>
 <span class="kn">from</span> <span class="nn">asgard.backends.accounts</span> <span class="k">import</span> <span class="n">AccountsBackend</span>
 <span class="kn">from</span> <span class="nn">asgard.http.auth</span> <span class="k">import</span> <span class="n">auth_required</span>
@@ -72,6 +72,19 @@
 <span class="k">async</span> <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
     <span class="n">accounts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AccountsService</span><span class="o">.</span><span class="n">get_accounts</span><span class="p">(</span><span class="n">AccountsBackend</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span><span class="n">AccountsResource</span><span class="p">(</span><span class="n">accounts</span><span class="o">=</span><span class="n">accounts</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="account_by_id"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.accounts.account_by_id">[documentos]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">([</span><span class="s2">&quot;/accounts/</span><span class="si">{account_id}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="nd">@auth_required</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">account_by_id</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="n">account_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">match_info</span><span class="p">[</span><span class="s2">&quot;account_id&quot;</span><span class="p">]</span>
+    <span class="n">account</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AccountsService</span><span class="o">.</span><span class="n">get_account_by_id</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">account_id</span><span class="p">),</span> <span class="n">AccountsBackend</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">status_code</span> <span class="o">=</span> <span class="mi">200</span> <span class="k">if</span> <span class="n">account</span> <span class="k">else</span> <span class="mi">404</span>
+    <span class="k">return</span> <span class="n">web</span><span class="o">.</span><span class="n">json_response</span><span class="p">(</span>
+        <span class="n">AccountResource</span><span class="p">(</span><span class="n">account</span><span class="o">=</span><span class="n">account</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">(),</span> <span class="n">status</span><span class="o">=</span><span class="n">status_code</span>
+    <span class="p">)</span></div>
 </pre></div>
 
           </div>
