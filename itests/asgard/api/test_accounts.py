@@ -15,6 +15,7 @@ from itests.util import (
     ACCOUNT_INFRA_DICT,
     ACCOUNT_INFRA_ID,
     ACCOUNT_WITH_NO_USERS_DICT,
+    ACCOUNT_WITH_NO_USERS_ID,
     USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
 )
 
@@ -77,7 +78,6 @@ class AccountsApiTest(BaseTestCase):
         )
         self.assertEqual(200, resp.status)
         data = await resp.json()
-        dev_account = Account(**ACCOUNT_DEV_DICT)
         self.assertEqual(
             {
                 "accounts": [
@@ -112,3 +112,38 @@ class AccountsApiTest(BaseTestCase):
         self.assertEqual(404, resp.status)
         data = await resp.json()
         self.assertEqual(AccountResource(), data)
+
+    async def test_accounts_get_users_account_does_not_exist(self):
+        resp = await self.client.get(
+            f"/accounts/42/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(404, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+    async def test_accounts_get_users_account_has_users(self):
+        resp = await self.client.get(
+            f"/accounts/{ACCOUNT_INFRA_ID}/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        data = await resp.json()
+        self.assertEqual(
+            {"users": [User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)]}, data
+        )
+
+    async def test_accounts_get_users_account_does_not_have_any_users(self):
+        resp = await self.client.get(
+            f"/accounts/{ACCOUNT_WITH_NO_USERS_ID}/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)

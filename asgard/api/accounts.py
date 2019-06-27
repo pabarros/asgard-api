@@ -1,7 +1,13 @@
+from typing import List
+
 from aiohttp import web
 from asyncworker import RouteTypes
 
-from asgard.api.resources.accounts import AccountsResource, AccountResource
+from asgard.api.resources.accounts import (
+    AccountsResource,
+    AccountResource,
+    AccountUsersResource,
+)
 from asgard.app import app
 from asgard.backends.accounts import AccountsBackend
 from asgard.http.auth import auth_required
@@ -50,4 +56,25 @@ async def account_by_id(request: web.Request):
     status_code = 200 if account else 404
     return web.json_response(
         AccountResource(account=account).dict(), status=status_code
+    )
+
+
+@app.route(
+    ["/accounts/{account_id}/users"], type=RouteTypes.HTTP, methods=["GET"]
+)
+@auth_required
+async def users_from_account(request: web.Request):
+    account_id: str = request.match_info["account_id"]
+    users: List[User] = []
+
+    account = await AccountsService.get_account_by_id(
+        int(account_id), AccountsBackend()
+    )
+    status_code = 200 if account else 404
+    if account:
+        users = await AccountsService.get_users_from_account(
+            account, AccountsBackend()
+        )
+    return web.json_response(
+        AccountUsersResource(users=users).dict(), status=status_code
     )
