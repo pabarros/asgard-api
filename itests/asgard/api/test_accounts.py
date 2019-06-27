@@ -1,6 +1,7 @@
 import jwt
 
 from asgard.api import accounts
+from asgard.api.resources.accounts import AccountResource
 from asgard.app import app
 from asgard.http.auth.jwt import jwt_encode
 from asgard.models.account import Account
@@ -87,3 +88,27 @@ class AccountsApiTest(BaseTestCase):
             },
             data,
         )
+
+    async def test_accounts_get_by_id_account_exists(self):
+        resp = await self.client.get(
+            f"/accounts/{ACCOUNT_INFRA_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        data = await resp.json()
+        self.assertEqual(
+            {"account": Account(**ACCOUNT_INFRA_DICT).dict()}, data
+        )
+
+    async def test_accounts_get_by_id_account_not_found(self):
+        resp = await self.client.get(
+            f"/accounts/42",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(404, resp.status)
+        data = await resp.json()
+        self.assertEqual(AccountResource(), data)
