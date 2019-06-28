@@ -42,3 +42,11 @@ class AccountsBackend:
                 .all()
             )
             return [await User.from_alchemy_obj(u) for u in users]
+
+    async def add_user(self, user: User, account: Account) -> None:
+        if not await account.user_has_permission(user):
+            async with AsgardDBSession() as s:
+                _insert = UserHasAccount.insert().values(
+                    user_id=user.id, account_id=account.id
+                )
+                await s.execute(_insert)
