@@ -50,3 +50,12 @@ class AccountsBackend:
                     user_id=user.id, account_id=account.id
                 )
                 await s.execute(_insert)
+
+    async def remove_user(self, user: User, account: Account) -> None:
+        async with AsgardDBSession() as s:
+            _delete = (
+                UserHasAccount.delete()
+                .where(UserHasAccount.c.account_id == account.id)
+                .where(UserHasAccount.c.user_id == user.id)
+            )
+            await s.execute(_delete)

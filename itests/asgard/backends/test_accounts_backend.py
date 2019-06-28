@@ -6,6 +6,7 @@ from itests.util import (
     BaseTestCase,
     ACCOUNT_DEV_ID,
     ACCOUNT_DEV_DICT,
+    ACCOUNT_INFRA_DICT,
     ACCOUNT_WITH_NO_USERS_DICT,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     USER_WITH_ONE_ACCOUNT_DICT,
@@ -80,3 +81,26 @@ class AccountsBackendTest(BaseTestCase):
             self.assertEqual(
                 1, len(total), "Registro duplicado em user_has_account"
             )
+
+    async def test_accounts_remove_from_account_user_already_in_account(self):
+        account = Account(**ACCOUNT_DEV_DICT)
+        user = User(**USER_WITH_ONE_ACCOUNT_DICT)
+
+        self.assertTrue(await account.user_has_permission(user))
+        await self.backend.remove_user(user, account)
+        self.assertFalse(await account.user_has_permission(user))
+
+        account2 = Account(**ACCOUNT_INFRA_DICT)
+        self.assertTrue(
+            await account.user_has_permission(
+                User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+            )
+        )
+
+    async def test_accounts_remove_from_account_user_not_in_account(self):
+        account = Account(**ACCOUNT_WITH_NO_USERS_DICT)
+        user = User(**USER_WITH_ONE_ACCOUNT_DICT)
+
+        self.assertFalse(await account.user_has_permission(user))
+        await self.backend.remove_user(user, account)
+        self.assertFalse(await account.user_has_permission(user))
