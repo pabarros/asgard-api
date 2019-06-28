@@ -92,7 +92,7 @@ class AccountsBackendTest(BaseTestCase):
 
         account2 = Account(**ACCOUNT_INFRA_DICT)
         self.assertTrue(
-            await account.user_has_permission(
+            await account2.user_has_permission(
                 User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
             )
         )
