@@ -47,16 +47,16 @@ class AccountsBackend:
     async def add_user(self, user: User, account: Account) -> None:
         if not await account.user_has_permission(user):
             async with AsgardDBSession() as s:
-                _insert: Insert = UserHasAccount.insert().values(
+                insert: Insert = UserHasAccount.insert().values(
                     user_id=user.id, account_id=account.id
                 )
-                await s.execute(_insert)
+                await s.execute(insert)
 
     async def remove_user(self, user: User, account: Account) -> None:
         async with AsgardDBSession() as s:
-            _delete: Delete = (
+            delete: Delete = (
                 UserHasAccount.delete()
                 .where(UserHasAccount.c.account_id == account.id)
                 .where(UserHasAccount.c.user_id == user.id)
             )
-            await s.execute(_delete)
+            await s.execute(delete)
