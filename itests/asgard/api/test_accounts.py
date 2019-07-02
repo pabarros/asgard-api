@@ -1,4 +1,5 @@
 import jwt
+from asynctest import skip
 
 from asgard.api import accounts
 from asgard.api.resources.accounts import AccountResource
@@ -200,6 +201,67 @@ class AccountsApiTest(BaseTestCase):
 
     async def test_account_add_user_input_not_json(self):
         resp = await self.client.post(
+            f"/accounts/99/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            data="{data",
+        )
+        self.assertEqual(400, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+    async def test_accounts_remove_user_to_account_input_OK(self):
+        """
+        Quando o body do request é válido, removemos o user da conta
+        """
+        resp = await self.client.delete(
+            f"/accounts/{ACCOUNT_WITH_NO_USERS_ID}/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json={"id": USER_WITH_NO_ACCOUNTS_ID},
+        )
+        self.assertEqual(200, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+        resp_check = await self.client.get(
+            f"/accounts/{ACCOUNT_WITH_NO_USERS_ID}/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        resp_check_data = await resp_check.json()
+        users_ids = [User(**u).id for u in resp_check_data["users"]]
+        self.assertNotIn(USER_WITH_NO_ACCOUNTS_ID, users_ids)
+
+    async def test_account_remove_user_account_not_found(self):
+        resp = await self.client.delete(
+            f"/accounts/99/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json={"id": USER_WITH_NO_ACCOUNTS_ID},
+        )
+        self.assertEqual(404, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+    async def test_account_remove_user_incomplete_input(self):
+        resp = await self.client.delete(
+            f"/accounts/99/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json={},
+        )
+        self.assertEqual(400, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+    async def test_account_remove_user_input_not_json(self):
+        resp = await self.client.delete(
             f"/accounts/99/users",
             headers={
                 "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"

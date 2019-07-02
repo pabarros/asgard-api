@@ -86,7 +86,7 @@ async def users_from_account(request: web.Request):
 @app.route(
     ["/accounts/{account_id}/users"], type=RouteTypes.HTTP, methods=["POST"]
 )
-async def add_users_to_account(request: web.Request):
+async def add_user_to_account(request: web.Request):
     account_id: str = request.match_info["account_id"]
     account = await AccountsService.get_account_by_id(
         int(account_id), AccountsBackend()
@@ -105,6 +105,34 @@ async def add_users_to_account(request: web.Request):
 
     if account and user:
         await AccountsService.add_user_to_account(
+            user, account, AccountsBackend()
+        )
+
+    return web.json_response(AccountUsersResource().dict(), status=status_code)
+
+
+@app.route(
+    ["/accounts/{account_id}/users"], type=RouteTypes.HTTP, methods=["DELETE"]
+)
+async def remove_user_from_account(request: web.Request):
+    account_id: str = request.match_info["account_id"]
+    account = await AccountsService.get_account_by_id(
+        int(account_id), AccountsBackend()
+    )
+
+    status_code = 200 if account else 404
+    try:
+        body = await request.json()
+        user = await UsersService.get_user_by_id(
+            int(body["id"]), UsersBackend()
+        )
+    except KeyError:
+        status_code = 400
+    except JSONDecodeError:
+        status_code = 400
+
+    if account and user:
+        await AccountsService.remove_user_from_account(
             user, account, AccountsBackend()
         )
 
