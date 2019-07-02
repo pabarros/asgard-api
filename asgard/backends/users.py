@@ -1,8 +1,10 @@
-from typing import List
+from typing import List, Optional
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from asgard.db import AsgardDBSession
 from asgard.models.account import Account
-from asgard.models.user import User
+from asgard.models.user import User, UserDB
 from asgard.models.user_has_account import UserHasAccount
 
 
@@ -32,3 +34,11 @@ class UsersBackend:
             )
             all_acc = [await Account.from_alchemy_obj(acc) for acc in accounts]
         return all_acc
+
+    async def get_user_by_id(self, user_id: int) -> Optional[User]:
+        try:
+            async with AsgardDBSession() as s:
+                user = await s.query(UserDB).filter(UserDB.id == user_id).one()
+                return await User.from_alchemy_obj(user)
+        except NoResultFound as e:
+            return None

@@ -9,6 +9,7 @@ from itests.util import (
     BaseTestCase,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     USER_WITH_ONE_ACCOUNT_DICT,
+    USER_WITH_ONE_ACCOUNT_ID,
     ACCOUNT_DEV_DICT,
     ACCOUNT_INFRA_DICT,
 )
@@ -17,6 +18,7 @@ from itests.util import (
 class UsersBackendTest(BaseTestCase):
     async def setUp(self):
         await super(UsersBackendTest, self).setUp()
+        self.backend = UsersBackend()
 
     async def tearDown(self):
         await super(UsersBackendTest, self).tearDown()
@@ -41,3 +43,12 @@ class UsersBackendTest(BaseTestCase):
         )
         self.assertEqual(0, len(accounts))
         self.assertEqual([], accounts)
+
+    async def test_get_user_by_id_user_exists(self):
+        user = await self.backend.get_user_by_id(USER_WITH_ONE_ACCOUNT_ID)
+        self.assertIsNotNone(user)
+        self.assertEqual(User(**USER_WITH_ONE_ACCOUNT_DICT), user)
+
+    async def test_get_user_by_id_user_not_found(self):
+        user = await self.backend.get_user_by_id(99)
+        self.assertIsNone(user)
