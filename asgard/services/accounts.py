@@ -27,3 +27,9 @@ class AccountsService:
         user: User, account: Account, backend: AccountsBackend
     ) -> None:
         return await backend.add_user(user, account)
+
+    @staticmethod
+    async def remove_user_from_account(
+        user: User, account: Account, backend: AccountsBackend
+    ) -> None:
+        return await backend.remove_user(user, account)

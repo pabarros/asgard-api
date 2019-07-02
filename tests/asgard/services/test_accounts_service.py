@@ -30,3 +30,10 @@ class AccountServiceTest(TestCase):
         backend = CoroutineMock(add_user=CoroutineMock())
         await AccountsService.add_user_to_account(user, account, backend)
         backend.add_user.assert_awaited_with(user, account)
+
+    async def test_calls_backend_with_right_parameters_remove_user(self):
+        account = Account(**ACCOUNT_DEV_DICT)
+        user = User(**USER_WITH_NO_ACCOUNTS_DICT)
+        backend = CoroutineMock(remove_user=CoroutineMock())
+        await AccountsService.remove_user_from_account(user, account, backend)
+        backend.remove_user.assert_awaited_with(user, account)
