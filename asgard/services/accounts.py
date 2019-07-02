@@ -21,3 +21,15 @@ class AccountsService:
         account: Account, backend: AccountsBackend
     ) -> List[User]:
         return await backend.get_users_from_account(account)
+
+    @staticmethod
+    async def add_user_to_account(
+        user: User, account: Account, backend: AccountsBackend
+    ) -> None:
+        return await backend.add_user(user, account)
+
+    @staticmethod
+    async def remove_user_from_account(
+        user: User, account: Account, backend: AccountsBackend
+    ) -> None:
+        return await backend.remove_user(user, account)
