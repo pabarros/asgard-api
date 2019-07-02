@@ -18,3 +18,8 @@ class UsersServiceTest(TestCase):
         backend.get_alternate_accounts.assert_awaited_with(
             user, current_account
         )
+
+    async def test_calls_backend_get_user_by_id(self):
+        backend = CoroutineMock(get_user_by_id=CoroutineMock())
+        await self.service.get_user_by_id(42, backend)
+        backend.get_user_by_id.assert_awaited_with(42)
