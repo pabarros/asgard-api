@@ -1,5 +1,5 @@
 from asgard.api import users
-from asgard.api.resources.users import UserListResource
+from asgard.api.resources.users import UserListResource, UserResource
 from asgard.app import app
 from asgard.http.auth.jwt import jwt_encode
 from asgard.models.account import Account
@@ -7,6 +7,7 @@ from asgard.models.user import User
 from itests.util import (
     BaseTestCase,
     USER_WITH_NO_ACCOUNTS_AUTH_KEY,
+    USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
     USER_WITH_MULTIPLE_ACCOUNTS_NAME,
     USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
@@ -127,3 +128,28 @@ class UsersTestCase(BaseTestCase):
             ).dict(),
             users_data,
         )
+
+    async def test_get_user_by_id_user_exists(self):
+        resp = await self.client.get(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        user_data = await resp.json()
+        self.assertEqual(
+            UserResource(user=User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)),
+            user_data,
+        )
+
+    async def test_get_user_by_id_user_not_found(self):
+        resp = await self.client.get(
+            f"/users/99",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(404, resp.status)
+        user_data = await resp.json()
+        self.assertEqual(UserResource(), user_data)

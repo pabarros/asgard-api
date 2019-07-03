@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -14,3 +14,7 @@ class UserMeResource(BaseModel):
 
 class UserListResource(BaseModel):
     users: List[User] = []
+
+
+class UserResource(BaseModel):
+    user: Optional[User]
