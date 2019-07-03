@@ -9,6 +9,7 @@ from asgard.api.resources.users import (
 )
 from asgard.app import app
 from asgard.backends.users import UsersBackend
+from asgard.exceptions import DuplicateEntity
 from asgard.http.auth import auth_required
 from asgard.models.account import Account
 from asgard.models.user import User
@@ -47,3 +48,21 @@ async def user_by_id(request: web.Request):
     user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
     status_code = 200 if user else 404
     return web.json_response(UserResource(user=user).dict(), status=status_code)
+
+
+@app.route(["/users"], type=RouteTypes.HTTP, methods=["POST"])
+async def create_user(request: web.Request):
+    status_code = 201
+    try:
+        user = User(**await request.json())
+    except ValueError:
+        return web.json_response(UserResource().dict(), status=400)
+
+    try:
+        created_user = await UsersService.create_user(user, UsersBackend())
+    except DuplicateEntity:
+        return web.json_response(UserResource().dict(), status=422)
+
+    return web.json_response(
+        UserResource(user=created_user).dict(), status=status_code
+    )

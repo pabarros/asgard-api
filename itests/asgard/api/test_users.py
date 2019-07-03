@@ -1,3 +1,5 @@
+from asynctest.mock import ANY
+
 from asgard.api import users
 from asgard.api.resources.users import UserListResource, UserResource
 from asgard.app import app
@@ -153,3 +155,41 @@ class UsersTestCase(BaseTestCase):
         self.assertEqual(404, resp.status)
         user_data = await resp.json()
         self.assertEqual(UserResource(), user_data)
+
+    async def test_create_user_all_OK(self):
+        user = User(name="New User", email="newuser@server.com")
+        resp = await self.client.post(
+            f"/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json=user.dict(),
+        )
+        self.assertEqual(201, resp.status)
+        user_data = await resp.json()
+
+        expected_result = UserResource(user=user).dict()
+        expected_result["user"]["id"] = ANY
+        self.assertEqual(expected_result, user_data)
+
+    async def test_create_user_invalid_input(self):
+        user = User(name="New User", email=USER_WITH_MULTIPLE_ACCOUNTS_EMAIL)
+        resp = await self.client.post(
+            f"/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            data="{data",
+        )
+        self.assertEqual(400, resp.status)
+
+    async def test_create_user_duplicate_email(self):
+        user = User(name="New User", email=USER_WITH_MULTIPLE_ACCOUNTS_EMAIL)
+        resp = await self.client.post(
+            f"/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json=user.dict(),
+        )
+        self.assertEqual(422, resp.status)
