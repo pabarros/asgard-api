@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from aiohttp import web
 from aiohttp.web import json_response
 from asyncworker import RouteTypes
@@ -46,22 +48,26 @@ async def user_by_id(request: web.Request):
 
     user_id: str = request.match_info["user_id"]
     user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
-    status_code = 200 if user else 404
+    status_code = HTTPStatus.OK if user else HTTPStatus.NOT_FOUND
     return web.json_response(UserResource(user=user).dict(), status=status_code)
 
 
 @app.route(["/users"], type=RouteTypes.HTTP, methods=["POST"])
 async def create_user(request: web.Request):
-    status_code = 201
+    status_code = HTTPStatus.CREATED
     try:
         user = User(**await request.json())
     except ValueError:
-        return web.json_response(UserResource().dict(), status=400)
+        return web.json_response(
+            UserResource().dict(), status=HTTPStatus.BAD_REQUEST
+        )
 
     try:
         created_user = await UsersService.create_user(user, UsersBackend())
     except DuplicateEntity:
-        return web.json_response(UserResource().dict(), status=422)
+        return web.json_response(
+            UserResource().dict(), status=HTTPStatus.UNPROCESSABLE_ENTITY
+        )
 
     return web.json_response(
         UserResource(user=created_user).dict(), status=status_code
