@@ -91,4 +91,6 @@ class UsersBackendTest(BaseTestCase):
         )
 
     async def test_get_accounts_from_user_user_has_no_accounts(self):
-        self.fail()
+        user = User(**USER_WITH_NO_ACCOUNTS_DICT)
+        accounts = await self.backend.get_accounts_from_user(user)
+        self.assertCountEqual([], accounts)
