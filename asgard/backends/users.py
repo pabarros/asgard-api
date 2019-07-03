@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from asgard.db import AsgardDBSession
 from asgard.exceptions import DuplicateEntity
-from asgard.models.account import Account
+from asgard.models.account import Account, AccountDB
 from asgard.models.user import User, UserDB
 from asgard.models.user_has_account import UserHasAccount
 
@@ -36,6 +36,22 @@ class UsersBackend:
             )
             all_acc = [await Account.from_alchemy_obj(acc) for acc in accounts]
         return all_acc
+
+    async def get_accounts_from_user(self, user: User) -> List[Account]:
+        async with AsgardDBSession() as s:
+            _join = UserDB.__table__.join(
+                UserHasAccount, UserDB.id == UserHasAccount.c.user_id
+            ).join(
+                AccountDB.__table__,
+                AccountDB.__table__.c.id == UserHasAccount.c.account_id,
+            )
+            accounts = (
+                await s.query(AccountDB.__table__)
+                .join(_join)
+                .filter(UserHasAccount.c.user_id == user.id)
+                .all()
+            )
+            return [await Account.from_alchemy_obj(a) for a in accounts]
 
     async def get_user_by_id(self, user_id: int) -> Optional[User]:
         try:

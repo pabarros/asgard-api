@@ -81,3 +81,14 @@ class UsersBackendTest(BaseTestCase):
             await self.backend.create_user(
                 User(name=user_name, email=user_email)
             )
+
+    async def test_get_accounts_from_user_user_has_accounts(self):
+        user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        accounts = await self.backend.get_accounts_from_user(user)
+        self.assertCountEqual(
+            [Account(**ACCOUNT_DEV_DICT), Account(**ACCOUNT_INFRA_DICT)],
+            accounts,
+        )
+
+    async def test_get_accounts_from_user_user_has_no_accounts(self):
+        self.fail()
