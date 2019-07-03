@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from json.decoder import JSONDecodeError
 from typing import List
 
@@ -39,7 +40,7 @@ async def change_account(request: web.Request):
         new_token = jwt_encode(user, account)
         return web.json_response(data={"jwt": new_token.decode("utf-8")})
 
-    return web.json_response(status=403)
+    return web.json_response(status=HTTPStatus.FORBIDDEN)
 
 
 @app.route(["/accounts"], type=RouteTypes.HTTP, methods=["GET"])
@@ -56,7 +57,7 @@ async def account_by_id(request: web.Request):
     account = await AccountsService.get_account_by_id(
         int(account_id), AccountsBackend()
     )
-    status_code = 200 if account else 404
+    status_code = HTTPStatus.OK if account else HTTPStatus.NOT_FOUND
     return web.json_response(
         AccountResource(account=account).dict(), status=status_code
     )
@@ -73,7 +74,7 @@ async def users_from_account(request: web.Request):
     account = await AccountsService.get_account_by_id(
         int(account_id), AccountsBackend()
     )
-    status_code = 200 if account else 404
+    status_code = HTTPStatus.OK if account else HTTPStatus.NOT_FOUND
     if account:
         users = await AccountsService.get_users_from_account(
             account, AccountsBackend()
@@ -95,7 +96,7 @@ async def add_user_to_account(request: web.Request):
         int(account_id), AccountsBackend()
     )
 
-    status_code = 200 if account else 404
+    status_code = HTTPStatus.OK if account else HTTPStatus.NOT_FOUND
     user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
 
     if account and user:
@@ -118,7 +119,7 @@ async def remove_user_from_account(request: web.Request):
         int(account_id), AccountsBackend()
     )
 
-    status_code = 200 if account else 404
+    status_code = HTTPStatus.OK if account else HTTPStatus.NOT_FOUND
     user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
 
     if account and user:
