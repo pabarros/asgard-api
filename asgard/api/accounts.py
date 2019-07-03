@@ -107,24 +107,19 @@ async def add_user_to_account(request: web.Request):
 
 
 @app.route(
-    ["/accounts/{account_id}/users"], type=RouteTypes.HTTP, methods=["DELETE"]
+    ["/accounts/{account_id}/users/{user_id}"],
+    type=RouteTypes.HTTP,
+    methods=["DELETE"],
 )
 async def remove_user_from_account(request: web.Request):
+    user_id: str = request.match_info["user_id"]
     account_id: str = request.match_info["account_id"]
     account = await AccountsService.get_account_by_id(
         int(account_id), AccountsBackend()
     )
 
     status_code = 200 if account else 404
-    try:
-        body = await request.json()
-        user = await UsersService.get_user_by_id(
-            int(body["id"]), UsersBackend()
-        )
-    except KeyError:
-        status_code = 400
-    except JSONDecodeError:
-        status_code = 400
+    user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
 
     if account and user:
         await AccountsService.remove_user_from_account(

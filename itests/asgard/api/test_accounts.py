@@ -12,6 +12,7 @@ from itests.util import (
     BaseTestCase,
     USER_WITH_ONE_ACCOUNT_DICT,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_ID,
     ACCOUNT_DEV_DICT,
     ACCOUNT_INFRA_DICT,
     ACCOUNT_INFRA_ID,
@@ -196,12 +197,56 @@ class AccountsApiTest(BaseTestCase):
         data = await resp.json()
         self.assertEqual({"users": []}, data)
 
-    async def test_accounts_remove_user_to_account_input_OK(self):
+    async def test_accounts_remove_user_user_in_account(self):
         """
         Quando o body do request é válido, removemos o user da conta
         """
         resp = await self.client.delete(
-            f"/accounts/{ACCOUNT_WITH_NO_USERS_ID}/users",
+            f"/accounts/{ACCOUNT_INFRA_ID}/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+        resp_check = await self.client.get(
+            f"/accounts/{ACCOUNT_INFRA_ID}/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        resp_check_data = await resp_check.json()
+        users_ids = [User(**u).id for u in resp_check_data["users"]]
+        self.assertNotIn(USER_WITH_NO_ACCOUNTS_ID, users_ids)
+
+    async def test_account_remove_user_account_not_found(self):
+        resp = await self.client.delete(
+            f"/accounts/99/users/{USER_WITH_NO_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(404, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+    async def test_account_remove_user_user_not_found(self):
+        resp = await self.client.delete(
+            f"/accounts/99/users/99",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json={},
+        )
+        self.assertEqual(404, resp.status)
+        data = await resp.json()
+        self.assertEqual({"users": []}, data)
+
+    async def test_account_remove_user_input_not_in_account(self):
+        resp = await self.client.delete(
+            f"/accounts/{ACCOUNT_WITH_NO_USERS_ID}/users/{USER_WITH_NO_ACCOUNTS_ID}",
             headers={
                 "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
             },
@@ -220,39 +265,3 @@ class AccountsApiTest(BaseTestCase):
         resp_check_data = await resp_check.json()
         users_ids = [User(**u).id for u in resp_check_data["users"]]
         self.assertNotIn(USER_WITH_NO_ACCOUNTS_ID, users_ids)
-
-    async def test_account_remove_user_account_not_found(self):
-        resp = await self.client.delete(
-            f"/accounts/99/users",
-            headers={
-                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
-            },
-            json={"id": USER_WITH_NO_ACCOUNTS_ID},
-        )
-        self.assertEqual(404, resp.status)
-        data = await resp.json()
-        self.assertEqual({"users": []}, data)
-
-    async def test_account_remove_user_incomplete_input(self):
-        resp = await self.client.delete(
-            f"/accounts/99/users",
-            headers={
-                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
-            },
-            json={},
-        )
-        self.assertEqual(400, resp.status)
-        data = await resp.json()
-        self.assertEqual({"users": []}, data)
-
-    async def test_account_remove_user_input_not_json(self):
-        resp = await self.client.delete(
-            f"/accounts/99/users",
-            headers={
-                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
-            },
-            data="{data",
-        )
-        self.assertEqual(400, resp.status)
-        data = await resp.json()
-        self.assertEqual({"users": []}, data)
