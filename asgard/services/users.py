@@ -17,3 +17,7 @@ class UsersService:
         user_id: int, backend: UsersBackend
     ) -> Optional[User]:
         return await backend.get_user_by_id(user_id)
+
+    @staticmethod
+    async def get_users(backend: UsersBackend) -> List[User]:
+        return await backend.get_users()

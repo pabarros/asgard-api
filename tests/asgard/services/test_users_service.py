@@ -23,3 +23,8 @@ class UsersServiceTest(TestCase):
         backend = CoroutineMock(get_user_by_id=CoroutineMock())
         await self.service.get_user_by_id(42, backend)
         backend.get_user_by_id.assert_awaited_with(42)
+
+    async def test_calls_backend_get_users(self):
+        backend = CoroutineMock(get_users=CoroutineMock())
+        await self.service.get_users(backend)
+        backend.get_users.assert_awaited_with()
