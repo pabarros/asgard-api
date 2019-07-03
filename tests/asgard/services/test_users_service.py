@@ -28,3 +28,9 @@ class UsersServiceTest(TestCase):
         backend = CoroutineMock(get_users=CoroutineMock())
         await self.service.get_users(backend)
         backend.get_users.assert_awaited_with()
+
+    async def test_calls_backend_create_user(self):
+        user = CoroutineMock()
+        backend = CoroutineMock(create_user=CoroutineMock())
+        await self.service.create_user(user, backend)
+        backend.create_user.assert_awaited_with(user)
