@@ -1,4 +1,5 @@
 from asgard.api import users
+from asgard.api.resources.users import UserListResource
 from asgard.app import app
 from asgard.http.auth.jwt import jwt_encode
 from asgard.models.account import Account
@@ -10,6 +11,8 @@ from itests.util import (
     USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     USER_WITH_MULTIPLE_ACCOUNTS_ID,
+    USER_WITH_NO_ACCOUNTS_DICT,
+    USER_WITH_ONE_ACCOUNT_DICT,
     ACCOUNT_DEV_ID,
     ACCOUNT_DEV_NAME,
     ACCOUNT_DEV_NAMESPACE,
@@ -105,3 +108,22 @@ class UsersTestCase(BaseTestCase):
             headers={"Authorization": f"JWT {jwt_token.decode('utf-8')}"},
         )
         self.assertEqual(401, resp.status)
+
+    async def test_users_endpoint_list_users(self):
+        resp = await self.client.get(
+            "/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_NO_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        users_data = await resp.json()
+        self.assertCountEqual(
+            UserListResource(
+                users=[
+                    User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT),
+                    User(**USER_WITH_NO_ACCOUNTS_DICT),
+                    User(**USER_WITH_ONE_ACCOUNT_DICT),
+                ]
+            ).dict(),
+            users_data,
+        )

@@ -10,3 +10,7 @@ class UserResource(BaseModel):
     user: User
     current_account: Account
     accounts: List[Account] = []
+
+
+class UserListResource(BaseModel):
+    users: List[User] = []
