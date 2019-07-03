@@ -18,3 +18,7 @@ class UserListResource(BaseModel):
 
 class UserResource(BaseModel):
     user: Optional[User]
+
+
+class UserAccountsResource(BaseModel):
+    accounts: List[Account] = []

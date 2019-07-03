@@ -8,6 +8,7 @@ from asgard.api.resources.users import (
     UserMeResource,
     UserListResource,
     UserResource,
+    UserAccountsResource,
 )
 from asgard.app import app
 from asgard.backends.users import UsersBackend
@@ -50,6 +51,23 @@ async def user_by_id(request: web.Request):
     user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
     status_code = HTTPStatus.OK if user else HTTPStatus.NOT_FOUND
     return web.json_response(UserResource(user=user).dict(), status=status_code)
+
+
+@app.route(["/users/{user_id}/accounts"], type=RouteTypes.HTTP, methods=["GET"])
+async def accounts_from_user(request: web.Request):
+    user_id: str = request.match_info["user_id"]
+    user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
+
+    status_code = HTTPStatus.OK if user else HTTPStatus.NOT_FOUND
+
+    if user:
+        accounts = await UsersService.get_accounts_from_user(
+            user, UsersBackend()
+        )
+        return web.json_response(
+            UserAccountsResource(accounts=accounts).dict(), status=status_code
+        )
+    return web.json_response(UserAccountsResource().dict(), status=status_code)
 
 
 @app.route(["/users"], type=RouteTypes.HTTP, methods=["POST"])

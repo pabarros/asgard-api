@@ -1,7 +1,11 @@
 from asynctest.mock import ANY
 
 from asgard.api import users
-from asgard.api.resources.users import UserListResource, UserResource
+from asgard.api.resources.users import (
+    UserListResource,
+    UserResource,
+    UserAccountsResource,
+)
 from asgard.app import app
 from asgard.http.auth.jwt import jwt_encode
 from asgard.models.account import Account
@@ -24,6 +28,7 @@ from itests.util import (
     ACCOUNT_INFRA_NAME,
     ACCOUNT_INFRA_NAMESPACE,
     ACCOUNT_INFRA_OWNER,
+    ACCOUNT_INFRA_DICT,
 )
 
 
@@ -193,3 +198,33 @@ class UsersTestCase(BaseTestCase):
             json=user.dict(),
         )
         self.assertEqual(422, resp.status)
+
+    async def test_get_accounts_from_user_user_with_accounts(self):
+        resp = await self.client.get(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}/accounts",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        accounts_data = await resp.json()
+        self.assertEqual(
+            UserAccountsResource(
+                accounts=[
+                    Account(**ACCOUNT_DEV_DICT),
+                    Account(**ACCOUNT_INFRA_DICT),
+                ]
+            ).dict(),
+            accounts_data,
+        )
+
+    async def test_get_accounts_from_user_user_not_found(self):
+        resp = await self.client.get(
+            f"/users/99/accounts",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(404, resp.status)
+        accounts_data = await resp.json()
+        self.assertEqual(UserAccountsResource().dict(), accounts_data)
