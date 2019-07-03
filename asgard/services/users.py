@@ -25,3 +25,9 @@ class UsersService:
     @staticmethod
     async def create_user(user: User, backend: UsersBackend) -> User:
         return await backend.create_user(user)
+
+    @staticmethod
+    async def get_accounts_from_user(
+        user: User, backend: UsersBackend
+    ) -> List[Account]:
+        return await backend.get_accounts_from_user(user)
