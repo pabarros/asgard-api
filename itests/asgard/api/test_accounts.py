@@ -155,11 +155,10 @@ class AccountsApiTest(BaseTestCase):
         Quando o body do request é válido, vinculamos o novo user à conta
         """
         resp = await self.client.post(
-            f"/accounts/{ACCOUNT_WITH_NO_USERS_ID}/users",
+            f"/accounts/{ACCOUNT_WITH_NO_USERS_ID}/users/{USER_WITH_NO_ACCOUNTS_ID}",
             headers={
                 "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
             },
-            json={"id": USER_WITH_NO_ACCOUNTS_ID},
         )
         self.assertEqual(200, resp.status)
         data = await resp.json()
@@ -177,37 +176,23 @@ class AccountsApiTest(BaseTestCase):
 
     async def test_account_add_user_account_not_found(self):
         resp = await self.client.post(
-            f"/accounts/99/users",
+            f"/accounts/99/users/{USER_WITH_NO_ACCOUNTS_ID}",
             headers={
                 "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
             },
-            json={"id": USER_WITH_NO_ACCOUNTS_ID},
         )
         self.assertEqual(404, resp.status)
         data = await resp.json()
         self.assertEqual({"users": []}, data)
 
-    async def test_account_add_user_incomplete_input(self):
+    async def test_account_add_user_user_not_found(self):
         resp = await self.client.post(
-            f"/accounts/99/users",
+            f"/accounts/99/users/99",
             headers={
                 "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
             },
-            json={},
         )
-        self.assertEqual(400, resp.status)
-        data = await resp.json()
-        self.assertEqual({"users": []}, data)
-
-    async def test_account_add_user_input_not_json(self):
-        resp = await self.client.post(
-            f"/accounts/99/users",
-            headers={
-                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
-            },
-            data="{data",
-        )
-        self.assertEqual(400, resp.status)
+        self.assertEqual(404, resp.status)
         data = await resp.json()
         self.assertEqual({"users": []}, data)
 
