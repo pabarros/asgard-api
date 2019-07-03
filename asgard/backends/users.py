@@ -40,5 +40,16 @@ class UsersBackend:
             async with AsgardDBSession() as s:
                 user = await s.query(UserDB).filter(UserDB.id == user_id).one()
                 return await User.from_alchemy_obj(user)
-        except NoResultFound as e:
+        except NoResultFound:
             return None
+
+    async def get_users(self) -> List[User]:
+        """
+        Lista todos os usuários do sistema, independente de qual conta
+        esses usuparios estão vinculados
+        """
+        async with AsgardDBSession() as s:
+            return [
+                await User.from_alchemy_obj(u)
+                for u in await s.query(UserDB).all()
+            ]

@@ -1,14 +1,12 @@
-from importlib import reload
-
 import asgard.services.users
 from asgard.backends.users import UsersBackend
-from asgard.conf import settings
 from asgard.models.account import Account
 from asgard.models.user import User
 from itests.util import (
     BaseTestCase,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
     USER_WITH_ONE_ACCOUNT_DICT,
+    USER_WITH_NO_ACCOUNTS_DICT,
     USER_WITH_ONE_ACCOUNT_ID,
     ACCOUNT_DEV_DICT,
     ACCOUNT_INFRA_DICT,
@@ -52,3 +50,14 @@ class UsersBackendTest(BaseTestCase):
     async def test_get_user_by_id_user_not_found(self):
         user = await self.backend.get_user_by_id(99)
         self.assertIsNone(user)
+
+    async def test_get_all_users(self):
+        users = await self.backend.get_users()
+        self.assertCountEqual(
+            [
+                User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT),
+                User(**USER_WITH_ONE_ACCOUNT_DICT),
+                User(**USER_WITH_NO_ACCOUNTS_DICT),
+            ],
+            users,
+        )
