@@ -2,7 +2,7 @@ from aiohttp import web
 from aiohttp.web import json_response
 from asyncworker import RouteTypes
 
-from asgard.api.resources.users import UserResource, UserListResource
+from asgard.api.resources.users import UserMeResource, UserListResource
 from asgard.app import app
 from asgard.backends.users import UsersBackend
 from asgard.http.auth import auth_required
@@ -23,7 +23,7 @@ async def whoami(request: web.Request):
         user, current_account, UsersBackend()
     )
 
-    resource_response = UserResource(
+    resource_response = UserMeResource(
         user=user, current_account=current_account, accounts=alternate_accounts
     )
 

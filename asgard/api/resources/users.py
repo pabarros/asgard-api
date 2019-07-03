@@ -6,7 +6,7 @@ from asgard.models.account import Account
 from asgard.models.user import User
 
 
-class UserResource(BaseModel):
+class UserMeResource(BaseModel):
     user: User
     current_account: Account
     accounts: List[Account] = []
