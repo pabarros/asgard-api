@@ -1,8 +1,10 @@
 from typing import List, Optional
 
+import psycopg2
 from sqlalchemy.orm.exc import NoResultFound
 
 from asgard.db import AsgardDBSession
+from asgard.exceptions import DuplicateEntity
 from asgard.models.account import Account
 from asgard.models.user import User, UserDB
 from asgard.models.user_has_account import UserHasAccount
@@ -46,10 +48,24 @@ class UsersBackend:
     async def get_users(self) -> List[User]:
         """
         Lista todos os usuários do sistema, independente de qual conta
-        esses usuparios estão vinculados
+        esses usuários estão vinculados
         """
         async with AsgardDBSession() as s:
             return [
                 await User.from_alchemy_obj(u)
                 for u in await s.query(UserDB).all()
             ]
+
+    async def create_user(self, user: User) -> User:
+        user_db, userTable = await user.to_alchemy_obj()
+        try:
+            async with AsgardDBSession() as s:
+                returned_values = await s.execute(
+                    userTable.__table__.insert()
+                    .values(tx_name=user.name, tx_email=user.email)
+                    .return_defaults(userTable.id)
+                )
+                created_id = list(returned_values)[0].id
+                return User(id=created_id, name=user.name, email=user.email)
+        except psycopg2.IntegrityError as e:
+            raise DuplicateEntity(e.pgerror)

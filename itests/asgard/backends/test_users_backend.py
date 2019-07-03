@@ -1,5 +1,6 @@
 import asgard.services.users
 from asgard.backends.users import UsersBackend
+from asgard.exceptions import DuplicateEntity
 from asgard.models.account import Account
 from asgard.models.user import User
 from itests.util import (
@@ -8,6 +9,7 @@ from itests.util import (
     USER_WITH_ONE_ACCOUNT_DICT,
     USER_WITH_NO_ACCOUNTS_DICT,
     USER_WITH_ONE_ACCOUNT_ID,
+    USER_WITH_NO_ACCOUNTS_EMAIL,
     ACCOUNT_DEV_DICT,
     ACCOUNT_INFRA_DICT,
 )
@@ -61,3 +63,21 @@ class UsersBackendTest(BaseTestCase):
             ],
             users,
         )
+
+    async def test_create_user_OK(self):
+        user_name = "New User"
+        user_email = "newuser@server.com"
+        user_created = await self.backend.create_user(
+            User(name=user_name, email=user_email)
+        )
+        self.assertEqual(
+            user_created, User(id=1, name=user_name, email=user_email)
+        )
+
+    async def test_create_user_duplicate_email(self):
+        user_name = "New User"
+        user_email = USER_WITH_NO_ACCOUNTS_EMAIL
+        with self.assertRaises(DuplicateEntity):
+            await self.backend.create_user(
+                User(name=user_name, email=user_email)
+            )
