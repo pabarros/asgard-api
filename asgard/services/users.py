@@ -35,3 +35,7 @@ class UsersService:
     @staticmethod
     async def delete_user(user: User, backend: UsersBackend) -> User:
         return await backend.delete_user(user)
+
+    @staticmethod
+    async def update_user(user: User, backend: UsersBackend) -> User:
+        return await backend.update_user(user)

@@ -47,3 +47,9 @@ class UsersServiceTest(TestCase):
         backend = CoroutineMock(spec=UsersBackend)
         await self.service.delete_user(user, backend)
         backend.delete_user.assert_awaited_with(user)
+
+    async def test_calls_backend_update_user(self):
+        user = CoroutineMock()
+        backend = CoroutineMock(spec=UsersBackend)
+        await self.service.update_user(user, backend)
+        backend.update_user.assert_awaited_with(user)
