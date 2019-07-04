@@ -99,3 +99,17 @@ class UsersBackend:
             await s.execute(delete_acc_relation)
             await s.execute(delete_user)
             return user
+
+    async def update_user(self, user: User) -> User:
+        async with AsgardDBSession() as s:
+            user_db, userTable = await user.to_alchemy_obj()
+            update = (
+                userTable.__table__.update()
+                .where(userTable.id == user.id)
+                .values(tx_name=user.name, tx_email=user.email)
+            )
+            try:
+                await s.execute(update)
+            except psycopg2.IntegrityError as e:
+                raise DuplicateEntity(e.pgerror)
+            return user

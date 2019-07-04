@@ -6,6 +6,7 @@ from asgard.models.user import User
 from itests.util import (
     BaseTestCase,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
+    USER_WITH_MULTIPLE_ACCOUNTS_ID,
     USER_WITH_ONE_ACCOUNT_DICT,
     USER_WITH_NO_ACCOUNTS_DICT,
     USER_WITH_ONE_ACCOUNT_ID,
@@ -130,3 +131,39 @@ class UsersBackendTest(BaseTestCase):
             ],
             remain_users,
         )
+
+    async def test_update_user_update_all_fields(self):
+        expected_new_name = "Novo Nome"
+        expected_new_email = "novo@server.com"
+        new_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        new_user.name = expected_new_name
+        new_user.email = expected_new_email
+
+        updated_user = await self.backend.update_user(new_user)
+        self.assertEqual(new_user, updated_user)
+
+        saved_user = await self.backend.get_user_by_id(
+            USER_WITH_MULTIPLE_ACCOUNTS_ID
+        )
+        self.assertEqual(new_user, saved_user)
+
+    async def test_update_user_update_name(self):
+        expected_new_email = "novo@server.com"
+        new_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        new_user.email = expected_new_email
+
+        updated_user = await self.backend.update_user(new_user)
+        self.assertEqual(new_user, updated_user)
+
+        saved_user = await self.backend.get_user_by_id(
+            USER_WITH_MULTIPLE_ACCOUNTS_ID
+        )
+        self.assertEqual(new_user, saved_user)
+
+    async def test_update_user_duplicate_email(self):
+        expected_new_email = USER_WITH_NO_ACCOUNTS_EMAIL
+        new_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        new_user.email = expected_new_email
+
+        with self.assertRaises(DuplicateEntity):
+            updated_user = await self.backend.update_user(new_user)
