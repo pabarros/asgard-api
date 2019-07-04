@@ -94,3 +94,39 @@ class UsersBackendTest(BaseTestCase):
         user = User(**USER_WITH_NO_ACCOUNTS_DICT)
         accounts = await self.backend.get_accounts_from_user(user)
         self.assertCountEqual([], accounts)
+
+    async def test_delete_user_with_no_accounts(self):
+        total_users = await self.backend.get_users()
+        self.assertEqual(3, len(total_users))
+
+        user = User(**USER_WITH_NO_ACCOUNTS_DICT)
+        deleted_user = await self.backend.delete_user(user)
+        self.assertEqual(deleted_user, user)
+
+        remain_users = await self.backend.get_users()
+        self.assertEqual(2, len(remain_users))
+        self.assertCountEqual(
+            [
+                User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT),
+                User(**USER_WITH_ONE_ACCOUNT_DICT),
+            ],
+            remain_users,
+        )
+
+    async def test_delete_user_with_accounts(self):
+        total_users = await self.backend.get_users()
+        self.assertEqual(3, len(total_users))
+
+        user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        deleted_user = await self.backend.delete_user(user)
+        self.assertEqual(deleted_user, user)
+
+        remain_users = await self.backend.get_users()
+        self.assertEqual(2, len(remain_users))
+        self.assertCountEqual(
+            [
+                User(**USER_WITH_NO_ACCOUNTS_DICT),
+                User(**USER_WITH_ONE_ACCOUNT_DICT),
+            ],
+            remain_users,
+        )
