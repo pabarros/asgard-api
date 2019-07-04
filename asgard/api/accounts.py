@@ -89,6 +89,7 @@ async def users_from_account(request: web.Request):
     type=RouteTypes.HTTP,
     methods=["POST"],
 )
+@auth_required
 async def add_user_to_account(request: web.Request):
     user_id: str = request.match_info["user_id"]
     account_id: str = request.match_info["account_id"]
@@ -112,6 +113,7 @@ async def add_user_to_account(request: web.Request):
     type=RouteTypes.HTTP,
     methods=["DELETE"],
 )
+@auth_required
 async def remove_user_from_account(request: web.Request):
     user_id: str = request.match_info["user_id"]
     account_id: str = request.match_info["account_id"]

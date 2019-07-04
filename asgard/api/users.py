@@ -41,12 +41,14 @@ async def whoami(request: web.Request):
 
 
 @app.route(["/users"], type=RouteTypes.HTTP, methods=["GET"])
+@auth_required
 async def users_list(request: web.Request):
     users = await UsersService.get_users(UsersBackend())
     return web.json_response(UserListResource(users=users).dict())
 
 
 @app.route(["/users/{user_id}"], type=RouteTypes.HTTP, methods=["GET"])
+@auth_required
 async def user_by_id(request: web.Request):
 
     user_id: str = request.match_info["user_id"]
@@ -56,6 +58,7 @@ async def user_by_id(request: web.Request):
 
 
 @app.route(["/users/{user_id}/accounts"], type=RouteTypes.HTTP, methods=["GET"])
+@auth_required
 async def accounts_from_user(request: web.Request):
     user_id: str = request.match_info["user_id"]
     user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
@@ -73,6 +76,7 @@ async def accounts_from_user(request: web.Request):
 
 
 @app.route(["/users"], type=RouteTypes.HTTP, methods=["POST"])
+@auth_required
 async def create_user(request: web.Request):
     status_code = HTTPStatus.CREATED
     try:
@@ -96,6 +100,7 @@ async def create_user(request: web.Request):
 
 
 @app.route(["/users/{user_id}"], type=RouteTypes.HTTP, methods=["DELETE"])
+@auth_required
 async def delete_user(request: web.Request):
     user_id: str = request.match_info["user_id"]
 
