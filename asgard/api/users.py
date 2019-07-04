@@ -93,3 +93,19 @@ async def create_user(request: web.Request):
     return web.json_response(
         UserResource(user=created_user).dict(), status=status_code
     )
+
+
+@app.route(["/users/{user_id}"], type=RouteTypes.HTTP, methods=["DELETE"])
+async def delete_user(request: web.Request):
+    user_id: str = request.match_info["user_id"]
+
+    user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
+    status_code = HTTPStatus.OK if user else HTTPStatus.NOT_FOUND
+
+    if user:
+        await UsersService.delete_user(user, UsersBackend())
+        return web.json_response(
+            UserResource(user=user).dict(), status=status_code
+        )
+
+    return web.json_response(UserResource().dict(), status=status_code)

@@ -15,6 +15,7 @@ from asgard.models.user import User
 from itests.util import (
     BaseTestCase,
     USER_WITH_NO_ACCOUNTS_AUTH_KEY,
+    USER_WITH_NO_ACCOUNTS_ID,
     USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
     USER_WITH_MULTIPLE_ACCOUNTS_NAME,
     USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
@@ -238,3 +239,74 @@ class UsersTestCase(BaseTestCase):
         self.assertEqual(404, resp.status)
         accounts_data = await resp.json()
         self.assertEqual(UserAccountsResource().dict(), accounts_data)
+
+    async def test_delete_user_user_with_no_accounts(self):
+        resp = await self.client.delete(
+            f"/users/{USER_WITH_NO_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        resp_data = await resp.json()
+        self.assertEqual(
+            UserResource(user=User(**USER_WITH_NO_ACCOUNTS_DICT)).dict(),
+            resp_data,
+        )
+        other_users = await self.client.get(
+            f"/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        other_users_data = await other_users.json()
+        self.assertCountEqual(
+            UserListResource(
+                users=[
+                    User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT),
+                    User(**USER_WITH_ONE_ACCOUNT_DICT),
+                ]
+            ).dict(),
+            other_users_data,
+        )
+
+    async def test_delete_user_user_with_accounts(self):
+        resp = await self.client.delete(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(200, resp.status)
+        resp_data = await resp.json()
+        self.assertEqual(
+            UserResource(user=User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)).dict(),
+            resp_data,
+        )
+        other_users = await self.client.get(
+            f"/users",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        other_users_data = await other_users.json()
+        self.assertCountEqual(
+            UserListResource(
+                users=[
+                    User(**USER_WITH_NO_ACCOUNTS_DICT),
+                    User(**USER_WITH_ONE_ACCOUNT_DICT),
+                ]
+            ).dict(),
+            other_users_data,
+        )
+
+    async def test_delete_user_user_not_fount(self):
+        resp = await self.client.delete(
+            f"/users/99",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        self.assertEqual(404, resp.status)
+        resp_data = await resp.json()
+        self.assertEqual(UserResource().dict(), resp_data)
