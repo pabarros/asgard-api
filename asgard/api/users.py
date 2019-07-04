@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from json.decoder import JSONDecodeError
 
 from aiohttp import web
 from aiohttp.web import json_response
@@ -114,3 +115,35 @@ async def delete_user(request: web.Request):
         )
 
     return web.json_response(UserResource().dict(), status=status_code)
+
+
+@app.route(["/users/{user_id}"], type=RouteTypes.HTTP, methods=["PATCH"])
+async def update_user_partial(request: web.Request):
+    user_id: str = request.match_info["user_id"]
+
+    try:
+        body_data = await request.json()
+    except JSONDecodeError as e:
+        return web.json_response(
+            ErrorResource(errors=[ErrorDetail(msg=str(e))]).dict(),
+            status=HTTPStatus.UNPROCESSABLE_ENTITY,
+        )
+
+    user = await UsersService.get_user_by_id(int(user_id), UsersBackend())
+    status_code = HTTPStatus.ACCEPTED if user else HTTPStatus.NOT_FOUND
+
+    try:
+        if user:
+            body_user = User(**body_data)
+            user.name = body_user.name if body_user.name else user.name
+            user.email = body_user.email if body_user.email else user.email
+            updated_user = await UsersService.update_user(user, UsersBackend())
+    except DuplicateEntity as de:
+        return web.json_response(
+            ErrorResource(errors=[ErrorDetail(msg=str(de))]).dict(),
+            status=status_code,
+        )
+
+    return web.json_response(
+        UserResource(user=updated_user).dict(), status=status_code
+    )

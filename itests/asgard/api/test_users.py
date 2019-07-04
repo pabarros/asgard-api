@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from asynctest.mock import ANY
 
 from asgard.api import users
@@ -16,7 +18,9 @@ from itests.util import (
     BaseTestCase,
     USER_WITH_NO_ACCOUNTS_AUTH_KEY,
     USER_WITH_NO_ACCOUNTS_ID,
+    USER_WITH_NO_ACCOUNTS_EMAIL,
     USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
+    USER_WITH_ONE_ACCOUNT_AUTH_KEY,
     USER_WITH_MULTIPLE_ACCOUNTS_NAME,
     USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
     USER_WITH_MULTIPLE_ACCOUNTS_DICT,
@@ -124,7 +128,7 @@ class UsersTestCase(BaseTestCase):
         resp = await self.client.get(
             "/users",
             headers={
-                "Authorization": f"Token {USER_WITH_NO_ACCOUNTS_AUTH_KEY}"
+                "Authorization": f"Token {USER_WITH_ONE_ACCOUNT_AUTH_KEY}"
             },
         )
         users_data = await resp.json()
@@ -286,9 +290,10 @@ class UsersTestCase(BaseTestCase):
         other_users = await self.client.get(
             f"/users",
             headers={
-                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+                "Authorization": f"Token {USER_WITH_ONE_ACCOUNT_AUTH_KEY}"
             },
         )
+
         other_users_data = await other_users.json()
         self.assertCountEqual(
             UserListResource(
@@ -310,3 +315,156 @@ class UsersTestCase(BaseTestCase):
         self.assertEqual(404, resp.status)
         resp_data = await resp.json()
         self.assertEqual(UserResource().dict(), resp_data)
+
+    async def test_update_user_invalid_json(self):
+        resp = await self.client.patch(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            data="{data",
+        )
+        self.assertEqual(HTTPStatus.UNPROCESSABLE_ENTITY, resp.status)
+        resp_data = await resp.json()
+        expected_error_msg = "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+        self.assertEqual(
+            ErrorResource(errors=[ErrorDetail(msg=expected_error_msg)]).dict(),
+            resp_data,
+        )
+
+    async def test_update_user_update_only_name(self):
+        expected_new_name = "Novo Nome"
+        new_user_data = {"name": expected_new_name}
+
+        resp = await self.client.patch(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json=new_user_data,
+        )
+        self.assertEqual(HTTPStatus.ACCEPTED, resp.status)
+        user_data = await resp.json()
+
+        new_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        new_user.name = expected_new_name
+        self.assertEqual(UserResource(user=new_user).dict(), user_data)
+
+        resp = await self.client.get(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        updated_user_data = await resp.json()
+        self.assertEqual(UserResource(user=new_user).dict(), updated_user_data)
+
+    async def test_update_user_cant_update_another_user(self):
+        """
+        Dado um request 
+          PATCH /users/42
+          {"id": 50, "name": "Nome", "email": "email"}
+
+        Não podemos, no final das contas ter atualizado o user id=50. Temos que atualizar o user id=42
+        """
+        expected_new_name = "Novo Nome"
+        expected_new_email = "novemail@server.com"
+
+        new_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        new_user.name = expected_new_name
+        new_user.email = expected_new_email
+        new_user.id = USER_WITH_NO_ACCOUNTS_ID
+
+        resp = await self.client.patch(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json=new_user.dict(),
+        )
+        self.assertEqual(HTTPStatus.ACCEPTED, resp.status)
+        user_data = await resp.json()
+
+        expected_returned_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        expected_returned_user.name = expected_new_name
+        expected_returned_user.email = expected_new_email
+        self.assertEqual(
+            UserResource(user=expected_returned_user).dict(), user_data
+        )
+
+        resp = await self.client.get(
+            f"/users/{USER_WITH_NO_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        updated_user_data = await resp.json()
+        self.assertEqual(
+            UserResource(user=User(**USER_WITH_NO_ACCOUNTS_DICT)).dict(),
+            updated_user_data,
+        )
+
+    async def test_update_user_update_all_fields(self):
+        expected_new_name = "Novo Nome"
+        expected_new_email = "newemail@server.com"
+
+        new_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        new_user.name = expected_new_name
+        new_user.email = expected_new_email
+
+        resp = await self.client.patch(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json=new_user.dict(),
+        )
+        self.assertEqual(HTTPStatus.ACCEPTED, resp.status)
+        user_data = await resp.json()
+
+        self.assertEqual(UserResource(user=new_user).dict(), user_data)
+
+        resp = await self.client.get(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        updated_user_data = await resp.json()
+        self.assertEqual(UserResource(user=new_user).dict(), updated_user_data)
+
+    async def test_update_user_duplicate_email(self):
+        expected_new_email = USER_WITH_NO_ACCOUNTS_EMAIL
+        new_user_data = {"email": expected_new_email}
+
+        resp = await self.client.patch(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+            json=new_user_data,
+        )
+        self.assertEqual(HTTPStatus.ACCEPTED, resp.status)
+        user_data = await resp.json()
+
+        new_user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        new_user.name = expected_new_email
+        expected_error_message = """ERROR:  duplicate key value violates unique constraint "user_tx_email_key"\nDETAIL:  Key (tx_email)=(user-no-accounts@host.com) already exists.\n"""
+        self.assertEqual(
+            ErrorResource(
+                errors=[ErrorDetail(msg=expected_error_message)]
+            ).dict(),
+            user_data,
+        )
+
+        resp = await self.client.get(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            headers={
+                "Authorization": f"Token {USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY}"
+            },
+        )
+        updated_user_data = await resp.json()
+        self.assertEqual(
+            UserResource(user=User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)).dict(),
+            updated_user_data,
+        )
