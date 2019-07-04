@@ -9,6 +9,8 @@ from asgard.api.resources.users import (
     UserListResource,
     UserResource,
     UserAccountsResource,
+    ErrorResource,
+    ErrorDetail,
 )
 from asgard.app import app
 from asgard.backends.users import UsersBackend
@@ -82,9 +84,10 @@ async def create_user(request: web.Request):
 
     try:
         created_user = await UsersService.create_user(user, UsersBackend())
-    except DuplicateEntity:
+    except DuplicateEntity as de:
         return web.json_response(
-            UserResource().dict(), status=HTTPStatus.UNPROCESSABLE_ENTITY
+            ErrorResource(errors=[ErrorDetail(msg=str(de))]).dict(),
+            status=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
     return web.json_response(

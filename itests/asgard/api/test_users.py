@@ -5,6 +5,8 @@ from asgard.api.resources.users import (
     UserListResource,
     UserResource,
     UserAccountsResource,
+    ErrorResource,
+    ErrorDetail,
 )
 from asgard.app import app
 from asgard.http.auth.jwt import jwt_encode
@@ -198,6 +200,14 @@ class UsersTestCase(BaseTestCase):
             json=user.dict(),
         )
         self.assertEqual(422, resp.status)
+        resp_data = await resp.json()
+        expected_error_message = """ERROR:  duplicate key value violates unique constraint "user_tx_email_key"\nDETAIL:  Key (tx_email)=(john@host.com) already exists.\n"""
+        self.assertEqual(
+            ErrorResource(
+                errors=[ErrorDetail(msg=expected_error_message)]
+            ).dict(),
+            resp_data,
+        )
 
     async def test_get_accounts_from_user_user_with_accounts(self):
         resp = await self.client.get(
