@@ -151,6 +151,7 @@
 
 
 <div class="viewcode-block" id="update_user_partial"><a class="viewcode-back" href="../../../src/asgard/asgard.api.html#asgard.api.users.update_user_partial">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">([</span><span class="s2">&quot;/users/</span><span class="si">{user_id}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="n">RouteTypes</span><span class="o">.</span><span class="n">HTTP</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;PATCH&quot;</span><span class="p">])</span>
+<span class="nd">@auth_required</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">update_user_partial</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">match_info</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">]</span>
 
