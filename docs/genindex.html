@@ -39,6 +39,7 @@
  <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
@@ -68,12 +69,22 @@
 </li>
       <li><a href="src/asgard/asgard.models.html#asgard.models.user.UserDB.accounts">accounts (atributo asgard.models.user.UserDB)</a>
 </li>
+      <li><a href="src/asgard/asgard.api.html#asgard.api.users.accounts_from_user">accounts_from_user() (no módulo asgard.api.users)</a>
+</li>
       <li><a href="src/asgard/asgard.backends.html#asgard.backends.accounts.AccountsBackend">AccountsBackend (classe em asgard.backends.accounts)</a>
 </li>
       <li><a href="src/asgard/asgard.services.html#asgard.services.accounts.AccountsService">AccountsService (classe em asgard.services.accounts)</a>
 </li>
       <li><a href="src/asgard/asgard.models.html#asgard.models.base.BaseModel.add_error">add_error() (método asgard.models.base.BaseModel)</a>
 </li>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.accounts.AccountsBackend.add_user">add_user() (método asgard.backends.accounts.AccountsBackend)</a>
+</li>
+      <li><a href="src/asgard/asgard.services.html#asgard.services.accounts.AccountsService.add_user_to_account">add_user_to_account() (método estático asgard.services.accounts.AccountsService)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.api.html#asgard.api.accounts.add_user_to_account">(no módulo asgard.api.accounts)</a>
+</li>
+      </ul></li>
       <li><a href="src/asgard/asgard.models.html#asgard.models.agent.Agent">Agent (classe em asgard.models.agent)</a>
 </li>
       <li><a href="src/asgard/asgard.api.html#asgard.api.agents.agent_apps">agent_apps() (no módulo asgard.api.agents)</a>
@@ -142,12 +153,12 @@
 </li>
       <li><a href="src/asgard/asgard.backends.html#module-asgard.backends.base">asgard.backends.base (módulo)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="src/asgard/asgard.backends.marathon.html#module-asgard.backends.marathon">asgard.backends.marathon (módulo)</a>
 </li>
       <li><a href="src/asgard/asgard.backends.marathon.html#module-asgard.backends.marathon.impl">asgard.backends.marathon.impl (módulo)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="src/asgard/asgard.backends.mesos.html#module-asgard.backends.mesos">asgard.backends.mesos (módulo)</a>
 </li>
       <li><a href="src/asgard/asgard.backends.mesos.client.html#module-asgard.backends.mesos.client">asgard.backends.mesos.client (módulo)</a>
@@ -175,6 +186,8 @@
       <li><a href="src/asgard/asgard.db.html#module-asgard.db">asgard.db (módulo)</a>
 </li>
       <li><a href="src/asgard/asgard.db.html#module-asgard.db.session">asgard.db.session (módulo)</a>
+</li>
+      <li><a href="src/asgard/asgard.exceptions.html#module-asgard.exceptions">asgard.exceptions (módulo)</a>
 </li>
       <li><a href="src/asgard/asgard.handlers.html#module-asgard.handlers">asgard.handlers (módulo)</a>
 </li>
@@ -260,15 +273,41 @@
         <li><a href="src/asgard/asgard.api.html#asgard.api.agents.calculate_stats">(no módulo asgard.api.agents)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="src/asgard/asgard.api.html#asgard.api.accounts.change_account">change_account() (no módulo asgard.api.accounts)</a>
 </li>
       <li><a href="src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.check_auth_token">check_auth_token() (no módulo asgard.http.auth.auth_required)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.check_jwt_token">check_jwt_token() (no módulo asgard.http.auth.auth_required)</a>
 </li>
       <li><a href="src/asgard/asgard.db.html#asgard.db.session.Session.connection">connection() (método asgard.db.session.Session)</a>
+</li>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.users.UsersBackend.create_user">create_user() (método asgard.backends.users.UsersBackend)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.services.html#asgard.services.users.UsersService.create_user">(método estático asgard.services.users.UsersService)</a>
+</li>
+        <li><a href="src/asgard/asgard.api.html#asgard.api.users.create_user">(no módulo asgard.api.users)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.users.UsersBackend.delete_user">delete_user() (método asgard.backends.users.UsersBackend)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.services.html#asgard.services.users.UsersService.delete_user">(método estático asgard.services.users.UsersService)</a>
+</li>
+        <li><a href="src/asgard/asgard.api.html#asgard.api.users.delete_user">(no módulo asgard.api.users)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="src/asgard/asgard.exceptions.html#asgard.exceptions.DuplicateEntity">DuplicateEntity</a>
 </li>
   </ul></td>
 </tr></table>
@@ -280,8 +319,12 @@
 </li>
       <li><a href="src/asgard/asgard.html#asgard.conf.Settings.Config.env_prefix">env_prefix (atributo asgard.conf.Settings.Config)</a>
 </li>
+      <li><a href="src/asgard/asgard.api.resources.html#asgard.api.resources.users.ErrorDetail">ErrorDetail (classe em asgard.api.resources.users)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="src/asgard/asgard.api.resources.html#asgard.api.resources.users.ErrorResource">ErrorResource (classe em asgard.api.resources.users)</a>
+</li>
       <li><a href="src/asgard/asgard.db.html#asgard.db.session.AsgardDBConnection.execute">execute() (método asgard.db.session.AsgardDBConnection)</a>
 </li>
       <li><a href="src/asgard/asgard.db.html#asgard.db.session.AsgardDBConnection.exists">exists() (método asgard.db.session.AsgardDBConnection)</a>
@@ -324,6 +367,12 @@
         <li><a href="src/asgard/asgard.services.html#asgard.services.accounts.AccountsService.get_accounts">(método estático asgard.services.accounts.AccountsService)</a>
 </li>
       </ul></li>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.users.UsersBackend.get_accounts_from_user">get_accounts_from_user() (método asgard.backends.users.UsersBackend)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.services.html#asgard.services.users.UsersService.get_accounts_from_user">(método estático asgard.services.users.UsersService)</a>
+</li>
+      </ul></li>
       <li><a href="src/asgard/asgard.backends.html#asgard.backends.base.Orchestrator.get_agent_by_id">get_agent_by_id() (método asgard.backends.base.Orchestrator)</a>
 
       <ul>
@@ -354,8 +403,6 @@
         <li><a href="src/asgard/asgard.services.html#asgard.services.users.UsersService.get_alternate_accounts">(método estático asgard.services.users.UsersService)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="src/asgard/asgard.backends.html#asgard.backends.base.AppsBackend.get_app_stats">get_app_stats() (método asgard.backends.base.AppsBackend)</a>
 
       <ul>
@@ -368,6 +415,8 @@
         <li><a href="src/asgard/asgard.services.html#asgard.services.apps.AppsService.get_app_stats">(método estático asgard.services.apps.AppsService)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="src/asgard/asgard.backends.html#asgard.backends.base.AgentsBackend.get_apps_running">get_apps_running() (método asgard.backends.base.AgentsBackend)</a>
 
       <ul>
@@ -394,6 +443,24 @@
 
       <ul>
         <li><a href="src/asgard/asgard.sdk.options.html#asgard.sdk.options.get_option">(no módulo asgard.sdk.options)</a>
+</li>
+      </ul></li>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.users.UsersBackend.get_user_by_id">get_user_by_id() (método asgard.backends.users.UsersBackend)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.services.html#asgard.services.users.UsersService.get_user_by_id">(método estático asgard.services.users.UsersService)</a>
+</li>
+      </ul></li>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.users.UsersBackend.get_users">get_users() (método asgard.backends.users.UsersBackend)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.services.html#asgard.services.users.UsersService.get_users">(método estático asgard.services.users.UsersService)</a>
+</li>
+      </ul></li>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.accounts.AccountsBackend.get_users_from_account">get_users_from_account() (método asgard.backends.accounts.AccountsBackend)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.services.html#asgard.services.accounts.AccountsService.get_users_from_account">(método estático asgard.services.accounts.AccountsService)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -526,8 +593,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="src/asgard/asgard.db.html#asgard.db.session.AsgardDBConnection.release">release() (método asgard.db.session.AsgardDBConnection)</a>
 </li>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.accounts.AccountsBackend.remove_user">remove_user() (método asgard.backends.accounts.AccountsBackend)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="src/asgard/asgard.services.html#asgard.services.accounts.AccountsService.remove_user_from_account">remove_user_from_account() (método estático asgard.services.accounts.AccountsService)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.api.html#asgard.api.accounts.remove_user_from_account">(no módulo asgard.api.accounts)</a>
+</li>
+      </ul></li>
       <li><a href="src/asgard/asgard.math.html#asgard.math.round_up">round_up() (no módulo asgard.math)</a>
 </li>
   </ul></td>
@@ -592,19 +667,39 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="src/asgard/asgard.backends.html#asgard.backends.users.UsersBackend.update_user">update_user() (método asgard.backends.users.UsersBackend)</a>
+
+      <ul>
+        <li><a href="src/asgard/asgard.services.html#asgard.services.users.UsersService.update_user">(método estático asgard.services.users.UsersService)</a>
+</li>
+      </ul></li>
+      <li><a href="src/asgard/asgard.api.html#asgard.api.users.update_user_partial">update_user_partial() (no módulo asgard.api.users)</a>
+</li>
       <li><a href="src/asgard/asgard.models.html#asgard.models.user.User">User (classe em asgard.models.user)</a>
+</li>
+      <li><a href="src/asgard/asgard.api.html#asgard.api.users.user_by_id">user_by_id() (no módulo asgard.api.users)</a>
 </li>
       <li><a href="src/asgard/asgard.models.html#asgard.models.account.Account.user_has_permission">user_has_permission() (método asgard.models.account.Account)</a>
 </li>
       <li><a href="src/asgard/asgard.http.auth.html#asgard.http.auth.auth_required.TokenTypes.USER_TOKEN">USER_TOKEN (atributo asgard.http.auth.auth_required.TokenTypes)</a>
 </li>
-      <li><a href="src/asgard/asgard.models.html#asgard.models.user.UserDB">UserDB (classe em asgard.models.user)</a>
+      <li><a href="src/asgard/asgard.api.resources.html#asgard.api.resources.users.UserAccountsResource">UserAccountsResource (classe em asgard.api.resources.users)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="src/asgard/asgard.models.html#asgard.models.user.UserDB">UserDB (classe em asgard.models.user)</a>
+</li>
+      <li><a href="src/asgard/asgard.api.resources.html#asgard.api.resources.users.UserListResource">UserListResource (classe em asgard.api.resources.users)</a>
+</li>
+      <li><a href="src/asgard/asgard.api.resources.html#asgard.api.resources.users.UserMeResource">UserMeResource (classe em asgard.api.resources.users)</a>
+</li>
       <li><a href="src/asgard/asgard.api.resources.html#asgard.api.resources.users.UserResource">UserResource (classe em asgard.api.resources.users)</a>
 </li>
       <li><a href="src/asgard/asgard.models.html#asgard.models.account.AccountDB.users">users (atributo asgard.models.account.AccountDB)</a>
+</li>
+      <li><a href="src/asgard/asgard.api.html#asgard.api.accounts.users_from_account">users_from_account() (no módulo asgard.api.accounts)</a>
+</li>
+      <li><a href="src/asgard/asgard.api.html#asgard.api.users.users_list">users_list() (no módulo asgard.api.users)</a>
 </li>
       <li><a href="src/asgard/asgard.backends.html#asgard.backends.users.UsersBackend">UsersBackend (classe em asgard.backends.users)</a>
 </li>
