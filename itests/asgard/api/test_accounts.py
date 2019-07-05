@@ -1,5 +1,4 @@
 import jwt
-from asynctest import skip
 
 from asgard.api import accounts
 from asgard.api.resources.accounts import AccountResource
