@@ -118,6 +118,7 @@ async def delete_user(request: web.Request):
 
 
 @app.route(["/users/{user_id}"], type=RouteTypes.HTTP, methods=["PATCH"])
+@auth_required
 async def update_user_partial(request: web.Request):
     user_id: str = request.match_info["user_id"]
 

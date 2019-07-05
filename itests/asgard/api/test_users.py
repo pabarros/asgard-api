@@ -316,6 +316,13 @@ class UsersTestCase(BaseTestCase):
         resp_data = await resp.json()
         self.assertEqual(UserResource().dict(), resp_data)
 
+    async def test_update_user_auth_required(self):
+        resp = await self.client.patch(
+            f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
+            json={"name": "Novo Nome"},
+        )
+        self.assertEqual(HTTPStatus.UNAUTHORIZED, resp.status)
+
     async def test_update_user_invalid_json(self):
         resp = await self.client.patch(
             f"/users/{USER_WITH_MULTIPLE_ACCOUNTS_ID}",
