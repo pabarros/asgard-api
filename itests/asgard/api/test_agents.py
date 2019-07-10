@@ -182,6 +182,9 @@ class AgentsApiEndpointTest(BaseTestCase):
             self.assertEqual("MESOS", data["agents"][0]["type"])
             self.assertEqual(0, data["agents"][0]["total_apps"])
             self.assertEqual([], data["agents"][0]["applications"])
+            self.assertTrue(
+                "INDISPONIVEL" in data["agents"][0]["errors"]["total_apps"]
+            )
 
     async def test_agents_with_attrs_empty_response(self):
         self._prepare_additional_fixture_data()

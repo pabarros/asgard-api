@@ -101,9 +101,14 @@ class MesosOrchestratorTest(TestCase):
 
     async def test_get_agent_by_id_logs_error_if_failed(self):
         """
-        O campo total_apps retorna com valor 0 caso não tenha sido possível obter a lista de apps rodando em um Agent 
+        O campo total_apps retorna com valor 0 caso não tenha sido possível obter a lista de apps rodando em um Agent.
+        Nesse caso o campo `errors` deverá estar preenchido
         """
-        agent_id = "ead07ffb-5a61-42c9-9386-21b680597e6c-S10"
+        agent_data = get_fixture(
+            "agents/ead07ffb-5a61-42c9-9386-21b680597e6c-S10/info.json"
+        )
+        agent_id = agent_data["id"]
+        agent_hostname = agent_data["hostname"]
         with aioresponses(
             passthrough=[TEST_LOCAL_AIOHTTP_ADDRESS]
         ) as rsps, mock.patch.object(log, "logger") as logger_mock:
@@ -116,7 +121,14 @@ class MesosOrchestratorTest(TestCase):
             self.assertEqual(agent_id, agent.id)
             self.assertEqual([], agent.applications)
             self.assertEqual(0, agent.total_apps)
-            logger_mock.exception.assert_called_with("error")
+            self.assertEqual({"total_apps": "INDISPONIVEL"}, agent.errors)
+            logger_mock.exception.assert_called_with(
+                {
+                    "event": "Erro buscando agent applications",
+                    "agent": agent_id,
+                    "hostname": agent_hostname,
+                }
+            )
 
     async def test_get_agent_by_id_returns_None_for_agent_in_another_namespace(
         self
