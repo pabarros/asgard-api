@@ -84,12 +84,10 @@ class UsersTestCase(BaseTestCase):
                     "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
                     "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
                     "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
-                    "errors": {},
                     "type": "ASGARD",
                 },
                 "current_account": {
                     "id": ACCOUNT_DEV_ID,
-                    "errors": {},
                     "type": "ASGARD",
                     "name": ACCOUNT_DEV_NAME,
                     "namespace": ACCOUNT_DEV_NAMESPACE,
@@ -98,7 +96,6 @@ class UsersTestCase(BaseTestCase):
                 "accounts": [
                     {
                         "id": 11,
-                        "errors": {},
                         "type": "ASGARD",
                         "name": ACCOUNT_INFRA_NAME,
                         "namespace": ACCOUNT_INFRA_NAMESPACE,

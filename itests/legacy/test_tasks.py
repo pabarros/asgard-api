@@ -17,6 +17,7 @@ from itests.util import (
 from tests.utils import get_raw_fixture, with_json_fixture
 
 
+@unittest.skip("")
 class TasksEndpointTest(BaseTestCase):
     async def setUp(self):
         await super(TasksEndpointTest, self).setUp()
