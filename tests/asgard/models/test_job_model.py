@@ -5,7 +5,6 @@ from asgard.models.job import ScheduledJob
 
 class ScheduledJobModelTest(TestCase):
     async def test_serialized_parse_dict_required_fields(self):
-        self.maxDiff = None
         container_spec = {"image": "alpine:3", "network": "BRIDGE"}
         schedule_spec = {
             "value": "20190811T2100+00:00/R",
