@@ -8,6 +8,7 @@ coverage:
       default: off
       unittest:
         flags: unittest
+        threshold: 0
       typehint:
         flags: typehint
     patch:
