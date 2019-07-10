@@ -1,7 +1,7 @@
 from asynctest import TestCase
 from pydantic import ValidationError
 
-from asgard.models.job import ConstraintSpec, ConstraintOperator
+from asgard.models.spec.constraint import ConstraintSpec, ConstraintOperator
 
 
 class ConstraintSpecModelTest(TestCase):
@@ -9,7 +9,6 @@ class ConstraintSpecModelTest(TestCase):
         constraint = ConstraintSpec(
             **{
                 "type": "ASGARD",
-                "errors": {},
                 "label": "workload",
                 "operator": "LIKE",
                 "value": "general",
@@ -26,7 +25,6 @@ class ConstraintSpecModelTest(TestCase):
             ConstraintSpec(
                 **{
                     "type": "ASGARD",
-                    "errors": {},
                     "label": "workload",
                     "operator": "OTHER",
                     "value": "general",
@@ -50,7 +48,6 @@ class ConstraintSpecModelTest(TestCase):
         self.assertEqual(
             {
                 "type": "ASGARD",
-                "errors": {},
                 "label": "workload",
                 "operator": ConstraintOperator.LIKE.value,
                 "value": "general",
