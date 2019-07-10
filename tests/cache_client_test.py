@@ -7,7 +7,6 @@ from hollowman.app import application
 cache.__cache_backend.init_app(application)
 
 
-@skip("")
 class CacheWrapperTest(unittest.TestCase):
     def setUp(self):
         self.logger_patcher = mock.patch.object(cache, "logger")

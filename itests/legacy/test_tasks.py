@@ -3,6 +3,7 @@ import unittest
 from http import HTTPStatus
 
 from responses import RequestsMock
+from tests.utils import get_raw_fixture, with_json_fixture
 
 from asgard.models.account import AccountDB
 from asgard.models.user import UserDB
@@ -14,10 +15,8 @@ from itests.util import (
     USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
     BaseTestCase,
 )
-from tests.utils import get_raw_fixture, with_json_fixture
 
 
-@unittest.skip("")
 class TasksEndpointTest(BaseTestCase):
     async def setUp(self):
         await super(TasksEndpointTest, self).setUp()
