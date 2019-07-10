@@ -1,52 +1,36 @@
-from enum import Enum
 from typing import List, Optional
 
-from pydantic import validator
-
 from asgard.models.base import BaseModel
+from asgard.models.spec.constraint import ConstraintSpec
+from asgard.models.spec.container import ContainerSpec
+from asgard.models.spec.env import EnvSpec
+from asgard.models.spec.fetch import FetchURISpec
+from asgard.models.spec.schedule import ScheduleSpec
 
 
-class FetchURI(BaseModel):
-    uri: str
-    extract: bool = True
-    executable: bool = False
-    cache: bool = False
+class App(BaseModel):
+    type: str = "ASGARD"
+    id: str
+    command: Optional[List[str]]
+    arguments: Optional[List[str]]
+    cpus: float
+    mem: int
+    disk: int = 0
+    container: ContainerSpec
+    env: Optional[List[EnvSpec]]
+    constraints: Optional[List[ConstraintSpec]]
+    fetch: Optional[List[FetchURISpec]]
 
 
-class EnvSpec(BaseModel):
-    name: str
-    value: str
-
-
-class ConstraintOperator(str, Enum):
-    LIKE: str = "LIKE"
-
-
-class ConstraintSpec(BaseModel):
-    type = "ASGARD"
-    label: str
-    operator: ConstraintOperator
-    value: str
-
-
-class ScheduledJob(BaseModel):
+class ScheduledJob(App):
     """
     Modelo que representa uma tarefa agendada, que pode
     rodar em um intervalo de tempo qualquer.
     """
 
-    type: str = "ASGARD"
-    name: str
     description: str
-    command: Optional[List[str]]
-    arguments: Optional[List[str]]
     shell: bool = False
     retries: int = 2
-    cpus: float
-    mem: int
-    disk: int = 0
     enabled: bool = True
     concurrent: bool = False
-    fetch: Optional[List[FetchURI]]
-    env: Optional[List[EnvSpec]]
-    constraints: Optional[List[ConstraintSpec]]
+    schedule: ScheduleSpec
