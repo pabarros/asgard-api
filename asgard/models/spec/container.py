@@ -10,16 +10,16 @@ class ContainerParameterSpec(BaseModel):
     value: str
 
 
-class ContainerVolumeModes(str, Enum):
+class ContainerVolumeModeSpec(str, Enum):
     RO = "RO"
     RW = "RW"
 
 
 class ContainerVolumeSpec(BaseModel):
     type = "ASGARD"
-    containerPath: str
-    hostPath: str
-    mode: ContainerVolumeModes = ContainerVolumeModes.RO
+    container_path: str
+    host_path: str
+    mode: ContainerVolumeModeSpec = ContainerVolumeModeSpec.RO
     persistent: bool = False
     external: bool = False
 

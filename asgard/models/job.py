@@ -9,9 +9,8 @@ from asgard.models.spec.schedule import ScheduleSpec
 
 
 class App(BaseModel):
-    type: str = "ASGARD"
-    id: str
-    command: Optional[List[str]]
+    id: Optional[str]
+    command: Optional[str]
     arguments: Optional[List[str]]
     cpus: float
     mem: int
@@ -27,6 +26,8 @@ class ScheduledJob(App):
     Modelo que representa uma tarefa agendada, que pode
     rodar em um intervalo de tempo qualquer.
     """
+
+    type: str = "ASGARD"
 
     description: str
     shell: bool = False
