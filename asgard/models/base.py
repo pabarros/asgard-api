@@ -8,8 +8,6 @@ BaseModelAlchemy = declarative_base()
 
 
 class BaseModel(PydanticBaseModel):
-    type: str
-
     async def from_alchemy_object(self, alchemy_obj) -> "BaseModel":
         raise NotImplementedError
 

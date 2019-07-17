@@ -34,7 +34,7 @@ class ChronosEnvSpecConverterTest(TestCase):
             asgarg_env_spec
         )
         self.assertEqual(
-            {"key": "MY_ENV", "value": "MY_VALUE"}, chronos_env_spec.dict()
+            [{"key": "MY_ENV", "value": "MY_VALUE"}], chronos_env_spec
         )
 
     async def test_to_client_model_multiple_envs(self):

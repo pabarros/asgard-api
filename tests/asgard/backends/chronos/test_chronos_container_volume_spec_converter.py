@@ -20,7 +20,6 @@ class ChronosContainerVolumeSpecConverterTest(TestCase):
         )
         self.assertEqual(
             {
-                "type": "ASGARD",
                 "container_path": "/var/data",
                 "host_path": "/tmp",
                 "mode": "RW",
@@ -40,11 +39,6 @@ class ChronosContainerVolumeSpecConverterTest(TestCase):
             asgard_volume_spec
         )
         self.assertEqual(
-            {
-                "type": "CHRONOS",
-                "hostPath": "/tmp",
-                "containerPath": "/var/data",
-                "mode": "RO",
-            },
+            {"hostPath": "/tmp", "containerPath": "/var/data", "mode": "RO"},
             chronos_volume_spec.dict(),
         )

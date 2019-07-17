@@ -22,14 +22,12 @@ class ChronosFetchURLSpecConverterTest(TestCase):
         self.assertEqual(
             [
                 {
-                    "type": "ASGARD",
                     "uri": chronos_fetch_list[0]["uri"],
                     "executable": False,
                     "extract": True,
                     "cache": False,
                 },
                 {
-                    "type": "ASGARD",
                     "uri": chronos_fetch_list[1]["uri"],
                     "executable": False,
                     "extract": False,
@@ -61,8 +59,8 @@ class ChronosFetchURLSpecConverterTest(TestCase):
         ]
 
         expected_asgard_fetch_list = [
-            {"type": "ASGARD", **base_fetch_list[0]},
-            {"type": "ASGARD", **base_fetch_list[1]},
+            {**base_fetch_list[0]},
+            {**base_fetch_list[1]},
         ]
 
         asgard_fetch_list = [

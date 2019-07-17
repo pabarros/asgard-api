@@ -33,16 +33,15 @@ class ScheduledJobModelTest(TestCase):
                 "pull_image": True,
                 "volumes": None,
                 "ports": None,
-                "type": "ASGARD",
+                "type": "DOCKER",
             },
-            "schedule": {**schedule_spec, "type": "ASGARD"},
+            "schedule": {**schedule_spec},
             "env": None,
             "constraints": None,
             "fetch": None,
             "shell": False,
             "retries": 2,
             "enabled": True,
-            "type": "ASGARD",
         }
         self.assertEqual(
             full_scheduled_job,

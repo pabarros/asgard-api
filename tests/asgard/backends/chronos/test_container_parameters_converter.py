@@ -18,11 +18,7 @@ class TestContainerParameterSpecConverter(TestCase):
             chronos_container_param
         )
         self.assertEqual(
-            {
-                "type": "ASGARD",
-                "name": "a-docker-option",
-                "value": "a-docker-value",
-            },
+            {"name": "a-docker-option", "value": "a-docker-value"},
             asgard_container_param.dict(),
         )
 
@@ -34,6 +30,5 @@ class TestContainerParameterSpecConverter(TestCase):
             asgard_container_param
         )
         self.assertEqual(
-            {"type": "CHRONOS", "key": "dns", "value": "10.0.0.1"},
-            chronos_container_param.dict(),
+            {"key": "dns", "value": "10.0.0.1"}, chronos_container_param.dict()
         )

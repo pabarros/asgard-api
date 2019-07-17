@@ -9,14 +9,12 @@ class ChronosEnvSpec(BaseModel):
 
 
 class ChronosContainerVolumeSpec(BaseModel):
-    type = "CHRONOS"
     containerPath: str
     hostPath: str
     mode: str
 
 
 class ChronosContainerParameterSpec(BaseModel):
-    type = "CHRONOS"
     key: str
     value: str
 

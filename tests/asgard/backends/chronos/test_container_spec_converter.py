@@ -18,16 +18,11 @@ class ChronosContainerSpecConverterTest(TestCase):
             "image": "alpine:3.4",
             "network": "BRIDGE",
             "parameters": [
-                {
-                    "type": "ASGARD",
-                    "name": "a-docker-option",
-                    "value": "a-docker-value",
-                },
-                {"type": "ASGARD", "name": "b-docker-option", "value": "yyy"},
+                {"name": "a-docker-option", "value": "a-docker-value"},
+                {"name": "b-docker-option", "value": "yyy"},
             ],
             "volumes": [
                 {
-                    "type": "ASGARD",
                     "container_path": "/var/log/",
                     "host_path": "/logs/",
                     "mode": "RW",
@@ -62,16 +57,8 @@ class ChronosContainerSpecConverterTest(TestCase):
                 "image": "alpine:3.4",
                 "network": "BRIDGE",
                 "parameters": [
-                    {
-                        "key": "a-docker-option",
-                        "type": "CHRONOS",
-                        "value": "a-docker-value",
-                    },
-                    {
-                        "key": "b-docker-option",
-                        "type": "CHRONOS",
-                        "value": "yyy",
-                    },
+                    {"key": "a-docker-option", "value": "a-docker-value"},
+                    {"key": "b-docker-option", "value": "yyy"},
                 ],
                 "type": "CHRONOS",
                 "volumes": [
@@ -79,7 +66,6 @@ class ChronosContainerSpecConverterTest(TestCase):
                         "containerPath": "/var/log/",
                         "hostPath": "/logs/",
                         "mode": "RW",
-                        "type": "CHRONOS",
                     }
                 ],
             },

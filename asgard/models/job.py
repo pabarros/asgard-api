@@ -27,8 +27,6 @@ class ScheduledJob(App):
     rodar em um intervalo de tempo qualquer.
     """
 
-    type: str = "ASGARD"
-
     description: str
     shell: bool = False
     retries: int = 2

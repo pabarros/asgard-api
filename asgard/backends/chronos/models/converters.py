@@ -42,7 +42,6 @@ class ChronosScheduledJobConverter(
                 other.constraints
             )
         return ScheduledJob(
-            type="CHRONOS",
             id=other.name,
             description=other.description,
             command=other.command,

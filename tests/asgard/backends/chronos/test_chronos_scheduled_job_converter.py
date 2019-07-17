@@ -13,23 +13,19 @@ class ChronosScheduledJobConverterTest(TestCase):
         self.maxDiff = None
 
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
-    async def test_convert_to_asgard_model_root_fields(
+    async def test_convert_to_asgard_model_full_model(
         self, chronos_job_fixture
     ):
         """
-        Validamos a transformação de campos simples (não compostos) e que estão
-        na raiz do objeto
+        Validamos a transformação de todos os campos e sub-campos.
         """
         chronos_job = ChronosJob(**chronos_job_fixture)
         asgard_scheduled_job = ChronosScheduledJobConverter.to_asgard_model(
             chronos_job
         )
         asgard_scheduled_job_dict = asgard_scheduled_job.dict()
-        del asgard_scheduled_job_dict["container"]
-        del asgard_scheduled_job_dict["schedule"]
         self.assertEqual(
             {
-                "type": "CHRONOS",
                 "id": chronos_job_fixture["name"],
                 "description": chronos_job_fixture["description"],
                 "enabled": True,
@@ -41,19 +37,57 @@ class ChronosScheduledJobConverterTest(TestCase):
                 "disk": 0,
                 "retries": 2,
                 "concurrent": False,
-                "env": None,
-                "fetch": None,
-                "constraints": None,
+                "container": {
+                    "image": "alpine:3.4",
+                    "ports": None,
+                    "privileged": False,
+                    "pull_image": False,
+                    "type": "DOCKER",
+                    "network": "BRIDGE",
+                    "parameters": [
+                        {"name": "a-docker-option", "value": "a-docker-value"},
+                        {"name": "b-docker-option", "value": "yyy"},
+                    ],
+                    "volumes": [
+                        {
+                            "container_path": "/var/log/",
+                            "host_path": "/logs/",
+                            "mode": "RW",
+                            "persistent": False,
+                            "external": False,
+                        }
+                    ],
+                },
+                "env": {
+                    "ENV_1": "VALUE_1",
+                    "ENV_2": "VALUE_2",
+                    "ENV_3": "VALUE_3",
+                },
+                "fetch": [
+                    {
+                        "uri": "file:///etc/docker.tar.bz2",
+                        "executable": False,
+                        "cache": False,
+                        "extract": True,
+                    },
+                    {
+                        "uri": "https://static.server.com/file.txt",
+                        "executable": False,
+                        "cache": False,
+                        "extract": False,
+                    },
+                ],
+                "constraints": [
+                    "hostname:LIKE:10.0.0.1",
+                    "workload:LIKE:general",
+                ],
+                "schedule": {
+                    "value": "R/2019-07-12T12:00:00.000Z/PT24H",
+                    "tz": "UTC",
+                },
             },
             asgard_scheduled_job_dict,
         )
-
-    async def test_convert_to_asgard_models_full_model(self):
-        """
-        Confere que um modelo completo (todos os campos e sub-campos) são
-        convertidos corretamente.
-        """
-        self.fail()
 
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
     async def test_convert_to_asgard_model_enabled_field(
@@ -84,7 +118,6 @@ class ChronosScheduledJobConverterTest(TestCase):
         asgard_job = ChronosScheduledJobConverter.to_asgard_model(chronos_job)
         self.assertEqual(
             {
-                "type": "ASGARD",
                 "value": chronos_job_fixture["schedule"],
                 "tz": chronos_job_fixture["scheduleTimeZone"],
             },
@@ -108,12 +141,10 @@ class ChronosScheduledJobConverterTest(TestCase):
                 "privileged": False,
                 "parameters": [
                     {
-                        "type": "ASGARD",
                         "name": chronos_param_dict[0]["key"],
                         "value": chronos_param_dict[0]["value"],
                     },
                     {
-                        "type": "ASGARD",
                         "name": chronos_param_dict[1]["key"],
                         "value": chronos_param_dict[1]["value"],
                     },
@@ -128,7 +159,6 @@ class ChronosScheduledJobConverterTest(TestCase):
                         "mode": "RW",
                         "external": False,
                         "persistent": False,
-                        "type": "ASGARD",
                     }
                 ],
             },
@@ -153,14 +183,12 @@ class ChronosScheduledJobConverterTest(TestCase):
         self.assertEqual(
             [
                 {
-                    "type": "ASGARD",
                     "uri": "file:///etc/docker.tar.bz2",
                     "executable": False,
                     "cache": False,
                     "extract": True,
                 },
                 {
-                    "type": "ASGARD",
                     "uri": "https://static.server.com/file.txt",
                     "executable": False,
                     "cache": False,
