@@ -44,7 +44,20 @@
    "errorsSinceLastSuccess" : 0,
    "executor" : "",
    "executorFlags" : "",
-   "fetch" : [],
+   "fetch" : [
+     {
+       "uri": "file:///etc/docker.tar.bz2",
+       "executable": false,
+       "cache": false,
+       "extract": true
+     },
+    {
+       "uri": "https://static.server.com/file.txt",
+       "executable": false,
+       "cache": false,
+       "extract": false
+     }
+   ],
    "highPriority" : false,
    "lastError" : "",
    "lastSuccess" : "",

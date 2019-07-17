@@ -7,6 +7,7 @@ from asgard.clients.chronos.models.job import (
     ChronosContainerVolumeSpec,
     ChronosContainerSpec,
     ChronosEnvSpec,
+    ChronosFetchURLSpec,
 )
 from asgard.models.job import ScheduledJob
 from asgard.models.spec.container import (
@@ -15,6 +16,7 @@ from asgard.models.spec.container import (
     ContainerVolumeSpec,
 )
 from asgard.models.spec.env import EnvSpec
+from asgard.models.spec.fetch import FetchURLSpec
 from asgard.models.spec.schedule import ScheduleSpec
 
 
@@ -26,6 +28,11 @@ class ChronosScheduledJobConverter(
         if other.environmentVariables:
             env_dict = ChronosEnvSpecConverter.to_asgard_model(
                 other.environmentVariables
+            )
+
+        if other.fetch:
+            fetch_list = ChronosFetchURLSpecConverter.to_asgard_model(
+                other.fetch
             )
         return ScheduledJob(
             type="CHRONOS",
@@ -45,6 +52,7 @@ class ChronosScheduledJobConverter(
                 value=other.schedule, tz=other.scheduleTimeZone
             ),
             env=env_dict,
+            fetch=fetch_list,
         )
 
     @classmethod
@@ -156,3 +164,40 @@ class ChronosEnvSpecConverter(
             env_spec_list.append(ChronosEnvSpec(key=key, value=value))
 
         return env_spec_list
+
+
+class ChronosFetchURLSpecConverter(
+    ModelConverterInterface[List[FetchURLSpec], List[ChronosFetchURLSpec]]
+):
+    @classmethod
+    def to_asgard_model(
+        cls, other: List[ChronosFetchURLSpec]
+    ) -> List[FetchURLSpec]:
+        fetch_list: List[FetchURLSpec] = []
+        for fetch_item in other:
+            fetch_list.append(
+                FetchURLSpec(
+                    type="ASGARD",
+                    uri=fetch_item.uri,
+                    executable=fetch_item.executable,
+                    cache=fetch_item.cache,
+                    extract=fetch_item.extract,
+                )
+            )
+        return fetch_list
+
+    @classmethod
+    def to_client_model(
+        cls, other: List[FetchURLSpec]
+    ) -> List[ChronosFetchURLSpec]:
+        fetch_list: List[ChronosFetchURLSpec] = []
+        for fetch_item in other:
+            fetch_list.append(
+                ChronosFetchURLSpec(
+                    uri=fetch_item.uri,
+                    executable=fetch_item.executable,
+                    cache=fetch_item.cache,
+                    extract=fetch_item.extract,
+                )
+            )
+        return fetch_list

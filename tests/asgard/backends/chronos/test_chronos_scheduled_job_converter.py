@@ -148,7 +148,27 @@ class ChronosScheduledJobConverterTest(TestCase):
     async def test_convert_to_asgard_model_fetch_field(
         self, chronos_job_fixture
     ):
-        self.fail()
+        chronos_job = ChronosJob(**chronos_job_fixture)
+        asgard_job = ChronosScheduledJobConverter.to_asgard_model(chronos_job)
+        self.assertEqual(
+            [
+                {
+                    "type": "ASGARD",
+                    "uri": "file:///etc/docker.tar.bz2",
+                    "executable": False,
+                    "cache": False,
+                    "extract": True,
+                },
+                {
+                    "type": "ASGARD",
+                    "uri": "https://static.server.com/file.txt",
+                    "executable": False,
+                    "cache": False,
+                    "extract": False,
+                },
+            ],
+            asgard_job.fetch,
+        )
 
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
     async def test_convert_to_asgard_model_constraints_field(

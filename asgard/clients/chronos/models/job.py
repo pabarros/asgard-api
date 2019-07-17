@@ -29,6 +29,13 @@ class ChronosContainerSpec(BaseModel):
     forcePullImage: bool = True
     volumes: Optional[List[ChronosContainerVolumeSpec]]
 
+class ChronosFetchURLSpec(BaseModel):
+    type = "CHRONOS"
+    uri: str
+    executable: bool = False
+    cache: bool = False
+    extract: bool = True
+
 
 class ChronosJob(BaseModel):
     name: str
@@ -46,5 +53,5 @@ class ChronosJob(BaseModel):
     scheduleTimeZone: str
     environmentVariables: Optional[List[ChronosEnvSpec]]
     container: ChronosContainerSpec
+    fetch: Optional[List[ChronosFetchURLSpec]]
     # constraints:
-    # fetch:
