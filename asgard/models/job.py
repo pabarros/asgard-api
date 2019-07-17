@@ -4,7 +4,7 @@ from asgard.models.base import BaseModel
 from asgard.models.spec.constraint import ConstraintSpec
 from asgard.models.spec.container import ContainerSpec
 from asgard.models.spec.env import EnvSpec
-from asgard.models.spec.fetch import FetchURISpec
+from asgard.models.spec.fetch import FetchURLSpec
 from asgard.models.spec.schedule import ScheduleSpec
 
 
@@ -17,8 +17,8 @@ class App(BaseModel):
     disk: int = 0
     container: ContainerSpec
     env: Optional[EnvSpec]
-    constraints: Optional[List[ConstraintSpec]]
-    fetch: Optional[List[FetchURISpec]]
+    constraints: Optional[ConstraintSpec]
+    fetch: Optional[List[FetchURLSpec]]
 
 
 class ScheduledJob(App):

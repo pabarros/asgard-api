@@ -8,8 +8,10 @@ from asgard.clients.chronos.models.job import (
     ChronosContainerSpec,
     ChronosEnvSpec,
     ChronosFetchURLSpec,
+    ChronosConstraintSpec,
 )
 from asgard.models.job import ScheduledJob
+from asgard.models.spec.constraint import ConstraintSpec
 from asgard.models.spec.container import (
     ContainerSpec,
     ContainerParameterSpec,
@@ -34,6 +36,11 @@ class ChronosScheduledJobConverter(
             fetch_list = ChronosFetchURLSpecConverter.to_asgard_model(
                 other.fetch
             )
+
+        if other.constraints:
+            constraints_list = ChronosConstraintSpecConverter.to_asgard_model(
+                other.constraints
+            )
         return ScheduledJob(
             type="CHRONOS",
             id=other.name,
@@ -53,6 +60,7 @@ class ChronosScheduledJobConverter(
             ),
             env=env_dict,
             fetch=fetch_list,
+            constraints=constraints_list,
         )
 
     @classmethod
@@ -201,3 +209,22 @@ class ChronosFetchURLSpecConverter(
                 )
             )
         return fetch_list
+
+
+class ChronosConstraintSpecConverter(
+    ModelConverterInterface[ConstraintSpec, ChronosConstraintSpec]
+):
+    @classmethod
+    def to_asgard_model(cls, other: ChronosConstraintSpec) -> ConstraintSpec:
+        constraint_spec: ConstraintSpec = []
+        for item in other:
+            constraint_spec.append(f"{item[0]}:{item[1]}:{item[2]}")
+        return constraint_spec
+
+    @classmethod
+    def to_client_model(cls, other: ConstraintSpec) -> ChronosConstraintSpec:
+        constraint_spec: ChronosConstraintSpec = []
+        for item in other:
+            parts = item.split(":")
+            constraint_spec.append([parts[0], parts[1], parts[2]])
+        return constraint_spec

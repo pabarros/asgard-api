@@ -174,7 +174,43 @@ class ChronosScheduledJobConverterTest(TestCase):
     async def test_convert_to_asgard_model_constraints_field(
         self, chronos_job_fixture
     ):
-        self.fail()
+        chronos_job = ChronosJob(**chronos_job_fixture)
+        asgard_job = ChronosScheduledJobConverter.to_asgard_model(chronos_job)
+        self.assertEqual(
+            ["hostname:LIKE:10.0.0.1", "workload:LIKE:general"],
+            asgard_job.constraints,
+        )
+
+    async def test_to_client_model_env_field(self):
+
+        asgard_dict_with_env_data = {
+            "cpus": 1,
+            "mem": 32,
+            "description": "Example",
+            "schedule": {"value": "2019"},
+            "container": {"image": "alpine", "network": "BRIDGE"},
+            "env": {
+                "SERVICE_A_ADDRESS": "https://a.service.local",
+                "SERVICE_B_ADDRESS": "https://b.service.local",
+            },
+        }
+        asgard_scheduled_job = ScheduledJob(**asgard_dict_with_env_data)
+        chronos_job = ChronosScheduledJobConverter.to_client_model(
+            asgard_scheduled_job
+        )
+        self.assertEqual(
+            [
+                {
+                    "key": "SERVICE_A_ADDRESS",
+                    "value": "https://a.service.local",
+                },
+                {
+                    "key": "SERVICE_B_ADDRESS",
+                    "value": "https://b.service.local",
+                },
+            ],
+            chronos_job.environmentVariables.dict(),
+        )
 
     async def test_convert_to_client_model(self):
         self.fail()
