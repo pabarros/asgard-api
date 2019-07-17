@@ -5,6 +5,7 @@ from asgard.backends.chronos.models.converters import (
     ChronosScheduledJobConverter,
 )
 from asgard.clients.chronos.models.job import ChronosJob
+from asgard.models.job import ScheduledJob
 
 
 class ChronosScheduledJobConverterTest(TestCase):
@@ -136,7 +137,12 @@ class ChronosScheduledJobConverterTest(TestCase):
 
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
     async def test_convert_to_asgard_model_env_field(self, chronos_job_fixture):
-        self.fail()
+        chronos_job = ChronosJob(**chronos_job_fixture)
+        asgard_job = ChronosScheduledJobConverter.to_asgard_model(chronos_job)
+        self.assertEqual(
+            {"ENV_1": "VALUE_1", "ENV_2": "VALUE_2", "ENV_3": "VALUE_3"},
+            asgard_job.dict()["env"],
+        )
 
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
     async def test_convert_to_asgard_model_fetch_field(

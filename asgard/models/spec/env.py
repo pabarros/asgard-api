@@ -1,6 +1,3 @@
-from asgard.models.base import BaseModel
+from typing import Dict
 
-
-class EnvSpec(BaseModel):
-    name: str
-    value: str
+EnvSpec = Dict[str, str]

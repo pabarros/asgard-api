@@ -1,9 +1,12 @@
+from typing import List
+
 from asgard.backends.models.converters import ModelConverterInterface
 from asgard.clients.chronos.models.job import (
     ChronosJob,
     ChronosContainerParameterSpec,
     ChronosContainerVolumeSpec,
     ChronosContainerSpec,
+    ChronosEnvSpec,
 )
 from asgard.models.job import ScheduledJob
 from asgard.models.spec.container import (
@@ -11,6 +14,7 @@ from asgard.models.spec.container import (
     ContainerParameterSpec,
     ContainerVolumeSpec,
 )
+from asgard.models.spec.env import EnvSpec
 from asgard.models.spec.schedule import ScheduleSpec
 
 
@@ -19,6 +23,10 @@ class ChronosScheduledJobConverter(
 ):
     @classmethod
     def to_asgard_model(cls, other: ChronosJob) -> ScheduledJob:
+        if other.environmentVariables:
+            env_dict = ChronosEnvSpecConverter.to_asgard_model(
+                other.environmentVariables
+            )
         return ScheduledJob(
             type="CHRONOS",
             id=other.name,
@@ -36,6 +44,7 @@ class ChronosScheduledJobConverter(
             schedule=ScheduleSpec(
                 value=other.schedule, tz=other.scheduleTimeZone
             ),
+            env=env_dict,
         )
 
     @classmethod
@@ -128,3 +137,22 @@ class ChronosContainerSpecConverter(
             forcePullImage=other.pull_image,
             volumes=volumes,
         )
+
+
+class ChronosEnvSpecConverter(
+    ModelConverterInterface[EnvSpec, List[ChronosEnvSpec]]
+):
+    @classmethod
+    def to_asgard_model(cls, other: List[ChronosEnvSpec]) -> EnvSpec:
+        env_dict: EnvSpec = {}
+        for other_item in other:
+            env_dict[other_item.key] = other_item.value
+        return env_dict
+
+    @classmethod
+    def to_client_model(cls, other: EnvSpec) -> List[ChronosEnvSpec]:
+        env_spec_list: List[ChronosEnvSpec] = []
+        for key, value in other.items():
+            env_spec_list.append(ChronosEnvSpec(key=key, value=value))
+
+        return env_spec_list

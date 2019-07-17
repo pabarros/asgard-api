@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from asgard.models.base import BaseModel
 from asgard.models.spec.constraint import ConstraintSpec
@@ -16,7 +16,7 @@ class App(BaseModel):
     mem: int
     disk: int = 0
     container: ContainerSpec
-    env: Optional[List[EnvSpec]]
+    env: Optional[EnvSpec]
     constraints: Optional[List[ConstraintSpec]]
     fetch: Optional[List[FetchURISpec]]
 
