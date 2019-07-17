@@ -1,11 +1,11 @@
 from asynctest import TestCase
-from tests.utils import with_json_fixture
 
 from asgard.backends.chronos.models.converters import (
     ChronosFetchURLSpecConverter,
 )
 from asgard.clients.chronos.models.job import ChronosFetchURLSpec
 from asgard.models.spec.fetch import FetchURLSpec
+from tests.utils import with_json_fixture
 
 
 class ChronosFetchURLSpecConverterTest(TestCase):

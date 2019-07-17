@@ -1,11 +1,11 @@
 from asynctest import TestCase
-from tests.utils import with_json_fixture
 
 from asgard.backends.chronos.models.converters import (
     ChronosContainerSpecConverter,
 )
 from asgard.clients.chronos.models.job import ChronosContainerSpec
 from asgard.models.spec.container import ContainerSpec
+from tests.utils import with_json_fixture
 
 
 class ChronosContainerSpecConverterTest(TestCase):
