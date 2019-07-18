@@ -204,14 +204,14 @@ class ChronosEnvSpecConverter(
     def to_asgard_model(cls, other: List[ChronosEnvSpec]) -> EnvSpec:
         env_dict: EnvSpec = {}
         for other_item in other:
-            env_dict[other_item.key] = other_item.value
+            env_dict[other_item.name] = other_item.value
         return env_dict
 
     @classmethod
     def to_client_model(cls, other: EnvSpec) -> List[ChronosEnvSpec]:
         env_spec_list: List[ChronosEnvSpec] = []
-        for key, value in other.items():
-            env_spec_list.append(ChronosEnvSpec(key=key, value=value))
+        for name, value in other.items():
+            env_spec_list.append(ChronosEnvSpec(name=name, value=value))
 
         return env_spec_list
 
