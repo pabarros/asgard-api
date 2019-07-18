@@ -34,12 +34,26 @@ class ChronosContainerSpecConverterTest(TestCase):
 
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
     async def test_to_asgard_model(self, chronos_job_fixture):
-        self.maxDiff = None
         chronos_container_dict = chronos_job_fixture["container"]
         chronos_container_spec = ChronosContainerSpec(**chronos_container_dict)
         asgard_container_spec = ChronosContainerSpecConverter.to_asgard_model(
             chronos_container_spec
         )
+        self.assertEqual(
+            self.expected_asgard_container_dict, asgard_container_spec.dict()
+        )
+
+    @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
+    async def test_to_asgard_model_required_fields(self, chronos_job_fixture):
+        chronos_container_dict = chronos_job_fixture["container"]
+        del chronos_container_dict["parameters"]
+        del chronos_container_dict["volumes"]
+        chronos_container_spec = ChronosContainerSpec(**chronos_container_dict)
+        asgard_container_spec = ChronosContainerSpecConverter.to_asgard_model(
+            chronos_container_spec
+        )
+        self.expected_asgard_container_dict["volumes"] = None
+        self.expected_asgard_container_dict["parameters"] = None
         self.assertEqual(
             self.expected_asgard_container_dict, asgard_container_spec.dict()
         )
@@ -60,7 +74,7 @@ class ChronosContainerSpecConverterTest(TestCase):
                     {"key": "a-docker-option", "value": "a-docker-value"},
                     {"key": "b-docker-option", "value": "yyy"},
                 ],
-                "type": "CHRONOS",
+                "type": "DOCKER",
                 "volumes": [
                     {
                         "containerPath": "/var/log/",
@@ -70,4 +84,26 @@ class ChronosContainerSpecConverterTest(TestCase):
                 ],
             },
             chronos_container_spec.dict(),
+        )
+
+    async def test_to_client_model_only_required_fields(self):
+        del self.expected_asgard_container_dict["parameters"]
+        del self.expected_asgard_container_dict["volumes"]
+        del self.expected_asgard_container_dict["pull_image"]
+        asgard_container_spec = ContainerSpec(
+            **self.expected_asgard_container_dict
+        )
+        chronos_continer_spec = ChronosContainerSpecConverter.to_client_model(
+            asgard_container_spec
+        )
+        self.assertEqual(
+            {
+                "forcePullImage": True,
+                "image": "alpine:3.4",
+                "network": "BRIDGE",
+                "parameters": None,
+                "type": "DOCKER",
+                "volumes": None,
+            },
+            chronos_continer_spec.dict(),
         )

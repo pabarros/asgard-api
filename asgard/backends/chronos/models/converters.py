@@ -27,6 +27,9 @@ class ChronosScheduledJobConverter(
 ):
     @classmethod
     def to_asgard_model(cls, other: ChronosJob) -> ScheduledJob:
+        env_dict = None
+        fetch_list = None
+        constraints_list = None
         if other.environmentVariables:
             env_dict = ChronosEnvSpecConverter.to_asgard_model(
                 other.environmentVariables
@@ -48,6 +51,7 @@ class ChronosScheduledJobConverter(
             arguments=other.arguments,
             cpus=other.cpus,
             mem=other.mem,
+            disk=other.disk,
             pull_image=other.container.forcePullImage,
             enabled=not other.disabled,
             shell=other.shell,
@@ -64,7 +68,42 @@ class ChronosScheduledJobConverter(
 
     @classmethod
     def to_client_model(cls, other: ScheduledJob) -> ChronosJob:
-        pass
+        env_list = None
+        fetch_list = None
+        constraints_list = None
+        if other.env:
+            env_list = ChronosEnvSpecConverter.to_client_model(other.env)
+
+        if other.fetch:
+            fetch_list = ChronosFetchURLSpecConverter.to_client_model(
+                other.fetch
+            )
+
+        if other.constraints:
+            constraints_list = ChronosConstraintSpecConverter.to_client_model(
+                other.constraints
+            )
+        return ChronosJob(
+            name=other.id,
+            command=other.command,
+            arguments=other.arguments,
+            description=other.description,
+            cpus=other.cpus,
+            shell=other.shell,
+            retires=other.retries,
+            disabled=not other.enabled,
+            concurrent=other.concurrent,
+            mem=other.mem,
+            disk=other.disk,
+            schedule=other.schedule.value,
+            scheduleTimeZone=other.schedule.tz,
+            container=ChronosContainerSpecConverter.to_client_model(
+                other.container
+            ),
+            environmentVariables=env_list,
+            fetch=fetch_list,
+            constraints=constraints_list,
+        )
 
 
 class ChronosContainerParameterSpecConverter(
@@ -114,6 +153,8 @@ class ChronosContainerSpecConverter(
 ):
     @classmethod
     def to_asgard_model(cls, other: ChronosContainerSpec) -> ContainerSpec:
+        params = None
+        volumes = None
         if other.parameters:
             params = [
                 ChronosContainerParameterSpecConverter.to_asgard_model(p)
@@ -135,6 +176,8 @@ class ChronosContainerSpecConverter(
 
     @classmethod
     def to_client_model(cls, other: ContainerSpec) -> ChronosContainerSpec:
+        params = None
+        volumes = None
         if other.parameters:
             params = [
                 ChronosContainerParameterSpecConverter.to_client_model(p)
