@@ -1,11 +1,11 @@
-from asynctest import TestCase, skip
+from asynctest import TestCase
+from tests.utils import with_json_fixture
 
 from asgard.backends.chronos.models.converters import (
     ChronosScheduledJobConverter,
 )
 from asgard.clients.chronos.models.job import ChronosJob
 from asgard.models.job import ScheduledJob
-from tests.utils import with_json_fixture
 
 
 class ChronosScheduledJobConverterTest(TestCase):
