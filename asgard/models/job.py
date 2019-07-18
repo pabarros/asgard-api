@@ -1,4 +1,7 @@
+import re
 from typing import List, Optional, Dict
+
+from pydantic import validator
 
 from asgard.models.base import BaseModel
 from asgard.models.spec.constraint import ConstraintSpec
@@ -19,6 +22,13 @@ class App(BaseModel):
     env: Optional[EnvSpec]
     constraints: Optional[ConstraintSpec]
     fetch: Optional[List[FetchURLSpec]]
+
+    @validator("id")
+    def validate_id(cls, v):
+        if v:
+            if not re.match(v, r"[a-z0-9-]+"):
+                raise ValueError("id must match [a-z0-9-]+")
+        return v
 
 
 class ScheduledJob(App):
