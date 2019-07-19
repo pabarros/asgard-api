@@ -1,15 +1,15 @@
+import aiohttp
 from asynctest import TestCase
 from asynctest.mock import CoroutineMock
-from tests.utils import with_json_fixture
 
 from asgard.backends.chronos.impl import ChronosScheduledJobsBackend
 from asgard.clients.chronos import ChronosClient
 from asgard.conf import settings
 from asgard.http.client import http_client
 from asgard.models.account import Account
-from asgard.models.job import ScheduledJob
 from asgard.models.user import User
 from itests.util import USER_WITH_MULTIPLE_ACCOUNTS_DICT, ACCOUNT_DEV_DICT
+from tests.utils import with_json_fixture
 
 
 class ChronosScheduledJobsBackendTest(TestCase):
@@ -50,4 +50,20 @@ class ChronosScheduledJobsBackendTest(TestCase):
         job_id = "scheduled-job"
 
         job = await self.backend.get_job_by_id(job_id, user, account)
-        self.assertEqual(f"{account.namespace}-{job_id}", job.id)
+        self.assertEqual(job_id, job.id)
+
+    async def test_get_job_by_id_service_unavailable(self):
+        """
+        Por enquanto deixamos o erro ser propagado.
+        """
+        get_job_by_id_mock = CoroutineMock(
+            side_effect=aiohttp.ClientConnectionError()
+        )
+        self.backend.client = CoroutineMock(spec=ChronosClient)
+        self.backend.client.get_job_by_id = get_job_by_id_mock
+
+        user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
+        account = Account(**ACCOUNT_DEV_DICT)
+
+        with self.assertRaises(aiohttp.ClientConnectionError):
+            await self.backend.get_job_by_id("job-id", user, account)

@@ -1,7 +1,5 @@
 from typing import Optional
 
-import aiohttp
-
 from asgard.backends.chronos.models.converters import (
     ChronosScheduledJobConverter,
 )
@@ -27,12 +25,8 @@ class ChronosScheduledJobsBackend(ScheduledJobsBackend):
                 scheduled_job = ChronosScheduledJobConverter.to_asgard_model(
                     chronos_job
                 )
+                scheduled_job.remove_namespace(account)
                 return scheduled_job
         except Http404:
             return None
         return None
-
-    async def update_job(
-        self, job: ScheduledJobsBackend
-    ) -> ScheduledJobsBackend:
-        pass
