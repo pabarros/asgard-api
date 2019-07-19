@@ -1,3 +1,4 @@
+import asyncio
 from http import HTTPStatus
 
 from asgard.api import jobs
@@ -39,11 +40,13 @@ class JobsEndpointTestCase(BaseTestCase):
 
         chronos_job_fixture["name"] = f"{self.account.namespace}-my-job"
         async with http_client as client:
-            await client.post(
+            resp = await client.post(
                 f"{settings.SCHEDULED_JOBS_SERVICE_ADDRESS}/v1/scheduler/iso8601",
                 json=chronos_job_fixture,
             )
 
+        # Para dar tempo do chronos registra e responder no request log abaixo
+        await asyncio.sleep(1)
         asgard_job = ChronosScheduledJobConverter.to_asgard_model(
             ChronosJob(**chronos_job_fixture)
         )

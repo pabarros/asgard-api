@@ -1,3 +1,5 @@
+import asyncio
+
 import aiohttp
 from asynctest import TestCase
 from asynctest.mock import CoroutineMock
@@ -45,6 +47,8 @@ class ChronosScheduledJobsBackendTest(TestCase):
                 json=job_fixture,
             )
 
+        # Para dar tempo do chronos registra e responder no request log abaixo
+        await asyncio.sleep(1)
         user = User(**USER_WITH_MULTIPLE_ACCOUNTS_DICT)
         account = Account(**ACCOUNT_DEV_DICT)
         job_id = "scheduled-job"
