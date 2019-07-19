@@ -1,3 +1,4 @@
+import abc
 import re
 from typing import List, Optional, Dict
 
@@ -12,7 +13,17 @@ from asgard.models.spec.fetch import FetchURLSpec
 from asgard.models.spec.schedule import ScheduleSpec
 
 
-class App(BaseModel):
+class AbstractApp(BaseModel, abc.ABC):
+    @abc.abstractmethod
+    def add_namespace(self, account: Account) -> None:
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def remove_namespace(self, account: Account) -> None:
+        raise NotImplementedError()
+
+
+class App(AbstractApp):
     id: str
     command: Optional[str]
     arguments: Optional[List[str]]
@@ -23,13 +34,6 @@ class App(BaseModel):
     env: Optional[EnvSpec]
     constraints: Optional[ConstraintSpec]
     fetch: Optional[List[FetchURLSpec]]
-
-    @validator("id")
-    def validate_id(cls, v):
-        if v:
-            if not re.match(r"[a-z0-9-]+", v):
-                raise ValueError("id must match [a-z0-9-]+")
-        return v
 
 
 class ScheduledJob(App):
@@ -44,6 +48,13 @@ class ScheduledJob(App):
     enabled: bool = True
     concurrent: bool = False
     schedule: ScheduleSpec
+
+    @validator("id")
+    def validate_id(cls, v):
+        if v:
+            if not re.match(r"[a-z0-9-]+", v):
+                raise ValueError("id must match [a-z0-9-]+")
+        return v
 
     def add_namespace(self, account: Account) -> None:
         """
