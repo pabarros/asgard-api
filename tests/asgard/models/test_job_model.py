@@ -66,6 +66,11 @@ class ScheduledJobModelTest(TestCase):
             self.required_fields_scheduled_job["id"] = "InvalidJobName"
             ScheduledJob(**self.required_fields_scheduled_job)
 
+    async def test_invalid_job_name_with_slash(self):
+        with self.assertRaises(ValidationError):
+            self.required_fields_scheduled_job["id"] = "my/app"
+            ScheduledJob(**self.required_fields_scheduled_job)
+
     async def test_remove_account_namespace_app_id_does_not_have_namespace(
         self
     ):

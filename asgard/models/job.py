@@ -52,7 +52,7 @@ class ScheduledJob(App):
     @validator("id")
     def validate_id(cls, v):
         if v:
-            if not re.match(r"[a-z0-9-]+", v):
+            if not re.match(r"^[a-z0-9-]+$", v):
                 raise ValueError("id must match [a-z0-9-]+")
         return v
 
