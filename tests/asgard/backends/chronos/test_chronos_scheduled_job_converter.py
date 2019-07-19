@@ -242,11 +242,11 @@ class ChronosScheduledJobConverterTest(TestCase):
         self.assertEqual(
             [
                 {
-                    "key": "SERVICE_A_ADDRESS",
+                    "name": "SERVICE_A_ADDRESS",
                     "value": "https://a.service.local",
                 },
                 {
-                    "key": "SERVICE_B_ADDRESS",
+                    "name": "SERVICE_B_ADDRESS",
                     "value": "https://b.service.local",
                 },
             ],
