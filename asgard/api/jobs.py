@@ -1,12 +1,29 @@
+from http import HTTPStatus
+
 from aiohttp import web
 from asyncworker import RouteTypes
 
+from asgard.api.resources.jobs import ScheduledJobResource
 from asgard.app import app
+from asgard.backends.chronos.impl import ChronosScheduledJobsBackend
+from asgard.http.auth import auth_required
+from asgard.models.account import Account
 from asgard.models.job import ScheduledJob
+from asgard.models.user import User
+from asgard.services.jobs import ScheduledJobsService
 
 
-@app.route(["/jobs"], type=RouteTypes.HTTP, methods=["POST"])
+@app.route(["/jobs/{job_id}"], type=RouteTypes.HTTP, methods=["GET"])
+@auth_required
 async def index_jobs(request: web.Request):
-    data = await request.json()
-    job = ScheduledJob(**data)
-    return web.json_response(job.dict())
+    user = await User.from_alchemy_obj(request["user"])
+    account = await Account.from_alchemy_obj(request["user"].current_account)
+    job_id = request.match_info["job_id"]
+
+    scheduled_job = await ScheduledJobsService.get_job_by_id(
+        job_id, user, account, ChronosScheduledJobsBackend()
+    )
+    status_code = HTTPStatus.OK if scheduled_job else HTTPStatus.NOT_FOUND
+    return web.json_response(
+        ScheduledJobResource(job=scheduled_job).dict(), status=status_code
+    )
