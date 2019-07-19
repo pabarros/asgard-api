@@ -3,6 +3,7 @@ from typing import List, Optional, Dict
 
 from pydantic import validator
 
+from asgard.models.account import Account
 from asgard.models.base import BaseModel
 from asgard.models.spec.constraint import ConstraintSpec
 from asgard.models.spec.container import ContainerSpec
@@ -12,7 +13,7 @@ from asgard.models.spec.schedule import ScheduleSpec
 
 
 class App(BaseModel):
-    id: Optional[str]
+    id: str
     command: Optional[str]
     arguments: Optional[List[str]]
     cpus: float
@@ -43,3 +44,15 @@ class ScheduledJob(App):
     enabled: bool = True
     concurrent: bool = False
     schedule: ScheduleSpec
+
+    def add_namespace(self, account: Account) -> None:
+        """
+        Adiciona ao id dessa App o namespace da Account `account`.
+        Para ScheduledJob a formação do nome é diferente, pois o
+        separador é "-".
+        """
+        self.id = f"{account.namespace}-{self.id}"
+
+    def remove_namespace(self, account: Account) -> None:
+        if self.id.startswith(f"{account.namespace}-"):
+            self.id = self.id.replace(f"{account.namespace}-", "", 1)

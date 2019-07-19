@@ -1,7 +1,9 @@
 from asynctest import TestCase
 from pydantic import ValidationError
 
+from asgard.models.account import Account
 from asgard.models.job import ScheduledJob
+from itests.util import ACCOUNT_DEV_DICT
 
 
 class ScheduledJobModelTest(TestCase):
@@ -63,3 +65,99 @@ class ScheduledJobModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self.required_fields_scheduled_job["id"] = "InvalidJobName"
             ScheduledJob(**self.required_fields_scheduled_job)
+
+    async def test_remove_account_namespace_app_id_does_not_have_namespace(
+        self
+    ):
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.assertEqual(self.required_fields_scheduled_job["id"], app.id)
+
+        app.remove_namespace(account)
+        self.assertEqual(self.required_fields_scheduled_job["id"], app.id)
+
+    async def test_remove_namespace_only_once(self):
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.required_fields_scheduled_job[
+            "id"
+        ] = f"{account.namespace}-{account.namespace}-my-app-with-ns"
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+
+        app.remove_namespace(account)
+        expected_app_id = f"{account.namespace}-my-app-with-ns"
+        self.assertEqual(expected_app_id, app.id)
+
+    async def test_remove_namespace_app_id_contains_namespace(self):
+        """
+        Se o namepspace está no meio do nome, não deve ser removido
+        """
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.required_fields_scheduled_job[
+            "id"
+        ] = f"my-app-with-{account.namespace}-ns"
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+
+        app.remove_namespace(account)
+        self.assertEqual(self.required_fields_scheduled_job["id"], app.id)
+
+    async def test_remove_namespace_app_id_begins_with_and_has_namespace_in_name(
+        self
+    ):
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.required_fields_scheduled_job[
+            "id"
+        ] = f"{account.namespace}-my-app-with-{account.namespace}-ns"
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+
+        app.remove_namespace(account)
+        expected_app_id = f"my-app-with-{account.namespace}-ns"
+        self.assertEqual(expected_app_id, app.id)
+
+    async def test_remove_namespace_app_id_begins_with_namespace(self):
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.required_fields_scheduled_job[
+            "id"
+        ] = f"{account.namespace}-my-app-with-ns"
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+
+        app.remove_namespace(account)
+        expected_app_id = "my-app-with-ns"
+        self.assertEqual(expected_app_id, app.id)
+
+    async def test_add_account_namespace_to_name(self):
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.assertEqual(self.required_fields_scheduled_job["id"], app.id)
+
+        app.add_namespace(account)
+        expected_app_id = (
+            f"{account.namespace}-{self.required_fields_scheduled_job['id'] }"
+        )
+        self.assertEqual(expected_app_id, app.id)
+
+    async def test_add_namespace_app_id_begins_with_namespace(self):
+        """
+        Adicionamos o namespace independente da app já ter o nome com
+        exatamente o namespace no começo.
+        """
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.assertEqual(self.required_fields_scheduled_job["id"], app.id)
+
+        app.add_namespace(account)
+        app.add_namespace(account)
+        expected_app_id = f"{account.namespace}-{account.namespace }-{self.required_fields_scheduled_job['id']}"
+        self.assertEqual(expected_app_id, app.id)
+
+    async def test_add_namespace_app_id_has_namespace_in_the_middle(self):
+        account = Account(**ACCOUNT_DEV_DICT)
+        self.required_fields_scheduled_job[
+            "id"
+        ] = f"my-app-with-{account.namespace}-ns"
+        app = ScheduledJob(**self.required_fields_scheduled_job)
+
+        app.add_namespace(account)
+        expected_app_id = (
+            f"{account.namespace}-{self.required_fields_scheduled_job['id'] }"
+        )
+        self.assertEqual(expected_app_id, app.id)
