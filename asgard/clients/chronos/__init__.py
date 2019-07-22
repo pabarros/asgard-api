@@ -22,4 +22,3 @@ class ChronosClient:
                 raise Http404()
             data = await resp.json()
             return ChronosJob(**data)
-        return None
