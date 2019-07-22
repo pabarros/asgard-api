@@ -1,8 +1,6 @@
 import asyncio
 from http import HTTPStatus
 
-from tests.utils import with_json_fixture
-
 from asgard.api import jobs
 from asgard.api.resources.jobs import ScheduledJobResource
 from asgard.app import app
@@ -20,6 +18,7 @@ from itests.util import (
     ACCOUNT_DEV_DICT,
     USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
 )
+from tests.utils import with_json_fixture
 
 
 class JobsEndpointTestCase(BaseTestCase):
