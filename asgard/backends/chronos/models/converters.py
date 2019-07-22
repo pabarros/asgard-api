@@ -208,10 +208,10 @@ class ChronosEnvSpecConverter(
 
     @classmethod
     def to_client_model(cls, other: EnvSpec) -> List[ChronosEnvSpec]:
-        env_spec_list: List[ChronosEnvSpec] = []
-        for name, value in other.items():
-            env_spec_list.append(ChronosEnvSpec(name=name, value=value))
-
+        env_spec_list = [
+            ChronosEnvSpec(name=name, value=value)
+            for name, value in other.items()
+        ]
         return env_spec_list
 
 
