@@ -1,6 +1,8 @@
 import asyncio
 from http import HTTPStatus
 
+from tests.utils import with_json_fixture
+
 from asgard.api import jobs
 from asgard.api.resources.jobs import ScheduledJobResource
 from asgard.app import app
@@ -18,7 +20,6 @@ from itests.util import (
     ACCOUNT_DEV_DICT,
     USER_WITH_MULTIPLE_ACCOUNTS_AUTH_KEY,
 )
-from tests.utils import with_json_fixture
 
 
 class JobsEndpointTestCase(BaseTestCase):
@@ -40,7 +41,7 @@ class JobsEndpointTestCase(BaseTestCase):
 
         chronos_job_fixture["name"] = f"{self.account.namespace}-my-job"
         async with http_client as client:
-            resp = await client.post(
+            await client.post(
                 f"{settings.SCHEDULED_JOBS_SERVICE_ADDRESS}/v1/scheduler/iso8601",
                 json=chronos_job_fixture,
             )
