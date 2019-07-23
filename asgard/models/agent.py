@@ -6,6 +6,7 @@ from asgard.models.base import BaseModel, ModelFactory
 
 
 class Agent(BaseModel, abc.ABC):
+    type: str
     id: str
     hostname: str
     active: bool

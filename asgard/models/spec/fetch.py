@@ -1,7 +1,7 @@
 from asgard.models.base import BaseModel
 
 
-class FetchURISpec(BaseModel):
+class FetchURLSpec(BaseModel):
     uri: str
     extract: bool = True
     executable: bool = False
