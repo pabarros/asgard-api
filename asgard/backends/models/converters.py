@@ -23,8 +23,20 @@ class ModelConverterInterface(Generic[AsgardModel, ClientModel], ABC):
 
     @abstractclassmethod
     def to_asgard_model(cls, other: ClientModel) -> AsgardModel:
+        """
+        Converte um ClientModel em AsgardModel.
+
+        O objetivo desse método é copiar todos os campos do ClientModel em questão
+        para seus respectivos campos em um Asgard Model.
+        """
         raise NotImplementedError
 
     @abstractclassmethod
     def to_client_model(cls, other: AsgardModel) -> ClientModel:
+        """
+        Converte um AsgardModel para ClientModel.
+
+        O objetivo desse método é copiar todos os campos do AsgardModel em questão
+        para seus respectivos campos em um ClientModel.
+        """
         raise NotImplementedError
