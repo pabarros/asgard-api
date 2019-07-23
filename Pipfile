@@ -49,6 +49,7 @@ freezegun = "==0.3.11"
 sphinx = "==2.0.0"
 sphinx-intl = "==0.9.11"
 lxml = "==4.3.4"
+docutils = "==0.15"
 
 [requires]
 python_version = "3"
