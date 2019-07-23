@@ -8,7 +8,7 @@ from asgard.models.spec.env import EnvSpec
 class ChronosEnvSpecConverterTest(TestCase):
     async def test_to_asgard_model(self):
         expected_asgard_env_dict = {"MY_ENV": "MY_VALUE"}
-        chronos_env_spec = ChronosEnvSpec(key="MY_ENV", value="MY_VALUE")
+        chronos_env_spec = ChronosEnvSpec(name="MY_ENV", value="MY_VALUE")
         asgard_env_spec = ChronosEnvSpecConverter.to_asgard_model(
             [chronos_env_spec]
         )
@@ -20,8 +20,8 @@ class ChronosEnvSpecConverterTest(TestCase):
             "OTHER_ENV": "OTHER_VALUE",
         }
         chronos_env_spec = [
-            ChronosEnvSpec(key="MY_ENV", value="MY_VALUE"),
-            ChronosEnvSpec(key="OTHER_ENV", value="OTHER_VALUE"),
+            ChronosEnvSpec(name="MY_ENV", value="MY_VALUE"),
+            ChronosEnvSpec(name="OTHER_ENV", value="OTHER_VALUE"),
         ]
         asgard_env_spec = ChronosEnvSpecConverter.to_asgard_model(
             chronos_env_spec
@@ -34,7 +34,7 @@ class ChronosEnvSpecConverterTest(TestCase):
             asgarg_env_spec
         )
         self.assertEqual(
-            [{"key": "MY_ENV", "value": "MY_VALUE"}], chronos_env_spec
+            [{"name": "MY_ENV", "value": "MY_VALUE"}], chronos_env_spec
         )
 
     async def test_to_client_model_multiple_envs(self):
@@ -47,8 +47,8 @@ class ChronosEnvSpecConverterTest(TestCase):
         )
         self.assertEqual(
             [
-                {"key": "MY_ENV", "value": "MY_VALUE"},
-                {"key": "OTHER_ENV", "value": "OTHER_VALUE"},
+                {"name": "MY_ENV", "value": "MY_VALUE"},
+                {"name": "OTHER_ENV", "value": "OTHER_VALUE"},
             ],
             chronos_env_spec,
         )

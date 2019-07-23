@@ -1,4 +1,4 @@
-from asynctest import TestCase, skip
+from asynctest import TestCase
 
 from asgard.backends.chronos.models.converters import (
     ChronosScheduledJobConverter,
@@ -9,9 +9,6 @@ from tests.utils import with_json_fixture
 
 
 class ChronosScheduledJobConverterTest(TestCase):
-    async def setUp(self):
-        self.maxDiff = None
-
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
     async def test_convert_to_asgard_model_full_model(
         self, chronos_job_fixture
@@ -34,7 +31,7 @@ class ChronosScheduledJobConverterTest(TestCase):
                 "arguments": chronos_job_fixture["arguments"],
                 "cpus": 0.1,
                 "mem": 64,
-                "disk": 0,
+                "disk": 256,
                 "retries": 2,
                 "concurrent": False,
                 "container": {
@@ -88,6 +85,21 @@ class ChronosScheduledJobConverterTest(TestCase):
             },
             asgard_scheduled_job_dict,
         )
+
+    @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
+    async def test_to_asgard_model_required_fields(self, chronos_job_fixture):
+        del chronos_job_fixture["environmentVariables"]
+        del chronos_job_fixture["constraints"]
+        del chronos_job_fixture["fetch"]
+
+        asgard_job = ChronosScheduledJobConverter.to_asgard_model(
+            ChronosJob(**chronos_job_fixture)
+        )
+
+        asgard_job_converted = ChronosScheduledJobConverter.to_asgard_model(
+            ChronosScheduledJobConverter.to_client_model(asgard_job)
+        )
+        self.assertEqual(asgard_job_converted.dict(), asgard_job.dict())
 
     @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
     async def test_convert_to_asgard_model_enabled_field(
@@ -209,10 +221,10 @@ class ChronosScheduledJobConverterTest(TestCase):
             asgard_job.constraints,
         )
 
-    @skip("")
     async def test_to_client_model_env_field(self):
 
         asgard_dict_with_env_data = {
+            "id": "my-app",
             "cpus": 1,
             "mem": 32,
             "description": "Example",
@@ -230,25 +242,67 @@ class ChronosScheduledJobConverterTest(TestCase):
         self.assertEqual(
             [
                 {
-                    "key": "SERVICE_A_ADDRESS",
+                    "name": "SERVICE_A_ADDRESS",
                     "value": "https://a.service.local",
                 },
                 {
-                    "key": "SERVICE_B_ADDRESS",
+                    "name": "SERVICE_B_ADDRESS",
                     "value": "https://b.service.local",
                 },
             ],
-            chronos_job.environmentVariables.dict(),
+            [
+                chronos_job.environmentVariables[0].dict(),
+                chronos_job.environmentVariables[1].dict(),
+            ],
         )
 
-    @skip("")
-    async def test_convert_to_client_model(self):
-        self.fail()
+    @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
+    async def test_to_client_model_disabled_field(self, chronos_job_fixture):
+        asgard_job = ChronosScheduledJobConverter.to_asgard_model(
+            ChronosJob(**chronos_job_fixture)
+        )
+        self.assertFalse(
+            ChronosScheduledJobConverter.to_client_model(asgard_job).disabled
+        )
 
-    @skip("")
-    async def test_convert_to_client_include_sub_models(self):
+        asgard_job.enabled = False
+        self.assertTrue(
+            ChronosScheduledJobConverter.to_client_model(asgard_job).disabled
+        )
+
+    @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
+    async def test_to_client_model_required_fields(self, chronos_job_fixture):
+        asgard_job_dict = ChronosScheduledJobConverter.to_asgard_model(
+            ChronosJob(**chronos_job_fixture)
+        ).dict()
+
+        del asgard_job_dict["env"]
+        del asgard_job_dict["fetch"]
+        del asgard_job_dict["constraints"]
+        chronos_job = ChronosScheduledJobConverter.to_client_model(
+            ScheduledJob(**asgard_job_dict)
+        )
+
+        chronos_converted = ChronosScheduledJobConverter.to_client_model(
+            ChronosScheduledJobConverter.to_asgard_model(chronos_job)
+        )
+
+        self.assertEqual(chronos_converted.dict(), chronos_job.dict())
+
+    @with_json_fixture("scheduled-jobs/chronos/infra-purge-logs-job.json")
+    async def test_convert_to_client_full_model(self, chronos_job_fixture):
         """
         Confirma que os campos que são, na verdade, sub-modelos também são
         incluídos na conversão.
         """
-        self.fail()
+        chronos_job_original = ChronosJob(**chronos_job_fixture)
+        asgard_job = ChronosScheduledJobConverter.to_asgard_model(
+            chronos_job_original
+        )
+
+        chronos_job_converted = ChronosScheduledJobConverter.to_client_model(
+            asgard_job
+        )
+        self.assertEqual(
+            chronos_job_original.dict(), chronos_job_converted.dict()
+        )

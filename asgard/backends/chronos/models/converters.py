@@ -27,6 +27,9 @@ class ChronosScheduledJobConverter(
 ):
     @classmethod
     def to_asgard_model(cls, other: ChronosJob) -> ScheduledJob:
+        env_dict = None
+        fetch_list = None
+        constraints_list = None
         if other.environmentVariables:
             env_dict = ChronosEnvSpecConverter.to_asgard_model(
                 other.environmentVariables
@@ -48,6 +51,7 @@ class ChronosScheduledJobConverter(
             arguments=other.arguments,
             cpus=other.cpus,
             mem=other.mem,
+            disk=other.disk,
             pull_image=other.container.forcePullImage,
             enabled=not other.disabled,
             shell=other.shell,
@@ -64,7 +68,42 @@ class ChronosScheduledJobConverter(
 
     @classmethod
     def to_client_model(cls, other: ScheduledJob) -> ChronosJob:
-        pass
+        env_list = None
+        fetch_list = None
+        constraints_list = None
+        if other.env:
+            env_list = ChronosEnvSpecConverter.to_client_model(other.env)
+
+        if other.fetch:
+            fetch_list = ChronosFetchURLSpecConverter.to_client_model(
+                other.fetch
+            )
+
+        if other.constraints:
+            constraints_list = ChronosConstraintSpecConverter.to_client_model(
+                other.constraints
+            )
+        return ChronosJob(
+            name=other.id,
+            command=other.command,
+            arguments=other.arguments,
+            description=other.description,
+            cpus=other.cpus,
+            shell=other.shell,
+            retires=other.retries,
+            disabled=not other.enabled,
+            concurrent=other.concurrent,
+            mem=other.mem,
+            disk=other.disk,
+            schedule=other.schedule.value,
+            scheduleTimeZone=other.schedule.tz,
+            container=ChronosContainerSpecConverter.to_client_model(
+                other.container
+            ),
+            environmentVariables=env_list,
+            fetch=fetch_list,
+            constraints=constraints_list,
+        )
 
 
 class ChronosContainerParameterSpecConverter(
@@ -114,6 +153,8 @@ class ChronosContainerSpecConverter(
 ):
     @classmethod
     def to_asgard_model(cls, other: ChronosContainerSpec) -> ContainerSpec:
+        params = None
+        volumes = None
         if other.parameters:
             params = [
                 ChronosContainerParameterSpecConverter.to_asgard_model(p)
@@ -125,7 +166,6 @@ class ChronosContainerSpecConverter(
                 for v in other.volumes
             ]
         return ContainerSpec(
-            type="DOCKER",
             image=other.image,
             network=other.network,
             parameters=params,
@@ -135,6 +175,8 @@ class ChronosContainerSpecConverter(
 
     @classmethod
     def to_client_model(cls, other: ContainerSpec) -> ChronosContainerSpec:
+        params = None
+        volumes = None
         if other.parameters:
             params = [
                 ChronosContainerParameterSpecConverter.to_client_model(p)
@@ -161,15 +203,15 @@ class ChronosEnvSpecConverter(
     def to_asgard_model(cls, other: List[ChronosEnvSpec]) -> EnvSpec:
         env_dict: EnvSpec = {}
         for other_item in other:
-            env_dict[other_item.key] = other_item.value
+            env_dict[other_item.name] = other_item.value
         return env_dict
 
     @classmethod
     def to_client_model(cls, other: EnvSpec) -> List[ChronosEnvSpec]:
-        env_spec_list: List[ChronosEnvSpec] = []
-        for key, value in other.items():
-            env_spec_list.append(ChronosEnvSpec(key=key, value=value))
-
+        env_spec_list = [
+            ChronosEnvSpec(name=name, value=value)
+            for name, value in other.items()
+        ]
         return env_spec_list
 
 
@@ -180,33 +222,31 @@ class ChronosFetchURLSpecConverter(
     def to_asgard_model(
         cls, other: List[ChronosFetchURLSpec]
     ) -> List[FetchURLSpec]:
-        fetch_list: List[FetchURLSpec] = []
-        for fetch_item in other:
-            fetch_list.append(
-                FetchURLSpec(
-                    type="ASGARD",
-                    uri=fetch_item.uri,
-                    executable=fetch_item.executable,
-                    cache=fetch_item.cache,
-                    extract=fetch_item.extract,
-                )
+        fetch_list = [
+            FetchURLSpec(
+                type="ASGARD",
+                uri=fetch_item.uri,
+                executable=fetch_item.executable,
+                cache=fetch_item.cache,
+                extract=fetch_item.extract,
             )
+            for fetch_item in other
+        ]
         return fetch_list
 
     @classmethod
     def to_client_model(
         cls, other: List[FetchURLSpec]
     ) -> List[ChronosFetchURLSpec]:
-        fetch_list: List[ChronosFetchURLSpec] = []
-        for fetch_item in other:
-            fetch_list.append(
-                ChronosFetchURLSpec(
-                    uri=fetch_item.uri,
-                    executable=fetch_item.executable,
-                    cache=fetch_item.cache,
-                    extract=fetch_item.extract,
-                )
+        fetch_list = [
+            ChronosFetchURLSpec(
+                uri=fetch_item.uri,
+                executable=fetch_item.executable,
+                cache=fetch_item.cache,
+                extract=fetch_item.extract,
             )
+            for fetch_item in other
+        ]
         return fetch_list
 
 
@@ -215,13 +255,16 @@ class ChronosConstraintSpecConverter(
 ):
     @classmethod
     def to_asgard_model(cls, other: ChronosConstraintSpec) -> ConstraintSpec:
-        constraint_spec: ConstraintSpec = []
-        for item in other:
-            constraint_spec.append(f"{item[0]}:{item[1]}:{item[2]}")
+        constraint_spec: ConstraintSpec = [
+            f"{item[0]}:{item[1]}:{item[2]}" for item in other
+        ]
         return constraint_spec
 
     @classmethod
     def to_client_model(cls, other: ConstraintSpec) -> ChronosConstraintSpec:
+        """
+        As constraints do chronos são representadas como lista de lista. Cada constraint é uma lista de 3 elementos [<label>, <operador>, <valor>]. Aqui dividimos a contraint do Asgard em três, já que ela é representada como uma string "<label>:<operador>:<valor>"
+        """
         constraint_spec: ChronosConstraintSpec = []
         for item in other:
             parts = item.split(":")

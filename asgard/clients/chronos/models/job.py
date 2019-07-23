@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class ChronosEnvSpec(BaseModel):
-    key: str
+    name: str
     value: str
 
 
@@ -20,7 +20,7 @@ class ChronosContainerParameterSpec(BaseModel):
 
 
 class ChronosContainerSpec(BaseModel):
-    type = "CHRONOS"
+    type = "DOCKER"
     image: str
     network: str
     parameters: Optional[List[ChronosContainerParameterSpec]]
