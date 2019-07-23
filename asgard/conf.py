@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     MESOS_API_URLS: List[str]
     DB_URL: str
     STATS_API_URL: str
+    SCHEDULED_JOBS_SERVICE_ADDRESS: str
 
     class Config:
         env_prefix = os.getenv("ENV", "ASGARD") + "_"

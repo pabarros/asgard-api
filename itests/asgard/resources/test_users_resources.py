@@ -58,7 +58,6 @@ class UsersMeResourcesTest(BaseTestCase):
                 {
                     "accounts": [
                         {
-                            "errors": {},
                             "id": ACCOUNT_INFRA_ID,
                             "name": ACCOUNT_INFRA_NAME,
                             "namespace": ACCOUNT_INFRA_NAMESPACE,
@@ -67,7 +66,6 @@ class UsersMeResourcesTest(BaseTestCase):
                         }
                     ],
                     "current_account": {
-                        "errors": {},
                         "id": ACCOUNT_DEV_ID,
                         "name": ACCOUNT_DEV_NAME,
                         "namespace": ACCOUNT_DEV_NAMESPACE,
@@ -76,7 +74,6 @@ class UsersMeResourcesTest(BaseTestCase):
                     },
                     "user": {
                         "email": USER_WITH_MULTIPLE_ACCOUNTS_EMAIL,
-                        "errors": {},
                         "id": USER_WITH_MULTIPLE_ACCOUNTS_ID,
                         "name": USER_WITH_MULTIPLE_ACCOUNTS_NAME,
                         "type": "ASGARD",
