@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class ChronosEnvSpec(BaseModel):
-    key: str
+    name: str
     value: str
 
 

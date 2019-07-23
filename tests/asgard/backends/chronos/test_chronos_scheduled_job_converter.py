@@ -1,4 +1,4 @@
-from asynctest import TestCase, skip
+from asynctest import TestCase
 
 from asgard.backends.chronos.models.converters import (
     ChronosScheduledJobConverter,
@@ -242,11 +242,11 @@ class ChronosScheduledJobConverterTest(TestCase):
         self.assertEqual(
             [
                 {
-                    "key": "SERVICE_A_ADDRESS",
+                    "name": "SERVICE_A_ADDRESS",
                     "value": "https://a.service.local",
                 },
                 {
-                    "key": "SERVICE_B_ADDRESS",
+                    "name": "SERVICE_B_ADDRESS",
                     "value": "https://b.service.local",
                 },
             ],
