@@ -1,7 +1,7 @@
 from typing import Optional
 
 from asgard.backends.chronos.models.converters import (
-    ChronosScheduledJobConverter
+    ChronosScheduledJobConverter,
 )
 from asgard.backends.jobs import ScheduledJobsBackend
 from asgard.clients.chronos import ChronosClient
