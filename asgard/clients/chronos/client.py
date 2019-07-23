@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from asgard.exceptions import HTTP404Exception
 from asgard.clients.chronos.models.job import ChronosJob
+from asgard.exceptions import HTTP404Exception
 from asgard.http.client import http_client
 
 
