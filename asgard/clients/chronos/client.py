@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
 from asgard.clients.chronos.models.job import ChronosJob
-from asgard.exceptions import HTTP404Exception
 from asgard.http.client import http_client
+from asgard.http.exceptions import HTTPNotFound
 
 
 class ChronosClient:
@@ -16,6 +16,6 @@ class ChronosClient:
                 # `/job/{name}` retorna 400 se o job não existe.
                 # Isso acontece por causa dessa linha:
                 # https://github.com/mesosphere/chronos/blob/7eff5e0e2d666a94bf240608a05afcbad5f2235f/src/main/scala/org/apache/mesos/chronos/scheduler/api/JobManagementResource.scala#L51
-                raise HTTP404Exception()
+                raise HTTPNotFound()
             data = await resp.json()
             return ChronosJob(**data)
